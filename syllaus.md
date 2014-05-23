@@ -1,14 +1,79 @@
 STA 633 Statistical Computing and Computation
 ========================================
 
+Pre-requisites (with testing)
+----------------------------------------
+
+* Working knowledge of linear algebra
+* Working knowledge of multivariable calculus
+* Able to use a Unix shell
+* Able to code in a high level language such as R or Matlab
+* Able to write a simple C/C++ program and build it using a Makefile
+* Basic understanding of version control and use of Git
+
+Learning objectives
+----------------------------------------
+
+The course will focus on the development of various algorithms for *optimization* and *simulation*, the workhorses of much of computational statistics. A variety of algorithms and data sets of gradually increasing complexity (1 dimension $\rightarrow$ many dimensions, fixed $\rightarrow$ adaptive, serial $\rightarrow$ parallel $\rightarrow$ massively parallel, small data $\rightarrow$ big data) will allow students to develop and practise the following skills:
+
+* Practices for reproducible analysis
+* Fundamentals of data management and munging
+* Use Python as a language for statistical computing
+* Use mathematical and statistical libraries effectively
+* Profile and optimize serial code
+* Effective use of different parallel programming paradigms
+
+In particular, the following algorithms will be covered:
+
+* Optimization
+    * Newton-Raphson (functional programming and vectorization)
+    * Quadrature (adaptive methods)
+    * Gradient descent (multivariable)
+    * Solving GLMs (multivariable  + interface to C/C++)
+    * Expectation-maximization (multivariable + finite mixture models )
+* Simulation
+    * Bootstrap (basics of parallel programming)
+    * Bag of little bootstraps (map-reduce)
+	* Monte Carlo simulations (more parallel programming)
+    * MCMC (Gibbs sampler - GPU programming)
+
+Course outline
+----------------------------------------
+
+1. Overview and setting up of local and cloud compute environment
+2. Introduction to Python, the IPython notebook and PyCharm
+3. Functional and recursive programs in Python
+4. Numerical computing in Python (numpy, blaze)
+5. Statistical computing in Python (Rmagic, pandas, statsmodels)
+6. Bayesian statistics in Python (pymc, emcee, multinest, pystan )
+7. Graphics in Python (matplotlib, bokeh, seashore)
+8. Testing, debugging and optimization
+9. The Newton-Raphson method
+10. Divide and conquer - adaptive quadrature
+11. Numerical optimization in $k$-dimensions - gradient descent algorithm
+12. Solving generalized linear models with IRLS
+13. Expectation-maximization for finite mixture models
+14. Overview of parallel and high performance computing
+15. Embarrassingly parallel problems with multiprocessing and IPython.Parallel
+16. Parallel tasks with MPI
+17. Map-reduce for data transforms and summaries
+18. Map-reduce and the bag of little bootstraps
+19. Introduction to massively parallel programming
+20. MCMC on GPUs
+
+
+
+
+
+
 Environment
 ----------------------------------------
 
+* Unix shell
 * Anaconda Python distribution with the Accelerate package
 * PyCharm IDE
 * C/C++ compiler
 * R/RStudio
-* Matlab (optional)
 
 Examples of statistical applications
 ----------------------------------------
