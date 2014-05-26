@@ -21,3 +21,7 @@ Computing Requirements for STA 633
 
 ### Possible offsets
 * Education grant from AWS of $100 credit per student
+
+### Alternative options for GPU resources
+
+* Use BDGrid - this requires partnership with Tom Milledge to work out kinks in BDGrid setup.
