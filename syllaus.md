@@ -41,25 +41,25 @@ Course outline
 ----------------------------------------
 
 1. Overview and setting up of local and cloud compute environment
-2. Introduction to Python, the IPython notebook and PyCharm
+2. Introduction to Python, the IPython notebook and PyCharm $\checkmark$
 3. Functional and recursive programs in Python
 4. Numerical computing in Python (numpy, blaze)
 5. Statistical computing in Python (Rmagic, pandas, statsmodels)
-6. Bayesian statistics in Python (pymc, emcee, multinest, pystan )
+6. Bayesian statistics in Python (pymc, emcee, multinest, pystan ) $\checkmark$
 7. Graphics in Python (matplotlib, bokeh, seashore)
-8. Testing, debugging and optimization
-9. The Newton-Raphson method
+8. Testing, debugging and optimization 
+9. The Newton-Raphson method $\checkmark$
 10. Divide and conquer - adaptive quadrature
-11. Numerical optimization in $k$-dimensions - gradient descent algorithm
+11. Numerical optimization in $k$-dimensions - gradient descent algorithm $\checkmark$
 12. Solving generalized linear models with IRLS
 13. Expectation-maximization for finite mixture models
 14. Overview of parallel and high performance computing
 15. Embarrassingly parallel problems with multiprocessing and IPython.Parallel
-16. Parallel tasks with MPI
+16. Parallel tasks with MPI $\checkmark$
 17. Map-reduce for data transforms and summaries
 18. Map-reduce and the bag of little bootstraps
 19. Introduction to massively parallel programming
-20. MCMC on GPUs
+20. MCMC on GPUs $\checkmark$
 
 
 
