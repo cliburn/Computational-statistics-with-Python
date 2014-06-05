@@ -47,7 +47,7 @@ Course outline
 5. Statistical computing (Rmagic, pandas, statsmodels) $\checkmark$
 6. Bayesian models (pymc, emcee, multinest, pystan ) <font color=red>$\checkmark$</font>
 7. Graphics (matplotlib, bokeh, seashore) <font color=red>$\checkmark$</font>
-8. Testing, debugging and optimization
+8. Profiling and optimization
 9. The Newton-Raphson method $\checkmark$
 12. Numerical optimization in $k$-dimensions - gradient descent algorithm $\checkmark$
 11. Solving generalized linear models with IRLS
@@ -60,7 +60,7 @@ Course outline
 18. Map-reduce and the bag of little bootstraps
 19. Introduction to massively parallel programming
 20. MCMC on GPUs $\checkmark$
-
+21. [Optional] Working with data
 
 
 

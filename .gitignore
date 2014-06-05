@@ -1,2 +1,5 @@
 *.ipynb_checkpoints
 *.pyc
+*foo*
+*~
+*.h5
