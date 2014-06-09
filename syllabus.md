@@ -48,6 +48,7 @@ Course outline
 6. Bayesian models (pymc, emcee, multinest, pystan ) <font color=red>$\checkmark$</font>
 7. Graphics (matplotlib, bokeh, seashore) <font color=red>$\checkmark$</font>
 8. Profiling and optimization
+9. Interfacing with compiled languages <font color=red>$\checkmark$</font>
 9. The Newton-Raphson method $\checkmark$
 12. Numerical optimization in $k$-dimensions - gradient descent algorithm $\checkmark$
 11. Solving generalized linear models with IRLS
