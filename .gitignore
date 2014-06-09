@@ -4,3 +4,11 @@
 *~
 *.h5
 *Scratch*
+.sconsign.dblite
+SConstruct
+*.o
+*.so
+*.so.*
+*.os
+*.dylib
+*.out
