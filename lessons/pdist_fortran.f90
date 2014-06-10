@@ -1,11 +1,10 @@
-
 subroutine pdist_fortran (n, p, A, D)
 
     integer, intent(in) :: n
     integer, intent(in) :: p
     real(8), intent(in), dimension(n,p) :: A
     real(8), intent(inout), dimension(n,n) :: D
-            
+
     integer :: i, j, k
     real(8) :: s, tmp
     do j = 1, n
