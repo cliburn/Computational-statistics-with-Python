@@ -12,3 +12,4 @@ SConstruct
 *.os
 *.dylib
 *.out
+docs/*.pdf
