@@ -160,6 +160,7 @@ Course outline
     * Graphics with Matplotlib
     * Graphics with Pandas
     * Graphics with Seaborn
+    * Graphics with ggplot
     * Interactive plots with mpld3
     * Volume rendering with yt
     * [Interactive web plotting](http://nbviewer.ipython.org/github/damianavila/bokeh_overview/blob/master/Bokeh%20Overview.ipynb?create=1) with `Bokeh`
