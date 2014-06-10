@@ -47,7 +47,7 @@ Course outline
 5. Statistical computing (Rmagic, pandas, statsmodels) $\checkmark$
 6. Bayesian models (pymc, emcee, multinest, pystan ) <font color=red>$\checkmark$</font>
 7. Graphics (matplotlib, bokeh, seashore) <font color=red>$\checkmark$</font>
-8. Profiling and optimization
+8. Profiling and optimization <font color=red>$\checkmark$</font>
 9. Interfacing with compiled languages <font color=red>$\checkmark$</font>
 9. The Newton-Raphson method $\checkmark$
 12. Numerical optimization in $k$-dimensions - gradient descent algorithm $\checkmark$
@@ -64,6 +64,159 @@ Course outline
 21. [Optional] Working with data
 
 
+Course details
+----------------------------------------
+
+Course outline
+----------------------------------------
+
+* Overview and setting up of local and cloud compute environment
+    * Local environment
+        * Anaconda distribution
+        * Extra python packages
+        * Extra IPython extensions
+        * Compiler support (C/C++, Fortran)
+        * R
+    * Cloud compute
+        * Logging in to EC2 instance
+        * Using ssh
+        * Using tmux
+        * AWS console
+        * Shutting down virtual machine
+* Introduction to Python, the IPython notebook and PyCharm
+* Functional programming
+    * Motivation
+    * Iterators
+    * List comprehensions and Generator expressions
+    * Generators
+    * The `functools` package
+        * map
+        * reduce
+        * partial
+    * The `operator` package
+    * The `itertools` package
+    * The `functional` package
+		* compose
+    * Decorators
+	* Recursion
+    * **Example**: counting words in books with map and reduce
+    * **Example**: a generic bootstrap function
+    * **Example**: recursion on trees
+* Numerical computing
+    * Introduction to numpy arrays
+        * Dimension and axis
+	    * Indexing and slicing
+        * Broadcasting
+    * Random number generators
+    * Linear algebra
+        * [Vector and matrix operations](http://cs.bc.edu/~alvarez/Randomness/Notes/matrixOperations)
+            * Matrix multiplication as weighed combinations
+            * Inner product
+            * Outer product
+            * Einstein summation convention
+        * Matrix decomposition
+            * Eigensystem
+            * LU
+            * QR
+            * SVD
+            * Cholesky
+        * Low level functions
+            * BLAS
+            * Lapack
+    * **Example**: Calculating the covariance matrix with matrix operations
+    * **Example**: Solving least squares problems
+* Statistical computing (Rmagic, pandas, statsmodels)
+    * Managing data with Pandas
+        * Series
+        * DataFrame
+        * Panels
+        * I/O
+        * Split-apply-combine
+    * Statistical models
+        * Getting data sets
+        * Basic statistics
+        * Linear Regression
+        * Generalized linear models
+    * Using R from Python
+* Bayesian models (pymc, emcee, multinest, pystan )
+    * MCMC
+        * Samplers with animation
+            * Metropolis sampler
+            * Gibbs sampler
+            * Hamiltonian sampler
+        * Convergence diagnostics
+        * Posterior predictions
+        * Estimating parameters of simple models
+        * Hierarchical models
+    * Implementation
+        * Python
+        * PyMC
+        * PyStan
+        * Emcee
+	* **Example**: [Gibbs sampler shootout](http://nbviewer.ipython.org/gist/fonnesbeck/4166681)
+    * **Example**: Logistic regression for classification
+    * **Example**: [Gaussian mixture models for density estimation](http://www.nehalemlabs.net/prototype/blog/2014/04/03/quick-introduction-to-gaussian-mixture-models-with-python/)
+* [Graphics](http://2014.pycon.se/assets/slides/Plotly-Pycon-Sweden.pdf) (matplotlib, bokeh, seashore)
+    * Graphics with Matplotlib
+    * Graphics with Pandas
+    * Graphics with Seaborn
+    * Interactive plots with mpld3
+    * Volume rendering with yt
+    * [Interactive web plotting](http://nbviewer.ipython.org/github/damianavila/bokeh_overview/blob/master/Bokeh%20Overview.ipynb?create=1) with `Bokeh`
+* Profiling and optimization
+    * [Profiling](https://docs.python.org/2/library/debug.html)
+        * Manual timing with the `timeit` package
+        * `%time` and `%timeit` functions
+        * Using the `hotshot` profiler
+        * Line profilers
+        * Memory profilers
+    * Optimization
+        * Premature optimization
+        * Measuring complexity
+            * Big O notation
+            * Time and space trade-offs
+    * Understanding performance
+           * Fundamental data structures
+           * Fundamental algorithms
+    * Python performance idioms
+    * Vectorization
+* Interfacing with compiled languages
+    * Pure python
+    * Numpy
+    * JIT compilation
+    * Cython
+    * C/C++
+    * Fortran
+    * Julia
+    * **Example**: Using C libraries (R standalone)
+    * **Example**: Using C++ libraries (Eigen)
+* The Newton-Raphson method
+* Numerical optimization in $k$-dimensions - gradient descent algorithm
+* Solving generalized linear models with IRLS
+    * <http://scipystats.blogspot.com/2009/07/iterated-reweighted-least-squares.html>
+    * <http://puzlet.com/m/b007h>
+* Divide and conquer - adaptive quadrature
+    * <http://en.wikipedia.org/wiki/Adaptive_quadrature>
+    * <http://en.wikipedia.org/wiki/Adaptive_Simpson%27s_method>
+* Expectation-maximization for finite mixture models
+    * <http://nbviewer.ipython.org/github/tritemio/notebooks/blob/master/Mixture_Model_Fitting.ipynb>
+    * <http://ai.stanford.edu/~chuongdo/papers/em_tutorial.pdf>
+* Overview of parallel and high performance computing
+    * [Starving CPUs](http://www.blosc.org/docs/StarvingCPUs-CISE-2010.pdf)
+    * What is theoretically possible?
+    * Parallel programming patterns
+    * Parallel programming with IPython.Parallel
+    * Using multiprocessing
+    * **Example**: Independent data sets
+    * **Example**: Monte Carlo simulations
+* Parallel tasks with MPI
+    * [A Python Introduction to Parallel Programming with MPI](http://jeremybejarano.zzl.org/MPIwithPython/)
+* Parallel Cython with OpenMP
+* Map-reduce for data transforms and summaries
+* Map-reduce and the bag of little bootstraps
+* Introduction to massively parallel programming
+* MCMC on GPUs
+* [Optional] Working with data
 
 
 
