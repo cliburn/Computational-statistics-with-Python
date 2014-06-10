@@ -43,9 +43,8 @@ Course outline
 1. Overview and setting up of local and cloud compute environment
 2. Introduction to Python, the IPython notebook and PyCharm $\checkmark$
 3. Functional programming <font color=red>$\checkmark$</font>
-4. Numerical computing <font color=red>$\checkmark$</font>
-5. Statistical computing (Rmagic, pandas, statsmodels) $\checkmark$
-6. Bayesian models (pymc, emcee, multinest, pystan ) <font color=red>$\checkmark$</font>
+4. Numerical building blocks <font color=red>$\checkmark$</font>
+5. Statistical building blocks (Rmagic, pandas, statsmodels) $\checkmark$
 7. Graphics (matplotlib, bokeh, seashore) <font color=red>$\checkmark$</font>
 8. Profiling and optimization <font color=red>$\checkmark$</font>
 9. Interfacing with compiled languages <font color=red>$\checkmark$</font>
@@ -54,6 +53,8 @@ Course outline
 11. Solving generalized linear models with IRLS
 12. Divide and conquer - adaptive quadrature
 13. Expectation-maximization for finite mixture models
+6. Bayesian models (I)
+7. Bayesian models (II) <font color=red>$\checkmark$</font>
 14. Overview of parallel and high performance computing
 15. Beginning parallel programming with multiprocessing and IPython.Parallel
 16. Parallel tasks with MPI $\checkmark$
@@ -61,7 +62,7 @@ Course outline
 18. Map-reduce and the bag of little bootstraps
 19. Introduction to massively parallel programming
 20. MCMC on GPUs $\checkmark$
-21. [Optional] Working with data
+21. [Maybe] Working with binary, bad, big, missing data
 
 
 Course details
@@ -123,6 +124,11 @@ Course outline
         * Low level functions
             * BLAS
             * Lapack
+    * **Example**: Pitfalls: How computers handle numbers
+        * Integer and floating point division in Python
+        * Calculating the pseduo-inverse and division by almost zero
+        * Not working in log space for probabilities
+        * Calculating a negative variance using the textbook definition
     * **Example**: Calculating the covariance matrix with matrix operations
     * **Example**: Solving least squares problems
 * Statistical computing (Rmagic, pandas, statsmodels)
@@ -139,7 +145,20 @@ Course outline
         * Generalized linear models
     * Using R from Python
 * Bayesian models (pymc, emcee, multinest, pystan )
-    * MCMC
+	* Ideas
+	    * Estimating integrals
+		   * Quadrature
+		   * Rejection sampling
+		   * Importance sampling
+		   * Grid-based sampling
+		   * Monte Carlo integration and the Strong Law of Large Numbers
+		   * Markov chains, MCMC and the ergodic theorem
+           * Primer on probabilistic graphical models
+		   * Metropolis-Hastings - random walk and independent
+		   * Gibbs sampling, full conditionals and conjugate priors
+		   * Hamiltonian sampling
+		   * Multiple walkers
+    * Computation
         * Samplers with animation
             * Metropolis sampler
             * Gibbs sampler
@@ -149,7 +168,7 @@ Course outline
         * Estimating parameters of simple models
         * Hierarchical models
     * Implementation
-        * Python
+        * Python and Cython
         * PyMC
         * PyStan
         * Emcee
@@ -161,8 +180,8 @@ Course outline
     * Graphics with Pandas
     * Graphics with Seaborn
     * Graphics with ggplot
-    * Interactive plots with mpld3
-    * Volume rendering with yt
+    * Interactive plots with mpld3 and plotly
+    * Volume rendering with yt (?)
     * [Interactive web plotting](http://nbviewer.ipython.org/github/damianavila/bokeh_overview/blob/master/Bokeh%20Overview.ipynb?create=1) with `Bokeh`
 * Profiling and optimization
     * [Profiling](https://docs.python.org/2/library/debug.html)
@@ -185,7 +204,7 @@ Course outline
     * Pure python
     * Numpy
     * JIT compilation
-    * Cython
+    * Cython (incremental optimization)
     * C/C++
     * Fortran
     * Julia
@@ -217,7 +236,7 @@ Course outline
 * Map-reduce and the bag of little bootstraps
 * Introduction to massively parallel programming
 * MCMC on GPUs
-* [Optional] Working with data
+* [Maybe] Working with bad data - getting data from various sources (Excel, JSON, XML, RDBMS, NoSQL), data munging, data validation and imputation.
 
 
 
