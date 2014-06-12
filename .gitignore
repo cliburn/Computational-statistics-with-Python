@@ -13,3 +13,4 @@ SConstruct
 *.dylib
 *.out
 docs/*.pdf
+build/*
