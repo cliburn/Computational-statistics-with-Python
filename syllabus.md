@@ -144,9 +144,12 @@ Course outline
         * Linear Regression
         * Generalized linear models
     * Using R from Python
+    * [Machine learning](http://www.cbinsights.com/blog/python-tools-machine-learning)
+        * Scikits-learn
 * Bayesian models (pymc, emcee, multinest, pystan )
 	* Ideas
 	    * Estimating integrals
+			* Generating univariate and multivariate random deviates
 		   * Quadrature
 		   * Rejection sampling
 		   * Importance sampling
