@@ -14,7 +14,7 @@ Pre-requisites (with testing)
 Learning objectives
 ----------------------------------------
 
-The course will focus on the development of various algorithms for *optimization* and *simulation*, the workhorses of much of computational statistics. A variety of algorithms and data sets of gradually increasing complexity (1 dimension $\rightarrow$ many dimensions, fixed $\rightarrow$ adaptive, serial $\rightarrow$ parallel $\rightarrow$ massively parallel, small data $\rightarrow$ big data) will allow students to develop and practise the following skills:
+The course will focus on the development of various algorithms for *optimization* and *simulation*, the workhorses of much of computational statistics. The emphasis is on *comptutation* for statistics  - how to prototype, optimize and develop high performance computing (HPC) algorithms in Python and C/C++. A variety of algorithms and data sets of gradually increasing complexity (1 dimension $\rightarrow$ many dimensions, fixed $\rightarrow$ adaptive, serial $\rightarrow$ parallel $\rightarrow$ massively parallel, small data $\rightarrow$ big data) will allow students to develop and practise the following skills:
 
 * Practices for reproducible analysis
 * Fundamentals of data management and munging
@@ -45,7 +45,7 @@ Course outline
 3. Functional programming <font color=red>$\checkmark$</font>
 4. Numerical building blocks <font color=red>$\checkmark$</font>
 5. Statistical building blocks (Rmagic, pandas, statsmodels) $\checkmark$
-7. Graphics (matplotlib, bokeh, seashore) <font color=red>$\checkmark$</font>
+7. Graphics (matplotlib, bokeh, seashore, bokeh) <font color=red>$\checkmark$</font>
 8. Profiling and optimization <font color=red>$\checkmark$</font>
 9. Interfacing with compiled languages <font color=red>$\checkmark$</font>
 9. The Newton-Raphson method $\checkmark$
