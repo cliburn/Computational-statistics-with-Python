@@ -41,27 +41,27 @@ Course outline
 ----------------------------------------
 
 1. Overview and setting up of local and cloud compute environment
-2. Introduction to Python, the IPython notebook and PyCharm $\checkmark$
-3. Functional programming <font color=red>$\checkmark$</font>
-4. Numerical building blocks <font color=red>$\checkmark$</font>
-5. Statistical building blocks (Rmagic, pandas, statsmodels) $\checkmark$
-7. Graphics (matplotlib, bokeh, seashore, bokeh) <font color=red>$\checkmark$</font>
-8. Profiling and optimization <font color=red>$\checkmark$</font>
-9. Interfacing with compiled languages <font color=red>$\checkmark$</font>
-9. The Newton-Raphson method $\checkmark$
-12. Numerical optimization in $k$-dimensions - gradient descent algorithm $\checkmark$
+2. Introduction to Python, the IPython notebook and PyCharm [jm]
+3. Functional programming [cc]
+4. Numerical building blocks [cc]
+5. Statistical building blocks (Rmagic, pandas, statsmodels) [jm]
+7. Graphics (matplotlib, bokeh, seashore, bokeh) [cc]
+8. Profiling and optimization [cc]
+9. Interfacing with compiled languages [cc]
+9. The Newton-Raphson method [jm]
+12. Numerical optimization in $k$-dimensions - gradient descent algorithm [jm]
 11. Solving generalized linear models with IRLS
 12. Divide and conquer - adaptive quadrature
 13. Expectation-maximization for finite mixture models
-6. Bayesian models (I)
-7. Bayesian models (II) <font color=red>$\checkmark$</font>
+6. Bayesian models (I) [cc]
+7. Bayesian models (II) [cc]
 14. Overview of parallel and high performance computing
 15. Beginning parallel programming with multiprocessing and IPython.Parallel
-16. Parallel tasks with MPI $\checkmark$
+16. Parallel tasks with MPI [jm]
 17. Map-reduce for data transforms and summaries
 18. Map-reduce and the bag of little bootstraps
 19. Introduction to massively parallel programming
-20. MCMC on GPUs $\checkmark$
+20. MCMC on GPUs [jm]
 21. [Maybe] Working with binary, bad, big, missing data
 
 
