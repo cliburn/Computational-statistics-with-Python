@@ -23,8 +23,9 @@ double cube(double x)
 int main()
 {
     double a = 3;
-    func fs[] = {square, cube};
-    for (int i=0; i<2; i++) {
-        printf("%.1f\n", apply(fs[i], a));
-    }
+    func fs[] = {square, cube, NULL};
+
+    for (func *f=fs; *f; f++) {
+        printf("%.1f\n", apply(*f, a));
+    }   
 }
