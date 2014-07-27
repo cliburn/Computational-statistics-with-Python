@@ -56,7 +56,7 @@ Course outline
 6. Bayesian models (I)
 7. Bayesian models (II) <font color=red>$\checkmark$</font>
 14. Overview of parallel and high performance computing
-15. Beginning parallel programming with multiprocessing and IPython.Parallel
+15. Beginning parallel programming with multiprocessing and IPython.Parallel <font color=red>$\checkmark$</font>
 16. Parallel tasks with MPI $\checkmark$
 17. Map-reduce for data transforms and summaries
 18. Map-reduce and the bag of little bootstraps
