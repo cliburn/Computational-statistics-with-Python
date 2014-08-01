@@ -16,3 +16,4 @@ docs/*.pdf
 */build/*
 *.html
 */bin/*
+*.db*
