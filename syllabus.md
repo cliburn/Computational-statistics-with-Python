@@ -50,22 +50,19 @@ Course outline
 9. Interfacing with compiled languages [cc]
 9. The Newton-Raphson method [jm]
 12. Numerical optimization in $k$-dimensions - gradient descent algorithm [jm]
-11. Solving generalized linear models with IRLS
-12. Divide and conquer - adaptive quadrature
-13. Expectation-maximization for finite mixture models
+11. Solving generalized linear models with IRLS [cc]
+12. Divide and conquer - adaptive quadrature [cc]
+13. Expectation-maximization for finite mixture models [cc/jm]
 6. Bayesian models (I) [cc]
 7. Bayesian models (II) [cc]
-14. Overview of parallel and high performance computing
-15. Beginning parallel programming with multiprocessing and IPython.Parallel <font color=red>$\checkmark$</font>
-16. Parallel tasks with MPI $\checkmark$
-=======
-15. Beginning parallel programming with multiprocessing and IPython.Parallel
+14. Overview of parallel and high performance computing [cc/jm]
+15. Beginning parallel programming with multiprocessing and IPython.Parallel [cc]
 16. Parallel tasks with MPI [jm]
-17. Map-reduce for data transforms and summaries
-18. Map-reduce and the bag of little bootstraps
-19. Introduction to massively parallel programming
+17. Map-reduce for data transforms and summaries [cc]
+18. Map-reduce and the bag of little bootstraps [cc]
+19. Introduction to massively parallel programming [jm]
 20. MCMC on GPUs [jm]
-21. [Maybe] Working with binary, bad, big, missing data
+21. Data management [cc]
 
 
 Course details
