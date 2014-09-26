@@ -14,6 +14,6 @@ SConstruct
 *.out
 docs/*.pdf
 */build/*
-*.html
+# *.html
 */bin/*
 *.db*
