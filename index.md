@@ -28,7 +28,9 @@ At the end of the course, these are the practical skills every student should le
 
 In particular, students should be able to write readable, well-documented, efficient (and if necessary parallel) code to implement a statistical method described in a textbook or paper, and apply it to real-world, possibly messy, data sets.
 
-### Unit 1: Setting up a reproducible analysis pipeline (5 hours)
+Unit 1: Setting up a reproducible analysis pipeline (5 hours)
+----------------------------------------
+
 * Setting up workspace and introduction to bash
 * Version control with git
 * Document generation with LaTeX
@@ -42,7 +44,9 @@ In particular, students should be able to write readable, well-documented, effic
 
 **Exercise**: Write functions to calculate the mean, median and variance of a set of numbers using test-driven development.
 
-### Unit 2: Data manipulation and munging (5 hours)
+Unit 2: Data manipulation and munging (5 hours)
+----------------------------------------
+
 * Reading and writing data
 * Text processing and regular expressions
 * Querying a relational database with SQL
@@ -54,7 +58,9 @@ In particular, students should be able to write readable, well-documented, effic
 
 **Exercise**: Given a spreadsheet, design a normalized database to manage the data. Transfer the data from the spreadsheet into the database.
 
-### Unit 3: Exploratory data analysis and visualization (5 hours)
+Unit 3: Exploratory data analysis and visualization (5 hours)
+----------------------------------------
+
 * Manipulating data in a DataFrame
 * Visualizing data with matplotlib
 * Grammar of graphics with ggplot and bokeh
@@ -64,7 +70,9 @@ In particular, students should be able to write readable, well-documented, effic
 
 **Exercise**: Plot and annotate the given dataset to illustrate its key features.
 
-### Unit 4: Efficient statistical routines (15 hours)
+Unit 4: Efficient statistical routines (15 hours)
+----------------------------------------
+
 * Broadcasting and vectorization in numpy and pandas
 * Functional programming
 * Representation of numbers and linear algebra
@@ -89,7 +97,9 @@ In particular, students should be able to write readable, well-documented, effic
 
 **Exercise**: Use regular Python, PyMC3 and PyStan to find the posterior distribution for a two-level model.
 
-### Unit 5: Code optimization and native code (5 hours)
+Unit 5: Code optimization and native code (5 hours)
+----------------------------------------
+
 * Complexity and performance of algorithms and data structures
 * C crash course for statisticians
 * Using numexpr, numba and cython
@@ -102,7 +112,9 @@ In particular, students should be able to write readable, well-documented, effic
 
 **Exercise**: You are given some slow code in Python. Speed it up using Cython.
 
-### Unit 6: High-performance computing (10 hours)
+Unit 6: High-performance computing (10 hours)
+----------------------------------------
+
 * Parallel progrmming patterns
 * Multiprocessing and IPython.Parallel
 * Processing big data with MapReduce
