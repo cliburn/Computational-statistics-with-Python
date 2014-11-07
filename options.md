@@ -21,3 +21,4 @@ Singular value decomposition (SVD)
 Solving a system of linear equations
 Strukturtensor
 Viterbi algorithm
+Union-find
