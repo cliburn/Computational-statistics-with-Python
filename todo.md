@@ -13,6 +13,7 @@ To do list
 	- [ ] Stochastic gradietn descent
 	- [ ] Conjugate gradient
 	- [ ] EM algorithm
+	- [ ] Dynamic programming and Viterbi algorithm
 - [ ] Simulation
 	- [ ] Simple MCMC
 	- [ ] Particle filter
