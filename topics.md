@@ -187,6 +187,10 @@ Using Python
 	- Virtualenv
 - Python for statistics
     - Numpy
+        - Ufuncs
+        - vectorization (EM example)
+        - tensordot
+        - einsum
     - Scipy
     - Scikits-learn, Scikits-monaco, Scikits-bootstrap, Scikits-image
     - Pandas
