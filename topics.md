@@ -60,7 +60,77 @@ Data structures and algorithms
     - Combinatorial algorithms
     - Graphs and networks
 
-Python for statistics
+Using Git in development workflow
+----------------------------------------
+
+- 5 minute tutorial
+    - Create an empty githbu repository
+    - Clone Github repository to local drive
+    - `git config --global user.name "My name"`
+    - `git config --global user.email "My email"`
+    - Create two files
+    - `git add`
+    - `git commit`
+    - `git push`
+    - Check on Github
+    - Create a branch
+    - `git checkout foo`
+    - Make soem changess in branch
+    - Delete branch
+    - `git branch -d foo`
+    - Create a branch
+    - `git checkout bar`
+    - Make some changes in branch
+    - `git add`
+    - `git commit`
+    - Merge branch to master
+    - `git checkout master`
+    - `git merge master`
+    - create a branch
+    - `git checkout baz`
+    - Make some changes in branch
+    - Temporarily save changes
+    - `git stash`
+    - Switch to main branch
+    - `git checkout master`
+    - Make some changes in master
+    - Resume work in baz
+    - `git checkout baz`
+    - `git stash pop`
+- Starting IPython notebook with --script argument for version control
+
+Testing
+----------------------------------------
+
+- Writing unit tests with pytest
+- Writing unit tests in IPython <https://github.com/zonca/pytest-ipynb>
+- Continuous integration with TravisCI
+
+Debugging
+----------------------------------------
+
+- Using pdb in IPython
+- Using a GUI (e.g. PyCharm)
+
+Using a vritual environment for reproducible analysis
+----------------------------------------
+
+See [tutorial](http://astropy.readthedocs.org/en/latest/development/workflow/virtual_pythons.html)
+
+Generating documentation
+----------------------------------------
+
+- Using IPython  with [Section numberiing](https://github.com/dpsanders/ipython_extensions/tree/master/section_numbering) and  [ipyBibtex](https://gist.github.com/z-m-k/6080008)
+- Using `nbconvert`
+- Using PythonTeX
+
+Packaging Python moduels for distribution
+----------------------------------------
+
+- Using binstar
+- Using PyPI
+
+Using Python
 ----------------------------------------
 
 - Fundamentals
@@ -95,10 +165,17 @@ Python for statistics
     - From single threaded to parallel and massively parallel
 - Python for data science
     - IPython
+	    - Using kernal and multiple clients
+        - [Jupyter](http://jupyter.org/)
+		- Using `%qtconsole`
+		- [Customizing IPython with JavaScript](https://github.com/ipython-contrib/IPython-notebook-extensions/wiki)
     - PythonTeX
     - Command line tools
     - Obtaining data
         - Working with relational databases
+            - SQLite
+            - [dataset](http://dataset.readthedocs.org/en/latest/)
+			- [PonyORM](http://ponyorm.com/)
         - Working with hierarchical databases (HDF5)
         - Working with Excel and CSV 
         - Working with JSON and XML
@@ -118,12 +195,23 @@ Python for statistics
     - SymPy
     - PyStan, PyMC, emcee
 - Python for visualization
-	- Matplotlib
+    - Matplotlib
+	- plt.rcdefaults() after e.g. xkcd()
+	- or use
+	```
+	with plt.xkcd():
+        fig1 = plt.figure()
+    ```
 	- Seaborn
+		- seaborn.reset_orig() to restore Matplotlib defaults
 	- Vispy
-	- pyggplot
+	- ggplot
 	- Bokeh
+	- Illustrating matrix multiplication with IPython blocks
+	- Illustration of IPython notebook widgets and interactive features
+	- Publication quality graphics with [Asymptote](https://github.com/jrjohansson/ipython-asymptote)
 - Python for HPC
+	- [Joblib for caching and embarrassingly parallel tasks](https://pythonhosted.org/joblib/)
     - Cython, bottleneck, CythonGSL
     - Multiprocessing 
     - NumExpr, Numba and NumbaPro
@@ -139,7 +227,7 @@ Optimization
     - Minimize residuals
     - Maximum likelihood
     - Method of moments
-    - Expectation-maximization (EM)
+    - [x] Expectation-maximization (EM)
 - Methods
     - Nelder-Mead
     - First-order methods
