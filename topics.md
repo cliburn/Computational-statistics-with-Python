@@ -235,7 +235,7 @@ Optimization
 - Methods
     - Nelder-Mead
     - First-order methods
-		- Gradient descent 
+		- [x]Gradient descent 
 		- Stochastic gradient descent
     - Second-order methods
         - Newton
