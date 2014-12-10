@@ -325,4 +325,20 @@ Visualization
     - Multi-dimensional scaling (MDS)
 - Projection pursuit 
 
+Key algorithms
+----------------------------------------
 
+- GD and SGD (1st order)
+- Newton type methods (2nd order)
+- EM
+- PCA, ICA, Factor anaalyis, LSI
+- Manifold learning - MDS
+- Monte Carlo methods - bootstrap, permutation resampling, cross-validation
+- MCMC
+- Particle filters
+- Smoothing concepts
+- Kernel density estimation
+- Viterbi algorihtm as example of dynamic progrramming
+- Time series - convolution, smoothing, FFT, wavelets
+- Matrix decomposition
+- Pairwise metrics - clustering
