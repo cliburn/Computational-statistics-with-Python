@@ -320,6 +320,12 @@ Lecture 16
 Computer lab 8
 ----------------------------------------
 
+- Exercise 1: Modify the EM algorithm for GMMs to find the MAP estimate of the posterior distribution
+- Exercise 2: Use k-fold cross-validation to evaluate which is the best model for a given data set
+- Exercise 3: Estimate the distribution of the slope in a linear regression model by bootstrapping on the residuals
+- Exercise 4: Find the type-1 error for $\alpha =0.05$ by using permutation resampling to correct for multiple testing
+
+
 Lecture 17
 ----------------------------------------
 
@@ -349,6 +355,12 @@ Lecture 18
 
 Computer lab 9
 ----------------------------------------
+
+- Exercise 1: Writing a Gibbs sampler for change point detection
+- Exercise 2: Using `pystan`
+- Exercise 3:Using `pymc2`
+- Exercise 4: Using `emcee`
+
 
 Lecture 19
 ----------------------------------------
@@ -382,6 +394,11 @@ Lecture 20
 Computer lab 10
 ----------------------------------------
 
+- Exercise 1 The label-switching problem
+- Exercise 2:Classifying points with the GMM:
+- Exercise 3: Profiling source code
+- Exercise 4 Optimizing source code
+
 Lecture 21
 ----------------------------------------
 
@@ -396,10 +413,11 @@ Lecture 22
 
 - [Why modern CPUs are starving and what can be done about it](http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf)
 - Parallel programming patterns
-- Amdahl's and Gustafson's laws
+- Amdahl's and GustClassifying points with the GMM:afson's laws
 - Parallel programming examples
-	- JIT compilation with `numba`
-	- Toy example - fractals in CUDA
+    - JIT compilation with `numba`
+	- Toy example - fractals 
+     - Using `joblib`
     - Using `multiprocessing`
     - Using `IPython.Parallel`
     - Using `MPI4py`
