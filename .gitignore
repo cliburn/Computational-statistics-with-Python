@@ -17,3 +17,4 @@ docs/*.pdf
 # *.html
 */bin/*
 *.db*
+*DS_Store
