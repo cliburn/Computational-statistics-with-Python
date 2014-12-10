@@ -1,3 +1,10 @@
+Arrays, lists, stacks
+Sets
+Trees
+Priority queues
+Graphs
+Disjoint sets -disjoint-set forest,  bitmap, Bloom filter
+State space search - e.g A* search
 Monte Carlo method
 Decompositional approach to matrix computations
 QR algorithm
