@@ -1,0 +1,20 @@
+(dp1
+S'runtime'
+p2
+(dp3
+S'traceback'
+p4
+S'Traceback (most recent call last):\n  File "/Users/cliburn/anaconda/lib/python2.7/site-packages/benchy/benchmark.py", line 84, in run_timeit\n    repeat=self.repeat, force_ms=True)\n  File "/Users/cliburn/anaconda/lib/python2.7/site-packages/benchy/utils.py", line 179, in magic_timeit\n    best = min(timer.repeat(repeat, number)) / number\n  File "/Users/cliburn/anaconda/lib/python2.7/timeit.py", line 223, in repeat\n    t = self.timeit(number)\n  File "/Users/cliburn/anaconda/lib/python2.7/timeit.py", line 189, in timeit\n    it = itertools.repeat(None, number)\nTypeError: an integer is required\n'
+p5
+sS'success'
+p6
+I00
+ssS'memory'
+p7
+(dp8
+g4
+S'Traceback (most recent call last):\n  File "/Users/cliburn/anaconda/lib/python2.7/site-packages/benchy/benchmark.py", line 101, in run_memit\n    repeat=self.repeat)\n  File "/Users/cliburn/anaconda/lib/python2.7/site-packages/benchy/utils.py", line 269, in magic_memit\n    _get_usage(q, stmt, ns=ns)\n  File "/Users/cliburn/anaconda/lib/python2.7/site-packages/benchy/utils.py", line 256, in _get_usage\n    from memory_profiler import memory_usage as _mu\nImportError: No module named memory_profiler\n'
+p9
+sg6
+I00
+ss.
