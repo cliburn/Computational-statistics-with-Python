@@ -131,7 +131,7 @@ Lecture 7
 ----------------------------------------
 
 - From math to computing
-    - Computer rerpresentation of numbers
+    - Computer representation of numbers
     - Overflow, underflow, catastrophic cancellation
     - Stability
     - Conditioning
@@ -413,7 +413,7 @@ Lecture 22
 
 - [Why modern CPUs are starving and what can be done about it](http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf)
 - Parallel programming patterns
-- Amdahl's and GustClassifying points with the GMM:afson's laws
+- Amdahl's and GustClassifying points with the Gustafson's laws
 - Parallel programming examples
     - JIT compilation with `numba`
 	- Toy example - fractals 
@@ -425,13 +425,19 @@ Lecture 22
 Computer lab 11
 ----------------------------------------
 
+Exercise 1: Optimizing EM code with numba
+Exercise 2: Optimizing EM code with Cython
+Exercise 3: Parallel processing of embarrassingly parallel code
+Exercise 4: Parallel processing of code requiring intr-process communication
+
 Lecture 23
 ----------------------------------------
 
 - GPU computing
+	- Introduction to CUDA
+	- Vanilla matrix multiplication
+	- Matrix multiplication with shared memory
 	- JIT compilation with `numba`
-	- Toy example - fractals in CUDA
-    - Matrix multiplication in CUDA
     - Matrix multiplication in OpneCL
 
 Lecture 24
@@ -443,10 +449,15 @@ Lecture 24
     - Using `hadoop` with `mrjob`
     - Using `spark` with `pyspark`
 	- Using `MLib` for large-scale machine learning
-	- Data sets
-        - [ecoli genome](http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz)
-		- [human genome](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/chromosomes/)
-
 
 Computer lab 12
 ----------------------------------------
+
+Exercise 1: Coding fractals in CUDA
+Exercise 2: Something more statistical in CUDA
+Exercise 3: Word count in map-reduce
+Exercise 4: K-mer count with map reduce with E Coli and human genome
+
+Data sets
+- [ecoli genome](http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz)
+-  [human genome](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/chromosomes/)
