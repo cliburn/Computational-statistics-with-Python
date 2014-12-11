@@ -1,0 +1,653 @@
+<!DOCTYPE html>  
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+body{-webkit-font-smoothing:antialiased;font-family:"Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;margin:30px 0 0;padding:0;background:#fff}#wrapper{padding:20px}li{font-size:110%}li li{font-size:100%}li p{font-size:100%;margin:.5em 0}h1{color:#000}h2{color:#111}h3{color:#111;margin:0}h4{color:#111}h5{color:#111}h6{font-size:1em;line-height:1.5em;margin:1.5em 0}body,p,td,div{color:#111;font-family:"Helvetica Neue",Helvetica,Arial,Verdana,sans-serif;word-wrap:break-word}a{color:#0d6ea1;text-decoration:none;-webkit-transition:color 0.2s ease-in-out;-moz-transition:color 0.2s ease-in-out;-o-transition:color 0.2s ease-in-out;-ms-transition:color 0.2s ease-in-out;transition:color 0.2s ease-in-out}a:hover{color:#3593d9}body{font-size:15px;line-height:21px;margin:0 auto}h1{font-size:37px;line-height:42px;margin-top:42px;margin-bottom:21px}h2{font-size:27px;line-height:42px;margin-top:42px;margin-bottom:21px}h3{font-size:20px;line-height:21px;margin-top:21px;margin-bottom:21px}h4{font-size:20px;line-height:21px;margin-top:21px;margin-bottom:21px}p,ul,ol,pre,table,blockquote{margin-top:21px;margin-bottom:21px}hr{border:1px solid;margin:-1px 0}ul ul,ol ol,ul ol,ol ul{margin-top:0;margin-bottom:0}b,strong,em,small,code{line-height:1}.footnote{color:#0d6ea1;font-size:.8em;vertical-align:super}#wrapper img{max-width:100%;height:auto}dd{font-size:1em;margin-bottom:1em}li>p:first-child{margin:0}ul ul,ul ol{margin-bottom:.4em}caption,col,colgroup,table,tbody,td,tfoot,th,thead,tr{border-spacing:0}table{border:1px solid rgba(0,0,0,0.25);border-collapse:collapse;display:table;empty-cells:hide;margin:-1px 0 1.3125em;padding:0;table-layout:fixed}caption{display:table-caption;font-weight:700}col{display:table-column}colgroup{display:table-column-group}tbody{display:table-row-group}tfoot{display:table-footer-group}thead{display:table-header-group}td,th{display:table-cell}tr{display:table-row}table th,table td{font-size:1.1em;line-height:1.3;padding:.5em 1em 0}table thead{background:rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.15);border-bottom:1px solid rgba(0,0,0,0.2)}table tbody{background:rgba(0,0,0,0.05)}table tfoot{background:rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.15);border-top:1px solid rgba(0,0,0,0.2)}figure{display:inline-block;overflow:hidden;position:relative;margin:1em 0 2em}figcaption{font-style:italic;text-align:center;background:white;color:#666}.poetry pre{display:block;font-family:Georgia,Garamond,serif !important;font-size:110% !important;font-style:italic;line-height:1.6em;margin-left:1em}.poetry pre code{font-family:Georgia,Garamond,serif !important;word-break:break-all;word-break:break-word;-webkit-hyphens:auto;-moz-hyphens:auto;hyphens:auto;white-space:pre-wrap}blockquote p{font-size:110%;font-style:italic;line-height:1.6em}sup,sub,a.footnote{font-size:1.4ex;height:0;line-height:1;position:relative;vertical-align:super}sub{vertical-align:sub;top:-1px}p,h5{font-size:1.1429em;line-height:1.3125em;margin:1.3125em 0}dt,th{font-weight:700}table tr:nth-child(odd),table th:nth-child(odd),table td:nth-child(odd){background:rgba(255,255,255,0.06)}table tr:nth-child(even),table td:nth-child(even){background:rgba(200,200,200,0.25)}@media print{body{font-size:13px !important}img,table,figure{page-break-inside:avoid}#wrapper{background:#fff;color:#303030;padding:10px;position:relative;text-indent:0}}@media screen{.inverted{background:#252a2a}.inverted #wrapper{background:#252a2a;color:#eee}.inverted hr{border-color:#333f40 !important}.inverted p,.inverted td,.inverted li,.inverted h1,.inverted h2,.inverted h3,.inverted h4,.inverted h5,.inverted h6,.inverted th,.inverted .math,.inverted caption,.inverted dt,.inverted dd{color:#eee}.inverted pre{background:#ccc}.inverted pre code{color:#111}.inverted table{background:none}.inverted table tr:nth-child(odd),.inverted table td:nth-child(odd){background:none}.inverted a{color:#acd1d5}::selection{background:rgba(157,193,200,0.5)}h1::selection{background-color:rgba(45,156,208,0.3)}h2::selection{background-color:rgba(90,182,224,0.3)}h3::selection,h4::selection,h5::selection,h6::selection,li::selection,ol::selection{background-color:rgba(133,201,232,0.3)}code::selection{background-color:rgba(0,0,0,0.7);color:#eee}code span::selection{background-color:rgba(0,0,0,0.7) !important;color:#eee !important}a::selection{background-color:rgba(255,230,102,0.2)}.inverted a::selection{background-color:rgba(255,230,102,0.6)}td::selection,th::selection,caption::selection{background-color:rgba(180,237,95,0.5)}}
+
+@media print{
+#generated-toc-clone,#generated-toc{display:none!important}hr{border:none!important;page-break-after:always!important}
+}
+#generated-toc-clone li.missing,#mkreplaced-toc li.missing{list-style-type:none!important}#generated-toc-clone li, #mkreplaced-toc li{list-style-type:upper-roman}#generated-toc-clone li li, #mkreplaced-toc li li{list-style-type:decimal}#generated-toc-clone li li li,#mkreplaced-toc li li li{list-style-type:decimal-leading-zero}#generated-toc-clone li li li li,#mkreplaced-toc li li li li{list-style-type:lower-greek}#generated-toc-clone li li li li li,#mkreplaced-toc li li li li li{list-style-type:disc}#generated-toc-clone li li li li li li,#mkreplaced-toc li li li li li li{list-style-type:square}
+</style>
+
+</head>
+<body class="normal">
+  <div id="wrapper">
+      <h2>Lecture 1</h2>
+
+<ul>
+<li>Using the command line
+
+<ul>
+<li>The Unix philosophy and <code>bash</code></li>
+<li>Remote computing with <code>ssh</code></li>
+<li>Version control with <code>git</code></li>
+<li>Documents with <span class="math">\(\LaTeX\)</span></li>
+<li>Automation with <code>make</code></li>
+</ul></li>
+</ul>
+
+<h2>Lecture 2</h2>
+
+<ul>
+<li>The IPython notebook
+
+<ul>
+<li>Markdown cells</li>
+<li>Code cells</li>
+<li>The display system</li>
+<li>IPython magic</li>
+<li>Widgets and the interact decorator</li>
+<li>Interfacing with other languages</li>
+</ul></li>
+<li>Programming in Python
+
+<ul>
+<li>Basic types</li>
+<li>Basic collections</li>
+<li>Control flow</li>
+<li>Functions</li>
+<li>Classes</li>
+<li>Modules</li>
+<li>The standard library</li>
+<li>PyPI and <code>pip</code></li>
+<li>Importing other modules</li>
+<li>Using <code>conda</code> virtual environments</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 1</h2>
+
+<ul>
+<li>Exercise 1: Using <code>bash</code> for data scrubbing</li>
+<li>Exercise 2: Using <code>git</code> for collaborative editing</li>
+<li>Exercise 3: Generating a report with <code>make</code>, <span class="math">\(\LaTeX\)</span> and python</li>
+<li>Exercise 4: Functions to calculate mean, variance and Pearson correlation coefficient</li>
+</ul>
+
+<h2>Lecture 3</h2>
+
+<ul>
+<li>Functional programming
+
+<ul>
+<li>Functions are first class objects</li>
+<li>Pure functions</li>
+<li>Iterators</li>
+<li>Generators</li>
+<li>Anonymous functions with lambda</li>
+<li>Recursion</li>
+<li>Decorators</li>
+<li>The <code>operator</code> module</li>
+<li>The <code>itertools</code> module</li>
+<li>The <code>functools</code> module</li>
+<li>The <code>toolz</code> module</li>
+<li>Constructing a lazy data pipeline</li>
+</ul></li>
+<li>Working with text
+
+<ul>
+<li>string methods</li>
+<li>The <code>string</code> module</li>
+<li>The <code>re</code> module</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 4</h2>
+
+<ul>
+<li>Obtaining data
+
+<ul>
+<li>CSV with <code>csv</code></li>
+<li>JSON with <code>json</code></li>
+<li>Web scraping with <code>scrapy</code></li>
+<li>HDF5 with <code>pyhdf</code></li>
+<li>Relational databases and SQL with <code>sqlite3</code></li>
+<li>The <code>datasets</code> module</li>
+</ul></li>
+<li>Scrubbing data
+
+<ul>
+<li>Removing comments</li>
+<li>Filtering rows</li>
+<li>Filtering columns</li>
+<li>Fixing inconsistencies</li>
+<li>Handling missing data</li>
+<li>Removing unwanted information</li>
+<li>Derived information</li>
+<li>Sanity check and visualization</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 2</h2>
+
+<ul>
+<li>Exercise 1: Moving data from CSV to JSON to HDF to sqlite3</li>
+<li>Exercise 2: Querying a relational database</li>
+<li>Exercise 3: Constructing a functional pipeline using generators</li>
+<li>Exercise 4: <a href="https://projecteuler.net/problems">Project Euler puzzle 1</a></li>
+</ul>
+
+<h2>Lecture 5</h2>
+
+<ul>
+<li>Using <code>numpy</code>
+
+<ul>
+<li>Data types</li>
+<li>Creating arrays</li>
+<li>Indexing</li>
+<li>Broadcasting
+
+<ul>
+<li>Outer product</li>
+</ul></li>
+<li>Ufuncs</li>
+<li>Generalized Ufuncs</li>
+<li>Linear algebra in numpy
+
+<ul>
+<li>Calculating covariance matrix</li>
+<li>Solving least squares linear regression</li>
+</ul></li>
+<li>I/O in numpy</li>
+</ul></li>
+<li>Using <code>pandas</code>
+
+<ul>
+<li>Reading and writing data</li>
+<li>Split-apply-combine</li>
+<li>Merging and joining</li>
+<li>Working with time series</li>
+</ul></li>
+<li>Using <code>blaze</code></li>
+</ul>
+
+<h2>Lecture 6</h2>
+
+<ul>
+<li>Graphics in Python
+
+<ul>
+<li>Using <code>matplotlib</code></li>
+<li>Using <code>seaborn</code></li>
+<li>Using <code>bokeh</code></li>
+<li><a href="http://daft-pgm.org/">Using <code>daft</code></a></li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 3</h2>
+
+<ul>
+<li>Exercise 1: Make a 12 by 12 times table chart without looping</li>
+<li>Exercise 2: Generate a 3$\times$3 magic square</li>
+<li>Exercise 3: Working with some data set in <code>pandas</code></li>
+<li>Exercise 4: Plotting the scatter matrix for the Iris data set in <code>matplotlib</code>, <code>seaborn</code> and <code>bokeh</code></li>
+</ul>
+
+<h2>Lecture 7</h2>
+
+<ul>
+<li>From math to computing
+
+<ul>
+<li>Computer representation of numbers</li>
+<li>Overflow, underflow, catastrophic cancellation</li>
+<li>Stability</li>
+<li>Conditioning</li>
+<li>Direct translation of symbols to code is dangerous</li>
+</ul></li>
+<li>The purpose of computing is insight not numbers</li>
+<li>Use of the computer in statistics
+
+<ul>
+<li>Estimating parameters (point and interval estimates)</li>
+<li>Estimating functions</li>
+<li>Approximating functions (especially PDFs)</li>
+<li>Feature extraction, class discovery and dimension reduction</li>
+<li>Classification and regression</li>
+<li>Simulations and computational inference</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 8</h2>
+
+<ul>
+<li>Algorithmic efficiency and big <span class="math">\(\mathcal{O}\)</span> notation</li>
+<li>Some data structures
+
+<ul>
+<li>Performance of built-in data structures</li>
+<li>Graphs and trees</li>
+</ul></li>
+<li><a href="http://cs.lmu.edu/~ray/notes/algpatterns/">Algorithmic patterns</a>
+
+<ul>
+<li>Divide and conquer</li>
+<li>Decrease and conquer</li>
+<li>Greedy algorithms</li>
+<li>Dynamic programming</li>
+<li>Hill climbing</li>
+<li>Reduction and transformation</li>
+<li>Monte Carlo</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 4</h2>
+
+<p>Exercise 1: <a href="https://projecteuler.net/problems">Project Euler puzzle 2</a><br/>
+Exercise 2: <a href="https://projecteuler.net/problems">Project Euler puzzle 3</a><br/>
+Exercise 3: <a href="https://projecteuler.net/problems">Project Euler puzzle 4</a><br/>
+Exercise 4: <a href="https://projecteuler.net/problems">Project Euler puzzle 14</a></p>
+
+<h2>Lecture 9</h2>
+
+<ul>
+<li>Numerical linear algebra
+
+<ul>
+<li>Simultaneous linear equations</li>
+<li>Column space, row space and rank</li>
+<li>Column space interpretation is most useful</li>
+<li>Rank, basis, span</li>
+<li>Norms and distance</li>
+<li>Trace and determinant</li>
+<li>Eigenvalues and eigenvectors</li>
+<li>Inner product</li>
+<li>Outer product</li>
+<li>Einstein summation notation</li>
+</ul></li>
+<li>Matrices as linear transforms
+
+<ul>
+<li>Types of matrices
+
+<ul>
+<li>Square and non-square</li>
+<li>Singular</li>
+<li>Positive definite</li>
+<li>Idempotent and projections</li>
+<li>Orthogonal and orthonormal</li>
+<li>Symmetric</li>
+<li>Hermitian</li>
+<li>Transition</li>
+</ul></li>
+<li>Matrix geometry illustrated</li>
+</ul></li>
+<li>Matrix decompositions
+
+<ul>
+<li>LU (Gaussian elimination)</li>
+<li>QR</li>
+<li>Spectral</li>
+<li>SVD</li>
+<li>Cholesky</li>
+</ul></li>
+<li>Using <code>scipy.linalg</code></li>
+<li>BLAS and LAPACK</li>
+</ul>
+
+<h2>Lecture 10</h2>
+
+<ul>
+<li>Projections, ordination, change of coordinates
+
+<ul>
+<li>PCA in detail</li>
+<li>PCA with eigendecomposition</li>
+<li>PCA with SVD</li>
+<li>Related methods
+
+<ul>
+<li>ICA</li>
+<li>LSA</li>
+<li>Factor analysis</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 5</h2>
+
+<ul>
+<li>Exercise 1: Solving a least squares problem using Cholesky decomposition</li>
+<li>Exercise 2: Implement latent semantic indexing</li>
+<li>Exercise 3: Implement k-means clustering</li>
+<li>Exercise 4: Use latent semantic indexing to reduce a set of documents to 2D then use k-means to cluster them, and finally plot the result</li>
+</ul>
+
+<h2>Lecture 11</h2>
+
+<ul>
+<li>Approximating functions
+
+<ul>
+<li>Orthogonal function basis</li>
+<li>Splines</li>
+<li>Kernel density estimation</li>
+</ul></li>
+<li>Estimating functions
+
+<ul>
+<li>Minimizing least squares
+
+<ul>
+<li>Linear regression example and the normal equations</li>
+</ul></li>
+<li>Maximum likelihood
+
+<ul>
+<li>Logistic regression example</li>
+</ul></li>
+<li>Bayesian posterior probability</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 12</h2>
+
+<ul>
+<li>Constrained and unconstrained optimization</li>
+<li>Discrete and continuous optimization</li>
+<li>Root finding and optimization in 1D
+
+<ul>
+<li>Taylor series</li>
+<li>Root finding with Newton methods</li>
+<li>Root finding with bisection and Brent's method</li>
+<li>Line search optimization</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 6</h2>
+
+<ul>
+<li>Exercise 1: Given a sequence of function values, write a program to perform kernel density estimation using several kernels</li>
+<li>Exercise 2: Use line search optimization to solve a 1D logistic regression problem</li>
+<li>Exercise 3: Implement the secant method for finding roots in 1D</li>
+<li>Exercise 4: Implement Newton's method and find an approximate solution to several equations (including ones that diverge)</li>
+</ul>
+
+<h2>Lecture 13</h2>
+
+<ul>
+<li>Multivariate optimization
+
+<ul>
+<li>GD and SGD</li>
+<li>Newton's method and IRLS for GLMs</li>
+</ul></li>
+<li>Other methods
+
+<ul>
+<li>Non-gradient based (e.g. Nelder-Mead)</li>
+<li>Global optimization</li>
+<li>Discrete optimization
+
+<ul>
+<li>Integer programming</li>
+<li>Combinatorial optimization</li>
+</ul></li>
+</ul></li>
+<li>Packages for optimization
+
+<ul>
+<li>Using <code>scipy.optimization</code></li>
+<li>Using <code>statsmodels</code></li>
+<li>Using <code>scikits-learn</code></li>
+<li>Others: <code>cvxopt</code> and <code>pyopt</code></li>
+</ul></li>
+<li>General approach to optimization
+
+<ul>
+<li>Know the problem</li>
+<li>Multiple random starts</li>
+<li>Combining algorithms</li>
+<li>Graphing progress</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 14</h2>
+
+<ul>
+<li>The EM algorithm (1)
+
+<ul>
+<li>Convex and concave functions</li>
+<li>Jansen's inequality</li>
+<li>Missing data setup</li>
+<li>Toy example - coin flipping with 2 biased coins</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 7</h2>
+
+<p>Exercise 1: Write the SGD function to solve a multivariate logistic regression problem using maximum likelihood<br/>
+Exercise 2: Write the EM algorithm to solve another toy problem<br/>
+Exercise 3: Playing with scipy.optimize<br/>
+Exercise 4: Playing with scikits-learn</p>
+
+<h2>Lecture 15</h2>
+
+<ul>
+<li>The EM algorithm (2)
+
+<ul>
+<li>Gaussian mixture model</li>
+<li>EM for Bayesians - MAP of posterior distribution</li>
+<li>Other applications of EM</li>
+<li>EM variants</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 16</h2>
+
+<ul>
+<li>Monte Carlo methods
+
+<ul>
+<li>Random number generators</li>
+<li>Generating random variates from a distribution</li>
+<li>Quadrature and volume estimation</li>
+<li>Estimate confidence intervals (bootstrap)</li>
+<li>Compare competing statistics (statistical simulation - e.g. power)</li>
+<li>Compare models (cross-validation)</li>
+<li>Hypothesis testing (permutation-resampling)</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 8</h2>
+
+<ul>
+<li>Exercise 1: Modify the EM algorithm for GMMs to find the MAP estimate of the posterior distribution</li>
+<li>Exercise 2: Use k-fold cross-validation to evaluate which is the best model for a given data set</li>
+<li>Exercise 3: Estimate the distribution of the slope in a linear regression model by bootstrapping on the residuals</li>
+<li>Exercise 4: Find the type-1 error for <span class="math">\(\alpha =0.05\)</span> by using permutation resampling to correct for multiple testing</li>
+</ul>
+
+<h2>Lecture 17</h2>
+
+<ul>
+<li>Conducting a simulation experiment (case study)</li>
+<li>Experimental design
+
+<ul>
+<li>Variables to study</li>
+<li>Levels of variables (factorial, Latin hypercube)</li>
+<li>Code documentation</li>
+<li>Recording results</li>
+<li>Reporting</li>
+<li>Reproducible analysis with <code>make</code> and <span class="math">\(\LaTeX\)</span></li>
+</ul></li>
+</ul>
+
+<h2>Lecture 18</h2>
+
+<ul>
+<li>MCMC (1)
+
+<ul>
+<li>Toy problem - rats on drugs</li>
+<li>Monte Carlo estimation</li>
+<li>Importance sampling</li>
+<li>Metropolis-Hasting</li>
+<li>Gibbs sampling</li>
+<li>Hamiltonian sampling</li>
+<li>Assessing convergence</li>
+<li>Using <code>pystan</code></li>
+<li>Using <code>pymc2</code></li>
+<li>Using <code>emcee</code></li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 9</h2>
+
+<ul>
+<li>Exercise 1: Writing a Gibbs sampler for change point detection</li>
+<li>Exercise 2: Using <code>pystan</code></li>
+<li>Exercise 3:Using <code>pymc2</code></li>
+<li>Exercise 4: Using <code>emcee</code></li>
+</ul>
+
+<h2>Lecture 19</h2>
+
+<ul>
+<li>MCMC (2)
+
+<ul>
+<li>Gaussian mixture model revisited</li>
+<li>Gibbs sampling</li>
+<li>Infinite mixture model with the Dirichlet process</li>
+<li>Simulated tempering</li>
+<li><span class="math">\(\text{MC}^3\)</span></li>
+</ul></li>
+</ul>
+
+<h2>Lecture 20</h2>
+
+<ul>
+<li>Profiling
+
+<ul>
+<li>Premature optimization is the root of all evil</li>
+<li>Using <code>%time</code> and <code>%timeit</code></li>
+<li>Profiling with <code>%prun</code></li>
+<li>Line profiler</li>
+<li>Memory profiler</li>
+</ul></li>
+<li>Code optimization
+
+<ul>
+<li>Use appropriate data structure</li>
+<li>Use appropriate algorithm</li>
+<li>Use known Python idioms</li>
+<li>Use optimized modules</li>
+<li>Caching and memoization</li>
+<li>Vectorize and broadcast</li>
+<li>Views</li>
+<li>Stride tricks</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 10</h2>
+
+<ul>
+<li>Exercise 1 The label-switching problem</li>
+<li>Exercise 2:Classifying points with the GMM:</li>
+<li>Exercise 3: Profiling source code</li>
+<li>Exercise 4 Optimizing source code</li>
+</ul>
+
+<h2>Lecture 21</h2>
+
+<ul>
+<li>JIT compilation with <code>numba</code></li>
+<li>Optimization with <code>cython</code></li>
+<li>Wrapping C code</li>
+<li>Wrapping C++ code</li>
+<li>Wrapping Fortran code</li>
+</ul>
+
+<h2>Lecture 22</h2>
+
+<ul>
+<li><a href="http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf">Why modern CPUs are starving and what can be done about it</a></li>
+<li>Parallel programming patterns</li>
+<li>Amdahl's and GustClassifying points with the Gustafson's laws</li>
+<li>Parallel programming examples
+
+<ul>
+<li>JIT compilation with <code>numba</code></li>
+<li>Toy example - fractals</li>
+<li>Using <code>joblib</code></li>
+<li>Using <code>multiprocessing</code></li>
+<li>Using <code>IPython.Parallel</code></li>
+<li>Using <code>MPI4py</code></li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 11</h2>
+
+<p>Exercise 1: Optimizing EM code with numba<br/>
+Exercise 2: Optimizing EM code with Cython<br/>
+Exercise 3: Parallel processing of embarrassingly parallel code<br/>
+Exercise 4: Parallel processing of code requiring intr-process communication</p>
+
+<h2>Lecture 23</h2>
+
+<ul>
+<li>GPU computing
+
+<ul>
+<li>Introduction to CUDA</li>
+<li>Vanilla matrix multiplication</li>
+<li>Matrix multiplication with shared memory</li>
+<li>JIT compilation with <code>numba</code></li>
+<li>Matrix multiplication in OpneCL</li>
+</ul></li>
+</ul>
+
+<h2>Lecture 24</h2>
+
+<ul>
+<li>Map-reduce and Spark
+
+<ul>
+<li>Problem - k-mer counting for DNA sequences</li>
+<li>Small scale map-reduce using Python</li>
+<li>Using <code>hadoop</code> with <code>mrjob</code></li>
+<li>Using <code>spark</code> with <code>pyspark</code></li>
+<li>Using <code>MLib</code> for large-scale machine learning</li>
+</ul></li>
+</ul>
+
+<h2>Computer lab 12</h2>
+
+<p>Exercise 1: Coding fractals in CUDA<br/>
+Exercise 2: Something more statistical in CUDA<br/>
+Exercise 3: Word count in map-reduce<br/>
+Exercise 4: K-mer count with map reduce with E Coli and human genome</p>
+
+<p>Data sets<br/>
+- <a href="http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz">ecoli genome</a><br/>
+- <a href="http://hgdownload.cse.ucsc.edu/goldenpath/hg19/chromosomes/">human genome</a></p>
+
+<div style="display:none">  
+<!--This seemingly unnecessary div markup is the only thing keeping this script working after Markdown conversion. Trust me.-->  
+ <script type="text/x-mathjax-config">  
+  MathJax.Hub.Config({  
+    tex2jax: {  
+  inlineMath: [ ['$','$'], ["\\(","\\)"] ],  
+  processEscapes: true  
+}
+  });  
+</script>  
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>  
+</div>
+<!-- ##END MARKED WRAPPER## -->
+    </div>
+</body>
+</html>

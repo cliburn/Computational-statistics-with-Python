@@ -325,7 +325,6 @@ Computer lab 8
 - Exercise 3: Estimate the distribution of the slope in a linear regression model by bootstrapping on the residuals
 - Exercise 4: Find the type-1 error for $\alpha =0.05$ by using permutation resampling to correct for multiple testing
 
-
 Lecture 17
 ----------------------------------------
 
@@ -360,7 +359,6 @@ Computer lab 9
 - Exercise 2: Using `pystan`
 - Exercise 3:Using `pymc2`
 - Exercise 4: Using `emcee`
-
 
 Lecture 19
 ----------------------------------------
