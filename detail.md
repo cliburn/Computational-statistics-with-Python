@@ -1,14 +1,4 @@
-Lecture 1 
-----------------------------------------
-
-- Using the command line
-    - The Unix philosophy and `bash`
-    - Remote computing with `ssh`
-    - Version control with `git`
-    - Documents with $\LaTeX$
-    - Automation with `make`
-
-Lecture 2
+Lecture 1
 ----------------------------------------
 
 - The IPython notebook
@@ -30,15 +20,7 @@ Lecture 2
     - Importing other modules
     - Using `conda` virtual environments
 
-Computer lab 1
-----------------------------------------
-
-- Exercise 1: Using `bash` for data scrubbing
-- Exercise 2: Using `git` for collaborative editing
-- Exercise 3: Generating a report with `make`, $\LaTeX$ and python
-- Exercise 4: Functions to calculate mean, variance and Pearson correlation coefficient
-
-Lecture 3
+Lecture 2
 ----------------------------------------
 
 - Functional programming
@@ -59,7 +41,15 @@ Lecture 3
     - The `string` module
     - The `re` module
 
-Lecture 4
+Computer lab 1
+----------------------------------------
+
+- Exercise 1: Generating a report with `make`, $\LaTeX$ and python
+- Exercise 2: Functions to calculate mean, variance and Pearson correlation coefficient
+- Exercise 3: [Project Euler puzzle 1](https://projecteuler.net/problems)
+- Exercise 4: Constructing a functional pipeline using generators
+
+Lecture 3
 ----------------------------------------
 
 - Obtaining data
@@ -79,16 +69,7 @@ Lecture 4
 	- Derived information
 	- Sanity check and visualization 
 
-
-Computer lab 2
-----------------------------------------
-
-- Exercise 1: Moving data from CSV to JSON to HDF to sqlite3
-- Exercise 2: Querying a relational database
-- Exercise 3: Constructing a functional pipeline using generators
-- Exercise 4: [Project Euler puzzle 1](https://projecteuler.net/problems)
-
-Lecture 5
+Lecture 4
 ----------------------------------------
 
 - Using `numpy`
@@ -110,24 +91,15 @@ Lecture 5
 	- Working with time series
 - Using `blaze`
 
-Lecture 6
-----------------------------------------
-
-- Graphics in Python
-    - Using `matplotlib`
-    - Using `seaborn`
-    - Using `bokeh`
-    - [Using `daft`](http://daft-pgm.org/)
-
-Computer lab 3
+Computer lab 2
 ----------------------------------------
 
 - Exercise 1: Make a 12 by 12 times table chart without looping
-- Exercise 2: Generate a 3$\times$3 magic square
+- Exercise 2: Working with CSV, JSON, HDF5 and RDBMS data
 - Exercise 3: Working with some data set in `pandas`
 - Exercise 4: Plotting the scatter matrix for the Iris data set in `matplotlib`, `seaborn` and `bokeh`
 
-Lecture 7
+Lecture 5
 ----------------------------------------
 
 - From math to computing
@@ -145,7 +117,7 @@ Lecture 7
     - Classification and regression
     - Simulations and computational inference
 
-Lecture 8
+Lecture 6
 ----------------------------------------
 
 - Algorithmic efficiency and big $\mathcal{O}$ notation
@@ -161,7 +133,7 @@ Lecture 8
     - Reduction and transformation
     - Monte Carlo
 
-Computer lab 4
+Computer lab 3
 ----------------------------------------
 
 Exercise 1: [Project Euler puzzle 2](https://projecteuler.net/problems)
@@ -169,7 +141,7 @@ Exercise 2: [Project Euler puzzle 3](https://projecteuler.net/problems)
 Exercise 3: [Project Euler puzzle 4](https://projecteuler.net/problems)
 Exercise 4: [Project Euler puzzle 14](https://projecteuler.net/problems)
 
-Lecture 9
+Lecture 7
 ----------------------------------------
 
 - Numerical linear algebra
@@ -203,7 +175,7 @@ Lecture 9
 - Using `scipy.linalg`
 - BLAS and LAPACK
 
-Lecture 10
+Lecture 8
 ----------------------------------------
 
 - Projections, ordination, change of coordinates
@@ -215,7 +187,7 @@ Lecture 10
  		- LSA
    		- Factor analysis
 
-Computer lab 5
+Computer lab 4
 ----------------------------------------
 
 - Exercise 1: Solving a least squares problem using Cholesky decomposition
@@ -223,7 +195,7 @@ Computer lab 5
 - Exercise 3: Implement k-means clustering
 - Exercise 4: Use latent semantic indexing to reduce a set of documents to 2D then use k-means to cluster them, and finally plot the result
 
-Lecture 11
+Lecture 9
 ----------------------------------------
 
 - Approximating functions
@@ -237,7 +209,7 @@ Lecture 11
         - Logistic regression example
     - Bayesian posterior probability
 
-Lecture 12
+Lecture 10
 ----------------------------------------
 
 - Constrained and unconstrained optimization
@@ -248,7 +220,7 @@ Lecture 12
 	- Root finding with bisection and Brent's  method
 	- Line search optimization 
 
-Computer lab 6
+Computer lab 5
 ----------------------------------------
 
 - Exercise 1: Given a sequence of function values, write a program to perform kernel density estimation using several kernels
@@ -256,7 +228,7 @@ Computer lab 6
 - Exercise 3: Implement the secant method for finding roots in 1D
 - Exercise 4: Implement Newton's method and find an approximate solution to several equations (including ones that diverge)
 
-Lecture 13
+Lecture 11
 ----------------------------------------
 
 - Multivariate optimization
@@ -279,7 +251,7 @@ Lecture 13
 	- Combining algorithms
 	- Graphing progress
 
-Lecture 14
+Lecture 12
 ----------------------------------------
 
 - The EM algorithm (1)
@@ -288,7 +260,7 @@ Lecture 14
     - Missing data setup
     - Toy example - coin flipping with 2 biased coins
 
-Computer lab 7
+Computer lab 6
 ----------------------------------------
 
 Exercise 1: Write the SGD function to solve a multivariate logistic regression problem using maximum likelihood
@@ -296,7 +268,7 @@ Exercise 2: Write the EM algorithm to solve another toy problem
 Exercise 3: Playing with scipy.optimize
 Exercise 4: Playing with scikits-learn
 
-Lecture 15
+Lecture 13
 ----------------------------------------
 
 - The EM algorithm (2)
@@ -305,7 +277,7 @@ Lecture 15
 	- Other applications of EM
     - EM variants
 
-Lecture 16
+Lecture 14
 ----------------------------------------
 
 - Monte Carlo methods
@@ -317,7 +289,7 @@ Lecture 16
     - Compare models (cross-validation)
     - Hypothesis testing (permutation-resampling)
 
-Computer lab 8
+Computer lab 7
 ----------------------------------------
 
 - Exercise 1: Modify the EM algorithm for GMMs to find the MAP estimate of the posterior distribution
@@ -325,7 +297,7 @@ Computer lab 8
 - Exercise 3: Estimate the distribution of the slope in a linear regression model by bootstrapping on the residuals
 - Exercise 4: Find the type-1 error for $\alpha =0.05$ by using permutation resampling to correct for multiple testing
 
-Lecture 17
+Lecture 15
 ----------------------------------------
 
 - Conducting a simulation experiment (case study)
@@ -337,7 +309,7 @@ Lecture 17
     - Reporting
     - Reproducible analysis with `make` and $\LaTeX$
 
-Lecture 18
+Lecture 16
 ----------------------------------------
 
 - MCMC (1)
@@ -352,7 +324,7 @@ Lecture 18
 	- Using `pymc2`
 	- Using `emcee`
 
-Computer lab 9
+Computer lab 8
 ----------------------------------------
 
 - Exercise 1: Writing a Gibbs sampler for change point detection
@@ -360,7 +332,7 @@ Computer lab 9
 - Exercise 3:Using `pymc2`
 - Exercise 4: Using `emcee`
 
-Lecture 19
+Lecture 17
 ----------------------------------------
 
 - MCMC (2)
@@ -370,7 +342,7 @@ Lecture 19
     - Simulated tempering
     - $\text{MC}^3$
 
-Lecture 20
+Lecture 18
 ----------------------------------------
 
 - Profiling 
@@ -389,7 +361,7 @@ Lecture 20
     - Views 
     - Stride tricks
 
-Computer lab 10
+Computer lab 9
 ----------------------------------------
 
 - Exercise 1 The label-switching problem
@@ -397,7 +369,7 @@ Computer lab 10
 - Exercise 3: Profiling source code
 - Exercise 4 Optimizing source code
 
-Lecture 21
+Lecture 19
 ----------------------------------------
 
 - JIT compilation with `numba`
@@ -406,7 +378,7 @@ Lecture 21
 - Wrapping C++ code
 - Wrapping Fortran code
 
-Lecture 22
+Lecture 20
 ----------------------------------------
 
 - [Why modern CPUs are starving and what can be done about it](http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf)
@@ -420,7 +392,7 @@ Lecture 22
     - Using `IPython.Parallel`
     - Using `MPI4py`
 
-Computer lab 11
+Computer lab 10
 ----------------------------------------
 
 Exercise 1: Optimizing EM code with numba
@@ -428,7 +400,7 @@ Exercise 2: Optimizing EM code with Cython
 Exercise 3: Parallel processing of embarrassingly parallel code
 Exercise 4: Parallel processing of code requiring intr-process communication
 
-Lecture 23
+Lecture 21
 ----------------------------------------
 
 - GPU computing
@@ -438,7 +410,7 @@ Lecture 23
 	- JIT compilation with `numba`
     - Matrix multiplication in OpneCL
 
-Lecture 24
+Lecture 22
 ----------------------------------------
 
 - Map-reduce and Spark
@@ -448,7 +420,7 @@ Lecture 24
     - Using `spark` with `pyspark`
 	- Using `MLib` for large-scale machine learning
 
-Computer lab 12
+Computer lab 11
 ----------------------------------------
 
 Exercise 1: Coding fractals in CUDA
@@ -459,3 +431,27 @@ Exercise 4: K-mer count with map reduce with E Coli and human genome
 Data sets
 - [ecoli genome](http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz)
 -  [human genome](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/chromosomes/)
+
+
+Supplementary Mateiral
+========================================
+
+SM 1 
+----------------------------------------
+
+- Using the command line
+    - The Unix philosophy and `bash`
+    - Remote computing with `ssh`
+    - Version control with `git`
+    - Documents with $\LaTeX$
+    - Automation with `make`
+
+SM 2
+----------------------------------------
+
+- Graphics in Python
+    - Using `matplotlib`
+    - Using `seaborn`
+    - Using `bokeh`
+    - [Using `daft`](http://daft-pgm.org/)
+

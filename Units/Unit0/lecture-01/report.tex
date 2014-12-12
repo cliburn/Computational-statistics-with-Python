@@ -1,0 +1,74 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{pythontex}
+
+\begin{sympycode}
+from sympy.stats import DiscreteUniform, sample
+x = Symbol(’x’)
+a = DiscreteUniform(’a’, range(-10, 11))
+b = DiscreteUniform(’b’, range(-10, 11))
+c = DiscreteUniform(’c’, range(-10, 11))
+def randquad():
+return Eq(sample(a)*x**2 + sample(b)*x + sample(c))
+\end{sympycode}
+\newcommand\randquad{\sympy{randquad()}}
+
+\begin{document}
+
+\title{Automating noise discovery}
+\author{Cliburn Chan}
+\maketitle
+
+\section{Introduction}
+
+Bacon ipsum dolor amet hamburger fatback beef doner, kielbasa short loin corned beef pancetta beef ribs tongue ham hock. Biltong ham hock tail tenderloin. Pig pork belly biltong alcatra jerky, drumstick meatloaf brisket chicken pork capicola landjaeger pork chop bresaola sausage. Chuck boudin brisket, bresaola rump jerky salami ball tip cupim. Boudin sausage brisket andouille shoulder chuck landjaeger shank doner pork chop.
+
+Pastrami landjaeger venison swine, short ribs ground round beef ribs t-bone pork chop tail shoulder biltong. Spare ribs pork belly ball tip meatloaf doner boudin jowl capicola. Beef ribs turducken pastrami ground round kielbasa cupim salami jerky pork chop pork short loin turkey beef kevin flank. Flank bacon beef, cupim kevin ham hock brisket boudin turkey. Doner biltong shankle ham hock. Beef ribs kevin andouille ball tip boudin. Shank chuck tail shoulder.
+
+Tail tri-tip ball tip, ham hock pastrami strip steak flank tongue sirloin biltong salami venison tenderloin. Ham chuck frankfurter venison. Leberkas alcatra drumstick, filet mignon cow spare ribs chuck venison kevin sausage pork loin tongue. Fatback strip steak kielbasa tail turducken landjaeger cupim salami venison jerky chicken. Beef ribs venison turducken, shank turkey rump ribeye pork loin kielbasa ground round alcatra.
+
+Leberkas doner tongue, tri-tip kevin swine brisket shank pastrami hamburger. Turducken biltong ham hock, kevin turkey landjaeger cow porchetta. Swine tongue strip steak beef bacon picanha pork loin flank jowl leberkas prosciutto pork brisket rump ham hock. Boudin jerky frankfurter, pork chop ground round leberkas meatloaf capicola cupim pig t-bone tri-tip ribeye spare ribs. Drumstick kielbasa shankle bresaola tri-tip strip steak salami turkey. Drumstick turkey shankle tongue.
+
+Tongue picanha alcatra spare ribs chuck. Short loin flank venison ribeye. Ham flank corned beef t-bone beef ribs shank. Beef pork belly sausage cupim, jowl andouille cow. Pork pig biltong, shank cupim tail strip steak meatloaf chicken. Prosciutto chicken flank, brisket tongue swine shankle picanha andouille ground round fatback shank tenderloin. Ribeye chuck beef ribs filet mignon t-bone pastrami picanha pork loin swine.
+
+\section{Results}
+
+Jowl capicola andouille kevin frankfurter short ribs spare ribs. Short loin landjaeger shoulder venison flank rump leberkas shankle chicken. Hamburger beef ribs shankle, pancetta frankfurter tri-tip rump fatback alcatra. Spare ribs andouille pork loin sausage pig chicken short ribs turkey kielbasa tail t-bone sirloin tri-tip venison. Kielbasa tenderloin short ribs strip steak, salami shoulder flank shank  See Table~1
+
+\begin{minipage}{\textwidth}
+  \centering{\input{table} }
+  \medskip
+
+  Table 1: Our top noise discoveries.
+
+  \medskip
+
+  \label{tbl:hits}
+\end{minipage}
+
+Shankle rump picanha bresaola quis occaecat, ex cillum short loin beef. Aute pork dolore biltong, sausage shank drumstick picanha porchetta quis rump cupim venison ham. Nulla aute ad pork chop exercitation, chuck fugiat ut ham ullamco eu brisket ex jowl. Cupidatat shank pork strip steak cupim, laboris ipsum beef ribs shankle corned beef minim. Beef deserunt elit pastrami pariatur laboris. See Figure~\ref{fig:heatmap}.
+
+\begin{figure}
+\includegraphics[width=\linewidth]{heatmap.png}
+\caption {Heatmap showing noise discovery in case-control studies.}
+\label{fig:heatmap}
+\end{figure}
+
+
+
+Leberkas doner tongue, tri-tip kevin swine brisket shank pastrami hamburger. Turducken biltong ham hock, kevin turkey landjaeger cow porchetta. Swine tongue strip steak beef bacon picanha pork loin flank jowl leberkas prosciutto pork brisket rump ham hock. Boudin jerky frankfurter, pork chop ground round leberkas meatloaf capicola cupim pig t-bone tri-tip ribeye spare ribs. Drumstick kielbasa shankle bresaola tri-tip strip steak salami turkey. Drumstick turkey shankle tongue.
+
+Tongue picanha alcatra spare ribs chuck. Short loin flank venison ribeye. Ham flank corned beef t-bone beef ribs shank. Beef pork belly sausage cupim, jowl andouille cow. Pork pig biltong, shank cupim tail strip steak meatloaf chicken. Prosciutto chicken flank, brisket tongue swine shankle picanha andouille ground round fatback shank tenderloin. Ribeye chuck beef ribs filet mignon t-bone pastrami picanha pork loin swine.
+
+
+
+\section{Conclusions}
+
+Salami bresaola beef ribs drumstick sausage venison. Jerky turkey fatback ribeye cupim drumstick kevin shank meatball. T-bone turkey ribeye, shank spare ribs landjaeger doner swine ham. Tenderloin ham fatback, cow bresaola t-bone pork belly rump boudin venison. Doner biltong spare ribs turducken ground round bresaola. Swine shoulder beef ribs, ham jerky pig shank short ribs chuck bresaola salami flank drumstick pork jowl. Kevin prosciutto turkey meatloaf cow chicken jowl boudin.
+
+Ribeye ball tip capicola short ribs, pork chop pork belly venison flank. Hamburger shank shankle, strip steak jerky boudin sausage ham hock salami bacon meatloaf beef tri-tip frankfurter. Landjaeger ball tip hamburger shankle bacon boudin filet mignon ham hock rump flank pork loin meatloaf. Beef ribs boudin pancetta, jerky jowl alcatra fatback frankfurter tongue porchetta meatloaf kevin. Sausage jowl hamburger, andouille tail turducken leberkas ball tip landjaeger bresaola corned beef boudin. Ball tip picanha bresaola, ground round venison cow short loin kevin tail swine hamburger brisket bacon biltong. Tongue sausage swine, cow shankle shank venison.
+
+Tenderloin doner short loin hamburger ribeye. Filet mignon pork loin jerky sirloin fatback rump flank, capicola pastrami t-bone landjaeger bresaola chuck tenderloin frankfurter. Pork chop bacon ham hock cow kevin boudin flank. Spare ribs turkey strip steak andouille. Bacon brisket doner, cupim tri-tip salami pork chuck corned beef shoulder pork belly jerky porchetta tail. Corned beef ball tip doner ribeye swine spare ribs jowl rump sirloin meatball beef. Capicola swine short ribs kevin beef ribs turkey t-bone pork belly beef sirloin pastrami pig pancetta bresaola tri-tip.
+
+\end{document}
