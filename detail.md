@@ -1,3 +1,18 @@
+Pre-requisites
+----------------------------------------
+
+Review the following if you are not familiar with them
+
+- Unix commands
+- Using `git` for version control
+- Writing Markdown
+- Writing $\LaTeX$
+- Using `make` to build programs
+
+The course will cover the basics of Python at an extremely rapid pace. Unless you are an experienced programmer, you should proabbly review basic Python programming skills from the [Think Python](http://www.greenteapress.com/thinkpython/html/index.html) book. This is also useful as a refernce when doing assignments.
+
+Also very useful as a refernece is the official [Python tutorial](https://docs.python.org/2/tutorial/)
+
 Lecture 1
 ----------------------------------------
 
