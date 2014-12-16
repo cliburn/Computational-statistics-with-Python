@@ -428,7 +428,8 @@ Lecture 21
 Lecture 22
 ----------------------------------------
 
-- Map-reduce and Spark
+- Map-reduce and Spark ([AWS](https://aws.amazon.com/articles/4926593393724923))
+
     - Problem - k-mer counting for DNA sequences
     - Small scale map-reduce using Python
     - Using `hadoop` with `mrjob`
