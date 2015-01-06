@@ -1,3 +1,31 @@
+Syllabus for STA 663
+========================================
+
+Instructor:: Cliburn Chan <cliburn.chan@duke..edu>
+Instructor: Janice McCarthy <janice.mccarthy@duke.edu>
+TA: Matt Johnson <mcj15@stat.duke.edu>
+
+Overview
+----------------------------------------
+
+The goal of STA 663 is to learn statistical programming - how to write code to solve statistical problems. In general, statistical problems have to do with the estimation of some characteristic derived from data - this can be a point estimate, an interval, or an entire function. Almost always, solving such statistical problems involves writing code to collect, organize, explore, analyze and present the data. For obvious reasons, we would like to write good code that is readable, correct and efficient, preferably without reinventing the wheel.
+
+This course will cover general ideas relevant for high-performance code (data structures, algorithms, code optimization including parallelization) as well as specific numerical methods important for data analysis (computer numbers, matrix decompositions, linear and nonlinear regression, numerial optimization, function estimation, Monte Carlo methods). We will mostly assume that you are comfortable with basic programming concepts (functions, classes, loops), have good habits (literate programming, testing, version control) and a decent mathematical and statistical background (linear algebra, calculus, probability).
+
+To solve statistical problems, you will typically need to (1) have the basic skills to collect, organize, explore and present the data, (2) apply specific numerical methods to analyze the data and (3) optimize the code to make it run acceptably fast (increasingly important in this era of "big data"). STA 663 is organized in 3 parts to reflect these stages of statistical programming - basics (20%), numerical methods (60%) and high performance computing (20%).
+
+Learning objectives
+----------------------------------------
+
+The course will focus on the development of various algorithms for *optimization* and *simulation*, the workhorses of much of computational statistics. The emphasis is on *comptutation* for statistics  - how to prototype, optimize and develop high performance computing (HPC) algorithms in Python and C/C++. A variety of algorithms and data sets of gradually increasing complexity (1 dimension $\rightarrow$ many dimensions, serial $\rightarrow$ parallel $\rightarrow$ massively parallel, small data $\rightarrow$ big data) will allow students to develop and practise the following skills:
+
+* Practices for reproducible analysis
+* Fundamentals of data management and munging
+* Use Python as a language for statistical computing
+* Use mathematical and statistical libraries effectively
+* Profile and optimize serial code
+* Effective use of different parallel programming paradigms
+
 Pre-requisites
 ----------------------------------------
 
@@ -12,6 +40,21 @@ Review the following if you are not familiar with them
 The course will cover the basics of Python at an extremely rapid pace. Unless you are an experienced programmer, you should proabbly review basic Python programming skills from the [Think Python](http://www.greenteapress.com/thinkpython/html/index.html) book. This is also useful as a refernce when doing assignments.
 
 Also very useful as a refernece is the official [Python tutorial](https://docs.python.org/2/tutorial/)
+
+Grading
+----------------------------------------
+
+- Quizzes (25%)
+- Programming project 1 (25%)
+- Programming project 2 (25%)
+- Final exam (25%)
+
+Computing Platform
+----------------------------------------
+
+Each student will be provided with access to a virtual machine image running Ubuntu - URLs for inidividual students will be provided on the first day. For GPU computing and map-reduce examples, we will be using the Amazon Web Services (AWS) cloud platform. Again, details for how to acccess will be provided when appropriate.
+
+All code developed for the course should be in a personal Github reposiitory called sta-663-firstname-lastname. Make the insstructors and TA collaborators so that we have full access to your code. We trust that you can figure out how to do this on your own.
 
 Lecture 1
 ----------------------------------------
@@ -124,45 +167,21 @@ Lecture 5
     - Conditioning
 	- Direct translation of symbols to code is dangerous
 - The purpose of computing is insight not numbers
-- Use of the computer in statistics
+- Examples of computation in statistics
     - Estimating parameters (point and interval estimates)
     - Estimating functions
-    - Approximating functions (especially PDFs)
     - Feature extraction, class discovery and dimension reduction
     - Classification and regression
     - Simulations and computational inference
+- Algorithmic efficiency and big $\mathcal{O}$ notation
+    - Examples from classic data structures and algorithms
 
 Lecture 6
-----------------------------------------
-
-- Algorithmic efficiency and big $\mathcal{O}$ notation
-- Some data structures
-    - Performance of built-in data structures
-    - Graphs and trees
-- [Algorithmic patterns](http://cs.lmu.edu/~ray/notes/algpatterns/)
-    - Divide and conquer
-    - Decrease and conquer
-    - Greedy algorithms
-    - Dynamic programming
-    - Hill climbing
-    - Reduction and transformation
-    - Monte Carlo
-
-Computer lab 3
-----------------------------------------
-
-Exercise 1: [Project Euler puzzle 2](https://projecteuler.net/problems)
-Exercise 2: [Project Euler puzzle 3](https://projecteuler.net/problems)
-Exercise 3: [Project Euler puzzle 4](https://projecteuler.net/problems)
-Exercise 4: [Project Euler puzzle 14](https://projecteuler.net/problems)
-
-Lecture 7
 ----------------------------------------
 
 - Numerical linear algebra
     - Simultaneous linear equations
     - Column space, row space and rank
-    - Column space interpretation is most useful
     - Rank, basis, span
     - Norms and distance
     - Trace and determinant
@@ -178,9 +197,20 @@ Lecture 7
         - Idempotent and projections
         - Orthogonal and orthonormal
         - Symmetric
-		- Hermitian
         - Transition
     - Matrix geometry illustrated
+
+Computer lab 3
+----------------------------------------
+
+- Exercise 1: [Project Euler puzzle 2](https://projecteuler.net/problems)
+- Exercise 2: [Project Euler puzzle 3](https://projecteuler.net/problems)
+- Exercise 3: [Project Euler puzzle 4](https://projecteuler.net/problems)
+- Exercise 4: [Project Euler puzzle 14](https://projecteuler.net/problems)
+
+Lecture 7
+----------------------------------------
+
 - Matrix decompositions
     - LU (Gaussian elimination)
     - QR
@@ -213,27 +243,30 @@ Computer lab 4
 Lecture 9
 ----------------------------------------
 
-- Approximating functions
-    - Orthogonal function basis
-    - Splines
-    - Kernel density estimation
-- Estimating functions
-    - Minimizing least squares
-        - Linear regression example and the normal equations
-    - Maximum likelihood
-        - Logistic regression example
-    - Bayesian posterior probability
+- Regression and maximum likelihood as optimization problems
+- Local and global extrema
+- Univariate root finding and optimization
+    - Golden section search
+    - Bisection
+	- Newton-Raphson and secant methods
+- Packages for optimization
+    - Using `scipy.optimization`
+    - Using `statsmodels`
+	- Using `scikits-learn`
+- General approach to optimization
+	- Know the problem
+	- Multiple random starts
+	- Combining algorithms
+	- Graphing progress
 
 Lecture 10
 ----------------------------------------
 
-- Constrained and unconstrained optimization
-- Discrete and continuous optimization
-- Root finding and optimization in 1D
-    - Taylor series
-	- Root finding with Newton methods
-	- Root finding with bisection and Brent's  method
-	- Line search optimization 
+- Multivariate optimization
+    - Non-gradient based (Nelder-Mead)
+    - First order (gradient descent and stochastic gradient descent)
+    - Second order (Newton's mehtod)
+    - Variations on Newton's methods (IRLS, conjugate gradiet, LM)
 
 Computer lab 5
 ----------------------------------------
@@ -246,42 +279,30 @@ Computer lab 5
 Lecture 11
 ----------------------------------------
 
-- Multivariate optimization
-    - GD and SGD
-    - Newton's method and IRLS for GLMs
-- Other methods
-    - Non-gradient based (e.g. Nelder-Mead)
-    - Global optimization
-    - Discrete optimization
-        - Integer programming
-	    - Combinatorial optimization
-- Packages for optimization
-    - Using `scipy.optimization`
-    - Using `statsmodels`
-	- Using `scikits-learn`
-	- Others: `cvxopt` and `pyopt`
-- General approach to optimization
-	- Know the problem
-	- Multiple random starts
-	- Combining algorithms
-	- Graphing progress
+- Constrained optimization
+    - Lagrange multipliers
+	- Barriers and penalties
+	- Transfomations
+	- Convex optimization
+	- Packages: `cvxopt`, `cvxpy` and `pyopt`
+
 
 Lecture 12
 ----------------------------------------
 
 - The EM algorithm (1)
     - Convex and concave functions
-    - Jansen's inequality
+    - Jensen's inequality
     - Missing data setup
     - Toy example - coin flipping with 2 biased coins
 
 Computer lab 6
 ----------------------------------------
 
-Exercise 1: Write the SGD function to solve a multivariate logistic regression problem using maximum likelihood
-Exercise 2: Write the EM algorithm to solve another toy problem
-Exercise 3: Playing with scipy.optimize
-Exercise 4: Playing with scikits-learn
+- Exercise 1: Write the SGD function to solve a multivariate logistic regression problem using maximum likelihood
+- Exercise 2: Write the EM algorithm to solve another toy problem
+- Exercise 3: Using scipy.optimize
+- Exercise 4: Using scikits-learn
 
 Lecture 13
 ----------------------------------------
@@ -298,7 +319,7 @@ Lecture 14
 - Monte Carlo methods
 	- Random number generators
     - Generating random variates from a distribution
-	- Quadrature and volume estimation
+	- Quadrature, Monte Carlo estimation and Monte Carlo swindles
     - Estimate confidence intervals (bootstrap)
     - Compare competing statistics (statistical simulation - e.g. power)
     - Compare models (cross-validation)
@@ -354,8 +375,6 @@ Lecture 17
     - Gaussian mixture model revisited
     - Gibbs sampling
     - Infinite mixture model with the Dirichlet process
-    - Simulated tempering
-    - $\text{MC}^3$
 
 Lecture 18
 ----------------------------------------
@@ -410,10 +429,10 @@ Lecture 20
 Computer lab 10
 ----------------------------------------
 
-Exercise 1: Optimizing EM code with numba
-Exercise 2: Optimizing EM code with Cython
-Exercise 3: Parallel processing of embarrassingly parallel code
-Exercise 4: Parallel processing of code requiring intr-process communication
+- Exercise 1: Optimizing EM code with numba
+- Exercise 2: Optimizing EM code with Cython
+- Exercise 3: Parallel processing of embarrassingly parallel code
+- Exercise 4: Parallel processing of code requiring intr-process communication
 
 Lecture 21
 ----------------------------------------
@@ -423,7 +442,7 @@ Lecture 21
 	- Vanilla matrix multiplication
 	- Matrix multiplication with shared memory
 	- JIT compilation with `numba`
-    - Matrix multiplication in OpneCL
+	- Example: Large-scale GMMs with CUDA
 
 Lecture 22
 ----------------------------------------
@@ -439,10 +458,10 @@ Lecture 22
 Computer lab 11
 ----------------------------------------
 
-Exercise 1: Coding fractals in CUDA
-Exercise 2: Something more statistical in CUDA
-Exercise 3: Word count in map-reduce
-Exercise 4: K-mer count with map reduce with E Coli and human genome
+- Exercise 1: Coding fractals in CUDA
+- Exercise 2: Large-scale GMMs with CUDA
+- Exercise 3: Word count in map-reduce
+- Exercise 4: K-mer count with map reduce with E Coli and human genome
 
 Data sets
 - [ecoli genome](http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz)
