@@ -37,9 +37,9 @@ Review the following if you are not familiar with them
 - Writing $\LaTeX$
 - Using `make` to build programs
 
-The course will cover the basics of Python at an extremely rapid pace. Unless you are an experienced programmer, you should proabbly review basic Python programming skills from the [Think Python](http://www.greenteapress.com/thinkpython/html/index.html) book. This is also useful as a refernce when doing assignments.
+The course will cover the basics of Python at an extremely rapid pace. Unless you are an experienced programmer, you should probably review basic Python programming skills from the [Think Python](http://www.greenteapress.com/thinkpython/html/index.html) book. This is also useful as a reference when doing assignments.
 
-Also very useful as a refernece is the official [Python tutorial](https://docs.python.org/2/tutorial/)
+Another very useful as a reference is the official [Python tutorial](https://docs.python.org/2/tutorial/)
 
 Grading
 ----------------------------------------
@@ -54,7 +54,7 @@ Computing Platform
 
 Each student will be provided with access to a virtual machine image running Ubuntu - URLs for inidividual students will be provided on the first day. For GPU computing and map-reduce examples, we will be using the Amazon Web Services (AWS) cloud platform. Again, details for how to acccess will be provided when appropriate.
 
-All code developed for the course should be in a personal Github reposiitory called sta-663-firstname-lastname. Make the insstructors and TA collaborators so that we have full access to your code. We trust that you can figure out how to do this on your own.
+All code developed for the course should be in a personal Github repository called sta-663-firstname-lastname. Make the instructors and TA collaborators so that we have full access to your code. We trust that you can figure out how to do this on your own.
 
 Lecture 1
 ----------------------------------------
@@ -64,19 +64,17 @@ Lecture 1
     - Code cells
     - The display system
     - IPython magic
-    - Widgets and the interact decorator
     - Interfacing with other languages
 - Programming in Python
     - Basic types
-    - Basic collections
+    - Basic collections (tuples, lists, sets, dicts, strings)
     - Control flow
     - Functions
     - Classes
     - Modules
     - The standard library
-    - PyPI and `pip`
+    - PyPI and `pip`   
     - Importing other modules
-    - Using `conda` virtual environments
 
 Lecture 2
 ----------------------------------------
@@ -365,7 +363,7 @@ Computer lab 8
 
 - Exercise 1: Writing a Gibbs sampler for change point detection
 - Exercise 2: Using `pystan`
-- Exercise 3:Using `pymc2`
+- Exercise 3: Using `pymc2`
 - Exercise 4: Using `emcee`
 
 Lecture 17
@@ -390,7 +388,7 @@ Lecture 18
     - Use appropriate algorithm
     - Use known Python idioms
     - Use optimized modules
-    - Caching and memoization
+    - Caching and memorization
     - Vectorize and broadcast
     - Views 
     - Stride tricks
@@ -398,10 +396,10 @@ Lecture 18
 Computer lab 9
 ----------------------------------------
 
-- Exercise 1 The label-switching problem
-- Exercise 2:Classifying points with the GMM:
+- Exercise 1: The label-switching problem
+- Exercise 2: Classifying points with the GMM:
 - Exercise 3: Profiling source code
-- Exercise 4 Optimizing source code
+- Exercise 4: Optimizing source code
 
 Lecture 19
 ----------------------------------------
@@ -421,7 +419,7 @@ Lecture 20
 - Parallel programming examples
     - JIT compilation with `numba`
 	- Toy example - fractals 
-     - Using `joblib`
+    - Using `joblib`
     - Using `multiprocessing`
     - Using `IPython.Parallel`
     - Using `MPI4py`
@@ -432,7 +430,7 @@ Computer lab 10
 - Exercise 1: Optimizing EM code with numba
 - Exercise 2: Optimizing EM code with Cython
 - Exercise 3: Parallel processing of embarrassingly parallel code
-- Exercise 4: Parallel processing of code requiring intr-process communication
+- Exercise 4: Parallel processing of code requiring intra-process communication
 
 Lecture 21
 ----------------------------------------
@@ -453,7 +451,7 @@ Lecture 22
     - Small scale map-reduce using Python
     - Using `hadoop` with `mrjob`
     - Using `spark` with `pyspark`
-	- Using `MLib` for large-scale machine learning
+    - Using `MLib` for large-scale machine learning
 
 Computer lab 11
 ----------------------------------------
