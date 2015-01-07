@@ -100,10 +100,7 @@ Lecture 2
 Computer lab 1
 ----------------------------------------
 
-- Exercise 1: Generating a report with `make`, $\LaTeX$ and python
-- Exercise 2: Functions to calculate mean, variance and Pearson correlation coefficient
-- Exercise 3: [Project Euler puzzle 1](https://projecteuler.net/problems)
-- Exercise 4: Constructing a functional pipeline using generators
+See Lab01/Exercise.ipynb in the course Github repository.
 
 Lecture 3
 ----------------------------------------
