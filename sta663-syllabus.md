@@ -5,6 +5,9 @@ Instructor:: Cliburn Chan <cliburn.chan@duke..edu>
 Instructor: Janice McCarthy <janice.mccarthy@duke.edu>
 TA: Matt Johnson <mcj15@stat.duke.edu>
 
+Github Repository for course materials
+<https://github.com/cliburn/STA663-2015.git>
+
 Overview
 ----------------------------------------
 
@@ -44,7 +47,7 @@ Another very useful as a reference is the official [Python tutorial](https://doc
 Grading
 ----------------------------------------
 
-- Quizzes (25%)
+- Computer lab quizzes (25%)
 - Programming project 1 (25%)
 - Programming project 2 (25%)
 - Final exam (25%)
@@ -100,7 +103,7 @@ Lecture 2
 Computer lab 1
 ----------------------------------------
 
-See Lab01/Exercise.ipynb in the course Github repository.
+See Lab01/Exercises01.ipynb in the course Github repository.
 
 Lecture 3
 ----------------------------------------
@@ -147,10 +150,7 @@ Lecture 4
 Computer lab 2
 ----------------------------------------
 
-- Exercise 1: Make a 12 by 12 times table chart without looping
-- Exercise 2: Working with CSV, JSON, HDF5 and RDBMS data
-- Exercise 3: Working with some data set in `pandas`
-- Exercise 4: Plotting the scatter matrix for the Iris data set in `matplotlib`, `seaborn` and `bokeh`
+See Lab02/Exercises02.ipynb in the course Github repository.
 
 Lecture 5
 ----------------------------------------
@@ -198,10 +198,7 @@ Lecture 6
 Computer lab 3
 ----------------------------------------
 
-- Exercise 1: [Project Euler puzzle 2](https://projecteuler.net/problems)
-- Exercise 2: [Project Euler puzzle 3](https://projecteuler.net/problems)
-- Exercise 3: [Project Euler puzzle 4](https://projecteuler.net/problems)
-- Exercise 4: [Project Euler puzzle 14](https://projecteuler.net/problems)
+Coming soon
 
 Lecture 7
 ----------------------------------------
@@ -230,10 +227,7 @@ Lecture 8
 Computer lab 4
 ----------------------------------------
 
-- Exercise 1: Solving a least squares problem using Cholesky decomposition
-- Exercise 2: Implement latent semantic indexing
-- Exercise 3: Implement k-means clustering
-- Exercise 4: Use latent semantic indexing to reduce a set of documents to 2D then use k-means to cluster them, and finally plot the result
+Coming soon
 
 Lecture 9
 ----------------------------------------
@@ -257,11 +251,7 @@ Lecture 9
 Lecture 10
 ----------------------------------------
 
-- Multivariate optimization
-    - Non-gradient based (Nelder-Mead)
-    - First order (gradient descent and stochastic gradient descent)
-    - Second order (Newton's mehtod)
-    - Variations on Newton's methods (IRLS, conjugate gradiet, LM)
+Coming soon
 
 Computer lab 5
 ----------------------------------------
@@ -294,10 +284,7 @@ Lecture 12
 Computer lab 6
 ----------------------------------------
 
-- Exercise 1: Write the SGD function to solve a multivariate logistic regression problem using maximum likelihood
-- Exercise 2: Write the EM algorithm to solve another toy problem
-- Exercise 3: Using scipy.optimize
-- Exercise 4: Using scikits-learn
+Coming soon
 
 Lecture 13
 ----------------------------------------
@@ -323,10 +310,7 @@ Lecture 14
 Computer lab 7
 ----------------------------------------
 
-- Exercise 1: Modify the EM algorithm for GMMs to find the MAP estimate of the posterior distribution
-- Exercise 2: Use k-fold cross-validation to evaluate which is the best model for a given data set
-- Exercise 3: Estimate the distribution of the slope in a linear regression model by bootstrapping on the residuals
-- Exercise 4: Find the type-1 error for $\alpha =0.05$ by using permutation resampling to correct for multiple testing
+Coming soon
 
 Lecture 15
 ----------------------------------------
@@ -358,10 +342,7 @@ Lecture 16
 Computer lab 8
 ----------------------------------------
 
-- Exercise 1: Writing a Gibbs sampler for change point detection
-- Exercise 2: Using `pystan`
-- Exercise 3: Using `pymc2`
-- Exercise 4: Using `emcee`
+Coming soon
 
 Lecture 17
 ----------------------------------------
@@ -393,10 +374,7 @@ Lecture 18
 Computer lab 9
 ----------------------------------------
 
-- Exercise 1: The label-switching problem
-- Exercise 2: Classifying points with the GMM:
-- Exercise 3: Profiling source code
-- Exercise 4: Optimizing source code
+Coming soon
 
 Lecture 19
 ----------------------------------------
@@ -424,10 +402,7 @@ Lecture 20
 Computer lab 10
 ----------------------------------------
 
-- Exercise 1: Optimizing EM code with numba
-- Exercise 2: Optimizing EM code with Cython
-- Exercise 3: Parallel processing of embarrassingly parallel code
-- Exercise 4: Parallel processing of code requiring intra-process communication
+Coming soon
 
 Lecture 21
 ----------------------------------------
@@ -453,14 +428,7 @@ Lecture 22
 Computer lab 11
 ----------------------------------------
 
-- Exercise 1: Coding fractals in CUDA
-- Exercise 2: Large-scale GMMs with CUDA
-- Exercise 3: Word count in map-reduce
-- Exercise 4: K-mer count with map reduce with E Coli and human genome
-
-Data sets
-- [ecoli genome](http://schatzlab.cshl.edu/teaching/exercises/hadoop/data/ecoli.fa.gz)
--  [human genome](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/chromosomes/)
+Coming soon
 
 
 Supplementary Mateiral
