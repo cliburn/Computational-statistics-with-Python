@@ -81,6 +81,11 @@ Lecture 1
     - PyPI and `pip`   
     - Importing other modules
 
+Computer lab 1
+----------------------------------------
+
+See Lab01/Exercises01.ipynb in the course Github repository.
+
 Lecture 2
 ----------------------------------------
 
@@ -102,11 +107,6 @@ Lecture 2
     - The `string` module
     - The `re` module
 
-Computer lab 1
-----------------------------------------
-
-See Lab01/Exercises01.ipynb in the course Github repository.
-
 Lecture 3
 ----------------------------------------
 
@@ -126,6 +126,11 @@ Lecture 3
 	- Removing unwanted information
 	- Derived information
 	- Sanity check and visualization 
+
+Computer lab 2
+----------------------------------------
+
+See GitLab/GitExercises.ipynb in the course Github repository.  
 
 Lecture 4
 ----------------------------------------
@@ -149,10 +154,11 @@ Lecture 4
 	- Working with time series
 - Using `blaze`
 
-Computer lab 2
+
+Computer lab 3
 ----------------------------------------
 
-See Lab02/Exercises02.ipynb in the course Github repository.
+See Lab02/Exercises02.ipynb in the course Github repository.  
 
 Lecture 5
 ----------------------------------------
@@ -196,11 +202,11 @@ Lecture 6
         - Symmetric
         - Transition
     - Matrix geometry illustrated
-
-Computer lab 3
+ 
+Computer lab 4
 ----------------------------------------
 
-Coming soon
+See Lab03/Exercises03.ipynb in the course Github repository. 
 
 Lecture 7
 ----------------------------------------
@@ -226,7 +232,8 @@ Lecture 8
  		- LSA
    		- Factor analysis
 
-Computer lab 4
+
+Computer lab 5
 ----------------------------------------
 
 Coming soon
@@ -253,15 +260,15 @@ Lecture 9
 Lecture 10
 ----------------------------------------
 
-Coming soon
-
-Computer lab 5
-----------------------------------------
-
 - Exercise 1: Given a sequence of function values, write a program to perform kernel density estimation using several kernels
 - Exercise 2: Use line search optimization to solve a 1D logistic regression problem
 - Exercise 3: Implement the secant method for finding roots in 1D
 - Exercise 4: Implement Newton's method and find an approximate solution to several equations (including ones that diverge)
+
+Computer lab 6
+----------------------------------------
+
+Coming soon
 
 Lecture 11
 ----------------------------------------
@@ -283,7 +290,7 @@ Lecture 12
     - Missing data setup
     - Toy example - coin flipping with 2 biased coins
 
-Computer lab 6
+Computer lab 7
 ----------------------------------------
 
 Coming soon
@@ -309,7 +316,7 @@ Lecture 14
     - Compare models (cross-validation)
     - Hypothesis testing (permutation-resampling)
 
-Computer lab 7
+Computer lab 8
 ----------------------------------------
 
 Coming soon
@@ -341,7 +348,7 @@ Lecture 16
 	- Using `pymc2`
 	- Using `emcee`
 
-Computer lab 8
+Computer lab 9
 ----------------------------------------
 
 Coming soon
@@ -373,7 +380,7 @@ Lecture 18
     - Views 
     - Stride tricks
 
-Computer lab 9
+Computer lab 10
 ----------------------------------------
 
 Coming soon
@@ -401,7 +408,7 @@ Lecture 20
     - Using `IPython.Parallel`
     - Using `MPI4py`
 
-Computer lab 10
+Computer lab 11
 ----------------------------------------
 
 Coming soon
@@ -427,7 +434,7 @@ Lecture 22
     - Using `spark` with `pyspark`
     - Using `MLib` for large-scale machine learning
 
-Computer lab 11
+Computer lab 12
 ----------------------------------------
 
 Coming soon
