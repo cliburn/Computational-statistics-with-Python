@@ -247,10 +247,6 @@ Lecture 9
     - Golden section search
     - Bisection
 	- Newton-Raphson and secant methods
-- Packages for optimization
-    - Using `scipy.optimization`
-    - Using `statsmodels`
-	- Using `scikits-learn`
 - General approach to optimization
 	- Know the problem
 	- Multiple random starts
@@ -260,10 +256,15 @@ Lecture 9
 Lecture 10
 ----------------------------------------
 
-- Exercise 1: Given a sequence of function values, write a program to perform kernel density estimation using several kernels
-- Exercise 2: Use line search optimization to solve a 1D logistic regression problem
-- Exercise 3: Implement the secant method for finding roots in 1D
-- Exercise 4: Implement Newton's method and find an approximate solution to several equations (including ones that diverge)
+- Introduction to multivariate optimization
+- 0th order methods - Nelder-Mead
+- 1st order methods - gradient descent and stochastic gradient descent
+- 2nd order methods - Newton's method and related algorithms
+- Example - optimization for maximum likelihood multivariate logistic regression 
+- Python packages for optimization
+    - Using `scipy.optimization`
+    - Using `statsmodels`
+	- Using `scikits-learn`
 
 Computer lab 6
 ----------------------------------------
