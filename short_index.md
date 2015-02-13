@@ -1,13 +1,16 @@
+STA 663 Course Outline
+---
+
 - [x] Lecture 1: Python and the IPython notebook (J)
 - [x] Lecture 2: Functional programming (C)
 - [x] Lecture 3: Python for data science (C)
 - [x] Lecture 4: Using `numpy` and `pandas` (C)
-- [ ] Lecture 5: Computer arithmetic and algorithms (C)
-- [ ] Lecture 6: Linear algebra and matrices I (J)
-- [ ] Lecture 7: Linear algebra and matrices II (J)
-- [ ] Lecture 8: PCA
-- [ ] Lecture 9: Univariate optimization
-- [ ] Lecture 10: Multivariate optimization
+- [x] Lecture 5: Computer arithmetic and algorithms (C)
+- [x] Lecture 6: Linear algebra and matrices I (J)
+- [x] Lecture 7: Linear algebra and matrices II (J)
+- [x] Lecture 8: PCA
+- [x] Lecture 9: Univariate optimization
+- [x] Lecture 10: Multivariate optimization
 - [ ] Lecture 11: Constrained optimization
 - [ ] Lecture 12: Expectation-Maximization I
 - [ ] Lecture 13: Expectation-Maximization II
