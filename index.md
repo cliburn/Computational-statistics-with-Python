@@ -49,10 +49,9 @@ Another very useful as a reference is the official [Python tutorial](https://doc
 Grading
 ----------------------------------------
 
-- Computer lab quizzes (25%)
-- Programming project 1 (25%)
-- Programming project 2 (25%)
-- Final exam (25%)
+- Computer lab homework assignments (50%)
+- Mid-terms  (25%)
+- Final project  (25%)
 
 Computing Platform
 ----------------------------------------
@@ -228,15 +227,12 @@ Lecture 8
     - PCA with eigendecomposition
     - PCA with SVD
    	- Related methods
-        - ICA
  		- LSA
-   		- Factor analysis
-
 
 Computer lab 5
 ----------------------------------------
 
-Coming soon
+See Lab04/Exercises04.ipynb in the course Github repository. 
 
 Lecture 9
 ----------------------------------------
@@ -256,66 +252,76 @@ Lecture 9
 Lecture 10
 ----------------------------------------
 
-- Introduction to multivariate optimization
-- 0th order methods - Nelder-Mead
-- 1st order methods - gradient descent and stochastic gradient descent
-- 2nd order methods - Newton's method and related algorithms
-- Example - optimization for maximum likelihood multivariate logistic regression 
-- Python packages for optimization
-    - Using `scipy.optimization`
-    - Using `statsmodels`
-	- Using `scikits-learn`
+- Practical optimization
+- Convexity, local optima and constraints
+- Condition number
+- Root finding
+- Optimization for univariate scalar functions
+- Optimization for multivariate scalar functions
+- Visualizaiton of progress
+- Application examples
+    - Curve fitting
+    - Fitting ODEs
+	- Graph dispaly using a spring model
+	- Multivariate logistic regression
 
 Computer lab 6
 ----------------------------------------
 
-Coming soon
+See Lab05/Exercises05.ipynb in the course Github repository. 
 
 Lecture 11
 ----------------------------------------
 
-- Constrained optimization
+- Multivariate and Constrained optimization
+    - Review of vector calculus
+    - Innner products
+	- Conjugaate gradients
+	- Newton methods (2nd order)
+	- Quasi-newton methods (1st order)
+	- Powells and Nelder Mead (0th order)
     - Lagrange multipliers
-	- Barriers and penalties
-	- Transfomations
-	- Convex optimization
-	- Packages: `cvxopt`, `cvxpy` and `pyopt`
-
 
 Lecture 12
 ----------------------------------------
 
-- The EM algorithm (1)
+- The EM algorithm
     - Convex and concave functions
     - Jensen's inequality
     - Missing data setup
     - Toy example - coin flipping with 2 biased coins
+    - Gaussian mixture model
+	- Code vectorization example
 
 Computer lab 7
 ----------------------------------------
 
 Coming soon
 
-Lecture 13
+Lecture 13 - Mid-term exams
 ----------------------------------------
 
-- The EM algorithm (2)
-    - Gaussian mixture model
-    - EM for Bayesians - MAP of posterior distribution
-	- Other applications of EM
-    - EM variants
+- Monday 23 January 4:40 - 6:25 (1 hour 45 minutes)
 
 Lecture 14
 ----------------------------------------
 
-- Monte Carlo methods
-	- Random number generators
-    - Generating random variates from a distribution
-	- Quadrature, Monte Carlo estimation and Monte Carlo swindles
-    - Estimate confidence intervals (bootstrap)
-    - Compare competing statistics (statistical simulation - e.g. power)
-    - Compare models (cross-validation)
-    - Hypothesis testing (permutation-resampling)
+- Background and introduction
+    - What are Monte Carlo methods
+    - Applications in general
+    - Applications in statistics
+    - Monte Carlo optimization
+- Where do random numbers come from?
+    - Psudo-random number genrators
+        - Linear conruential generators
+    - Getting one distribution from another
+        - The inverse transform
+        - Rejection sampling
+        - Mixture representations
+-  Monte Carlo integration
+    - Basic concepts
+    - Quasi-random numbers
+- Monte Carlo swindles
 
 Computer lab 8
 ----------------------------------------
@@ -325,8 +331,13 @@ Coming soon
 Lecture 15
 ----------------------------------------
 
+- Resampling methods
+    - Bootstrap
+	- Jackknife
+	- Permuation sampling
+	- Cross-validation
 - Conducting a simulation experiment (case study)
-- Experimental design
+	- Experimental design
     - Variables to study
     - Levels of variables (factorial, Latin hypercube)
     - Code documentation
