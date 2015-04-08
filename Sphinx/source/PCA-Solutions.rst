@@ -41,8 +41,8 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.1178,  0.0385],
-           [ 0.0385,  0.0983]])
+    array([[ 0.0566,  0.0065],
+           [ 0.0065,  0.0469]])
 
 
 
@@ -55,8 +55,8 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.1178,  0.0385],
-           [ 0.0385,  0.0983]])
+    array([[ 0.0566,  0.0065],
+           [ 0.0065,  0.0469]])
 
 
 
@@ -70,9 +70,9 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.1178,  0.0385, -0.0703],
-           [ 0.0385,  0.0983, -0.0189],
-           [-0.0703, -0.0189,  0.1132]])
+    array([[ 0.0566,  0.0065,  0.0063],
+           [ 0.0065,  0.0469, -0.0024],
+           [ 0.0063, -0.0024,  0.1133]])
 
 
 
@@ -215,52 +215,47 @@ do some algebra:
 
 So
 
-\\[ [w]\_B = (
-
 .. raw:: latex
 
-   \begin{array}{cc}
+   \begin{align}
+   [w]_B =
+   \left( \begin{array}{cc}
    ax' + cy' \\
    bx' + dy' 
-   \end{array}
+   \end{array} \right)
+   \end{align}
 
-) \\]
-
-Expressing in matrix form \\[ [w]\_B = (
+Expressing in matrix form
 
 .. raw:: latex
 
-   \begin{array}{cc}
+   \begin{align}
+   [w]_B =
+   \left( \begin{array}{cc}
    a & c \\
    b & d
-   \end{array}
-
-) % (
-
-.. raw:: latex
-
-   \begin{array}{c}
+   \end{array} \right)
+   %
+   \left( \begin{array}{c}
    x' \\
    y'
-   \end{array}
-
-) \\]
+   \end{array} \right)
+   \end{align}
 
 Since :math:`[w]_{B'} = (x', y')`, we see that the linear transform we
 need to change a vector in :math:`B'` to one in :math:`B`, we simply
 mulitply by the *change of coordinates* matrix :math:`P` that is the
 formed by using the basis vectors as column vectors, i.e.
 
-\\[ P = (
-
 .. raw:: latex
 
-   \begin{array}{cc}
+   \begin{align}
+   P =
+   \left( \begin{array}{cc}
    a & c \\
    b & d 
-   \end{array}
-
-) \\]
+   \end{array} \right)
+   \end{align}
 
 To get from :math:`B` to :math:`B'`, we multiply by :math:`P^{-1}`.
 
@@ -350,8 +345,8 @@ coordinates for interpreation. This is simply another linear transform
 
 .. parsed-literal::
 
-    array([[ 1.,  0.],
-           [ 0.,  1.]])
+    array([[  1.0000e+00,   5.5511e-17],
+           [  5.5511e-17,   1.0000e+00]])
 
 
 
@@ -383,8 +378,8 @@ sum of the variances.
 
 .. parsed-literal::
 
-    array([[ 0.5854,  0.1921],
-           [ 0.1921,  0.1993]])
+    array([[ 0.6344,  0.2192],
+           [ 0.2192,  0.2039]])
 
 
 
@@ -396,7 +391,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.7847
+    0.8383
 
 
 
@@ -410,8 +405,8 @@ sum of the variances.
 
 .. parsed-literal::
 
-    array([[ 0.6647,  0.    ],
-           [ 0.    ,  0.12  ]])
+    array([[ 0.7263,  0.    ],
+           [ 0.    ,  0.112 ]])
 
 
 
@@ -423,7 +418,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.7847
+    0.8383
 
 
 
@@ -435,7 +430,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.8471
+    0.8664
 
 
 
@@ -498,8 +493,8 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([[ 0.9244, -0.3815],
-           [ 0.3815,  0.9244]])
+    array([[ 0.9218, -0.3876],
+           [ 0.3876,  0.9218]])
 
 
 
@@ -511,8 +506,8 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([[-0.9244, -0.3815],
-           [-0.3815,  0.9244]])
+    array([[-0.9218, -0.3876],
+           [-0.3876,  0.9218]])
 
 
 
@@ -524,7 +519,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([ 0.6647,  0.12  ])
+    array([ 0.7282,  0.1121])
 
 
 
@@ -536,7 +531,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([ 0.6647,  0.12  ])
+    array([ 0.7282,  0.1121])
 
 
 
@@ -592,13 +587,13 @@ the data set using spectral decomposition.
 
 .. parsed-literal::
 
-    [[ 4.415  -1.6696 -2.7454]
-     [-1.6696  1.5195  0.1501]
-     [-2.7454  0.1501  2.5953]]
-    [  6.8000e+00   1.7298e+00  -3.9728e-16]
-    [[-0.8021  0.1527  0.5774]
-     [ 0.2688 -0.771   0.5774]
-     [ 0.5333  0.6183  0.5774]]
+    [[ 5.005  -1.4784 -3.5266]
+     [-1.4784  1.1497  0.3287]
+     [-3.5266  0.3287  3.198 ]]
+    [  8.0173e+00   1.3353e+00  -1.6873e-15]
+    [[-0.7847  0.2255  0.5774]
+     [ 0.1971 -0.7924  0.5774]
+     [ 0.5877  0.5668  0.5774]]
 
 
 **3**. Find the eigenvecors ane eigenvalues of the coveriance matrix of
@@ -613,10 +608,10 @@ using spectral decomposition.
 
 .. parsed-literal::
 
-    [  6.8008e+00   1.7398e+00   1.4825e-31]
-    [[-0.802   0.1532  0.5774]
-     [ 0.2683 -0.7711  0.5774]
-     [ 0.5337  0.618   0.5774]]
+    [  8.1027e+00   1.3404e+00   7.3335e-31]
+    [[-0.784   0.228   0.5774]
+     [ 0.1946 -0.793   0.5774]
+     [ 0.5894  0.565   0.5774]]
 
 
 **4**. What percent of the total variability is explained by the
@@ -639,7 +634,7 @@ the total variability is retained.
 
 .. parsed-literal::
 
-    Explained variance [ 0.7972  1.      1.    ]
+    Explained variance [ 0.8572  1.      1.    ]
 
 
 **5**. Plot the data points in the origianla and PCA coordiantes as a
@@ -680,12 +675,7 @@ package to perfrom the decomposiiton.
         plt.subplot(2, 3, k+4)
         plt.scatter(B2[dim[0], :], B2[dim[1], :])
 
-.. parsed-literal::
 
-    (3, 100)
-
-
-
-.. image:: PCA-Solutions_files/PCA-Solutions_57_1.png
+.. image:: PCA-Solutions_files/PCA-Solutions_57_0.png
 
 

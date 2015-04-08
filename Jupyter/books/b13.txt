@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+<head>
+<style type="text/css">
+.icon   { background: transparent url(/pics/sprite.png?1422449462) 0 0 no-repeat; }
+</style>
+<link rel="stylesheet" type="text/css" href="/css/pg-desktop-one.css?1422449462" />
+<script type="text/javascript">//<![CDATA[
+var json_search     = "/ebooks/suggest/";
+var mobile_url      = "//m.gutenberg.org/w/captcha/question/?format=mobile";
+var canonical_url   = "http://www.gutenberg.org/w/captcha/question/";
+var lang            = "en_US";
+var fb_lang         = "en_US"; /* FB accepts only xx_XX */
+var msg_load_more   = "Load More Results…";
+var page_mode       = "screen";
+var dialog_title    = "";
+var dialog_message  = "";
+//]]></script>
+<script type="text/javascript" src="/js/pg-desktop-one.js?1422449462"></script>
+<link rel="shortcut icon" href="/pics/favicon" />
+<link rel="canonical" href="http://www.gutenberg.org/w/captcha/question/" />
+<link rel="search" type="application/opensearchdescription+xml" title="Search Project Gutenberg" href="//www.gutenberg.org/catalog/osd-books.xml" />
+<link rel="alternate nofollow" type="application/atom+xml;profile=opds-catalog" title="OPDS feed" href="/w/captcha/question/?format=opds" />
+<link rel="apple-touch-icon" href="/pics/apple-touch-icon" />
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Language" content="en_US" />
+<meta name="title" content="Project Gutenberg" />
+<meta name="description" content="Project Gutenberg offers 48,024 free ebooks for Kindle, iPad, Nook, Android, and iPhone." />
+<meta name="keywords" content="ebook, ebooks, free ebooks, free books, book, books, audio books" />
+<meta name="classification" content="public" />
+<meta property="og:title" content="Project Gutenberg" />
+<meta property="og:description" content="Project Gutenberg offers 48,024 free ebooks for Kindle, iPad, Nook, Android, and iPhone." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="http://www.gutenberg.org/pics/logo-144x144.png" />
+<meta property="og:url" content="http://www.gutenberg.org/w/captcha/question/" />
+<meta property="og:site_name" content="Project Gutenberg" />
+<meta property="fb:app_id" content="115319388529183" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@gutenberg_new" />
+<title>Captcha</title>
+<style type="text/css">
+.ui-dialog-titlebar-close {
+display: none;
+}
+#recaptcha_response_field {
+margin-bottom: 1em;
+width: 300px;
+}
+.recaptcha_only_if_incorrect_sol {
+color: red;
+}
+</style>
+<script type="text/javascript" src="//www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<script type="text/javascript">
+function on_recaptcha_loaded () {
+$('#need_javascript').hide ();
+Recaptcha.focus_response_field ();
+}
+var RecaptchaOptions = {
+theme: "custom",
+custom_theme_widget: "recaptcha_widget",
+callback: on_recaptcha_loaded
+};
+require (
+[
+'jquery',
+'jquery-ui/dialog',
+'jquery.cookie/jquery.cookie'
+],
+function (jquery, dialog, cookie) {
+if (jquery.cookie ('session_id')) {
+jquery ('#need_cookies').hide ();
+}
+Recaptcha.create ("6LfCKOwSAAAAAJL5QwhpdHZSr7kKr0b5_zl6HIXW", "id_captcha", RecaptchaOptions);
+var dlg = jquery ('#dialog');
+dlg.dialog ({
+width: 350,
+resizable: false,
+modal: true,
+closeOnEscape: false
+});
+});
+</script>
+</head>
+<body>
+<div id="mw-head-dummy" class="noprint"></div>
+<div id="content">
+<div class="body">
+<div id="dialog" title="Are you human?" class="hidden">
+<p>You have used Project Gutenberg quite a lot today or clicked through it really fast. To make sure you are human, we ask you to resolve this captcha:</p>
+<form method="post" action="/w/captcha/answer/">
+<div id="recaptcha_widget">
+<div id="recaptcha_image"></div>
+<p class="recaptcha_only_if_incorrect_sol">Incorrect please try again</p>
+<p class="recaptcha_only_if_image">Enter the words you see:</p>
+<p class="recaptcha_only_if_audio">Enter the numbers you hear:</p>
+<input type="text" id="recaptcha_response_field" name="recaptcha_response_field" />
+<input type="submit" name="SubmitButton" value="Submit" />
+<input type="button" name="ReloadButton" value="Get another captcha" onclick="Recaptcha.reload ()" />
+<input type="button" name="AudioButton" value="Get an audio captcha" class="recaptcha_only_if_image" onclick="Recaptcha.switch_type ('audio')" />
+<input type="button" name="ImageButton" value="Get an image captcha" class="recaptcha_only_if_audio" onclick="Recaptcha.switch_type ('image')" />
+<input type="button" name="HelpButton" value="Help" onclick="Recaptcha.showhelp ()" />
+<p id="need_cookies">Project Gutenberg works better with cookies enabled.</p>
+</div>
+</form>
+</div>
+<p id="need_javascript">You need javascript for this.</p>
+</div>
+<div class="footer">
+</div>
+</div>
+<div id="fb-root"></div>
+<div id="print-head" class="noscreen">
+<div class="center">http://www.gutenberg.org/w/captcha/question/<br /><br />Project Gutenberg offers 48,024 free ebooks to download.</div>
+</div>
+<div id="screen-head" class="noprint">
+<table>
+<tr>
+<td rowspan="2" id="logo">
+<a href="/wiki/Main_Page" title="Go to the Main Page.">
+<span id="id8787" class="icon icon_logo"></span>
+</a>
+</td>
+<td id="tagline-badges" colspan="2">
+<table>
+<tr>
+<td id="tagline">Project Gutenberg offers 48,024 free ebooks to download.</td>
+<td id="fb-badge" class="badge">
+<a title="Project Gutenberg on Facebook" href="https://www.facebook.com/project.gutenberg"><span class="icon icon_facebook"></span></a>
+</td>
+<td id="paypal-badge" class="badge">
+<form class="paypal-button" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<div>
+<input lang="en" xml:lang="en" type="hidden" name="cmd" value="_s-xclick" />
+<input lang="en" xml:lang="en" type="hidden" name="hosted_button_id" value="XKAL6BZL3YPSN" />
+<input type="image" name="submit" src="//www.gutenberg.org/pics/paypal/en_US.gif" title="Send us money through PayPal." />
+</div>
+</form>
+</td>
+<td id="flattr-badge" class="badge">
+<a class="flattr-button" target="_blank" href="https://flattr.com/thing/509045/Project-Gutenberg" title="Send us money through Flattr.">
+<span class="icon icon_flattr"></span>
+</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr id="menubar-search">
+<td id="menubar">
+<a id="menubar-first" tabindex="11" accesskey="1" title="Start a new search." href="/ebooks/">Search</a>
+<a tabindex="22" title="Our latest releases." href="/ebooks/search/?sort_order=release_date">Latest</a>
+<a tabindex="31" title="Read the Project Gutenberg terms of use." href="/terms_of_use/">Terms of Use</a>
+<a tabindex="32" href="/wiki/Gutenberg:Project_Gutenberg_Needs_Your_Donation" title="Learn why we need some money.">Donate?</a>
+<a tabindex="33" accesskey="m" href="//m.gutenberg.org/w/captcha/question/?format=mobile" title="Go to our mobile site.">Mobile</a>
+</td>
+<td id="search">
+<form method="get" action="/ebooks/search/" enctype="multipart/form-data">
+<table class="borderless">
+<tr>
+<td id="search-button-cell">
+<button id="search-button" type="submit" title="Execute the search. &lt;enter&gt;">
+<span class="icon icon_smsearch"></span>
+</button>
+</td>
+<td id="search-input-cell">
+<input id="search-input" name="query" type="text" title="Search Project Gutenberg. &lt;s&gt;" accesskey="s" value="" />
+</td>
+<td id="help-button-cell">
+<button id="help-button" type="button" title="Open the help menu. &lt;h&gt;" accesskey="h">Help</button>
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
+</table>
+<div id="helpbox" class="hide">
+<div>
+<p>Enter your search terms separated by spaces,
+then press &lt;Enter&gt;.
+Avoid punctuation except as indicated below:</p>
+<table class="helpbox">
+<tr>
+<th>Suffixes</th>
+<th lang="en" xml:lang="en">.</th>
+<td>exact match</td>
+</tr>
+<tr>
+<th rowspan="7">Prefixes</th>
+<th lang="en" xml:lang="en">a.</th>
+<td>author</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">t.</th>
+<td>title</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">s.</th>
+<td>subject</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">l.</th>
+<td>language</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">#</th>
+<td>ebook no.</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">n.</th>
+<td>ebook no.</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">cat.</th>
+<td>category</td>
+</tr>
+<tr>
+<th rowspan="3" style="width: 8em">
+Operators
+<small>Always put spaces around these.</small>
+</th>
+<th lang="en" xml:lang="en">|</th>
+<td>or</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">!</th>
+<td>not</td>
+</tr>
+<tr>
+<th lang="en" xml:lang="en">( )</th>
+<td>grouping</td>
+</tr>
+</table>
+<table class="helpbox">
+<tr>
+<th>this query</th>
+<th>finds</th>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">shakespeare hamlet</td>
+<td>"Hamlet" by Shakespeare</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">qui.</td>
+<td>"qui", not "Quixote"</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">love stories</td>
+<td>love stories</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">a.shakespeare</td>
+<td>by Shakespeare</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">s.shakespeare</td>
+<td>about Shakespeare</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">#74</td>
+<td>ebook no. 74</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">juvenile l.german</td>
+<td>juvenile lit in German</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">verne ( l.fr | l.it )</td>
+<td>by Verne in French or Italian</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">love stories ! austen</td>
+<td>love stories not by Austen</td>
+</tr>
+<tr>
+<td lang="en" xml:lang="en">jane austen cat.audio</td>
+<td>audio books by Jane Austen</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>
