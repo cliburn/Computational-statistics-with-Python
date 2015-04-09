@@ -1,9 +1,12 @@
 
 Hadoop MapReduce on AWS EMR with ``mrjob``
-------------------------------------------
+==========================================
+
+`Elastic MapReduce
+Quickstart <https://pythonhosted.org/mrjob/guides/emr-quickstart.html>`__
 
 MapReduce code
-~~~~~~~~~~~~~~
+--------------
 
 .. code:: python
 
@@ -32,7 +35,7 @@ MapReduce code
 
 
 Configuration file
-~~~~~~~~~~~~~~~~~~
+------------------
 
 .. code:: python
 
@@ -40,13 +43,13 @@ Configuration file
     
     runners:
       emr:
-        aws_access_key_id: AKIAJR4O2MXDDSYESSAQ
-        aws_secret_access_key: DfRJMv/TaCc6RjaIYKRzb/VnK80xmBML9L4XPrgj
-        ec2_key_pair: EMR2
-        ec2_key_pair_file: ./EMR2.pem
+        aws_access_key_id: <Your AWS access key>
+        aws_secret_access_key: <Your AWS secret key>
+        ec2_key_pair: <Your key_pair name>
+        ec2_key_pair_file: <Location of PEM file>
         ssh_tunnel_to_job_tracker: true
         ec2_master_instance_type: c3.xlarge
-        ec2_instance_type: c3.xlrge
+        ec2_instance_type: c3.xlarge
         num_ec2_instances: 3
 
 
@@ -56,7 +59,7 @@ Configuration file
 
 
 Launching job
-~~~~~~~~~~~~~
+-------------
 
 .. code:: python
 

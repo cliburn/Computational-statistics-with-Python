@@ -18,8 +18,8 @@
     import pystan
     import scipy.stats as stats
 
-PyStan
-------
+Using PyStan
+============
 
 Install PyStan with
 
@@ -33,8 +33,8 @@ to specify the model and the data, which is less flexible and more work.
 However, in exchange you get an extremely powerful HMC package (only
 does HMC) that can be used in R and Python.
 
-Useful links
-~~~~~~~~~~~~
+References
+~~~~~~~~~~
 
 -  `Paper describing
    Stan <http://www.stat.columbia.edu/~gelman/research/unpublished/stan-resubmit-JSS1293.pdf>`__
@@ -43,11 +43,8 @@ Useful links
 -  `PyStan docs <http://pystan.readthedocs.org/en/latest/>`__
 -  `PyStan GitHub page <https://github.com/stan-dev/pystan>`__
 
-Examples
---------
-
 Coin toss
-~~~~~~~~~
+---------
 
 We'll repeat the example of determining the bias of a coin from observed
 coin tosses. The likelihood is binomial, and we use a beta prior.
@@ -135,7 +132,7 @@ The string in coin\_code can also be in a file - say ``coin_code.stan``
 
 
 Estimating mean and standard deviation of normal distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 .. math::
 
@@ -310,7 +307,7 @@ them for later use without needing to recompile.
 
 
 Estimating parameters of a linear regreession model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 We will show how to estimate regression parameters using a simple linear
 modesl
@@ -476,7 +473,7 @@ model to guess the sex.
     pd.scatter_matrix(df_trace[:], diagonal='kde');
 
 Estimating parameters of a logistic model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Gelman's book has an example where the dose of a drug may be affected to
 the number of rat deaths in an experiment.
@@ -541,7 +538,7 @@ Original PyMC3 code
 
 
 Using a hierarchcical model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 This uses the Gelman radon data set and is based off this `IPython
 notebook <http://twiecki.github.io/blog/2014/03/17/bayesian-glms-3/>`__.

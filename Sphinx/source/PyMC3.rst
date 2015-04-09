@@ -24,8 +24,8 @@
     _logger = logging.getLogger("theano.gof.compilelock")
     _logger.setLevel(logging.ERROR)
 
-PyMC3
------
+Using PyMC3
+===========
 
 Install PyMC3 directly from GitHub with
 
@@ -60,11 +60,8 @@ Analysis <https://github.com/aloctavodia/Doing_bayesian_data_analysis>`__.
 However, the API is different and it is not backwards compartible with
 models specified in PyMC2.
 
-Examples
---------
-
 Coin toss
-~~~~~~~~~
+---------
 
 We'll repeat the example of determining the bias of a coin from observed
 coin tosses. The likelihood is binomial, and we use a beta prior.
@@ -105,11 +102,11 @@ Note the different API from PyMC2.
 
 
 
-.. image:: PyMC3_files/PyMC3_7_0.png
+.. image:: PyMC3_files/PyMC3_6_0.png
 
 
 Estimating mean and standard deviation of normal distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 .. math::
 
@@ -153,11 +150,11 @@ Estimating mean and standard deviation of normal distribution
 
 
 
-.. image:: PyMC3_files/PyMC3_10_0.png
+.. image:: PyMC3_files/PyMC3_9_0.png
 
 
 Estimating parameters of a linear regreession model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 We will show how to estimate regression parameters using a simple linear
 modesl
@@ -219,7 +216,7 @@ assume the following priors
      [-----------------100%-----------------] 1000 of 1000 complete in 8.9 sec
 
 
-.. image:: PyMC3_files/PyMC3_12_1.png
+.. image:: PyMC3_files/PyMC3_11_1.png
 
 
 Alternative fromulation using GLM formulas
@@ -245,7 +242,7 @@ Alternative fromulation using GLM formulas
 
 
 
-.. image:: PyMC3_files/PyMC3_15_0.png
+.. image:: PyMC3_files/PyMC3_14_0.png
 
 
 .. code:: python
@@ -260,7 +257,7 @@ Alternative fromulation using GLM formulas
 
 
 
-.. image:: PyMC3_files/PyMC3_16_0.png
+.. image:: PyMC3_files/PyMC3_15_0.png
 
 
 Simple Logistic model
@@ -348,7 +345,7 @@ model to guess the sex.
 
 
 
-.. image:: PyMC3_files/PyMC3_20_0.png
+.. image:: PyMC3_files/PyMC3_19_0.png
 
 
 .. code:: python
@@ -361,7 +358,7 @@ model to guess the sex.
 
 
 
-.. image:: PyMC3_files/PyMC3_21_0.png
+.. image:: PyMC3_files/PyMC3_20_0.png
 
 
 There is no convergence!
@@ -390,7 +387,7 @@ long time to converge. The HMC does much better.
 
 
 
-.. image:: PyMC3_files/PyMC3_24_0.png
+.. image:: PyMC3_files/PyMC3_23_0.png
 
 
 .. code:: python
@@ -454,7 +451,7 @@ long time to converge. The HMC does much better.
 
 
 
-.. image:: PyMC3_files/PyMC3_26_0.png
+.. image:: PyMC3_files/PyMC3_25_0.png
 
 
 We can use the logistic regression results to classify subjects as male
@@ -496,11 +493,11 @@ cutoff.
 
 
 
-.. image:: PyMC3_files/PyMC3_28_0.png
+.. image:: PyMC3_files/PyMC3_27_0.png
 
 
 Estimating parameters of a logistic model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Gelman's book has an example where the dose of a drug may be affected to
 the number of rat deaths in an experiment.
@@ -591,11 +588,11 @@ parameters for the logistic model.
 
 
 
-.. image:: PyMC3_files/PyMC3_32_0.png
+.. image:: PyMC3_files/PyMC3_31_0.png
 
 
 Using a hierarchcical model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 This uses the Gelman radon data set and is based off this `IPython
 notebook <http://twiecki.github.io/blog/2014/03/17/bayesian-glms-3/>`__.
@@ -745,6 +742,6 @@ distributions
 
 
 
-.. image:: PyMC3_files/PyMC3_38_1.png
+.. image:: PyMC3_files/PyMC3_37_1.png
 
 

@@ -13,8 +13,8 @@
     plt.style.use('ggplot')
 
 
-Code Optimization Overview
---------------------------
+Code Optimization
+=================
 
 There is a traditional sequence for writing code, and it goes like this:
 
@@ -548,7 +548,7 @@ conjugate gradient descent, random walk Metropolis versus Hamiltonian
 Monte Carlo.
 
 I/O Bound problems
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Sometimes the issue is that you need to load or save massive amounts of
 data, and the transfer to and from the hard disk is the bootleneck.

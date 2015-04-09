@@ -19,8 +19,8 @@
     import pymc
     import scipy.stats as stats
 
-PyMC2
------
+Using PyMC2
+===========
 
 Install PyMC2 with
 
@@ -30,11 +30,8 @@ Install PyMC2 with
 
 -  `Dcoumentation for PyMC2 <http://pymc-devs.github.io/pymc/>`__
 
-Examples
---------
-
 Coin toss
-~~~~~~~~~
+---------
 
 We'll repeat the example of determining the bias of a coin from observed
 coin tosses. The likelihood is binomial, and we use a beta prior.
@@ -65,7 +62,7 @@ coin tosses. The likelihood is binomial, and we use a beta prior.
      [-----------------100%-----------------] 11000 of 11000 complete in 1.5 sec
 
 
-.. image:: PyMC2_files/PyMC2_6_1.png
+.. image:: PyMC2_files/PyMC2_5_1.png
 
 
 Since the computer is doing all the work, we don't need to use a
@@ -94,11 +91,11 @@ conjugate prior if we have good reasons not to.
      [-----------------100%-----------------] 11000 of 11000 complete in 1.5 sec
 
 
-.. image:: PyMC2_files/PyMC2_9_1.png
+.. image:: PyMC2_files/PyMC2_8_1.png
 
 
 Estimating mean and standard deviation of normal distribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 .. math::
 
@@ -140,11 +137,11 @@ Estimating mean and standard deviation of normal distribution
 
 
 
-.. image:: PyMC2_files/PyMC2_12_0.png
+.. image:: PyMC2_files/PyMC2_11_0.png
 
 
 Estimating parameters of a linear regreession model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 We will show how to estimate regression parameters using a simple linear
 modesl
@@ -204,7 +201,7 @@ deterministic function of the parameters :math:`a`, :math:`b` and
 
 
 
-.. image:: PyMC2_files/PyMC2_16_0.png
+.. image:: PyMC2_files/PyMC2_15_0.png
 
 
 .. code:: python
@@ -242,7 +239,7 @@ deterministic function of the parameters :math:`a`, :math:`b` and
 
 
 
-.. image:: PyMC2_files/PyMC2_18_0.png
+.. image:: PyMC2_files/PyMC2_17_0.png
 
 
 .. code:: python
@@ -264,19 +261,19 @@ deterministic function of the parameters :math:`a`, :math:`b` and
 
 
 
-.. image:: PyMC2_files/PyMC2_19_2.png
+.. image:: PyMC2_files/PyMC2_18_2.png
 
 
 
-.. image:: PyMC2_files/PyMC2_19_3.png
+.. image:: PyMC2_files/PyMC2_18_3.png
 
 
 
-.. image:: PyMC2_files/PyMC2_19_4.png
+.. image:: PyMC2_files/PyMC2_18_4.png
 
 
 Estimating parameters of a logistic model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Gelman's book has an example where the dose of a drug may be affected to
 the number of rat deaths in an experiment.
@@ -376,7 +373,7 @@ parameters for the logistic model.
 
 
 
-.. image:: PyMC2_files/PyMC2_24_0.png
+.. image:: PyMC2_files/PyMC2_23_0.png
 
 
 .. code:: python
@@ -391,15 +388,15 @@ parameters for the logistic model.
 
 
 
-.. image:: PyMC2_files/PyMC2_25_1.png
+.. image:: PyMC2_files/PyMC2_24_1.png
 
 
 
-.. image:: PyMC2_files/PyMC2_25_2.png
+.. image:: PyMC2_files/PyMC2_24_2.png
 
 
 Using a hierarchcical model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 This uses the Gelman radon data set and is based off this `IPython
 notebook <http://twiecki.github.io/blog/2014/03/17/bayesian-glms-3/>`__.
@@ -506,7 +503,7 @@ linear regression model.
 
 
 
-.. image:: PyMC2_files/PyMC2_31_0.png
+.. image:: PyMC2_files/PyMC2_30_0.png
 
 
 .. code:: python
@@ -531,7 +528,7 @@ linear regression model.
 
 
 
-.. image:: PyMC2_files/PyMC2_33_0.png
+.. image:: PyMC2_files/PyMC2_32_0.png
 
 
 Individual couty model
@@ -569,19 +566,19 @@ a model for each county.
      [-----------------100%-----------------] 1100 of 1100 complete in 3.0 sec
 
 
-.. image:: PyMC2_files/PyMC2_35_1.png
+.. image:: PyMC2_files/PyMC2_34_1.png
 
 
 
-.. image:: PyMC2_files/PyMC2_35_2.png
+.. image:: PyMC2_files/PyMC2_34_2.png
 
 
 
-.. image:: PyMC2_files/PyMC2_35_3.png
+.. image:: PyMC2_files/PyMC2_34_3.png
 
 
 
-.. image:: PyMC2_files/PyMC2_35_4.png
+.. image:: PyMC2_files/PyMC2_34_4.png
 
 
 Hiearchical model
@@ -662,18 +659,18 @@ distributions
 
 
 
-.. image:: PyMC2_files/PyMC2_40_0.png
+.. image:: PyMC2_files/PyMC2_39_0.png
 
 
 
-.. image:: PyMC2_files/PyMC2_40_1.png
+.. image:: PyMC2_files/PyMC2_39_1.png
 
 
 
-.. image:: PyMC2_files/PyMC2_40_2.png
+.. image:: PyMC2_files/PyMC2_39_2.png
 
 
 
-.. image:: PyMC2_files/PyMC2_40_3.png
+.. image:: PyMC2_files/PyMC2_39_3.png
 
 

@@ -18,6 +18,9 @@
     
     from IPython.display import HTML, Image
 
+Writing CUDA in C
+=================
+
 Review of GPU Architechture - A Simplification
 ----------------------------------------------
 
@@ -34,7 +37,7 @@ needs to understand a more simplistic view.
 
 
 
-.. image:: GPUSAndCUDAC_files/GPUSAndCUDAC_5_0.jpe
+.. image:: GPUsAndCUDAC_files/GPUsAndCUDAC_6_0.jpe
 
 
 
@@ -69,7 +72,7 @@ grouped into a common block, and the data should be stored in shared
 memory.
 
 Cuda C program - an Outline
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 The following are the minimal ingredients for a Cuda C program:
 

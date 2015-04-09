@@ -1,6 +1,25 @@
 
-Interfacing with compiled languages
------------------------------------
+.. code:: python
+
+    %matplotlib inline
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from numba import jit
+    import numexpr as ne
+    import parakeet
+    %precision 2
+
+
+
+
+.. parsed-literal::
+
+    u'%.2f'
+
+
+
+Optimization bake-off
+=====================
 
 Python is a high-level interpreted language, which greatly reduces the
 time taken to prototyte and develop useful statistical programs.
@@ -23,35 +42,13 @@ http://nbviewer.ipython.org/url/jakevdp.github.io/downloads/notebooks/NumbaCytho
 
 .. code:: python
 
-    %matplotlib inline
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from numba import jit
-    import numexpr as ne
-    import parakeet
-    %precision 2
-
-
-
-
-.. parsed-literal::
-
-    u'%.2f'
-
-
-
-Make up some test data for use later
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: python
-
     A = np.array([[0.0,0.0],[3.0,4.0]])
     n = 1000
     p = 3
     xs = np.random.random((n, p))
 
-"Pure" Python version
-~~~~~~~~~~~~~~~~~~~~~
+Python version
+--------------
 
 .. code:: python
 
@@ -77,14 +74,11 @@ Make up some test data for use later
 
     [[ 0.  5.]
      [ 5.  0.]]
-    1 loops, best of 3: 4.87 s per loop
+    1 loops, best of 3: 3.87 s per loop
 
-
-From Python :math:`\rightarrow` Compiled langauges
---------------------------------------------------
 
 Numpy version
-~~~~~~~~~~~~~
+-------------
 
 The numpy version makes use of advanced broadcasting. To follow the code
 below, we will have to understand numpy broadcasting rules a little
@@ -258,11 +252,11 @@ Finally, we come to the anti-climax - a one-liner function!
 
     [[ 0.  5.]
      [ 5.  0.]]
-    10 loops, best of 3: 72.3 ms per loop
+    10 loops, best of 3: 94.2 ms per loop
 
 
 Numexpr version
-~~~~~~~~~~~~~~~
+---------------
 
 .. code:: python
 
@@ -280,11 +274,11 @@ Numexpr version
 
     [[ 0.  5.]
      [ 5.  0.]]
-    10 loops, best of 3: 27.8 ms per loop
+    10 loops, best of 3: 30.7 ms per loop
 
 
 Numba version
-~~~~~~~~~~~~~
+-------------
 
 .. code:: python
 
@@ -300,11 +294,11 @@ Numba version
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 11.9 ms per loop
+    100 loops, best of 3: 11.7 ms per loop
 
 
 NumbaPro version
-~~~~~~~~~~~~~~~~
+----------------
 
 .. code:: python
 
@@ -319,11 +313,11 @@ NumbaPro version
 
 .. parsed-literal::
 
-    100 loops, best of 3: 14.5 ms per loop
+    100 loops, best of 3: 11.6 ms per loop
 
 
 Parakeet version
-~~~~~~~~~~~~~~~~
+----------------
 
 .. code:: python
 
@@ -339,11 +333,11 @@ Parakeet version
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 20.2 ms per loop
+    100 loops, best of 3: 18.1 ms per loop
 
 
 Cython version
-~~~~~~~~~~~~~~
+--------------
 
 For more control over the translation to C, most Python scientific
 developers will use the Cython package. Essentially, this is a language
@@ -363,6 +357,15 @@ over ther approaches are:
 .. code:: python
 
     %load_ext cythonmagic
+
+
+.. parsed-literal::
+
+    The Cython magic has been moved to the Cython package, hence 
+    `%load_ext cythonmagic` is deprecated; please use `%load_ext Cython` instead.
+    
+    Though, because I am nice, I'll still try to load it for you this time.
+
 
 .. code:: python
 
@@ -398,14 +401,11 @@ over ther approaches are:
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 7.75 ms per loop
+    100 loops, best of 3: 7.09 ms per loop
 
-
-From Compiled langauges :math:`\rightarrow` Python
---------------------------------------------------
 
 C version
-~~~~~~~~~
+---------
 
 There are many ways to wrap C code for Python, such as
 `Cython <http://cython.org/>`__, `Swig <http://www.swig.org/>`__ or
@@ -477,11 +477,11 @@ shown below.
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 8.93 ms per loop
+    100 loops, best of 3: 7.5 ms per loop
 
 
 C++ version
-~~~~~~~~~~~
+-----------
 
 Using C++ is almost the same as using C. Just add an extern C statement
 and use an appropriate C++ compiler.
@@ -550,11 +550,11 @@ and use an appropriate C++ compiler.
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 11.6 ms per loop
+    100 loops, best of 3: 7.56 ms per loop
 
 
-Fortran
-~~~~~~~
+Fortran version
+---------------
 
 .. code:: python
 
@@ -638,7 +638,7 @@ Fortran
 
     [[ 0.  5.]
      [ 5.  0.]]
-    100 loops, best of 3: 9.19 ms per loop
+    100 loops, best of 3: 7.23 ms per loop
 
 
 Bake-off
@@ -675,16 +675,16 @@ Bake-off
 
 .. parsed-literal::
 
-    Python    1 loops, best of 3: 2.97 s per loop
-     Numpy     10 loops, best of 3: 58 ms per loop
-     Numexpr   10 loops, best of 3: 21.1 ms per loop
-     Numba     100 loops, best of 3: 8.4 ms per loop
-     Parakeet  10 loops, best of 3: 23.6 ms per loop
-     Cython    100 loops, best of 3: 9.65 ms per loop
-     C         100 loops, best of 3: 10.7 ms per loop
-     C++       100 loops, best of 3: 12 ms per loop
-     Fortran   100 loops, best of 3: 9.44 ms per loop
-     Scipy     100 loops, best of 3: 4.33 ms per loop
+    Python    1 loops, best of 3: 3.72 s per loop
+     Numpy     10 loops, best of 3: 94.3 ms per loop
+     Numexpr   10 loops, best of 3: 30.8 ms per loop
+     Numba     100 loops, best of 3: 11.7 ms per loop
+     Parakeet  100 loops, best of 3: 22 ms per loop
+     Cython    100 loops, best of 3: 7.08 ms per loop
+     C         100 loops, best of 3: 7.52 ms per loop
+     C++       100 loops, best of 3: 7.58 ms per loop
+     Fortran   100 loops, best of 3: 7.28 ms per loop
+     Scipy     100 loops, best of 3: 4.26 ms per loop
     
 
 
@@ -715,7 +715,7 @@ Summary
    and p=3.
 
 Recommendations for optimizing Python code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 -  Does a reliable fast implementiaont already exist? If so, consider
    using that
@@ -753,7 +753,7 @@ Recommendations for optimizing Python code
 
 .. raw:: html
 
-    <table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>2.7.9 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>2.2.0</td></tr><tr><td>OS</td><td>Darwin 13.4.0 x86_64 i386 64bit</td></tr><tr><td>numpy</td><td>1.9.2</td></tr><tr><td>scipy</td><td>0.15.1</td></tr><tr><td>numexpr</td><td>2.3.1</td></tr><tr><td>numba</td><td>0.17.0</td></tr><tr><td>numbapro</td><td>0.17.1</td></tr><tr><td>parakeet</td><td>0.23.2</td></tr><tr><td>cython</td><td>0.22</td></tr><tr><td>f2py</td><td>f2py</td></tr><tr><td colspan='2'>Thu Mar 26 16:42:39 2015 EDT</td></tr></table>
+    <table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>2.7.9 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>3.1.0</td></tr><tr><td>OS</td><td>Darwin 13.4.0 x86_64 i386 64bit</td></tr><tr><td>numpy</td><td>1.9.2</td></tr><tr><td>scipy</td><td>0.15.1</td></tr><tr><td>numexpr</td><td>2.3.1</td></tr><tr><td>numba</td><td>0.17.0</td></tr><tr><td>numbapro</td><td>0.17.1</td></tr><tr><td>parakeet</td><td>0.23.2</td></tr><tr><td>cython</td><td>0.22</td></tr><tr><td>f2py</td><td>f2py</td></tr><tr><td colspan='2'>Thu Apr 09 09:52:28 2015 EDT</td></tr></table>
 
 
 

@@ -24,8 +24,8 @@
 
     np.random.seed(1234)
 
-Outline of topics for MCMC
---------------------------
+Markov Chain Monte Carlo (MCMC)
+===============================
 
 -  Baye's rule and definitions
 -  Estimating coin bias example
@@ -203,8 +203,8 @@ grid resolution and :math:`d` is the size of :math:`\theta`.
 .. image:: MCMC_files/MCMC_9_0.png
 
 
-Markov Chain Monte Carlo (MCMC)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Metropolis-Hastings sampler
+---------------------------
 
 This lecture will only cover the basic ideas of MCMC and the 3 common
 veriants - Metropolis-Hastings, Gibbs and slice sampling. All ocde will
@@ -395,7 +395,7 @@ works.
 
 
 
-.. image:: MCMC_files/MCMC_13_0.png
+.. image:: MCMC_files/MCMC_12_0.png
 
 
 Assessing for convergence
@@ -442,7 +442,7 @@ practice.
 
 
 
-.. image:: MCMC_files/MCMC_17_0.png
+.. image:: MCMC_files/MCMC_16_0.png
 
 
 Why does Metropolis-Hastings work?
@@ -577,8 +577,8 @@ for algebraic details.
 
 .. |Markov chain| image:: ./mh.png
 
-The Gibbs sampler
-~~~~~~~~~~~~~~~~~
+Gibbs sampler
+-------------
 
 Suppose we have a vector of parameters
 :math:`\theta = (\theta_1, \theta_2, \dots, \theta_k)`, and we want to
@@ -698,11 +698,11 @@ Analytic solution
 
 
 
-.. image:: MCMC_files/MCMC_29_0.png
+.. image:: MCMC_files/MCMC_28_0.png
 
 
 
-.. image:: MCMC_files/MCMC_29_1.png
+.. image:: MCMC_files/MCMC_28_1.png
 
 
 Grid approximation
@@ -730,11 +730,11 @@ Grid approximation
 
 
 
-.. image:: MCMC_files/MCMC_32_0.png
+.. image:: MCMC_files/MCMC_31_0.png
 
 
 
-.. image:: MCMC_files/MCMC_32_1.png
+.. image:: MCMC_files/MCMC_31_1.png
 
 
 Metropolis
@@ -778,11 +778,11 @@ Metropolis
 
 
 
-.. image:: MCMC_files/MCMC_35_0.png
+.. image:: MCMC_files/MCMC_34_0.png
 
 
 
-.. image:: MCMC_files/MCMC_35_1.png
+.. image:: MCMC_files/MCMC_34_1.png
 
 
 Gibbs
@@ -825,15 +825,15 @@ Gibbs
 
 
 
-.. image:: MCMC_files/MCMC_38_0.png
+.. image:: MCMC_files/MCMC_37_0.png
 
 
 
-.. image:: MCMC_files/MCMC_38_1.png
+.. image:: MCMC_files/MCMC_37_1.png
 
 
-Slice sampling
-~~~~~~~~~~~~~~
+Slice sampler
+-------------
 
 Yet another MCMC algorithm is slice sampling. In slice sampling, the
 Markov chain is constructed by using an auxiliary variable representing
@@ -887,7 +887,7 @@ this is typicaly done numerically - repeat
 
 
 
-.. image:: MCMC_files/MCMC_41_0.png
+.. image:: MCMC_files/MCMC_40_0.png
 
 
 Notes on the slice sampler:
@@ -1091,7 +1091,7 @@ Setup
 
 
 
-.. image:: MCMC_files/MCMC_51_0.png
+.. image:: MCMC_files/MCMC_50_0.png
 
 
 LaTeX for Markov chain diagram

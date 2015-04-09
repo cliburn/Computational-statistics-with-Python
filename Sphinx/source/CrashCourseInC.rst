@@ -18,7 +18,7 @@
     from IPython.display import Image
 
 C Crash Course
---------------
+==============
 
 C functions are typically split into header files (``.h``) where things
 are declared but not defined, and implementation files (``.c``) where
@@ -30,6 +30,7 @@ executable file as illuatrated at http://www.codingunit.com/
    :alt: Compilation process
 
    Compilation process
+
 The preprocessor merges the contents of the header and implementation
 files, and also expands any macros. The compiler then translates these
 into low level object code (``.o``) for each file, and the linker then
@@ -39,7 +40,7 @@ generate object code and save it as a library (e.g. so that we can use
 it in Python).
 
 Hello world
-~~~~~~~~~~~
+-----------
 
 .. code:: python
 
@@ -70,7 +71,7 @@ Hello world
     Hello, world!
 
 A tutorial example - coding a Fibonacci function in C
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 Python version
 ^^^^^^^^^^^^^^
@@ -214,11 +215,8 @@ Run executable file
 
     354224848179261997056.000000
 
-C Basics
---------
-
 Types in C
-~~~~~~~~~~
+----------
 
 The basic types are very simple - use int, float and double for numbers.
 In genneral, avoid float for plain C code as its lack of precision may
@@ -262,7 +260,7 @@ You can define your own types using ``typedef`` -.e.g.
     };
 
 Operators
-~~~~~~~~~
+---------
 
 Most of the operators in C are the same in Python, but an important
 difference is the increment/decrement operator. That is
@@ -327,7 +325,7 @@ Note: There is a similar ternary construct in Python
 ``expr = expr1 if condition else epxr2``.
 
 Control of program flow
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Very similar to Python or R. The examples below should be
 self-explanatory.
@@ -335,7 +333,7 @@ self-explanatory.
 if-else
 ^^^^^^^
 
-.. code:: C
+.. code:: c
 
     // Interpretation of grades by Asian parent
     if (grade == 'A') {
@@ -353,7 +351,7 @@ if-else
 for, while, do
 ^^^^^^^^^^^^^^
 
-.. code:: C
+.. code:: c
 
     // Looping variants
 
@@ -381,7 +379,7 @@ The C standard does not require braces if the body is a singel line, but
 I think it is safer to always include them. Note that whitespace is not
 significant in C (unlike Python), so
 
-.. code:: C
+.. code:: c
 
     int i = 10;
     while (i > 0)
@@ -402,7 +400,7 @@ and the use of braces even for single statement bodies prevnets such
 errors.
 
 Arrays and pointers
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Automatic arrays
 ^^^^^^^^^^^^^^^^
@@ -850,7 +848,7 @@ this says
 
 
 Functions
-~~~~~~~~~
+---------
 
 .. code:: python
 
@@ -888,7 +886,7 @@ Functions
 
 
 Function pointers
-~~~~~~~~~~~~~~~~~
+-----------------
 
 How to make a nice function pointer: Start with a regular function
 declaration func, for example, here func is a function that takes a pair
@@ -972,7 +970,7 @@ functions etc as shown in the following example.
 
 
 Using make to compile C programs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 As you have seen, the processs of C program compilation can be quite
 messy, with all sorts of different compiler and linker flags to specify,
@@ -1147,7 +1145,7 @@ depends on the libm C math library.
 
 
 Exercise
-~~~~~~~~
+--------
 
 Debugging programs (understanding compiler warnings and errors)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1253,7 +1251,7 @@ What other language has an annual Obfuscated Code Contest
 http://www.ioccc.org/? In particular, the following features of C are
 very conducive to writing unreadable code:
 
--  lax rules for identifiers (e.g. *o, *\ 0, \_O, O are all valide
+-  lax rules for identifiers (e.g. \_o, \_0, \_O, O are all valide
    identifiers)
 -  chars are bytes and pointers are integers
 -  pointer arithmetic means that ``array[index]`` is the same as

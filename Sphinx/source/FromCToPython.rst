@@ -21,8 +21,11 @@
 
     %load_ext cythonmagic
 
-The Fibonacci Sequence
-----------------------
+Using C code in Python
+======================
+
+Example: The Fibonacci Sequence
+-------------------------------
 
 .. code:: python
 
@@ -55,7 +58,7 @@ The Fibonacci Sequence
 
 
 Using clang and bitey
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 .. code:: python
 
@@ -79,11 +82,16 @@ Using clang and bitey
 
 
 Using gcc and ctypes
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. code:: python
 
     ! gcc -O3 -bundle -undefined dynamic_lookup c_fib.c -o ctypes_fib.so
+
+.. code:: python
+
+    # For Unix systmes
+    # ! gcc -O3 -fPIC -shared -std=c99  c_fib.c -o ctypes_fib.so
 
 .. code:: python
 
@@ -114,7 +122,7 @@ Using gcc and ctypes
 
 
 Using Cython
-~~~~~~~~~~~~
+------------
 
 .. code:: python
 

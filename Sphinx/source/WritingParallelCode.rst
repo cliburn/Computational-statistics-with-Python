@@ -25,8 +25,8 @@
 
     import random
 
-Analysis of problems for parallelism
-------------------------------------
+Writing Parallel Code
+=====================
 
 The goal is to desing parallel programs that are flexible, efficient and
 simple.
@@ -797,9 +797,6 @@ and then
     100 loops, best of 3: 1.95 ms per loop
 
 
-Using parallel execution
-~~~~~~~~~~~~~~~~~~~~~~~~
-
 **The bigger the problem, the more scope there is for parallelism**
 
 **Amhdahls' law** says that the speedup from parallelization is bounded
@@ -813,7 +810,7 @@ for large samples, each iteration may be able perform PDF evaluations in
 parallel for zillions of data points.
 
 Using Multiprocessing
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 -  `Documentation <https://docs.python.org/2/library/multiprocessing.html>`__
 -  `Tutorial - kerndel density esitmation with
@@ -927,7 +924,7 @@ for examples of communicating across processes with multiprocessing.
 
 
 Using IPython parallel for interactive parallel computing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------------------
 
 Start a cluster of workers using IPython notebook interface.
 Alternatively, enter
@@ -1403,8 +1400,8 @@ a %%px cell.
 
 
 
-Other parallel programmign approaches not covered
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Other parallel programming approaches not covered
+-------------------------------------------------
 
 -  `MPI: Message Passing Interface <http://www-unix.mcs.anl.gov/mpi/>`__
 -  `mpi4py: MPI for Python <http://mpi4py.scipy.org/>`__

@@ -23,8 +23,8 @@
     from scipy.optimize import minimize
     from scipy.stats import bernoulli, binom
 
-Outline
--------
+Expectation Maximizatio (EM) Algorithm
+======================================
 
 -  Review of Jensen's inequality
 -  Concavity of log function

@@ -8,6 +8,11 @@ All of the lectures in this course have been developed using this tool.
 In this lecture, we will introduce the notebook interface and
 demonstrate some of its features.
 
+**New**: A new version of the IPython notebook knowan as Jupyter
+supports multiple kernels (differnet languages) and other enhancements.
+For a tour of its features, see this
+`notebook <http://nbviewer.ipython.org/urls/bitbucket.org/ipre/calico/raw/master/notebooks/Documentation/Reference%20Guide/Reference%20Guide.ipynb>`__.
+
 Cells
 -----
 
@@ -39,7 +44,7 @@ To enter a markdown cell, just choose the cell tab and set the type to
 
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_7_0.png
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_8_0.png
 
 
 
@@ -837,7 +842,7 @@ Python as Glue
 
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_26_0.png
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_27_0.png
 
 
 Matlab works too:
@@ -894,7 +899,7 @@ Matlab works too:
 
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_30_0.png
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_31_0.png
 
 
 .. code:: python
@@ -992,7 +997,7 @@ Python <-> R <-> Matlab <-> Octave
 
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_36_0.png
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_37_0.png
 
 
 .. code:: python
@@ -1013,7 +1018,7 @@ Python <-> R <-> Matlab <-> Octave
 
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_37_0.png
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_38_0.png
 
 
 .. code:: python

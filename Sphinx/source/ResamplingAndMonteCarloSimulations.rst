@@ -16,8 +16,8 @@
 
     np.set_printoptions(formatter={'float': lambda x: '%.3f' % x})
 
-Outline
--------
+Resampling methods
+==================
 
 Resampling
 ~~~~~~~~~~
@@ -303,7 +303,7 @@ homework.
 
 
 Bootstrap
-~~~~~~~~~
+---------
 
 The bootstrap is commonly used to estimate statistics when theory fails.
 We have already seen the bootstrap for estiamting confidence bounds for
@@ -375,7 +375,7 @@ Reprise of bootstrap example for Monte Carlo integration
 
 
 Leave some-out resampling
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 Jackknife estimate of parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

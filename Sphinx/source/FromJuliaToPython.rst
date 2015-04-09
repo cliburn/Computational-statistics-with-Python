@@ -12,6 +12,9 @@
     %precision 4
     plt.style.use('ggplot')
 
+Julia and Python
+================
+
 You will need to install Julia from http://julialang.org/downloads/ and
 make sure it is on your path. On Ubuntu you can install via ``apt-get``
 with
@@ -36,7 +39,6 @@ https://github.com/JuliaLang/pyjulia
 
 Make sure that you can start ``julia`` line - if not, add a symlink to
 it.
-
 
 .. code:: python
 
@@ -63,7 +65,7 @@ it.
 
 
 Defining a function in Julia
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. code:: python
 
@@ -87,7 +89,7 @@ Defining a function in Julia
 
 
 Using it in Python
-~~~~~~~~~~~~~~~~~~
+------------------
 
 .. code:: python
 
@@ -105,7 +107,7 @@ Using it in Python
 
 
 Using Python libraries in Julia
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 .. code:: python
 

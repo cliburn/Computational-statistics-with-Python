@@ -1,13 +1,13 @@
 
-What is distributed computing?
-==============================
+Distributed computing for Big Data
+==================================
 
 -  many (cheapish) machines (known as nodes)
 -  loosely coupled
 -  fault tolerant
 
 Why and when does distributed computing matter?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 -  data growing exponentially
 
@@ -35,7 +35,7 @@ Why and when does distributed computing matter?
    -  Volunteer computing (compute time :math:`\gg` data transfer time)
 
 Ingredients for effiicient distributed computing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 -  Problems
 
@@ -54,7 +54,7 @@ Ingredients for effiicient distributed computing
    -  Declarative
 
 What is Hadoop?
-~~~~~~~~~~~~~~~
+---------------
 
 Hadoop is a framework for distributed programming that handles failures
 transparently and provides a way to robuslty code programs for execution
@@ -246,7 +246,7 @@ Working with key-value pairs
 
 
 The Hadoop MapReduce workflow
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 A Hadoop job consists of the input file(s) on HDFS, :math:`m` map tasks
 and :math:`n` reduce tasks, and the output is :math:`n` files. The
@@ -342,7 +342,7 @@ Reduce
 
 
 Using Hadoop MapReduce
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 We want to count the number of times each word occurs in a set of books.
 We will do this in Python.

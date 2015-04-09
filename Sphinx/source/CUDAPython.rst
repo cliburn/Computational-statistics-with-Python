@@ -21,8 +21,8 @@
 
     from timeit import default_timer as timer
 
-Why GPU Programming?
---------------------
+Massively parallel programming with GPUs
+========================================
 
 .. code:: python
 
@@ -420,7 +420,7 @@ For optimal performance, the programmer has to juggle
    for contiguous memory
 
 CUDA Python
-~~~~~~~~~~~
+-----------
 
 We will mostly foucs on the use of CUDA Python via the ``numbapro``
 compiler. Low level Python code using the numbapro.cuda module is
@@ -643,7 +643,7 @@ Fortunately, these :math:`1 \times 1`, :math:`2 \times 2` and
 macro proivded in CUDA Python using the ``grid`` macro.
 
 Vector addition - the 'Hello, world' of CUDA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 Version 1 of the kernel
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -953,7 +953,7 @@ that lack a GPU.
 
 
 Performing a reduction on CUDA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 A more challenging example is to use CUDA to sum a vector. This is a
 reducction and requires communicaiton across threads. In the CUDA model,
@@ -1062,7 +1062,7 @@ steps - and we will revisit this pattern with Hadoop/SPARK.
 
 
 Recreational
-~~~~~~~~~~~~
+------------
 
 We will plot the famous Madnelbrot fractal and compare the code for and
 run times of a pure Pythoo with a GPU version.
@@ -1324,8 +1324,8 @@ FFT and IFFT
 
 
 
-Extras
-------
+More examples
+-------------
 
 Navie matrix multiply
 ~~~~~~~~~~~~~~~~~~~~~

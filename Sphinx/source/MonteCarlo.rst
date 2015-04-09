@@ -20,8 +20,8 @@
     import scipy.stats as stats
     import seaborn as sns
 
-Topics
-------
+Monte Carlo Methods
+===================
 
 -  Background and introduction
 
@@ -48,7 +48,6 @@ Topics
    -  Quasi-random numbers
 
 -  Monte Carlo swindles
-
 
 Pseudorandom number generators (PRNG)
 -------------------------------------
@@ -162,7 +161,7 @@ Inverst transform method
 
 
 
-.. image:: MonteCarlo_files/MonteCarlo_13_0.png
+.. image:: MonteCarlo_files/MonteCarlo_12_0.png
 
 
 Creating a random number generator for arbitrary distributions
@@ -214,7 +213,7 @@ using interpolation.
 
 
 
-.. image:: MonteCarlo_files/MonteCarlo_16_0.png
+.. image:: MonteCarlo_files/MonteCarlo_15_0.png
 
 
 Rejection sampling (Accept-reject method)
@@ -755,7 +754,7 @@ Using importance sampling
     h_is, np.abs(h_is- h_true)/h_true
 
 Quasi-random numbers
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 Recall that the convergence of Monte Carlo integration is
 :math:`\mathcal{0}(n^{1/2})`. It turns out that if we use quasi-random
@@ -792,7 +791,7 @@ functions.
     plt.title('Quasi-random', fontsize=20);
 
 Quasi-Monte Carlo integration can reduce variance
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 

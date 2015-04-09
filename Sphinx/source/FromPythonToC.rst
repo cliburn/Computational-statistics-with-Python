@@ -21,8 +21,11 @@
 
     %load_ext cythonmagic
 
-Fibonacci
-~~~~~~~~~
+Converting Python Code to C for speed
+=====================================
+
+Example: Fibonacci
+------------------
 
 .. code:: python
 
@@ -1003,8 +1006,8 @@ Fibonacci
     1000000 loops, best of 3: 250 ns per loop
 
 
-Matrix multiplication
-~~~~~~~~~~~~~~~~~~~~~
+Example: Matrix multiplication
+------------------------------
 
 .. code:: python
 
@@ -2518,8 +2521,8 @@ Matrix multiplication
     10 loops, best of 3: 205 µs per loop
 
 
-Pairwise distance matrix
-~~~~~~~~~~~~~~~~~~~~~~~~
+Example: Pairwise distance matrix
+---------------------------------
 
 Python
 ^^^^^^
@@ -2571,7 +2574,7 @@ Python
 
 
 Profiling code
-^^^^^^^^^^^^^^
+--------------
 
 .. code:: python
 
@@ -2616,7 +2619,7 @@ Profiling code
 
 
 Numba
-^^^^^
+-----
 
 .. code:: python
 
@@ -2701,7 +2704,7 @@ Numba
 
 
 Cython
-^^^^^^
+------
 
 .. code:: python
 
@@ -3441,7 +3444,7 @@ Cython
 
 
 Comparison with optimized C from scipy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 .. code:: python
 

@@ -34,8 +34,8 @@
       %load_ext biteymagic
 
 
-From compiled code to Python
-----------------------------
+Using functions from various compiled languages in Python
+=========================================================
 
 There are 2 main reasons why interpreted Python code is slower than code
 in a compiled lanauge such as C (or other compiled langauge):
@@ -76,8 +76,8 @@ Here we will look at how to go from C (C++, Fortran, Julia) to Python,
     100000 loops, best of 3: 8.47 µs per loop
 
 
-Calling a C function
-~~~~~~~~~~~~~~~~~~~~
+C
+-
 
 .. code:: python
 
@@ -246,8 +246,8 @@ platforms.
     1000000 loops, best of 3: 224 ns per loop
 
 
-Wrapping a C++ function
-~~~~~~~~~~~~~~~~~~~~~~~
+C++
+---
 
 C++ is a superset of C - the syntax for the fib program is exactly the
 same except for change in the filname extensions.
@@ -339,8 +339,8 @@ same except for change in the filname extensions.
 
 
 
-Calling a Fortran function
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fortran
+-------
 
 This is almost trivial with the Fortran Magic extnesion.
 
@@ -430,7 +430,7 @@ Antoher example from the
 
 
 Benchmarking
-~~~~~~~~~~~~
+------------
 
 .. code:: python
 
@@ -449,7 +449,7 @@ Benchmarking
 
 
 Wrapping a function from a C library for use in Python
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------
 
 Cython ships with a set of standard .pxd files that provide these
 declarations in a readily usable way that is adapted to their use in
@@ -568,7 +568,7 @@ Python.
 
 
 Wrapping functions from C++ library for use in Pyton
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 Example - Andrew Cron (DSS PhD graduate) has a GitHub repository
 wrapping the C++ Armadillo linear algebra package with Cython at
