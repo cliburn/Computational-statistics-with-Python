@@ -12,6 +12,9 @@
     from scipy.stats import ttest_ind as t
     import matplotlib.colors as mcolors
 
+Change of Basis
+===============
+
 Variance and covariance
 -----------------------
 
@@ -46,8 +49,8 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.0566,  0.0065],
-           [ 0.0065,  0.0469]])
+    array([[ 0.0727, -0.0092],
+           [-0.0092,  0.0798]])
 
 
 
@@ -61,8 +64,8 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.0566,  0.0065],
-           [ 0.0065,  0.0469]])
+    array([[ 0.0727, -0.0092],
+           [-0.0092,  0.0798]])
 
 
 
@@ -77,9 +80,9 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 .. parsed-literal::
 
-    array([[ 0.0566,  0.0065,  0.0063],
-           [ 0.0065,  0.0469, -0.0024],
-           [ 0.0063, -0.0024,  0.1133]])
+    array([[ 0.0727, -0.0092,  0.0383],
+           [-0.0092,  0.0798, -0.0299],
+           [ 0.0383, -0.0299,  0.0541]])
 
 
 
@@ -127,7 +130,7 @@ Eigendecomposition of the covariance matrix
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_13_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_14_0.png
 
 
 PCA
@@ -176,7 +179,7 @@ matrix from the positive semi-definite matrix :math:`XX^T`.
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_17_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_18_0.png
 
 
 Change of basis via PCA
@@ -323,7 +326,7 @@ rise to a new set of coordinates.
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_25_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_26_0.png
 
 
 For example, if we only use the first column of ``ys``, we will have the
@@ -351,7 +354,7 @@ coordinates for interpreation. This is simply another linear transform
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_29_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_30_0.png
 
 
 .. code:: python
@@ -364,8 +367,8 @@ coordinates for interpreation. This is simply another linear transform
 
 .. parsed-literal::
 
-    array([[  1.0000e+00,   5.5511e-17],
-           [  5.5511e-17,   1.0000e+00]])
+    array([[ 1.,  0.],
+           [ 0.,  1.]])
 
 
 
@@ -398,8 +401,8 @@ sum of the variances.
 
 .. parsed-literal::
 
-    array([[ 0.6344,  0.2192],
-           [ 0.2192,  0.2039]])
+    array([[ 0.628 ,  0.2174],
+           [ 0.2174,  0.2083]])
 
 
 
@@ -412,7 +415,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.8383
+    0.8364
 
 
 
@@ -427,8 +430,8 @@ sum of the variances.
 
 .. parsed-literal::
 
-    array([[ 0.7263,  0.    ],
-           [ 0.    ,  0.112 ]])
+    array([[ 0.7203,  0.    ],
+           [ 0.    ,  0.116 ]])
 
 
 
@@ -441,7 +444,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.8383
+    0.8364
 
 
 
@@ -454,7 +457,7 @@ sum of the variances.
 
 .. parsed-literal::
 
-    0.8664
+    0.8612
 
 
 
@@ -467,7 +470,7 @@ principal components so that (say) :math:`90\%` fo the total variability
 is exlained.
 
 Using Singular Value Decomposition (SVD) for PCA
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 SVD is a decomposition of the data matrix :math:`X = U S V^T` where
 :math:`U` and :math:`V` are orthogonal matrices and :math:`S` is a
@@ -508,7 +511,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_40_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_41_0.png
 
 
 .. code:: python
@@ -520,8 +523,8 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([[ 0.9218, -0.3876],
-           [ 0.3876,  0.9218]])
+    array([[ 0.9205, -0.3909],
+           [ 0.3909,  0.9205]])
 
 
 
@@ -534,8 +537,8 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([[-0.9218, -0.3876],
-           [-0.3876,  0.9218]])
+    array([[-0.9205, -0.3909],
+           [-0.3909,  0.9205]])
 
 
 
@@ -548,7 +551,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([ 0.7282,  0.1121])
+    array([ 0.7204,  0.1161])
 
 
 
@@ -561,7 +564,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 .. parsed-literal::
 
-    array([ 0.7282,  0.1121])
+    array([ 0.7204,  0.1161])
 
 
 
@@ -619,13 +622,13 @@ the data set using spectral decomposition.
 
 .. parsed-literal::
 
-    [[ 5.005  -1.4784 -3.5266]
-     [-1.4784  1.1497  0.3287]
-     [-3.5266  0.3287  3.198 ]]
-    [  8.0173e+00   1.3353e+00  -1.6873e-15]
-    [[-0.7847  0.2255  0.5774]
-     [ 0.1971 -0.7924  0.5774]
-     [ 0.5877  0.5668  0.5774]]
+    [[ 4.1765 -1.4026 -2.7739]
+     [-1.4026  1.3427  0.0598]
+     [-2.7739  0.0598  2.7141]]
+    [  6.5711e+00   1.6621e+00   8.2823e-16]
+    [[-0.7906  0.204   0.5774]
+     [ 0.2186 -0.7867  0.5774]
+     [ 0.572   0.5827  0.5774]]
 
 
 **3**. Find the eigenvecors ane eigenvalues of the coveriance matrix of
@@ -641,10 +644,10 @@ using spectral decomposition.
 
 .. parsed-literal::
 
-    [  8.1027e+00   1.3404e+00   7.3335e-31]
-    [[-0.784   0.228   0.5774]
-     [ 0.1946 -0.793   0.5774]
-     [ 0.5894  0.565   0.5774]]
+    [  6.5995e+00   1.6711e+00   3.4685e-31]
+    [[-0.7899  0.2066  0.5774]
+     [ 0.2161 -0.7874  0.5774]
+     [ 0.5739  0.5808  0.5774]]
 
 
 **4**. What percent of the total variability is explained by the
@@ -668,7 +671,7 @@ the total variability is retained.
 
 .. parsed-literal::
 
-    Explained variance [ 0.8572  1.      1.    ]
+    Explained variance [ 0.7981  1.      1.    ]
 
 
 **5**. Plot the data points in the origianla and PCA coordiantes as a
@@ -687,7 +690,7 @@ each, where the columns show the (0,1), (0,2) and (1,2) proejctions.
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_55_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_56_0.png
 
 
 **6**. Use the ``decomposition.PCA()`` function from the ``sklearn``
@@ -712,6 +715,6 @@ package to perfrom the decomposiiton.
 
 
 
-.. image:: PCA-Solutions_files/PCA-Solutions_57_0.png
+.. image:: PCA-Solutions_files/PCA-Solutions_58_0.png
 
 

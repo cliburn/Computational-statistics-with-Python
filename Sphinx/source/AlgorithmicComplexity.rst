@@ -13,7 +13,7 @@
 
 
 Algorithmic complexity
-----------------------
+======================
 
 Data structures, as the name implies, are abstract structures for
 storing data. You are already familiar wiht several - e..g. list and
@@ -23,7 +23,7 @@ we need to better understand how the performacne of data structures and
 algorithms is measured so that we can choose the appropriate strategy.
 
 Profling and benchmarking
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 We can measure performance in terms of the time taken as well as in
 terms of the number of basic operations performed. Measuring the time
@@ -60,7 +60,7 @@ can be done conveniently with matic functions.
 
 
 Measuring algorithmic complexity
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 However, profiling doesn't tell us much about how the algorithm will
 perform on a different computer since it is partly determined by the

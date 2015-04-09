@@ -9,8 +9,8 @@
     import regex as re
     import string
 
-Preprocessing textual data
-==========================
+Preprocessing text data
+=======================
 
 Common applciations where there is a need to process text include:
 

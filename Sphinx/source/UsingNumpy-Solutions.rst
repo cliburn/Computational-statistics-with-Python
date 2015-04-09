@@ -22,6 +22,9 @@
       %load_ext version_information
 
 
+Using numpy
+===========
+
 References
 ----------
 
@@ -211,15 +214,11 @@ Computes and print, based on the data in populations.txt...
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_13_1.png
-
-
-Numerical computing in Python
-=============================
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_14_1.png
 
 
 NDArray
-~~~~~~~
+-------
 
 The base structure in ``numpy`` is ``ndarray``, used to represent
 vectors, matrices and higher-dimensional arrays. Each ``ndarray`` has
@@ -468,7 +467,7 @@ Array indexing
 
 
 Broadcasting, row, column and matrix operations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 .. code:: python
 
@@ -663,7 +662,7 @@ Calculate the pairwise distance matrix between the following points
 
 
 Universal functions (Ufuncs)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Functions that work on both scalars and arrays are known as ufuncs. For
 arrays, ufuncs apply the function in an element-wise fashion. Use of
@@ -678,7 +677,7 @@ computtionally efficient than using an explicit loop over each element.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_44_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_43_0.png
 
 
 .. code:: python
@@ -705,7 +704,7 @@ computtionally efficient than using an explicit loop over each element.
 
 
 Generalized ufucns
-~~~~~~~~~~~~~~~~~~
+------------------
 
 A universal function performs vectorized looping over scalars. A
 generalized ufucn performs looping over vectors or arrays. Currently,
@@ -755,7 +754,7 @@ in future lectures.
 
 
 Random numbers
-~~~~~~~~~~~~~~
+--------------
 
 There are two modules for (pseudo) random numbers that are commonly
 used. When all you need is to generate random numbers from some
@@ -808,7 +807,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_53_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_52_0.png
 
 
 .. code:: python
@@ -965,7 +964,7 @@ refernce <http://docs.scipy.org/doc/scipy-0.14.0/reference/stats.html>`__
 
 
 Linear algebra
-~~~~~~~~~~~~~~
+--------------
 
 In general, the linear algebra functions can be found in scipy.linalg.
 You can also get access to BLAS and LAPACK function via
@@ -1314,7 +1313,7 @@ solved in the same way
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_83_1.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_82_1.png
 
 
 .. code:: python
@@ -1333,7 +1332,7 @@ solved in the same way
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_84_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_83_0.png
 
 
 .. code:: python
@@ -1366,7 +1365,7 @@ solved in the same way
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_85_1.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_84_1.png
 
 
 Exercises
@@ -1563,7 +1562,7 @@ and :math:`2\pi` (includsive).
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_94_1.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_93_1.png
 
 
 **5**. Create a matrix that shows the 10 by 10 multiplication table.
@@ -1787,7 +1786,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_107_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_106_0.png
 
 
 .. code:: python
@@ -1853,7 +1852,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_111_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_110_0.png
 
 
 .. code:: python
@@ -1864,7 +1863,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_112_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_111_0.png
 
 
 .. code:: python
@@ -1876,7 +1875,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_113_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_112_0.png
 
 
 .. code:: python
@@ -1888,7 +1887,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_114_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_113_0.png
 
 
 .. code:: python
@@ -1898,7 +1897,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_115_0.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_114_0.png
 
 
 .. code:: python
@@ -1956,7 +1955,7 @@ values of the matrix :math:`m`.
 
 
 
-.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_118_1.png
+.. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_117_1.png
 
 
 .. code:: python

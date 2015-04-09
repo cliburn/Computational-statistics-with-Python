@@ -13,11 +13,11 @@
     plt.style.use('ggplot')
 
 
-Calibration Template for single ODE and system of ODEs
-------------------------------------------------------
+Fitting ODEs with the Levenberg–Marquardt algorithm
+===================================================
 
 1D example
-^^^^^^^^^^
+----------
 
 .. code:: python
 
@@ -97,7 +97,7 @@ Calibration Template for single ODE and system of ODEs
 
 
 2D example
-^^^^^^^^^^
+----------
 
 .. code:: python
 

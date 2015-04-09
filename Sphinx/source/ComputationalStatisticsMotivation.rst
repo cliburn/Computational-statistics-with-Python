@@ -17,7 +17,7 @@
     import scipy.stats as st
 
 Computational problems in statistics
-------------------------------------
+====================================
 
 Starting with some data (which may come from an experiment or a
 simulation), we often use statsitics to answer a few typcical questions:

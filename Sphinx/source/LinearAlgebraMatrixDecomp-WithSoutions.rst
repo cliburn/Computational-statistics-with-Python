@@ -17,8 +17,11 @@
 `SciPy's official tutorial on Linear
 algebra <http://docs.scipy.org/doc/scipy/reference/tutorial/linalg.html>`__
 
+Linear Algebra and Matrix Decompositions
+========================================
+
 Large Linear Systems
-====================
+--------------------
 
 This is the age of Big Data. Every second of every day, data is being
 recorded in countless systems over the world. Our shopping habits, book
@@ -54,15 +57,14 @@ tastes may change over time). Part of the analysis is related to matrix
 decomposition - we won't go into the details of the winning algorithm,
 but we will spend some time on basic matrix decompositions.
 
-
 Matrix Decompositions
-=====================
+---------------------
 
 Matrix decompositions are an important step in solving linear systems in
 a computationally efficient manner.
 
 LU Decomposition and Gaussian Elimination
------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 LU stands for 'Lower Upper', and so an LU decomposition of a matrix
 :math:`A` is a decomposition so that
@@ -233,7 +235,7 @@ lead to numerical instability. Another reason why one should use library
 functions whenever possible!
 
 Cholesky Decomposition
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 Recall that a square matrix :math:`A` is positive definite if
 
@@ -257,7 +259,7 @@ Cholesky decompostion, and :math:`L` may be interpreted as the 'square
 root' of the matrix :math:`A`.
 
 Algorithm:
-~~~~~~~~~~
+^^^^^^^^^^
 
 Let :math:`A` be an :math:`n\times n` matrix. We find the matri
 :math:`L` using the following iterative procedure:
@@ -277,7 +279,7 @@ Let :math:`A` be an :math:`n\times n` matrix. We find the matri
 :math:`L_{22}`
 
 Example:
-~~~~~~~~
+^^^^^^^^
 
 .. math:: A = \left(\begin{matrix}1&3&5\\3&13&23\\5&23&42\end{matrix}\right)
 
@@ -328,10 +330,10 @@ Matrix Decompositions for PCA and Least Squares
 -----------------------------------------------
 
 Eigendecomposition
-------------------
+~~~~~~~~~~~~~~~~~~
 
 Eigenvectors and Eigenvalues
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 First recall that an *eigenvector* of a matrix :math:`A` is a non-zero
 vector :math:`v` such that
@@ -463,7 +465,7 @@ Singular values also provide a measure of the *stabilty* of a matrix.
 We'll revisit this in the end of the lecture.
 
 QR decompositon
----------------
+~~~~~~~~~~~~~~~
 
 As with the previous decompositions, :math:`QR` decomposition is a
 method to write a matrix :math:`A` as the product of two matrices of

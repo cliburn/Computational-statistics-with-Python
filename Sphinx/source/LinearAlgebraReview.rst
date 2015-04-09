@@ -105,7 +105,7 @@ how they *efficiently* solve systems of equations.
 First, let's review some linear algebra topics:
 
 Linear Independence
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 A collection of vectors :math:`v_1,...,v_n` is said to be *linearly
 independent* if
@@ -156,7 +156,7 @@ Linear algebra has a whole lot more to tell us about linear systems, so
 we'll review a few basics.
 
 Norms and Distance of Vectors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Recall that the 'norm' of a vector :math:`v`, denoted :math:`||v||` is
 simply its length. For a vector with components
@@ -342,7 +342,7 @@ Example
 
 
 Trace and Determinant of Matrices
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The trace of a matrix :math:`A` is the sum of its diagonal elements. It
 is important for a couple of reasons:
@@ -399,7 +399,7 @@ What is most important about the determinant:
 
 
 Column space, Row space, Rank and Kernel
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 Let :math:`A` be an :math:`m\times n` matrix. We can view the columns of
 :math:`A` as vectors, say :math:`\textbf{a_1},...,\textbf{a_n}`. The
@@ -427,7 +427,7 @@ Index theorem: For an :math:`m\times n` matrix :math:`A`,
 rank(\ :math:`A`) + nullity(\ :math:`A`) = :math:`n`.
 
 Matrices as Linear Transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Let's consider: what does a matrix *do* to a vector? Matrix
 multiplication has a *geometric* interpretation. When we multiply a
@@ -578,7 +578,7 @@ the basis :math:`v_1, v_2` via
 
 
 Matrix Norms
-~~~~~~~~~~~~
+------------
 
 We can extend the notion of a norm of a vector to a norm of a matrix.
 Matrix norms are used in determining the *condition* of a matrix (we
@@ -616,7 +616,7 @@ the simplests to compute:
 .. math:: ||A||_F = \left(\sum\sum \left(a_{ij}\right)^2\right)^\frac12
 
 Special Matrices
-~~~~~~~~~~~~~~~~
+----------------
 
 Some matrices have interesting properties that allow us either simplify
 the underlying linear system or to understand more about it.

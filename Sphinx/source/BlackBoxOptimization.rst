@@ -16,6 +16,9 @@
 
     import scipy.linalg as la
 
+Practical Optimizatio Routines
+==============================
+
 Finding roots
 -------------
 
@@ -39,7 +42,7 @@ Univariate roots and fixed points
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_5_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_6_0.png
 
 
 .. code:: python
@@ -102,7 +105,7 @@ also exist - e.g. using ``scipy.optimize.fixedpoint``.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_13_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_14_0.png
 
 
 Mutlivariate roots and fixed points
@@ -258,7 +261,7 @@ for some :math:`t` between 0 and 1 - this is shown in the figure below.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_23_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_24_0.png
 
 
 Checking if a function is convex using the Hessian
@@ -377,7 +380,7 @@ Minimizing a univariate function :math:`f: \mathbb{R} \rightarrow \mathbb{R}`
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_36_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_37_0.png
 
 
 The
@@ -435,7 +438,7 @@ Local and global minima
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_42_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_43_0.png
 
 
 .. code:: python
@@ -471,7 +474,7 @@ Local and global minima
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_44_1.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_45_1.png
 
 
 We can try multiple ranodm starts to find the global minimum
@@ -495,7 +498,7 @@ We can try multiple ranodm starts to find the global minimum
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_48_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_49_0.png
 
 
 Using a stochastic algorithm
@@ -534,7 +537,7 @@ with multivariate scalar optimization.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_51_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_52_0.png
 
 
 Minimizing a multivariate function :math:`f: \mathbb{R}^n \rightarrow \mathbb{R}`
@@ -611,7 +614,7 @@ since they may be forced to take many sharp turns.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_57_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_58_0.png
 
 
 Gradient deescent
@@ -732,11 +735,11 @@ function below to ilustrate how it works.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_64_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_65_0.png
 
 
 Newton's method and variants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Recall Newton's method for finding roots of a univariate function
 
@@ -833,7 +836,7 @@ package is ``Newton-GC``.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_69_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_70_0.png
 
 
 Frist order methods
@@ -882,7 +885,7 @@ approximated by finite difference methods.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_72_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_73_0.png
 
 
 Zeroth order methods
@@ -925,11 +928,11 @@ Nelder-Mead simplex algorithm.
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_75_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_76_0.png
 
 
 Constrained optimization
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Many real-world optimization problems have constraints - for example, a
 set of parameters may have to sum to 1.0 (eqquality constraint), or some
@@ -997,7 +1000,7 @@ subject to the constraint
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_78_1.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_79_1.png
 
 
 To set consttarints, we pass in a dictionary with keys ``ty;pe``,
@@ -1084,14 +1087,11 @@ Constrained optimization
 
 
 
-.. image:: BlackBoxOptimization_files/BlackBoxOptimization_86_0.png
+.. image:: BlackBoxOptimization_files/BlackBoxOptimization_87_0.png
 
-
-Some applications of optimization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Curve fitting
-^^^^^^^^^^^^^
+-------------
 
 Sometimes, we simply want to use non-linear least squares to fit a
 function to data, perhaps to estimate paramters for a mechanistic or
@@ -1151,7 +1151,7 @@ have already seen in a more conveneint format.
 
 
 Finding paraemeters for ODE models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 This is a specialized application of ``curve_fit``, in which the curve
 to be fitted is defined implcitly by an ordinary differentail equation
@@ -1170,20 +1170,12 @@ solved but the same approach can be used to find multiple paraemters for
 zombie
 apocalypse <http://adventuresinpython.blogspot.com/2012/08/fitting-differential-equation-system-to.html>`__
 
-.. code:: python
+from scipy.integrate import odeint
 
-    from scipy.integrate import odeint
-    
-    def f(x, t, k):
-        """Simple exponential decay."""
-        return -k*x
-    
-    def x(t, k, x0):
-        """
-        Solution to the ODE x'(t) = f(t,x,k) with initial condition x(0) = x0
-        """
-        x = odeint(f, x0, t, args=(k,))
-        return x.ravel()
+def f(x, t, k): """Simple exponential decay.""" return -k\*x
+
+def x(t, k, x0): """ Solution to the ODE x'(t) = f(t,x,k) with initial
+condition x(0) = x0 """ x = odeint(f, x0, t, args=(k,)) return x.ravel()
 
 .. code:: python
 
@@ -1220,7 +1212,7 @@ apocalypse <http://adventuresinpython.blogspot.com/2012/08/fitting-differential-
 
 
 Optimization of graph node placement
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------------------
 
 To show the many different applications of optimization, here is an
 exmaple using optimization to change the layout of nodes of a graph. We

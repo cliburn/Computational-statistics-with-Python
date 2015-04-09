@@ -7,16 +7,11 @@
     %precision 4
     import os, sys, glob
 
+Working with structured data
+============================
+
 Using SQLite3
 -------------
-
-Willl change this to use the same example for queries and schema design
-
--  Subjects - Ann, Bob, Charlie
--  Tests - Liver function, Complete blood count
--  Test parameters - AST, ALT, RBC, platelets, WBC (may perform all or
-   only subset of parameters)
--  Diffrent number of visits, different number of tests per visit
 
 Working example dataset
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -486,7 +481,7 @@ Self-joins
 
 
 Basic concepts of database normalization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 In which we convert a dataframe into a normalized database.
 
@@ -847,7 +842,7 @@ of rows. As we have seen, we can use SQL queries to recreate the
 origianl dataformat if that is more convenient for analysis.
 
 Using HDF5
-~~~~~~~~~~
+----------
 
 When your data consists of many numerical and matrices, each of which is
 relatively independent, relational databases offer little benefit, and
@@ -929,7 +924,7 @@ matrix and a list of count data at every iteration.
 
 
 Interfacing withPandas
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 .. code:: python
 
