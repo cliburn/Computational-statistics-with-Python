@@ -28,6 +28,7 @@ String methods
     print s.find('wisdom')
     print s.find('foolsihness')
 
+
 .. parsed-literal::
 
     10
@@ -38,6 +39,7 @@ String methods
 .. code:: python
 
     print s.upper()
+
 
 .. parsed-literal::
 
@@ -58,6 +60,7 @@ String methods
 .. code:: python
 
     print s.replace('was', 'might have been')
+
 
 .. parsed-literal::
 
@@ -83,6 +86,7 @@ Splitting and joining strings
     paths = !`echo $PATH`
     print paths[0]
 
+
 .. parsed-literal::
 
     /bin/sh: 1: /home/bitnami/anaconda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games: not found
@@ -92,6 +96,7 @@ Splitting and joining strings
 
     for path in paths[0].split(':'):
         print '=> '.join(path.strip().split('/'))
+
 
 .. parsed-literal::
 
@@ -124,6 +129,7 @@ easier to show than to explain what this does.
     dna = 'gattaca'
     print dna.upper().translate(dna_to_rna).lower()
 
+
 .. parsed-literal::
 
     gauuaca
@@ -135,6 +141,7 @@ easier to show than to explain what this does.
     
     from string import punctuation
     print punctuation
+
 
 .. parsed-literal::
 
@@ -149,6 +156,7 @@ easier to show than to explain what this does.
     
     if not os.path.exists('alice.txt'):
         ! wget http://www.gutenberg.org/cache/epub/11/pg11.txt -O alice.txt
+
 .. code:: python
 
     from collections import Counter
@@ -160,6 +168,7 @@ easier to show than to explain what this does.
     for item in word_counts.most_common(10):
         print item
     print 'alice', word_counts['alice']
+
 
 .. parsed-literal::
 
@@ -250,6 +259,7 @@ details.
     AGCCCGTCAGTATCGGCGGAATTCCAGCTGAGCGCCGGTCGCTACCATTACCAGTTGGTC
     TGGTGTCAAAAATAA
     """
+
 .. code:: python
 
     # Suppose we want to replace motifs that start with 'ATA', 
@@ -271,6 +281,7 @@ details.
     linewidth = 60
     print '\n'.join([''.join(line) for line 
                     in partition(linewidth, modified_dna)])
+
 
 ::
 
@@ -312,6 +323,7 @@ Note: The following are complementary bases A\|T, C\|G.
     
     
 
+
 **2**. Write a regular expression that matches the following:
 
 -  Phone numbers with the format: (919)-1234567 (i.e. (123)-9876543
@@ -327,6 +339,7 @@ Note: The following are complementary bases A\|T, C\|G.
     
     
 
+
 **3**. Download 'Pride and Prejudice' by Jane Austin from Project
 Gutenbrrg.
 
@@ -340,6 +353,7 @@ Gutenbrrg.
     # YOUR CODE HERE
     
     
+
 
 **4**. Download "The Gutenberg Webster's Unabridged Dictionary" from
 Project Gutenbrrg
@@ -355,3 +369,4 @@ Project Gutenbrrg
     # YOUR CODE HERE
     
     
+

@@ -11,11 +11,13 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     np.random.seed(1234)
     import pystan
     import scipy.stats as stats
+
 PyStan
 ------
 
@@ -75,6 +77,7 @@ coin tosses. The likelihood is binomial, and we use a beta prior.
                 }
     
     fit = pystan.stan(model_code=coin_code, data=coin_dat, iter=1000, chains=1)
+
 Loading from a file
 ^^^^^^^^^^^^^^^^^^^
 
@@ -88,6 +91,7 @@ The string in coin\_code can also be in a file - say ``coin_code.stan``
 .. code:: python
 
     print(fit)
+
 
 .. parsed-literal::
 
@@ -113,6 +117,7 @@ The string in coin\_code can also be in a file - say ``coin_code.stan``
 
 
 
+
 .. parsed-literal::
 
     [u'mu', u'sigma', u'lp__']
@@ -123,6 +128,7 @@ The string in coin\_code can also be in a file - say ``coin_code.stan``
 
     fit.plot('p');
     plt.tight_layout()
+
 
 
 .. image:: PyStan_files/PyStan_9_0.png
@@ -161,9 +167,11 @@ Estimating mean and standard deviation of normal distribution
                 }
     
     fit = pystan.stan(model_code=norm_code, data=norm_dat, iter=1000, chains=1)
+
 .. code:: python
 
     print fit
+
 
 .. parsed-literal::
 
@@ -185,6 +193,7 @@ Estimating mean and standard deviation of normal distribution
 .. code:: python
 
     trace = fit.extract()
+
 .. code:: python
 
     plt.figure(figsize=(10,4))
@@ -192,6 +201,7 @@ Estimating mean and standard deviation of normal distribution
     plt.hist(trace['mu'][:], 25, histtype='step');
     plt.subplot(1,2,2); 
     plt.hist(trace['sigma'][:], 25, histtype='step');
+
 
 
 .. image:: PyStan_files/PyStan_14_0.png
@@ -205,6 +215,7 @@ Optimization (finding MAP)
     sm = pystan.StanModel(model_code=norm_code)
     op = sm.optimizing(data=norm_dat)
     op
+
 
 
 
@@ -223,12 +234,15 @@ Reusing fitted objects
                  'n': 100,
                  'y': np.random.normal(10, 2, 100),
                 }
+
 .. code:: python
 
     fit2 = pystan.stan(fit=fit, data=new_dat, chains=1)
+
 .. code:: python
 
     print fit2
+
 
 .. parsed-literal::
 
@@ -265,15 +279,18 @@ them for later use without needing to recompile.
         """Reload compiled models for reuse."""
         import pickle
         return pickle.load(open(filename, 'r'))
+
 .. code:: python
 
     model = pystan.StanModel(model_code=norm_code)
     save(model, 'norm_model.pic')
+
 .. code:: python
 
     new_model = load('norm_model.pic')
     fit4 = new_model.sampling(new_dat, chains=1)
     print fit4
+
 
 .. parsed-literal::
 
@@ -363,13 +380,16 @@ We will assume the following priors
                 }
     
     fit = pystan.stan(model_code=lin_reg_code, data=lin_reg_dat, iter=1000, chains=1)
+
 .. code:: python
 
     print fit
+
 .. code:: python
 
     fit.plot(['a', 'b']);
     plt.tight_layout()
+
 Simple Logistic model
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -381,6 +401,7 @@ model to guess the sex.
     # observed data
     df = pd.read_csv('HtWt.csv')
     df.head()
+
 .. code:: python
 
     data {
@@ -407,6 +428,7 @@ model to guess the sex.
         y[n] ~ bernoulli(inv_logit( alpha + a[g[n]] + x[n]*beta));
       }
     }'
+
 
 .. code:: python
 
@@ -443,13 +465,16 @@ model to guess the sex.
                 }
     
     fit = pystan.stan(model_code=log_reg_code, data=log_reg_dat, iter=2000, chains=1)
+
 .. code:: python
 
     print fit
+
 .. code:: python
 
     df_trace = pd.DataFrame(fit.extract(['c', 'b', 'a']))
     pd.scatter_matrix(df_trace[:], diagonal='kde');
+
 Estimating parameters of a logistic model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -537,6 +562,7 @@ county and floor.
 
     radon = pd.read_csv('radon.csv')[['county', 'floor', 'log_radon']]
     radon.head()
+
 Hiearchical model
 ^^^^^^^^^^^^^^^^^
 

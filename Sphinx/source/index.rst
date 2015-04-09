@@ -13,11 +13,9 @@ Contents:
    	      
    IntroductionToPython-Solutions.rst 
    IPythonNotebookIntroduction.rst
-   IPythonNotebookPolyglot.rst
    Functions-Solutions.rst 
    DataProcessing-Solutions.rst 
    TextProcessing-Solutions.rst 
-   TextProcessing.rst 
    TextProcessingExtras.rst 
    WorkingWithStructuredData.rst 
    UsingNumpy-Solutions.rst 
@@ -29,11 +27,12 @@ Contents:
    LinearAlgebraMatrixDecomp-WithSoutions.rst 
    PCA-Solutions.rst 
    OptimizationInOneDimension.rst 
-   BlackBoxOptimization.rst 
+   BlackBoxOptimization.rst
+   CalibratingODEs.rst
    MultivariateOptimizationAlgortihms.rst 
    EM_algorithm.rst 
    MonteCarlo.rst 
-   Resampling and Monte Carlo simulations.rst 
+   ResamplingAndMonteCarloSimulations.rst 
    MCMC.rst 
    PyMC2.rst
    PyMC3.rst
@@ -48,7 +47,10 @@ Contents:
    Optimization_Bakeoff.rst 
    WritingParallelCode.rst 
    CUDAPython.rst
-   
+   GPUSAndCUDAC.rst
+   DistributedComputing.rst
+   MapReduce.rst
+   Spark.rst
 
 Indices and tables
 ==================

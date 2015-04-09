@@ -1,5 +1,5 @@
 
-Workign with text
+Working with text
 =================
 
 One of Python's strengths is the ease of working with text. Here are
@@ -28,6 +28,7 @@ String methods
     print s.find('wisdom')
     print s.find('foolsihness')
 
+
 .. parsed-literal::
 
     10
@@ -38,6 +39,7 @@ String methods
 .. code:: python
 
     print s.upper()
+
 
 .. parsed-literal::
 
@@ -58,6 +60,7 @@ String methods
 .. code:: python
 
     print s.replace('was', 'might have been')
+
 
 .. parsed-literal::
 
@@ -83,6 +86,7 @@ Splitting and joining strings
     paths = !`echo $PATH`
     print paths[0]
 
+
 .. parsed-literal::
 
     /bin/sh: /usr/local/bin:/Users/cliburn/git/julia/:/Developer/NVIDIA/CUDA-6.5/bin:/Users/cliburn/anaconda/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/opt/X11/bin:/usr/texbin: No such file or directory
@@ -92,6 +96,7 @@ Splitting and joining strings
 
     for path in paths[0].split(':'):
         print '=> '.join(path.strip().split('/'))
+
 
 .. parsed-literal::
 
@@ -111,7 +116,7 @@ Splitting and joining strings
 
 
 The string module
-=================
+-----------------
 
 The string module provides a very useful maketrans function. It is
 easeir to show than to explain what this does.
@@ -125,6 +130,7 @@ easeir to show than to explain what this does.
     dna = 'gattaca'
     print dna.upper().translate(dna_to_rna).lower()
 
+
 .. parsed-literal::
 
     gauuaca
@@ -136,6 +142,7 @@ easeir to show than to explain what this does.
     
     from string import punctuation
     print punctuation
+
 
 .. parsed-literal::
 
@@ -150,6 +157,7 @@ easeir to show than to explain what this does.
     
     if not os.path.exists('alice.txt'):
         ! wget http://www.gutenberg.org/cache/epub/11/pg11.txt -O alice.txt
+
 .. code:: python
 
     from collections import Counter
@@ -161,6 +169,7 @@ easeir to show than to explain what this does.
     for item in word_counts.most_common(10):
         print item
     print 'alice', word_counts['alice']
+
 
 .. parsed-literal::
 
@@ -251,6 +260,7 @@ details.
     AGCCCGTCAGTATCGGCGGAATTCCAGCTGAGCGCCGGTCGCTACCATTACCAGTTGGTC
     TGGTGTCAAAAATAA
     """
+
 .. code:: python
 
     # Suppose we want to replace motifs that start wtih 'ATA', 
@@ -273,6 +283,7 @@ details.
     linewidth = 60
     print '\n'.join([''.join(line) for line 
                     in partition(linewidth, modified_dna)])
+
 
 .. parsed-literal::
 
@@ -358,6 +369,7 @@ Note: The following are complementary bases A\|T, C\|G.
     
     print complement('ATCGTTA')
 
+
 .. parsed-literal::
 
     TAGCAAT
@@ -385,6 +397,7 @@ Note: The following are complementary bases A\|T, C\|G.
         else:
             print 'Not matched', s
 
+
 .. parsed-literal::
 
     Mathced (123)-9876543
@@ -408,6 +421,7 @@ and should probably be checked with a *parser*.
         else:
             print 'Not matched', s
 
+
 .. parsed-literal::
 
     Not matched johm@
@@ -426,6 +440,7 @@ and should probably be checked with a *parser*.
             print 'Mathced', s
         else:
             print 'Not matched', s
+
 
 .. parsed-literal::
 
@@ -449,6 +464,7 @@ Gutenbrrg.
     
     if not os.path.exists('pride_and_prejudice.txt'):
         ! curl 'http://www.gutenberg.org/cache/epub/1342/pg1342.txt' > 'pride_and_prejudice.txt'
+
 .. code:: python
 
     import string
@@ -463,6 +479,7 @@ Gutenbrrg.
         print "'daughter' and 'married' appera %d times in the same 10-word window" % \
             sum('daughter' in window and 'married' in window for window in windows)
         print "The word 'married' appears %d times" % s.count('married')
+
 
 .. parsed-literal::
 
@@ -490,9 +507,11 @@ Project Gutenbrrg
     
     if not os.path.exists('websters.html'):
         ! curl 'www.gutenberg.org/cache/epub/29765/pg29765.html' > 'websters.html'
+
 .. code:: python
 
     ! head -n 400 websters.html | tail -n 30
+
 
 .. parsed-literal::
 
@@ -548,6 +567,7 @@ Project Gutenbrrg
     lengths = map(len, palindromes)
     max_len = max(lengths)
     print "Longest palindromes are", [p for p in palindromes if len(p) == max_len]
+
 
 .. parsed-literal::
 

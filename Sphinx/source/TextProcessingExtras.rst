@@ -8,6 +8,7 @@
     import os, sys, glob
     import regex as re
     import string
+
 Preprocessing textual data
 ==========================
 
@@ -63,10 +64,12 @@ to be Happy Though Married) as an example (from Project Gutenberg).
     import requests
     url = "http://www.gutenberg.org/cache/epub/35534/pg35534.txt"
     raw = requests.get(url).text
+
 .. code:: python
 
     # peek at the first 1000 characters of the downloaded text
     raw[:1000]
+
 
 
 
@@ -100,6 +103,7 @@ extract only the text of the downloaded book.
 
 
 
+
 .. parsed-literal::
 
     u'\r\n\r\n\r\n\r\n\r\nProduced by Colin Bell, Christine P. Travers and the Online\r\nDistributed Proofreading Team at http://www.pgdp.net (This\r\nfile was produced from images generously made available\r\nby The Internet Archive)\r\n\r\n\r\n\r\n\r\n\r\n\r\n[Transcriber\'s note: The author\'s spelling has been maintained.\r\n\r\n+ signs around words indicate the use of a different font in the book.\r\n\r\nIn the word "Puranic", the "a" is overlined in the book.]\r\n\r\n\r\n\r\n\r\n_HOW TO BE HAPPY THOUGH MARRIED._\r\n\r\n\r\n\r\n\r\nPRESS NOTICES ON THE FIRST EDITION.\r\n\r\n  "_If wholesome advice you can brook,\r\n    When single too long you have tarried;\r\n  If comfort you\'d gain from a book,\r\n    When very much wedded and harried;\r\n  No doubt you should speedily look,\r\n    In \'How to be Happy though Married!\'_"--PUNCH.\r\n\r\n\r\n"We strongly recommend this book as one of the best of wedding presents.\r\nIt is a complete handbook to an earthly Paradise, and its author may be\r\nregarded as the Murray of Matrimony and the Baedeker of Bliss."--_Pall\r\nMall Gaze'
@@ -116,6 +120,7 @@ Splitting into words - version using standard string methods
     words1 = re.sub(ur"\p{P}+", "", text.lower()).split()
     print words1[:100]
     len(words1)
+
 
 .. parsed-literal::
 
@@ -152,6 +157,7 @@ Splitting into words - version using the NLTK (Natural Langauge Tool Kit)
     print words2[:100]
     len(words2)
 
+
 .. parsed-literal::
 
     [u'produced', u'by', u'colin', u'bell', u'christine', u'p.', u'travers', u'and', u'the', u'online', u'distributed', u'proofreading', u'team', u'at', u'http', u'//www.pgdp.net', u'this', u'file', u'was', u'produced', u'from', u'images', u'generously', u'made', u'available', u'by', u'the', u'internet', u'archive', u'transcriber', u'note', u'the', u'author', u'spelling', u'has', u'been', u'maintained', u'signs', u'around', u'words', u'indicate', u'the', u'use', u'of', u'a', u'different', u'font', u'in', u'the', u'book', u'in', u'the', u'word', u'puranic', u'the', u'a', u'is', u'overlined', u'in', u'the', u'book', u'_how', u'to', u'be', u'happy', u'though', u'married._', u'press', u'notices', u'on', u'the', u'first', u'edition', u'_if', u'wholesome', u'advice', u'you', u'can', u'brook', u'when', u'single', u'too', u'long', u'you', u'have', u'tarried', u'if', u'comfort', u'you', u'gain', u'from', u'a', u'book', u'when', u'very', u'much', u'wedded', u'and', u'harried', u'no']
@@ -173,6 +179,7 @@ Counting words
     from collections import Counter
     c = Counter(words2)
     c.most_common(n=10)
+
 
 
 
@@ -207,6 +214,7 @@ Ignoring stopwords
 
 
 
+
 .. parsed-literal::
 
     [(u'wife', 353),
@@ -233,6 +241,7 @@ What is the difference between words1 and words2?
 
 
 
+
 .. parsed-literal::
 
     [u'wedmore',
@@ -256,6 +265,7 @@ What is the difference between words1 and words2?
 
 
 
+
 .. parsed-literal::
 
     [u'_john',
@@ -276,6 +286,7 @@ What is the difference between words1 and words2?
     %load_ext version_information
     
     %version_information requests, regex, nltk
+
 
 .. parsed-literal::
 

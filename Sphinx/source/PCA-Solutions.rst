@@ -6,10 +6,12 @@
     import numpy as np
     %precision 4
     import os, sys, glob
+
 .. code:: python
 
     from scipy.stats import ttest_ind as t
     import matplotlib.colors as mcolors
+
 Variance and covariance
 -----------------------
 
@@ -29,13 +31,16 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
         xbar = x.mean()
         ybar = y.mean()
         return np.sum((x - xbar)*(y - ybar))/(len(x) - 1)
+
 .. code:: python
 
     X = np.random.random(10)
     Y = np.random.random(10)
+
 .. code:: python
 
     np.array([[cov(X, X), cov(X, Y)], [cov(Y, X), cov(Y,Y)]])
+
 
 
 
@@ -53,6 +58,7 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
 
 
 
+
 .. parsed-literal::
 
     array([[ 0.0566,  0.0065],
@@ -65,6 +71,7 @@ where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
     # Extension to more vairables is done in a pair-wise way
     Z = np.random.random(10)
     np.cov([X, Y, Z])
+
 
 
 
@@ -85,14 +92,17 @@ Eigendecomposition of the covariance matrix
     sigma = [[0.6,0.2],[0.2,0.2]]
     n = 1000
     x = np.random.multivariate_normal(mu, sigma, n).T
+
 .. code:: python
 
     A = np.cov(x)
+
 .. code:: python
 
     m = np.array([[1,2,3],[6,5,4]])
     ms = m - m.mean(1).reshape(2,1)
     np.dot(ms, ms.T)/2
+
 
 
 
@@ -106,6 +116,7 @@ Eigendecomposition of the covariance matrix
 .. code:: python
 
     e, v = np.linalg.eig(A)
+
 .. code:: python
 
     plt.scatter(x[0,:], x[1,:], alpha=0.2)
@@ -113,6 +124,7 @@ Eigendecomposition of the covariance matrix
         plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
     plt.axis([-3,3,-3,3])
     plt.title('Eigenvectors of covariance matrix scaled by eigenvalue.');
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_13_0.png
@@ -154,12 +166,14 @@ matrix from the positive semi-definite matrix :math:`XX^T`.
 .. code:: python
 
     e1, v1 = np.linalg.eig(np.dot(x, x.T)/(n-1))
+
 .. code:: python
 
     plt.scatter(x[0,:], x[1,:], alpha=0.2)
     for e_, v_ in zip(e1, v1.T):
         plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
     plt.axis([-3,3,-3,3]);
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_17_0.png
@@ -179,6 +193,7 @@ symmetric matrix, and so the eigenvector matrix is an orthogonal matrix.
 
     e, v = np.linalg.eig(np.cov(x))
     v.dot(v.T)
+
 
 
 
@@ -276,7 +291,6 @@ Graphical illustration of change of basis
    :alt: :math:`A = Q^{-1}\Lambda Q`
 
    :math:`A = Q^{-1}\Lambda Q`
-
 Suppose we have a vector :math:`u` in the standard basis :math:`B` , and
 a matrix :math:`A` that maps :math:`u` to :math:`v`, also in :math:`B`.
 We can use the eigenvalues of :math:`A` to form a new basis :math:`B'`.
@@ -291,6 +305,7 @@ to :math:`A` is the diagonal matrix :math:`\Lambda` - this takes
 .. code:: python
 
     ys = np.dot(v1.T, x)
+
 Principal components
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -305,6 +320,7 @@ rise to a new set of coordinates.
     for e_, v_ in zip(e1, np.eye(2)):
         plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
     plt.axis([-3,3,-3,3]);
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_25_0.png
@@ -325,12 +341,14 @@ coordinates for interpreation. This is simply another linear transform
 .. code:: python
 
     zs = np.dot(v1, ys)
+
 .. code:: python
 
     plt.scatter(zs[0,:], zs[1,:], alpha=0.2)
     for e_, v_ in zip(e1, v1.T):
         plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
     plt.axis([-3,3,-3,3]);
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_29_0.png
@@ -340,6 +358,7 @@ coordinates for interpreation. This is simply another linear transform
 
     u, s, v = np.linalg.svd(x)
     u.dot(u.T)
+
 
 
 
@@ -376,6 +395,7 @@ sum of the variances.
 
 
 
+
 .. parsed-literal::
 
     array([[ 0.6344,  0.2192],
@@ -386,6 +406,7 @@ sum of the variances.
 .. code:: python
 
     A.trace()
+
 
 
 
@@ -403,6 +424,7 @@ sum of the variances.
 
 
 
+
 .. parsed-literal::
 
     array([[ 0.7263,  0.    ],
@@ -416,6 +438,7 @@ sum of the variances.
 
 
 
+
 .. parsed-literal::
 
     0.8383
@@ -425,6 +448,7 @@ sum of the variances.
 .. code:: python
 
     D[0,0]/D.trace()
+
 
 
 
@@ -472,6 +496,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 .. code:: python
 
     u, s, v = np.linalg.svd(x)
+
 .. code:: python
 
     e2 = s**2/(n-1)
@@ -482,12 +507,14 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
     plt.axis([-3,3,-3,3]);
 
 
+
 .. image:: PCA-Solutions_files/PCA-Solutions_40_0.png
 
 
 .. code:: python
 
     v1 # from eigenvectors of covariance matrix
+
 
 
 
@@ -504,6 +531,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 
 
+
 .. parsed-literal::
 
     array([[-0.9218, -0.3876],
@@ -517,6 +545,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 
 
 
+
 .. parsed-literal::
 
     array([ 0.7282,  0.1121])
@@ -526,6 +555,7 @@ eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
 .. code:: python
 
     e2 # from SVD
+
 
 
 
@@ -561,6 +591,7 @@ Normalzie so that the row means are 0.
 
 
 
+
 .. parsed-literal::
 
     (3, 100)
@@ -585,6 +616,7 @@ the data set using spectral decomposition.
     print e
     print v
 
+
 .. parsed-literal::
 
     [[ 5.005  -1.4784 -3.5266]
@@ -605,6 +637,7 @@ using spectral decomposition.
     u, s, v = la.svd(A)
     print s**2/(A.shape[1] - 1)
     print u
+
 
 .. parsed-literal::
 
@@ -632,6 +665,7 @@ the total variability is retained.
     e[2:] = 0
     A1 = u.dot(np.diag(e).dot(B1)) # in original coorindate with dimension reduction
 
+
 .. parsed-literal::
 
     Explained variance [ 0.8572  1.      1.    ]
@@ -650,6 +684,7 @@ each, where the columns show the (0,1), (0,2) and (1,2) proejctions.
         plt.scatter(A[dim[0], :], A[dim[1], :])
         plt.subplot(2, 3, k+4)
         plt.scatter(B1[dim[0], :], B1[dim[1], :])
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_55_0.png
@@ -674,6 +709,7 @@ package to perfrom the decomposiiton.
         plt.scatter(A[dim[0], :], A[dim[1], :])
         plt.subplot(2, 3, k+4)
         plt.scatter(B2[dim[0], :], B2[dim[1], :])
+
 
 
 .. image:: PCA-Solutions_files/PCA-Solutions_57_0.png

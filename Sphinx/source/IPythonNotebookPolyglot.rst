@@ -13,6 +13,7 @@ IPython notebook if you install the rpy2 package
 
     %load_ext rpy2.ipython 
 
+
 .. parsed-literal::
 
     The rpy2.ipython extension is already loaded. To reload it, use:
@@ -22,6 +23,7 @@ IPython notebook if you install the rpy2 package
 .. code:: python
 
     %matplotlib inline
+
 .. code:: python
 
     %%R
@@ -30,6 +32,7 @@ IPython notebook if you install the rpy2 package
     
     # scatterplot matrix 
     splom(mtcars[c(1,3,4,5,6)], main="MTCARS Data")
+
 
 
 .. parsed-literal::
@@ -56,6 +59,7 @@ Matlab users are also covered with
     import pymatbridge as pymat
     ip = get_ipython()
     pymat.load_ipython_extension(ip)
+
 .. code:: python
 
     %%matlab
@@ -66,6 +70,7 @@ Matlab users are also covered with
     V = exp(-(X.^2 + Y.^2));
     surf(X,Y,V)
     title('Gridded Data Set', 'fontweight','b');
+
 
 ::
 
@@ -125,6 +130,7 @@ And it is also OK if you prefer Octave. Just type
 .. code:: python
 
     %load_ext octavemagic
+
 .. code:: python
 
     %%octave
@@ -135,6 +141,7 @@ And it is also OK if you prefer Octave. Just type
     [L,U,P] = lu(A)
     [Q,R] = qr(A)
     [V,D] = eig(A)
+
 
 ::
 
@@ -185,6 +192,7 @@ We will redo these examples in Python
     import numpy as np
     import statsmodels.api as sm 
     from pandas.tools.plotting import scatter_matrix
+
 .. code:: python
 
     # First we will load the mtcars dataset and do a scatterplot matrix
@@ -192,6 +200,7 @@ We will redo these examples in Python
     mtcars = sm.datasets.get_rdataset('mtcars')
     df = pd.DataFrame(mtcars.data)
     scatter_matrix(df[[0,2,3,4,5]], alpha=0.3, figsize=(8, 8), diagonal='kde', marker='o');
+
 .. code:: python
 
     # Next we will do the 3D mesh
@@ -207,6 +216,7 @@ We will redo these examples in Python
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(X, Y, V, rstride=1, cstride=1, cmap=plt.cm.jet, linewidth=0.25)
     plt.title('Gridded Data Set');
+
 .. code:: python
 
     # And finally, the matrix manipulations
@@ -227,6 +237,7 @@ We will redo these examples in Python
     print "R =\n", R, '\n'
     print 'V =\n', V, '\n'
     print "D =\nDiagonal matrix\n", np.diag(abs(D)), '\n'
+
 Julia
 -----
 

@@ -12,12 +12,15 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     import bitey
+
 .. code:: python
 
     %load_ext cythonmagic
+
 The Fibonacci Sequence
 ----------------------
 
@@ -25,6 +28,7 @@ The Fibonacci Sequence
 
     %%file c_fib.h
     double c_fib(int n);
+
 
 .. parsed-literal::
 
@@ -44,6 +48,7 @@ The Fibonacci Sequence
         return a;
     }
 
+
 .. parsed-literal::
 
     Overwriting c_fib.c
@@ -55,12 +60,15 @@ Using clang and bitey
 .. code:: python
 
     !clang -O3 -emit-llvm -c c_fib.c -o bitey_fib.o
+
 .. code:: python
 
     import bitey_fib
+
 .. code:: python
 
     bitey_fib.c_fib(10)
+
 
 
 
@@ -76,6 +84,7 @@ Using gcc and ctypes
 .. code:: python
 
     ! gcc -O3 -bundle -undefined dynamic_lookup c_fib.c -o ctypes_fib.so
+
 .. code:: python
 
     from ctypes import CDLL, c_int, c_double
@@ -90,9 +99,11 @@ Using gcc and ctypes
         lib.c_fib.restype  = c_double
         
         return lib.c_fib(n)
+
 .. code:: python
 
     ctypes_fib(10)
+
 
 
 
@@ -109,6 +120,7 @@ Using Cython
 
     %load_ext cythonmagic
 
+
 .. parsed-literal::
 
     The cythonmagic extension is already loaded. To reload it, use:
@@ -120,6 +132,7 @@ Using Cython
     %%file cy_fib.pxd
     cdef extern from "c_fib.h":
         double c_fib(int n)
+
 
 .. parsed-literal::
 
@@ -133,6 +146,7 @@ Using Cython
     
     cpdef cython_fib(n):
         return cy_fib.c_fib(n)
+
 
 .. parsed-literal::
 
@@ -151,6 +165,7 @@ Using Cython
     setup(name = "cython_fib",
           ext_modules = cythonize(ext))
 
+
 .. parsed-literal::
 
     Overwriting setup.py
@@ -159,6 +174,7 @@ Using Cython
 .. code:: python
 
     ! python setup.py build_ext -i &> /dev/null
+
 Benchmark
 ---------
 
@@ -166,11 +182,13 @@ Benchmark
 
     import cy_fib
     import bitey_fib
+
 .. code:: python
 
     print ctypes_fib(100)
     print bitey_fib.c_fib(100)
     print cy_fib.cython_fib(100)
+
 
 .. parsed-literal::
 
@@ -184,6 +202,7 @@ Benchmark
     %timeit -n 1000 ctypes_fib(100)
     %timeit -n 1000 bitey_fib.c_fib(100)
     %timeit -n 1000 cy_fib.cython_fib(100)
+
 
 .. parsed-literal::
 

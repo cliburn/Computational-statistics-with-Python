@@ -11,9 +11,11 @@
     %precision 4
     np.random.seed(1)
     plt.style.use('ggplot')
+
 .. code:: python
 
     import scipy.stats as st
+
 Computational problems in statistics
 ------------------------------------
 
@@ -63,6 +65,7 @@ Data comes from simulation.
     h = sum(results)
     print h
 
+
 .. parsed-literal::
 
     62
@@ -76,6 +79,7 @@ Data comes from simulation.
     mu = rv.mean()
     sd = rv.std()
     mu, sd
+
 
 
 
@@ -93,6 +97,7 @@ Hypothesis testing framework.
 .. code:: python
 
     st.binom_test(h, n, p)
+
 
 
 
@@ -114,6 +119,7 @@ Use of approximation when true solution is computatioanlly expensive.
 
 
 
+
 .. parsed-literal::
 
     2.3000
@@ -123,6 +129,7 @@ Use of approximation when true solution is computatioanlly expensive.
 .. code:: python
 
     2*(1 - st.norm.cdf(z))
+
 
 
 
@@ -142,9 +149,11 @@ assumptions of test)
 
     nsamples = 100000
     xs = np.random.binomial(n, p, nsamples)
+
 .. code:: python
 
     2*np.sum(xs >= h)/(xs.size + 0.0)
+
 
 
 
@@ -163,6 +172,7 @@ Point estimate of parameter.
 
     print "Maximum likelihood", np.sum(results)/float(len(results))
 
+
 .. parsed-literal::
 
     Maximum likelihood 0.62
@@ -179,6 +189,7 @@ Interval etsimate of parameter.
     bs_ps = np.mean(bs_samples, axis=1)
     bs_ps.sort()
     print "Bootstrap CI: (%.4f, %.4f)" % (bs_ps[int(0.025*nsamples)], bs_ps[int(0.975*nsamples)])
+
 
 .. parsed-literal::
 
@@ -207,6 +218,7 @@ from which all other point/interval statistics can be estimated.
     plt.axhline(0.3, ci[0], ci[1], c='black', linewidth=2, label='95% CI');
     plt.axvline(n*map_, c='blue', linestyle='dashed', alpha=0.4)
     plt.legend();
+
 
 
 .. image:: ComputationalStatisticsMotivation_files/ComputationalStatisticsMotivation_19_0.png

@@ -4,10 +4,12 @@
     %matplotlib inline
     import numpy as np
     import matplotlib.pyplot as plt
+
 .. code:: python
 
     import warnings
     warnings.filterwarnings("ignore")
+
 Using Pandas
 ------------
 
@@ -28,6 +30,7 @@ Users <http://pandas.pydata.org/pandas-docs/stable/comparison_with_r.html>`__
     from pandas import Series, DataFrame, Panel
     from string import ascii_lowercase as letters
     from scipy.stats import chisqprob
+
 Series
 ~~~~~~
 
@@ -43,6 +46,7 @@ Series is a 1D array with axis labels.
     print xs[::3], '\n'
     print xs[['d', 'f', 'h']], '\n'
     print xs.d, xs.f, xs.h
+
 
 .. parsed-literal::
 
@@ -79,6 +83,7 @@ Series is a 1D array with axis labels.
 
 
 
+
 .. parsed-literal::
 
     (4.5, 8.25)
@@ -91,6 +96,7 @@ Series is a 1D array with axis labels.
     plt.plot(xs, np.sin(xs), 'r-o', xs, np.cos(xs), 'b-x');
 
 
+
 .. image:: UsingPandas_files/UsingPandas_7_0.png
 
 
@@ -99,6 +105,7 @@ Series is a 1D array with axis labels.
     # Convert to numpy arrays with values
     
     print xs.values
+
 
 .. parsed-literal::
 
@@ -121,6 +128,7 @@ Series is a 1D array with axis labels.
     # Extracting elements
     print ts[0:4], '\n'
     print ts['2015-01-21':'2015-01-28'], '\n' # Note - includes end time
+
 
 .. parsed-literal::
 
@@ -151,6 +159,7 @@ Series is a 1D array with axis labels.
     
     df = ts.resample(rule='W', how=('mean', 'std', lambda x: sum(x*x)))
     df
+
 
 
 
@@ -221,6 +230,7 @@ Series object.
     # Note that the df object in the previous cell is a DataFrame
     print type(df)
 
+
 .. parsed-literal::
 
     <class 'pandas.core.frame.DataFrame'>
@@ -235,6 +245,7 @@ Series object.
     
     df.columns = ('mu', 'sigma', 'sum_of_sq')
     print df
+
 
 .. parsed-literal::
 
@@ -253,6 +264,7 @@ Series object.
     
     print df.mu, '\n' # by attribute
     print df['sigma'], '\n' # by column name
+
 
 .. parsed-literal::
 
@@ -281,6 +293,7 @@ Series object.
     print df[1:3], '\n'
     print df['2015-01-21'::2]
 
+
 .. parsed-literal::
 
                        mu     sigma   sum_of_sq
@@ -301,6 +314,7 @@ Series object.
     print df.loc['2015-01-25':'2015-03-01', 'sum_of_sq'], '\n' # indexing by label
     print df.iloc[:3, 2], '\n'  # indexing by position
     print df.ix[:3, 'sum_of_sq'], '\n' # by label OR position
+
 
 .. parsed-literal::
 
@@ -333,6 +347,7 @@ Series object.
     print df[(df.sigma < 1) & (df.sum_of_sq < 700)], '\n' # need parenthesis because of operator precedence
     print df.query('sigma < 1 and sum_of_sq < 700') # the query() method allows more readable query strings
 
+
 .. parsed-literal::
 
                       mu     sigma  sum_of_sq
@@ -357,6 +372,7 @@ DataFrames.
     score_panel = Panel({'Girls': dff, 'Boys': dfm})
     print score_panel, '\n'
 
+
 .. parsed-literal::
 
     <class 'pandas.core.panel.Panel'>
@@ -370,6 +386,7 @@ DataFrames.
 .. code:: python
 
     score_panel['Girls'].transpose()
+
 
 
 
@@ -439,6 +456,7 @@ DataFrames.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -504,9 +522,11 @@ to each subgroup.
     except:
         tips = pd.read_csv('https://raw.github.com/vincentarelbundock/Rdatasets/master/csv/reshape2/tips.csv', )
         tips.to_pickle('tips.pic')
+
 .. code:: python
 
     tips.head(n=4)
+
 
 
 
@@ -588,6 +608,7 @@ to each subgroup.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -663,6 +684,7 @@ to each subgroup.
 
 
 
+
 .. parsed-literal::
 
     sex     smoker
@@ -679,6 +701,7 @@ to each subgroup.
     # If you need the margins, use the crosstab function
     
     pd.crosstab(tips.sex, tips.smoker, margins=True)
+
 
 
 
@@ -730,6 +753,7 @@ to each subgroup.
     # If more than 1 column of resutls is generated, a DataFrame is returned
     
     grouped.mean()
+
 
 
 
@@ -799,6 +823,7 @@ to each subgroup.
     print converter
     grouped['total_bill', 'tip'].mean().apply(lambda x: x*converter['rate'])
 
+
 .. parsed-literal::
 
     {u'to': u'EUR', u'rate': 0.879191, u'from': u'USD'}
@@ -865,6 +890,7 @@ to each subgroup.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -907,6 +933,7 @@ to each subgroup.
 
     # Suppose we want to apply a set of functions to only some columns
     grouped['total_bill', 'tip'].agg(['mean', 'min', 'max'])
+
 
 
 
@@ -995,6 +1022,7 @@ to each subgroup.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -1074,6 +1102,7 @@ Many of the basic statistical tools available in R are replicted in the
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -1149,6 +1178,7 @@ Many of the basic statistical tools available in R are replicted in the
     fit1 = sm.Logit.from_formula('status ~ %s' % '+'.join(df.columns[1:]), data=df).fit()
     fit1.summary()
 
+
 .. parsed-literal::
 
     Optimization terminated successfully.
@@ -1215,6 +1245,7 @@ Many of the basic statistical tools available in R are replicted in the
     print chisqprob(fit2.null_deviance - fit2.deviance, fit2.df_model)
     print(fit2.null_deviance - fit2.deviance, fit2.df_model)
 
+
 .. parsed-literal::
 
                      Generalized Linear Model Regression Results                  
@@ -1256,12 +1287,14 @@ the -i flag and R objects pased out with the -o flag.
 .. code:: python
 
     ! pip install ggplot &> /dev/null
+
 Using Rmagic
 ~~~~~~~~~~~~
 
 .. code:: python
 
     %load_ext rpy2.ipython
+
 .. code:: python
 
     %%R -i df,status -o fit
@@ -1271,6 +1304,7 @@ Using Rmagic
     print(fit$null.deviance - fit$deviance)
     print(fit$df.null - fit$df.residual)
     with(fit, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+
 
 
 .. parsed-literal::
@@ -1320,6 +1354,7 @@ Using rpy2 directly
     fit_full = ro.r("lm('mpg ~ wt + cyl', data=mtcars)")
     print(base.summary(fit_full))
 
+
 .. parsed-literal::
 
     
@@ -1358,6 +1393,7 @@ Reading R dataset into Python
     df = com.load_data('mtcars')
     print df.head(n=6)
 
+
 .. parsed-literal::
 
         mpg  cyl  disp   hp  drat     wt   qsec  vs  am  gear  carb
@@ -1374,6 +1410,7 @@ Reading R dataset into Python
     %load_ext version_information
     
     %version_information numpy, matplotlib, pandas, statsmodels
+
 
 
 

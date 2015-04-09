@@ -12,12 +12,15 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     from numba import jit, int32, int64, float32, float64 
+
 .. code:: python
 
     %load_ext cythonmagic
+
 Fibonacci
 ~~~~~~~~~
 
@@ -28,6 +31,7 @@ Fibonacci
         for i in range(n):
             a, b = a+b, a
         return a
+
 .. code:: python
 
     @jit(float64(int64), nopython=True, locals={'a': float64})
@@ -39,6 +43,7 @@ Fibonacci
             a = a + b
             b = tmp
         return a
+
 .. code:: python
 
     %%cython -a
@@ -48,6 +53,7 @@ Fibonacci
         for i in range(n):
             a, b = a+b, a
         return a
+
 
 
 
@@ -542,6 +548,7 @@ Fibonacci
 
 
 
+
 .. raw:: html
 
     <!DOCTYPE html>
@@ -988,6 +995,7 @@ Fibonacci
     %timeit numba_fib(100)
     %timeit cy_fib(100)
 
+
 .. parsed-literal::
 
     100000 loops, best of 3: 8.77 µs per loop
@@ -1014,6 +1022,7 @@ Matrix multiplication
                 for k in range(n):
                     w[i, j] += u[i, k] * v[k, j]
         return w
+
 
 
 
@@ -1870,6 +1879,7 @@ Matrix multiplication
                 for k in range(n):
                     w[i, j] += u[i, k] * v[k, j]
         return w   
+
 .. code:: python
 
     %%cython -a
@@ -1891,6 +1901,7 @@ Matrix multiplication
                 for k in range(n):
                     w[i, j] += u[i, k] * v[k, j]
         return np.asarray(w)
+
 
 
 
@@ -2490,12 +2501,14 @@ Matrix multiplication
     p = 40
     u = np.random.random((m, n))
     v = np.random.random((n, p))
+
 .. code:: python
 
     %timeit -n 10 np.dot(u, v)
     %timeit -n 10 py_mult(u, v)
     %timeit -n 10 numba_mult(u, v)
     %timeit -n 10 cy_mult(u, v)
+
 
 .. parsed-literal::
 
@@ -2533,12 +2546,15 @@ Python
                 else:
                     ds[i, j] = dist(vs, i, j)
         return ds
+
 .. code:: python
 
     vs = np.random.random((100, 100))
+
 .. code:: python
 
     py_pairwise(vs, py_euclidean)
+
 
 
 
@@ -2561,6 +2577,7 @@ Profiling code
 
     %timeit py_pairwise(vs, py_euclidean)
 
+
 .. parsed-literal::
 
     1 loops, best of 3: 520 ms per loop
@@ -2570,6 +2587,7 @@ Profiling code
 
     prof = %prun -r -q py_pairwise(vs, py_euclidean)
 
+
 .. parsed-literal::
 
      
@@ -2577,6 +2595,7 @@ Profiling code
 .. code:: python
 
     prof.sort_stats('time').print_stats(10);
+
 
 .. parsed-literal::
 
@@ -2623,10 +2642,12 @@ Numba
                 else:
                     ds[i, j] = dist(vs, i, j)
         return ds
+
 .. code:: python
 
     %timeit -n 100 py_euclidean(vs, 0, 1)
     %timeit -n 100 numba_euclidean(vs, 0, 1)
+
 
 .. parsed-literal::
 
@@ -2639,6 +2660,7 @@ Numba
     %timeit -n 10 py_pairwise(vs, py_euclidean)
     %timeit -n 10 numba_pairwise(vs, numba_euclidean)
 
+
 .. parsed-literal::
 
     10 loops, best of 3: 537 ms per loop
@@ -2649,6 +2671,7 @@ Numba
 
     prof = %prun -r -q numba_pairwise(vs, numba_euclidean)
 
+
 .. parsed-literal::
 
      
@@ -2656,6 +2679,7 @@ Numba
 .. code:: python
 
     prof.sort_stats('time').print_stats(10);
+
 
 .. parsed-literal::
 
@@ -2724,6 +2748,7 @@ Cython
                 else:
                     ds[i, j] = dist(vs, i, j)
         return np.asarray(ds)
+
 
 
 
@@ -3407,6 +3432,7 @@ Cython
     %timeit -n 10 numba_pairwise(vs, numba_euclidean)
     %timeit -n 10 cy_pairwise(vs)
 
+
 .. parsed-literal::
 
     10 loops, best of 3: 576 ms per loop
@@ -3422,6 +3448,7 @@ Comparison with optimized C from scipy
     from scipy.spatial.distance import pdist
     
     %timeit -n 10 pdist(vs)
+
 
 .. parsed-literal::
 

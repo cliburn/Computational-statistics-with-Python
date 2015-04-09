@@ -11,6 +11,7 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 You will need to install Julia from http://julialang.org/downloads/ and
 make sure it is on your path. On Ubuntu you can install via ``apt-get``
 with
@@ -41,6 +42,7 @@ it.
 
     %install_ext https://raw.githubusercontent.com/JuliaLang/pyjulia/master/julia/magic.py
 
+
 .. parsed-literal::
 
     Installed magic.py. To use it, type:
@@ -53,6 +55,7 @@ it.
     %julia @pyimport matplotlib.pyplot as plt
     %julia @pyimport numpy as np
     %julia @pyimport numpy.random as npr
+
 
 .. parsed-literal::
 
@@ -76,6 +79,7 @@ Defining a function in Julia
 
 
 
+
 .. parsed-literal::
 
     <PyCall.jlwrap fib>
@@ -90,6 +94,7 @@ Using it in Python
     jfib = %julia fib
     
     jfib(100)
+
 
 
 
@@ -111,6 +116,7 @@ Using Python libraries in Julia
 
 
 
+
 .. parsed-literal::
 
     <matplotlib.collections.PathCollection at 0x1220f3a50>
@@ -127,6 +133,7 @@ Benchmarking
 .. code:: python
 
     %timeit jfib(100)
+
 
 .. parsed-literal::
 

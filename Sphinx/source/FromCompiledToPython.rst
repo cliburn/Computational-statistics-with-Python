@@ -11,11 +11,13 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     ! pip install git+https://github.com/dabeaz/bitey.git
     %install_ext https://raw.github.com/mgaitan/fortran_magic/master/fortranmagic.py
     %install_ext https://gist.githubusercontent.com/bfroehle/3458310/raw/biteymagic.py
+
 
 .. parsed-literal::
 
@@ -63,9 +65,11 @@ Here we will look at how to go from C (C++, Fortran, Julia) to Python,
         for i in range(n):
             a, b = a+b, a
         return a
+
 .. code:: python
 
     %timeit python_fib(100)
+
 
 .. parsed-literal::
 
@@ -80,6 +84,7 @@ Calling a C function
     %%file fib.h
     
     double fib(int n);
+
 
 .. parsed-literal::
 
@@ -100,6 +105,7 @@ Calling a C function
         return a;
     }
 
+
 .. parsed-literal::
 
     Writing fib.c
@@ -114,14 +120,17 @@ This is perhaps the simplest method, but it only works with the
 .. code:: python
 
     import bitey
+
 .. code:: python
 
     !clang -O3 -emit-llvm -c fib.c -o fib1.o
+
 .. code:: python
 
     import fib1
     
     fib1.fib(100)
+
 
 
 
@@ -134,6 +143,7 @@ This is perhaps the simplest method, but it only works with the
 .. code:: python
 
     %timeit fib1.fib(100)
+
 
 .. parsed-literal::
 
@@ -158,6 +168,7 @@ Define functions to be imported from C
     cdef extern from "fib.h":
         double fib(int n)
 
+
 .. parsed-literal::
 
     Writing fib.pxd
@@ -174,6 +185,7 @@ Define wrapper for calling function from Python
     
     def fib(n):
         return fib.fib(n)
+
 
 .. parsed-literal::
 
@@ -199,6 +211,7 @@ platforms.
     setup(name = "cython_fib",
           ext_modules = cythonize(ext))
 
+
 .. parsed-literal::
 
     Overwriting setup.py
@@ -207,11 +220,13 @@ platforms.
 .. code:: python
 
     ! python setup.py build_ext -i &> /dev/null
+
 .. code:: python
 
     import fib2
     
     fib2.fib(100)
+
 
 
 
@@ -224,6 +239,7 @@ platforms.
 .. code:: python
 
     %timeit fib2.fib(100)
+
 
 .. parsed-literal::
 
@@ -241,6 +257,7 @@ same except for change in the filname extensions.
     %%file fib.hpp
     
     double fib(int n);
+
 
 .. parsed-literal::
 
@@ -261,6 +278,7 @@ same except for change in the filname extensions.
         return a;
     }
 
+
 .. parsed-literal::
 
     Writing fib.cpp
@@ -279,6 +297,7 @@ same except for change in the filname extensions.
     setup(name = "cython_fibcpp",
           ext_modules = cythonize(ext))
 
+
 .. parsed-literal::
 
     Overwriting setup.py
@@ -293,6 +312,7 @@ same except for change in the filname extensions.
     def fib(n):
         return fib.fib(n)
 
+
 .. parsed-literal::
 
     Writing fib2cpp.pyx
@@ -301,12 +321,15 @@ same except for change in the filname extensions.
 .. code:: python
 
     ! python setup.py build_ext -i &> /dev/null
+
 .. code:: python
 
     import fib2cpp
+
 .. code:: python
 
     fib2cpp.fib(100)
+
 
 
 
@@ -324,9 +347,11 @@ This is almost trivial with the Fortran Magic extnesion.
 .. code:: python
 
     ! pip install fortran-magic &> /dev/null
+
 .. code:: python
 
     %load_ext fortranmagic
+
 
 
 
@@ -349,9 +374,11 @@ This is almost trivial with the Fortran Magic extnesion.
             a = a + tmp
         end do
     end subroutine
+
 .. code:: python
 
     fib3(100)
+
 
 
 
@@ -385,12 +412,14 @@ Antoher example from the
         call DGESV(n, 1, A, n, pivot, x, n, ok)
         
     end subroutine
+
 .. code:: python
 
     A = np.array([[1, 2.5], [-3, 4]])
     b = np.array([1, 2.5])
     
     solve(A, b)
+
 
 
 
@@ -409,6 +438,7 @@ Benchmarking
     %timeit fib1.fib(100)   # bitey
     %timeit fib2.fib(100)   # Cython
     %timeit fib3(100)       # Fortran
+
 
 .. parsed-literal::
 
@@ -446,6 +476,7 @@ Python.
         ! wget http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.sep.tgz
         ! tar -xzvf mt19937ar.sep.tgz
 
+
 .. parsed-literal::
 
     --2015-03-26 16:02:41--  http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.sep.tgz
@@ -474,6 +505,7 @@ Python.
         void init_genrand(unsigned long s)
         double genrand_real1()
 
+
 .. parsed-literal::
 
     Writing mt.pxd
@@ -490,6 +522,7 @@ Python.
     
     def rand():
         return mt.genrand_real1()
+
 
 .. parsed-literal::
 
@@ -509,6 +542,7 @@ Python.
     setup(name="mersenne_random",
           ext_modules = cythonize([ext]))
 
+
 .. parsed-literal::
 
     Overwriting setup.py
@@ -517,6 +551,7 @@ Python.
 .. code:: python
 
     ! python setup.py build_ext -i &> /dev/null
+
 .. code:: python
 
     import mt_random
@@ -525,6 +560,7 @@ Python.
     for i in range(10):
         print mt_random.rand(),
     print
+
 
 .. parsed-literal::
 

@@ -5,6 +5,7 @@
     import matplotlib.pyplot as plt
     import numpy as np
     import scipy as scipy
+
 Optimization and Non-linear Methods
 ===================================
 
@@ -88,6 +89,7 @@ the process on the interval :math:`[c,b]`.
     xaxis = plt.axhline(0);
 
 
+
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_11_0.png
 
 
@@ -107,6 +109,7 @@ the process on the interval :math:`[c,b]`.
     plt.scatter([d,b,c], [0,0,0], s=50, c='red')
     
     xaxis = plt.axhline(0);
+
 
 
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_12_0.png
@@ -157,6 +160,7 @@ secant line to extrapolate the next candidate point.
         count = count+1
     
     plt.show()
+
 
 
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_16_0.png
@@ -227,6 +231,7 @@ The graph of this function is:
     plt.show()
 
 
+
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_24_0.png
 
 
@@ -269,6 +274,7 @@ The graph of this function is:
 
 
 
+
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_25_0.png
 
 
@@ -282,6 +288,7 @@ rapid convergence!
 .. code:: python
 
     funval
+
 
 
 
@@ -329,6 +336,7 @@ In fact, the Newton-Rhapson method converges quadratically. However, NR
         count = count+1
     
     plt.show()
+
 
 
 
@@ -382,6 +390,7 @@ Basins of Attraction Can Be 'Close'
     xvals[count-1]
 
 
+
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_33_0.png
 
 
@@ -425,6 +434,7 @@ Basins of Attraction Can Be 'Close'
     
     plt.show()
     xvals[count-1]
+
 
 
 .. image:: OptimizationInOneDimension_files/OptimizationInOneDimension_34_0.png
@@ -563,6 +573,7 @@ univariate function:
 
 
 
+
 .. parsed-literal::
 
     1.2807764040333458
@@ -577,6 +588,7 @@ univariate function:
     plt.ylim(-10, 20)
     plt.xlabel('x')
     plt.axhline(0)
+
 
 
 
@@ -598,6 +610,7 @@ To find zeroes, use
 
 
 
+
 .. parsed-literal::
 
     -7.864845203343107e-19
@@ -610,6 +623,7 @@ To find zeroes, use
 
 
 
+
 .. parsed-literal::
 
     2.0
@@ -619,6 +633,7 @@ To find zeroes, use
 .. code:: python
 
     scipy.optimize.newton(f,-3)
+
 
 
 

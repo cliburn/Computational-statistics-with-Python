@@ -11,16 +11,19 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     np.random.seed(1234)
     import pymc3 as pm
     import scipy.stats as stats
+
 .. code:: python
 
     import logging
     _logger = logging.getLogger("theano.gof.compilelock")
     _logger.setLevel(logging.ERROR)
+
 PyMC3
 -----
 
@@ -88,6 +91,7 @@ Note the different API from PyMC2.
         step = pm.Metropolis() # Have a choice of samplers
         trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1000 of 1000 complete in 0.2 sec
@@ -98,6 +102,7 @@ Note the different API from PyMC2.
     x = np.linspace(0, 1, 100)
     plt.plot(x, stats.beta.pdf(x, alpha, beta), label='prior');
     plt.legend(loc='best');
+
 
 
 .. image:: PyMC3_files/PyMC3_7_0.png
@@ -133,6 +138,7 @@ Estimating mean and standard deviation of normal distribution
         step = pm.Slice()
         trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1000 of 1000 complete in 1.9 sec
@@ -144,6 +150,7 @@ Estimating mean and standard deviation of normal distribution
     plt.hist(trace['mu'][-niter/2:,0], 25, histtype='step');
     plt.subplot(1,2,2); 
     plt.hist(trace['sigma'][-niter/2:,0], 25, histtype='step');
+
 
 
 .. image:: PyMC3_files/PyMC3_10_0.png
@@ -206,6 +213,7 @@ assume the following priors
         trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
         pm.traceplot(trace);
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1000 of 1000 complete in 8.9 sec
@@ -226,6 +234,7 @@ Alternative fromulation using GLM formulas
         step = pm.NUTS() 
         trace = pm.sample(2000, step, progressbar=True) 
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 2000 of 2000 complete in 8.1 sec
@@ -233,6 +242,7 @@ Alternative fromulation using GLM formulas
 .. code:: python
 
     pm.traceplot(trace);
+
 
 
 .. image:: PyMC3_files/PyMC3_15_0.png
@@ -249,6 +259,7 @@ Alternative fromulation using GLM formulas
     plt.legend(loc='best');
 
 
+
 .. image:: PyMC3_files/PyMC3_16_0.png
 
 
@@ -263,6 +274,7 @@ model to guess the sex.
     # observed data
     df = pd.read_csv('HtWt.csv')
     df.head()
+
 
 
 
@@ -322,6 +334,7 @@ model to guess the sex.
         pm.glm.glm('male ~ height + weight', df, family=pm.glm.families.Binomial()) 
         trace = pm.sample(niter, step=pm.Slice(), random_seed=123, progressbar=True)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1000 of 1000 complete in 3.2 sec
@@ -334,6 +347,7 @@ model to guess the sex.
     pd.scatter_matrix(df_trace[-1000:], diagonal='kde');
 
 
+
 .. image:: PyMC3_files/PyMC3_20_0.png
 
 
@@ -344,6 +358,7 @@ model to guess the sex.
     plt.plot(df_trace.ix[-1000:, 'height'], linewidth=0.7)
     plt.subplot(122)
     plt.plot(df_trace.ix[-1000:, 'weight'], linewidth=0.7);
+
 
 
 .. image:: PyMC3_files/PyMC3_21_0.png
@@ -363,6 +378,7 @@ long time to converge. The HMC does much better.
         pm.glm.glm('male ~ height + weight', df, family=pm.glm.families.Binomial()) 
         trace = pm.sample(niter, step=pm.NUTS(), random_seed=123, progressbar=True)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1001 of 1000 complete in 27.0 sec
@@ -373,12 +389,14 @@ long time to converge. The HMC does much better.
     pd.scatter_matrix(df_trace[-1000:], diagonal='kde');
 
 
+
 .. image:: PyMC3_files/PyMC3_24_0.png
 
 
 .. code:: python
 
     pm.summary(trace);
+
 
 .. parsed-literal::
 
@@ -435,6 +453,7 @@ long time to converge. The HMC does much better.
     plt.style.use('ggplot')
 
 
+
 .. image:: PyMC3_files/PyMC3_26_0.png
 
 
@@ -474,6 +493,7 @@ cutoff.
     plt.ylabel('Height', fontsize=16)
     plt.title('Gender classification by weight and height', fontsize=16)
     plt.tight_layout();
+
 
 
 .. image:: PyMC3_files/PyMC3_28_0.png
@@ -539,6 +559,7 @@ parameters for the logistic model.
         step = pm.NUTS()
         trace = pm.sample(niter, step, start, random_seed=123, progressbar=True)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 1000 of 1000 complete in 2.5 sec
@@ -546,6 +567,7 @@ parameters for the logistic model.
 .. code:: python
 
     np.exp
+
 
 
 
@@ -566,6 +588,7 @@ parameters for the logistic model.
     plt.scatter(x, y/5, s=50);
     plt.xlabel('Log does of drug')
     plt.ylabel('Risk of death');
+
 
 
 .. image:: PyMC3_files/PyMC3_32_0.png
@@ -593,6 +616,7 @@ county and floor.
 
     radon = pd.read_csv('radon.csv')[['county', 'floor', 'log_radon']]
     radon.head()
+
 
 
 
@@ -693,12 +717,14 @@ distributions
         
         # Data likelihood
         y = pm.Normal('y', mu=mu, sd=sigma, observed=radon.log_radon)
+
 .. code:: python
 
     with hm:
         start = pm.find_MAP()
         step = pm.NUTS(scaling=start)
         hm_trace = pm.sample(2000, step, start=start, random_seed=123, progressbar=True)
+
 
 .. parsed-literal::
 
@@ -708,6 +734,7 @@ distributions
 
     plt.figure(figsize=(8, 60))
     pm.forestplot(hm_trace, vars=['slope', 'intercept']);
+
 
 
 

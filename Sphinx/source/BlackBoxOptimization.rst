@@ -11,9 +11,11 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     import scipy.linalg as la
+
 Finding roots
 -------------
 
@@ -28,11 +30,13 @@ Univariate roots and fixed points
 
     def f(x):
         return x**3-3*x+1
+
 .. code:: python
 
     x = np.linspace(-3,3,100)
     plt.axhline(0)
     plt.plot(x, f(x));
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_5_0.png
@@ -41,9 +45,11 @@ Univariate roots and fixed points
 .. code:: python
 
     from scipy.optimize import brentq, newton
+
 .. code:: python
 
     brentq(f, -3, 0), brentq(f, 0, 1), brentq(f, 1,3)
+
 
 
 
@@ -56,6 +62,7 @@ Univariate roots and fixed points
 .. code:: python
 
     newton(f, -3), newton(f, 0), newton(f, 3)
+
 
 
 
@@ -75,20 +82,24 @@ also exist - e.g. using ``scipy.optimize.fixedpoint``.
 .. code:: python
 
     from scipy.optimize import fixed_point
+
 .. code:: python
 
     def f(x, r):
         """Discrete logistic equation."""
         return r*x*(1-x)
+
 .. code:: python
 
     n = 100
     fps = np.zeros(n)
     for i, r in enumerate(np.linspace(0, 4, n)):
         fps[i] = fixed_point(f, 0.5, args=(r, ))
+
 .. code:: python
 
     plt.plot(np.linspace(0, 4, n), fps);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_13_0.png
@@ -100,15 +111,18 @@ Mutlivariate roots and fixed points
 .. code:: python
 
     from scipy.optimize import root, fsolve
+
 .. code:: python
 
     def f(x):
         return [x[1] - 3*x[0]*(x[0]+1)*(x[0]-1),
                 .25*x[0]**2 + x[1]**2 - 1]
+
 .. code:: python
 
     sol = root(f, (0.5, 0.5))
     sol
+
 
 
 
@@ -133,6 +147,7 @@ Mutlivariate roots and fixed points
 
 
 
+
 .. parsed-literal::
 
     [-0.0000, 0.0000]
@@ -143,6 +158,7 @@ Mutlivariate roots and fixed points
 
     sol = root(f, (12,12))
     sol
+
 
 
 
@@ -164,6 +180,7 @@ Mutlivariate roots and fixed points
 .. code:: python
 
     f(sol.x)
+
 
 
 
@@ -240,6 +257,7 @@ for some :math:`t` between 0 and 1 - this is shown in the figure below.
         plt.suptitle('Convex function', fontsize=20)
 
 
+
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_23_0.png
 
 
@@ -266,13 +284,16 @@ positive everywhere.
     from sympy import symbols, hessian, Function, N
     x, y, z = symbols('x y z')
     f = symbols('f', cls=Function)
+
 .. code:: python
 
     f = x**2 + 2*y**2 + 3*z**2 + 2*x*y + 2*x*z
+
 .. code:: python
 
     H = np.array(hessian(f, (x, y, z)))
     H
+
 
 
 
@@ -288,6 +309,7 @@ positive everywhere.
 
     e, v = la.eig(H)
     np.real_if_close(e)
+
 
 
 
@@ -339,6 +361,7 @@ intuitive interface.
 .. code:: python
 
     from scipy import optimize as opt
+
 Minimizing a univariate function :math:`f: \mathbb{R} \rightarrow \mathbb{R}`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -346,10 +369,12 @@ Minimizing a univariate function :math:`f: \mathbb{R} \rightarrow \mathbb{R}`
 
     def f(x):
         return x**4 + 3*(x-2)**3 - 15*(x)**2 + 1
+
 .. code:: python
 
     x = np.linspace(-8, 5, 100)
     plt.plot(x, f(x));
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_36_0.png
@@ -367,6 +392,7 @@ bracketing strategy with a parabolic approximation.
 
 
 
+
 .. parsed-literal::
 
       fun: -803.39553088258845
@@ -379,6 +405,7 @@ bracketing strategy with a parabolic approximation.
 .. code:: python
 
     opt.minimize_scalar(f, method='bounded', bounds=[0, 6])
+
 
 
 
@@ -400,10 +427,12 @@ Local and global minima
 
     def f(x, offset):
         return -np.sinc(x-offset)
+
 .. code:: python
 
     x = np.linspace(-20, 20, 100)
     plt.plot(x, f(x, 5));
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_42_0.png
@@ -414,6 +443,7 @@ Local and global minima
     # note how additional function arguments are passed in
     sol = opt.minimize_scalar(f, args=(5,))
     sol
+
 
 
 
@@ -430,6 +460,7 @@ Local and global minima
 
     plt.plot(x, f(x, 5))
     plt.axvline(sol.x)
+
 
 
 
@@ -451,14 +482,17 @@ We can try multiple ranodm starts to find the global minimum
     lower = np.random.uniform(-20, 20, 100)
     upper = lower + 1
     sols = [opt.minimize_scalar(f, args=(5,), bracket=(l, u)) for (l, u) in zip(lower, upper)]
+
 .. code:: python
 
     idx = np.argmin([sol.fun for sol in sols])
     sol = sols[idx]
+
 .. code:: python
 
     plt.plot(x, f(x, 5))
     plt.axvline(sol.x);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_48_0.png
@@ -480,6 +514,7 @@ with multivariate scalar optimization.
 
 
 
+
 .. parsed-literal::
 
                       nfev: 2017
@@ -496,6 +531,7 @@ with multivariate scalar optimization.
 
     plt.plot(x, f(x, 5))
     plt.axvline(sol.x);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_51_0.png
@@ -546,6 +582,7 @@ since they may be forced to take many sharp turns.
     print np.array(H)
     print N(H.condition_number())
 
+
 .. parsed-literal::
 
     [[802 -400]
@@ -558,17 +595,20 @@ since they may be forced to take many sharp turns.
     def rosen(x):
         """Generalized n-dimensional version of the Rosenbrock function"""
         return sum(100*(x[1:]-x[:-1]**2.0)**2.0 +(1-x[:-1])**2.0)
+
 .. code:: python
 
     x = np.linspace(-5, 5, 100)
     y = np.linspace(-5, 5, 100)
     X, Y = np.meshgrid(x, y)
     Z = rosen(np.vstack([X.ravel(), Y.ravel()])).reshape((100,100))
+
 .. code:: python
 
     # Note: the global minimum is at (1,1) in a tiny contour island
     plt.contour(X, Y, Z, np.arange(10)**5)
     plt.text(1, 1, 'x', va='center', ha='center', color='red', fontsize=20);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_57_0.png
@@ -617,6 +657,7 @@ function below to ilustrate how it works.
         der[0] = -400*x[0]*(x[1]-x[0]**2) - 2*(1-x[0])
         der[-1] = 200*(x[-1]-x[-2]**2)
         return der
+
 .. code:: python
 
     def custmin(fun, x0, args=(), maxfev=None, alpha=0.0002,
@@ -648,20 +689,24 @@ function below to ilustrate how it works.
     
         return opt.OptimizeResult(fun=besty, x=bestx, nit=niter,
                                   nfev=funcalls, success=(niter > 1))
+
 .. code:: python
 
     def reporter(p):
         """Reporter function to capture intermediate states of optimization."""
         global ps
         ps.append(p)
+
 .. code:: python
 
     # Initial starting position
     x0 = np.array([4,-4.1])
+
 .. code:: python
 
     ps = [x0]
     opt.minimize(rosen, x0, method=custmin, callback=reporter)
+
 
 
 
@@ -684,6 +729,7 @@ function below to ilustrate how it works.
     plt.plot(ps[:, 0], ps[:, 1], '-o')
     plt.subplot(122)
     plt.semilogy(range(len(ps)), rosen(ps.T));
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_64_0.png
@@ -752,10 +798,12 @@ package is ``Newton-GC``.
 .. code:: python
 
     from scipy.optimize import rosen, rosen_der, rosen_hess
+
 .. code:: python
 
     ps = [x0]
     opt.minimize(rosen, x0, method='Newton-CG', jac=rosen_der, hess=rosen_hess, callback=reporter)
+
 
 
 
@@ -784,6 +832,7 @@ package is ``Newton-GC``.
     plt.semilogy(range(len(ps)), rosen(ps.T));
 
 
+
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_69_0.png
 
 
@@ -802,6 +851,7 @@ approximated by finite difference methods.
 
     ps = [x0]
     opt.minimize(rosen, x0, method='BFGS', callback=reporter)
+
 
 
 
@@ -831,6 +881,7 @@ approximated by finite difference methods.
     plt.semilogy(range(len(ps)), rosen(ps.T));
 
 
+
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_72_0.png
 
 
@@ -846,6 +897,7 @@ Nelder-Mead simplex algorithm.
 
     ps = [x0]
     opt.minimize(rosen, x0, method='nelder-mead', callback=reporter)
+
 
 
 
@@ -870,6 +922,7 @@ Nelder-Mead simplex algorithm.
     plt.plot(ps[:, 0], ps[:, 1], '-o')
     plt.subplot(122)
     plt.semilogy(range(len(ps)), rosen(ps.T));
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_75_0.png
@@ -921,6 +974,7 @@ subject to the constraint
 
     def f(x):
         return -(2*x[0]*x[1] + 2*x[0] - x[0]**2 - 2*x[1]**2)
+
 .. code:: python
 
     x = np.linspace(0, 3, 100)
@@ -932,6 +986,7 @@ subject to the constraint
     plt.plot(x, (x-1)**4+2, 'k:', linewidth=1)
     plt.fill([0.5,0.5,1.5,1.5], [2.5,1.5,1.5,2.5], alpha=0.3)
     plt.axis([0,3,0,3])
+
 
 
 
@@ -959,15 +1014,18 @@ numerically estimted if not provided.
              'fun' : lambda x: np.array([x[1] - (x[0]-1)**4 - 2])})
     
     bnds = ((0.5, 1.5), (1.5, 2.5))
+
 .. code:: python
 
     x0 = [0, 2.5]
+
 Unconstrained optimization
 
 .. code:: python
 
     ux = opt.minimize(f, x0, constraints=None)
     ux
+
 
 
 
@@ -992,6 +1050,7 @@ Constrained optimization
 
     cx = opt.minimize(f, x0, bounds=bnds, constraints=cons)
     cx
+
 
 
 
@@ -1024,6 +1083,7 @@ Constrained optimization
     plt.axis([0,3,0,3]);
 
 
+
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_86_0.png
 
 
@@ -1043,26 +1103,31 @@ have already seen in a more conveneint format.
 .. code:: python
 
     from scipy.optimize import curve_fit 
+
 .. code:: python
 
     def logistic4(x, a, b, c, d):
         """The four paramter logistic function is often used to fit dose-response relationships."""
         return ((a-d)/(1.0+((x/c)**b))) + d
+
 .. code:: python
 
     nobs = 24
     xdata = np.linspace(0.5, 3.5, nobs)
     ptrue = [10, 3, 1.5, 12]
     ydata = logistic4(xdata, *ptrue) + 0.5*np.random.random(nobs)
+
 .. code:: python
 
     popt, pcov = curve_fit(logistic4, xdata, ydata) 
+
 .. code:: python
 
     perr = yerr=np.sqrt(np.diag(pcov))
     print 'Param\tTrue\tEstim (+/- 1 SD)'
     for p, pt, po, pe  in zip('abcd', ptrue, popt, perr):
         print '%s\t%5.2f\t%5.2f (+/-%5.2f)' % (p, pt, po, pe)
+
 
 .. parsed-literal::
 
@@ -1079,6 +1144,7 @@ have already seen in a more conveneint format.
     y = logistic4(x, *popt)
     plt.plot(xdata, ydata, 'o')
     plt.plot(x, y);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_94_0.png
@@ -1118,6 +1184,7 @@ apocalypse <http://adventuresinpython.blogspot.com/2012/08/fitting-differential-
         """
         x = odeint(f, x0, t, args=(k,))
         return x.ravel()
+
 .. code:: python
 
     # True parameter values
@@ -1134,6 +1201,7 @@ apocalypse <http://adventuresinpython.blogspot.com/2012/08/fitting-differential-
     print("k = %g" % k_opt)
     print("x0 = %g" % x0_opt)
 
+
 .. parsed-literal::
 
     k = 0.314062
@@ -1145,6 +1213,7 @@ apocalypse <http://adventuresinpython.blogspot.com/2012/08/fitting-differential-
     import matplotlib.pyplot as plt
     t = np.linspace(0, 10, 100)
     plt.plot(ts, xs, '.', t, x(t, k_opt, x0_opt), '-');
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_98_0.png
@@ -1183,6 +1252,7 @@ data to get some intuitive understanding of its "structure".
 .. code:: python
 
     from scipy.spatial.distance import pdist, squareform
+
 -  P0 is the initial location of nodes
 -  P is the minimal energy location of nodes given constraints
 -  A is a connectivity matrix - there is a spring between :math:`i` and
@@ -1200,15 +1270,18 @@ data to get some intuitive understanding of its "structure".
     A = np.ones((n, n))
     A[np.tril_indices_from(A)] = 0
     L = A.copy()
+
 .. code:: python
 
     def energy(P):
         P = P.reshape((-1, 2))
         D = squareform(pdist(P))
         return 0.5*(k * A * (D - L)**2).sum()
+
 .. code:: python
 
     energy(P0.ravel())
+
 
 
 
@@ -1225,6 +1298,7 @@ data to get some intuitive understanding of its "structure".
     bounds = (np.repeat(P0[:fixed,:].ravel(), 2).reshape((-1,2)).tolist() + 
               [[None, None]] * (2*(n-fixed)))
     bounds[:fixed*2+4]
+
 
 
 
@@ -1248,11 +1322,13 @@ data to get some intuitive understanding of its "structure".
 .. code:: python
 
     sol = opt.minimize(energy, P0.ravel(), bounds=bounds)
+
 .. code:: python
 
     plt.scatter(P0[:, 0], P0[:, 1], s=25)
     P = sol.x.reshape((-1,2))
     plt.scatter(P[:, 0], P[:, 1], edgecolors='red', facecolors='none', s=30, linewidth=2);
+
 
 
 .. image:: BlackBoxOptimization_files/BlackBoxOptimization_107_0.png
@@ -1278,6 +1354,7 @@ order optimzation algorithm.
 .. code:: python
 
     import statsmodels.api as sm
+
 Logistic regression as optimization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1330,6 +1407,7 @@ column of 1s, we can write :math:`\beta_0 + x_i\cdot\beta` as just
 
     df_ = pd.read_csv("http://www.ats.ucla.edu/stat/data/binary.csv")
     df_.head()
+
 
 
 
@@ -1396,6 +1474,7 @@ column of 1s, we can write :math:`\beta_0 + x_i\cdot\beta` as just
     df = df_[cols_to_keep]
     df.insert(1, 'dummy', 1)
     df.head()
+
 
 
 
@@ -1472,6 +1551,7 @@ constrained optimizaiton.
 
 
 
+
 .. raw:: html
 
     <table class="simpletable">
@@ -1530,6 +1610,7 @@ will be more accurate than homebrew version.
     model2 = sm.Logit.from_formula('admit ~ %s' % '+'.join(df.columns[2:]), data=df)
     fit2 = model2.fit(method='bfgs', maxiter=100)
     fit2.summary()
+
 
 .. parsed-literal::
 
@@ -1601,10 +1682,12 @@ is a library function available, youu should probably use that instead.
     def f(beta, y, x):
         """Minus log likelihood function for logistic regression."""
         return -((-np.log(1 + np.exp(np.dot(x, beta)))).sum() + (y*(np.dot(x, beta))).sum())
+
 .. code:: python
 
     beta0 = np.zeros(3)
     opt.minimize(f, beta0, args=(df['admit'], df.ix[:, 'dummy':]), method='BFGS', options={'gtol':1e-2})
+
 
 
 

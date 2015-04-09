@@ -12,9 +12,11 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     from IPython.display import Image
+
 C Crash Course
 --------------
 
@@ -28,7 +30,6 @@ executable file as illuatrated at http://www.codingunit.com/
    :alt: Compilation process
 
    Compilation process
-
 The preprocessor merges the contents of the header and implementation
 files, and also expands any macros. The compiler then translates these
 into low level object code (``.o``) for each file, and the linker then
@@ -49,6 +50,7 @@ Hello world
         printf("Hello, world!");
     }
 
+
 .. parsed-literal::
 
     Overwriting hello.c
@@ -57,9 +59,11 @@ Hello world
 .. code:: python
 
     ! gcc hello.c -o hello
+
 .. code:: python
 
     ! ./hello
+
 
 .. parsed-literal::
 
@@ -78,9 +82,11 @@ Python version
         for i in range(n):
             a, b = a+b, a
         return a
+
 .. code:: python
 
     fib(100)
+
 
 
 
@@ -101,6 +107,7 @@ Header file
     %%file fib.h
     
     double fib(int n);
+
 
 .. parsed-literal::
 
@@ -124,6 +131,7 @@ Implemetnation file
         return a;
     }
 
+
 .. parsed-literal::
 
     Overwriting fib.c
@@ -143,6 +151,7 @@ Driver program
         int n = atoi(argv[1]);
         printf("%f", fib(n));
     }
+
 
 
 .. parsed-literal::
@@ -172,6 +181,7 @@ Makefile
     clean:
     	 rm -f *.o
 
+
 .. parsed-literal::
 
     Writing Makefile
@@ -183,6 +193,7 @@ Compile
 .. code:: python
 
     ! make 
+
 
 .. parsed-literal::
 
@@ -197,6 +208,7 @@ Run executable file
 .. code:: python
 
     ! ./fib 100
+
 
 .. parsed-literal::
 
@@ -281,6 +293,7 @@ returns the value after the increment.
         printf("x = %d, y = %d\n", x, y); 
     }
 
+
 .. parsed-literal::
 
     Writing increment.c
@@ -292,6 +305,7 @@ returns the value after the increment.
     
     clang -Wall increment.c -o increment
     ./increment
+
 
 .. parsed-literal::
 
@@ -321,7 +335,7 @@ self-explanatory.
 if-else
 ^^^^^^^
 
-.. code:: c
+.. code:: C
 
     // Interpretation of grades by Asian parent
     if (grade == 'A') {
@@ -339,7 +353,7 @@ if-else
 for, while, do
 ^^^^^^^^^^^^^^
 
-.. code:: c
+.. code:: C
 
     // Looping variants
 
@@ -367,7 +381,7 @@ The C standard does not require braces if the body is a singel line, but
 I think it is safer to always include them. Note that whitespace is not
 significant in C (unlike Python), so
 
-.. code:: c
+.. code:: C
 
     int i = 10;
     while (i > 0)
@@ -467,6 +481,7 @@ passed in (e.g. see address.c below).
         printf("&q = %p\n", &q);
     }
 
+
 .. parsed-literal::
 
     Writing pointers.c
@@ -478,6 +493,7 @@ passed in (e.g. see address.c below).
     
     clang -Wall -Wno-uninitialized pointers.c -o pointers
     ./pointers
+
 
 .. parsed-literal::
 
@@ -509,6 +525,7 @@ Passing by value and passing by reference
     }
 
 
+
 .. parsed-literal::
 
     Writing by_val.c
@@ -520,6 +537,7 @@ Passing by value and passing by reference
     
     clang -Wall by_val.c -o by_val
     ./by_val
+
 
 .. parsed-literal::
 
@@ -541,6 +559,7 @@ Passing by value and passing by reference
         printf("%d\n", x);
     }
 
+
 .. parsed-literal::
 
     Writing by_ref.c
@@ -552,6 +571,7 @@ Passing by value and passing by reference
     
     clang -Wall by_ref.c -o by_ref
     ./by_ref
+
 
 .. parsed-literal::
 
@@ -575,6 +595,7 @@ Pointers to pointers to pointers - just remember that a pointer is simply a name
         printf("%d, %p, %p, %p, %p, %p, %p, %d", x, &x, p, &p, q, &q, r, ***r);
     }
 
+
 .. parsed-literal::
 
     Writing ptr.c
@@ -585,6 +606,7 @@ Pointers to pointers to pointers - just remember that a pointer is simply a name
     %%bash
     gcc ptr.c -o ptr
     ./ptr
+
 
 .. parsed-literal::
 
@@ -629,6 +651,7 @@ type, this allows us to do **pointer arithmetic** - i.e. the pointer
         free(ps); // avoid memory leak
     }
 
+
 .. parsed-literal::
 
     Writing pointers2.c
@@ -640,6 +663,7 @@ type, this allows us to do **pointer arithmetic** - i.e. the pointer
     
     clang -Wall pointers2.c -o pointers2
     ./pointers2
+
 
 .. parsed-literal::
 
@@ -671,6 +695,7 @@ leads to the following legal but weird syntax:
         printf("%d\t%d\t%d\t%d\t%d\t%d\n", *arr, arr[0], 0[arr], *(arr + 2), arr[2], 2[arr]);
     }
 
+
 .. parsed-literal::
 
     Writing array_pointer.c
@@ -682,6 +707,7 @@ leads to the following legal but weird syntax:
     
     clang -Wall array_pointer.c -o array_pointer
     ./array_pointer
+
 
 .. parsed-literal::
 
@@ -728,6 +754,7 @@ Allocating memory for 2D arrays
         free(arr);
     }
 
+
 .. parsed-literal::
 
     Writing array_2d.c
@@ -739,6 +766,7 @@ Allocating memory for 2D arrays
     
     gcc -Wall array_2d.c -o array_2d
     ./array_2d
+
 
 .. parsed-literal::
 
@@ -797,6 +825,7 @@ this says
         }
     }
 
+
 .. parsed-literal::
 
     Writing pointers3.c
@@ -808,6 +837,7 @@ this says
     
     clang -Wall pointers3.c -o pointers3
     ./pointers3
+
 
 .. parsed-literal::
 
@@ -838,6 +868,7 @@ Functions
         printf("%f\n", square(a));
     }
 
+
 .. parsed-literal::
 
     Writing square.c
@@ -849,6 +880,7 @@ Functions
     
     clang -Wall square.c -o square
     ./square
+
 
 .. parsed-literal::
 
@@ -919,6 +951,7 @@ functions etc as shown in the following example.
         }   
     }
 
+
 .. parsed-literal::
 
     Writing square2.c
@@ -930,6 +963,7 @@ functions etc as shown in the following example.
     
     clang -Wall -lm square2.c -o square2
     ./square2
+
 
 .. parsed-literal::
 
@@ -981,6 +1015,7 @@ by the makefile
     
     $(TARGET): $(OBJECTS)
 
+
 .. parsed-literal::
 
     Overwriting makefile
@@ -999,6 +1034,7 @@ depends on the libm C math library.
     
     void do_stuff();
 
+
 .. parsed-literal::
 
     Writing stuff.h
@@ -1012,6 +1048,7 @@ depends on the libm C math library.
     void do_stuff() {
         printf("The square root of 2 is %.2f\n", sqrt(2));
     }
+
 
 .. parsed-literal::
 
@@ -1027,6 +1064,7 @@ depends on the libm C math library.
     {
         do_stuff();
     }
+
 
 .. parsed-literal::
 
@@ -1049,6 +1087,7 @@ depends on the libm C math library.
     
     $(TARGET): $(OBJECTS)
 
+
 .. parsed-literal::
 
     Overwriting makefile
@@ -1057,6 +1096,7 @@ depends on the libm C math library.
 .. code:: python
 
     ! make
+
 
 .. parsed-literal::
 
@@ -1068,6 +1108,7 @@ depends on the libm C math library.
 
     ! ./test_make
 
+
 .. parsed-literal::
 
     The square root of 2 is 1.41
@@ -1078,6 +1119,7 @@ depends on the libm C math library.
     # Make is clever enough to recompile only what has been changed since the last time it was called
     ! make
 
+
 .. parsed-literal::
 
     make: Nothing to be done for `all'.
@@ -1087,6 +1129,7 @@ depends on the libm C math library.
 
     ! make clean
 
+
 .. parsed-literal::
 
     rm test_make stuff.o
@@ -1095,6 +1138,7 @@ depends on the libm C math library.
 .. code:: python
 
     ! make
+
 
 .. parsed-literal::
 
@@ -1154,6 +1198,7 @@ Try to fix the following buggy program.
         }   
     }
 
+
 .. parsed-literal::
 
     Writing buggy.c
@@ -1162,6 +1207,7 @@ Try to fix the following buggy program.
 .. code:: python
 
     ! clang -g -Wall buggy.c -o buggy
+
 
 .. parsed-literal::
 
@@ -1207,7 +1253,7 @@ What other language has an annual Obfuscated Code Contest
 http://www.ioccc.org/? In particular, the following features of C are
 very conducive to writing unreadable code:
 
--  lax rules for identifiers (e.g. \_o, \_0, \_O, O are all valide
+-  lax rules for identifiers (e.g. *o, *\ 0, \_O, O are all valide
    identifiers)
 -  chars are bytes and pointers are integers
 -  pointer arithmetic means that ``array[index]`` is the same as
@@ -1234,6 +1280,7 @@ the heart of statisticians - it displays sparklines (invented by Tufte).
     main(a,b)char**b;{int c=1,d=c,e=a-d;for(;e;e--)_(e)<_(c)?c=e:_(e)>_(d)?d=e:7;
     while(++e<a)printf("\xe2\x96%c",129+(**b=8*(_(e)-_(c))/(_(d)-_(c))));}
 
+
 .. parsed-literal::
 
     Writing sparkl.c
@@ -1242,11 +1289,13 @@ the heart of statisticians - it displays sparklines (invented by Tufte).
 .. code:: python
 
     ! gcc -Wno-implicit-int -include stdio.h -include stdlib.h -D'_(x)=strtof(b[x],0)' sparkl.c -o sparkl
+
 .. code:: python
 
     import numpy as np
     np.set_printoptions(linewidth=np.infty)
     print ' '.join(map(str, (100*np.sin(np.linspace(0, 8*np.pi, 30))).astype('int')))
+
 
 .. parsed-literal::
 
@@ -1258,6 +1307,7 @@ the heart of statisticians - it displays sparklines (invented by Tufte).
     %%bash
     
     ./sparkl 0 76 98 51 -31 -92 -88 -21 60 99 68 -10 -82 -96 -41 41 96 82 10 -68 -99 -60 21 88 92 31 -51 -98 -76 0
+
 
 .. parsed-literal::
 

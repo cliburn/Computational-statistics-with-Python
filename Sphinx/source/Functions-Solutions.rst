@@ -12,6 +12,7 @@
 
 
 
+
 .. parsed-literal::
 
     u'%.4f'
@@ -22,6 +23,9 @@
 
 `Functional Programming
 HOWTO <https://docs.python.org/2/howto/functional.html>`__
+
+Functional Programming in Python
+================================
 
 Functions are first class objects
 ---------------------------------
@@ -41,6 +45,7 @@ functions.
     def cube(x):
         """Cube of x."""
         return x*x*x
+
 .. code:: python
 
     # create a dictionary of functions
@@ -49,6 +54,7 @@ functions.
         'square': square,
         'cube': cube,
     }
+
 .. code:: python
 
     x = 2
@@ -58,6 +64,7 @@ functions.
     
     for func in sorted(funcs):
         print func, funcs[func](x)
+
 
 .. parsed-literal::
 
@@ -106,6 +113,7 @@ list), then the copy of the name ``x`` now points to the new object, but
     print transmogrify(x)
     print x
 
+
 .. parsed-literal::
 
     [1, 2, 3]
@@ -123,6 +131,7 @@ list), then the copy of the name ``x`` now points to the new object, but
     print x
     print no_mogrify(x)
     print x
+
 
 .. parsed-literal::
 
@@ -146,6 +155,7 @@ Binding of default arguments occurs at function *definition*
     print f(x = [9,9,9])
     print f()
     print f()
+
 
 .. parsed-literal::
 
@@ -173,6 +183,7 @@ Binding of default arguments occurs at function *definition*
     print f(x = [9,9,9])
     print f()
     print f()
+
 
 .. parsed-literal::
 
@@ -202,6 +213,7 @@ examples are ``map`` and ``filter``.
 
 
 
+
 .. parsed-literal::
 
     [0, 1, 4, 9, 16]
@@ -220,6 +232,7 @@ examples are ``map`` and ``filter``.
 
 
 
+
 .. parsed-literal::
 
     [0, 2, 4]
@@ -231,6 +244,7 @@ examples are ``map`` and ``filter``.
     # It is common to combine map and filter
     
     map(square, filter(is_even, range(5)))
+
 
 
 
@@ -252,6 +266,7 @@ examples are ``map`` and ``filter``.
 
 
 
+
 .. parsed-literal::
 
     15
@@ -269,6 +284,7 @@ examples are ``map`` and ``filter``.
     xs = range(5)
     print custom_sum(xs, square)
     print custom_sum(xs, cube)
+
 
 .. parsed-literal::
 
@@ -290,9 +306,11 @@ examples are ``map`` and ``filter``.
     foo_logger = make_logger('foo.txt')
     foo_logger('Hello')
     foo_logger('World')
+
 .. code:: python
 
     !cat 'foo.txt'
+
 
 .. parsed-literal::
 
@@ -325,6 +343,7 @@ rewritten as a regular function.
     
     print map(square, range(5))
 
+
 .. parsed-literal::
 
     [0, 1, 4, 9, 16]
@@ -335,6 +354,7 @@ rewritten as a regular function.
     # Using an anonymous function
     
     print map(lambda x: x*x, range(5))
+
 
 .. parsed-literal::
 
@@ -359,6 +379,7 @@ rewritten as a regular function.
     # and reduce is used to calculate some aggreate function of the results 
     # returned by map
 
+
 .. parsed-literal::
 
     285
@@ -382,12 +403,14 @@ hence trivially parallelizable.
         """Make a new list and return that."""
         xs = [x*2 for x in xs]
         return xs
+
 .. code:: python
 
     xs = range(5)
     print "xs =", xs
     print pure(xs)
     print "xs =", xs
+
 
 .. parsed-literal::
 
@@ -402,12 +425,14 @@ hence trivially parallelizable.
         for i, x in enumerate(xs):
             xs[i] = x*2
         return xs
+
 .. code:: python
 
     xs = range(5)
     print "xs =", xs
     print impure(xs)
     print "xs =", xs
+
 
 .. parsed-literal::
 
@@ -425,11 +450,13 @@ hence trivially parallelizable.
         """Never give an empty list or other mutable structure as a default."""
         y.append(x)
         return sum(y)
+
 .. code:: python
 
     print f1(10)
     print f1(10)
     print f1(10, y =[1,2])
+
 
 .. parsed-literal::
 
@@ -448,11 +475,13 @@ hence trivially parallelizable.
             y = []
         y.append(x)
         return sum(y)
+
 .. code:: python
 
     print f1(10)
     print f1(10)
     print f1(10, y =[1,2])
+
 
 .. parsed-literal::
 
@@ -491,6 +520,7 @@ this clearer.
     
     print [fact(n) for n in range(10)]
 
+
 .. parsed-literal::
 
     [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880]
@@ -512,6 +542,7 @@ this clearer.
     
     print [fib1(i) for i in range(10)]
 
+
 .. parsed-literal::
 
     [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
@@ -529,6 +560,7 @@ this clearer.
         return b
     
     print [fib2(i) for i in range(10)]
+
 
 .. parsed-literal::
 
@@ -549,6 +581,7 @@ this clearer.
     # fib(2) -> fib(1), fib(0)
     # fib(1) -> 1
     # fib(0) -> 1
+
 
 .. parsed-literal::
 
@@ -575,6 +608,7 @@ this clearer.
     %timeit fib1(20)
     %timeit fib2(20)
     %timeit fib3(20)
+
 
 .. parsed-literal::
 
@@ -604,6 +638,7 @@ this clearer.
     xs = [3,1,4,1,5,9,2,6,5,3,5,9]
     print almost_quick_sort(xs)
 
+
 .. parsed-literal::
 
     [1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9, 9]
@@ -627,6 +662,7 @@ very helpful for working with data sets too large to fit into RAM.
     print x_iter.next()
     print x_iter.next()
     print x_iter.next()
+
 
 .. parsed-literal::
 
@@ -659,6 +695,7 @@ very helpful for working with data sets too large to fit into RAM.
     for x in x_iter:
         print x
 
+
 .. parsed-literal::
 
     1
@@ -679,6 +716,7 @@ Generators create iterator streams.
     def count_down(n):
         for i in range(n, 0, -1):
             yield i
+
 .. code:: python
 
     counter = count_down(10)
@@ -686,6 +724,7 @@ Generators create iterator streams.
     print counter.next()
     for count in counter:
         print count,
+
 
 .. parsed-literal::
 
@@ -710,6 +749,7 @@ Generators create iterator streams.
         print x,
     print
 
+
 .. parsed-literal::
 
     [0, 1, 4, 9, 16]
@@ -726,6 +766,7 @@ Generators create iterator streams.
         while True:
             yield a
             a, b = b, a+b
+
 .. code:: python
 
     for i in fib():
@@ -733,6 +774,7 @@ Generators create iterator streams.
         if i > 1000:
             break
         print i,
+
 
 .. parsed-literal::
 
@@ -749,6 +791,7 @@ Generators create iterator streams.
     
     for line in open('foo.txt'):
         print line,
+
 
 .. parsed-literal::
 
@@ -783,6 +826,7 @@ Generators and comprehensions
     
     print {x: x for x in range(10)}
 
+
 .. parsed-literal::
 
     <generator object <genexpr> at 0x1130d0960>
@@ -812,6 +856,7 @@ Two useful functions and an unusual operator.
     for i, x in enumerate(xs):
         print i, x
 
+
 .. parsed-literal::
 
     0 1
@@ -839,6 +884,7 @@ Two useful functions and an unusual operator.
     
     # Note that zip stops when the shortest list is exhausted
 
+
 .. parsed-literal::
 
     1 10 a
@@ -852,6 +898,7 @@ Two useful functions and an unusual operator.
     # For list comprehensions, the ternary if-else operator is sometimes very useful
     
     [x**2 if x%2 == 0 else x**3 for x in range(10)]
+
 
 
 
@@ -888,6 +935,7 @@ Examples:
             return results
         
         return f
+
 .. code:: python
 
     # There is a special shorthand notation for decorating functions
@@ -900,6 +948,7 @@ Examples:
         print msg
     
     sleepy("Hello", 1.5)
+
 
 .. parsed-literal::
 
@@ -924,6 +973,7 @@ argument is expected.
     # The pattern can be generalized
     print reduce(op.mul, range(1, 10))
 
+
 .. parsed-literal::
 
     45
@@ -942,6 +992,7 @@ argument is expected.
     
     # the key argument is quite flexible
     print sorted(my_list, key=lambda x: len(x[0]), reverse=True)
+
 
 .. parsed-literal::
 
@@ -966,6 +1017,7 @@ arguments "filled-in".
     print sum_([1,2,3,4])
     print prod_([1,2,3,4])
 
+
 .. parsed-literal::
 
     10
@@ -982,6 +1034,7 @@ arguments "filled-in".
     def compare(x, y, func):
         """Returne p-value for some appropriate comparison test."""
         return func(x, y)[1]
+
 .. code:: python
 
     x, y = np.random.normal(0, 1, (100,2)).T
@@ -989,6 +1042,7 @@ arguments "filled-in".
     print "p value assuming equal variance    =%.8f" % compare(x, y, stats.ttest_ind)
     test = partial(stats.ttest_ind, equal_var=False)
     print "p value not assuming equal variance=%.8f" % compare(x, y, test)
+
 
 .. parsed-literal::
 
@@ -1021,6 +1075,7 @@ analyiss.
     print 
     
     print [list(c) for c in combinations([1,2,3,4], r=2)]
+
 
 .. parsed-literal::
 
@@ -1140,6 +1195,7 @@ packages
 
 
 
+
 .. parsed-literal::
 
     'MTMITDSLAVVLQRRDWENPGVTQLNRLAAHPPFASWRNSEEARTDRPSQQLRSLNGEWRFAWFPAPEAVPESWLECDLPEADTVVVPSNWQMHGYDAPIYTNVTYPITVNPPFVPTENPTGCYSLTFNVDESWLQEGQTRIIFDGVNSAFHLWCNGRWVGYGQDSRLPSEFDLSAFLRAGENRLAVMVLRWSDGSYLEDQDMWRMSGIFRDVSLLHKPTTQISDFHVATRFNDDFSRAVLEAEVQMCGELRDYLRVTVSLWQGETQVASGTAPFGGEIIDERGGYADRVTLRLNVENPKLWSAEIPNLYRAVVELHTADGTLIEAEACDVGFREVRIENGLLLLNGKPLLIRGVNRHEHHPLHGQVMDEQTMVQDILLMKQNNFNAVRCSHYPNHPLWYTLCDRYGLYVVDEANIETHGMVPMNRLTDDPRWLPAMSERVTRMVQRDRNHPSVIIWSLGNESGHGANHDALYRWIKSVDPSRPVQYEGGGADTTATDIICPMYARVDEDQPFPAVPKWSIKKWLSLPGETRPLILCEYAHAMGNSLGGFAKYWQAFRQYPRLQGGFVWDWVDQSLIKYDENGNPWSAYGGDFGDTPNDRQFCMNGLVFADRTPHPALTEAKHQQQFFQFRLSGQTIEVTSEYLFRHSDNELLHWMVALDGKPLASGEVPLDVAPQGKQLIELPELPQPESAGQLWLTVRVVQPNATAWSEAGHISAWQQWRLAENLSVTLPAASHAIPHLTTSEMDFCIELGNKRWQFNRQSGFLSQMWIGDKKQLLTPLRDQFTRAPLDNDIGVSEATRIDPNAWVERWKAAGHYQAEAALLQCTADTLADAVLITTAHAWQHQGKTLFISRKTYRIDGSGQMAITVDVEVASDTPHPARIGLNCQLAQVAERVNWLGLGPQENYPDRLTAACFDRWDLPLSDMYTPYVFPSENGLRCGTRELNYGPHQWRGDFQFNISRYSQQQLMETSHRHLLHAEEGTWLNIDGFHMGIGGDDSWSPSVSAEFQLSAGRYHYQLVWCQK_'
@@ -1170,6 +1226,7 @@ Exercises
             ans.append((i, j))
     print ans
 
+
 .. parsed-literal::
 
     [(0, 0), (0, 1), (0, 2), (0, 3), (1, 0), (1, 1), (1, 2), (1, 3), (2, 0), (2, 1), (2, 2), (2, 3)]
@@ -1181,6 +1238,7 @@ Exercises
     
     ans = [(i,j) for i in range(3) for j in range(4)]
     print ans
+
 
 .. parsed-literal::
 
@@ -1199,6 +1257,7 @@ Exercises
     ans = map(lambda x: x*x, filter(lambda x: x%2 == 0, range(5)))
     print ans
 
+
 .. parsed-literal::
 
     [0, 4, 16]
@@ -1210,6 +1269,7 @@ Exercises
     
     ans = [x*x for x in range(5) if x%2 == 0]
     print ans
+
 
 .. parsed-literal::
 
@@ -1245,6 +1305,7 @@ variables or side effects
     print ans
     print alist # alist has been changed!
 
+
 .. parsed-literal::
 
     [1, 2, 3, 0, 1, 2, 3, 4]
@@ -1263,6 +1324,7 @@ variables or side effects
     ans = f(alist)
     print ans
     print alist 
+
 
 .. parsed-literal::
 
@@ -1308,6 +1370,7 @@ when called will give the following result
     
     print square(2)
 
+
 .. parsed-literal::
 
     Hello!
@@ -1341,6 +1404,7 @@ when called will give the following result
     for i in range(1,11):
         print fact1(i),
 
+
 .. parsed-literal::
 
     1 2 6 24 120 720 5040 40320 362880 3628800
@@ -1356,6 +1420,7 @@ when called will give the following result
     
     for i in range(1,11):
         print fact1(i),
+
 
 .. parsed-literal::
 
@@ -1380,6 +1445,7 @@ cache to speed up calculations
     for i in range(1,11):
         print fact2(i),
 
+
 .. parsed-literal::
 
     1 2 6 24 120 720 5040 40320 362880 3628800
@@ -1390,6 +1456,7 @@ cache to speed up calculations
     %timeit -n3 fact(20)
     %timeit -n3 fact1(20)
     %timeit -n3 fact2(20)
+
 
 .. parsed-literal::
 
@@ -1411,6 +1478,7 @@ fucntion.
     
     def f(x, y):
         return x**2 + y**2
+
 **8**. Find an efficient way to extrac a subset of ``dict1`` into a a
 new dictionary ``dict2`` that only contains entrires with the keys given
 in the set ``good_keys``. Note that good\_keys may include keys not
@@ -1429,6 +1497,7 @@ found in dict1 - these must be excluded when building dict2.
         cPickle.dump(dict1, open('dict1.pic', 'w'), protocol=2)
     
     good_keys = set(np.random.randint(1, 1e7, 1000))
+
 .. code:: python
 
     # YOUR CODE HEREß
@@ -1436,6 +1505,7 @@ found in dict1 - these must be excluded when building dict2.
     # dictionary comprehension
     dict2 = {key: dict1[key] for key in good_keys if key in dict1}
     dict2
+
 
 
 

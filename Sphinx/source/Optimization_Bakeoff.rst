@@ -33,6 +33,7 @@ http://nbviewer.ipython.org/url/jakevdp.github.io/downloads/notebooks/NumbaCytho
 
 
 
+
 .. parsed-literal::
 
     u'%.2f'
@@ -48,6 +49,7 @@ Make up some test data for use later
     n = 1000
     p = 3
     xs = np.random.random((n, p))
+
 "Pure" Python version
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -64,10 +66,12 @@ Make up some test data for use later
                     s += tmp * tmp
                 D[i, j] = s**0.5
         return D
+
 .. code:: python
 
     print pdist_python(A)
     %timeit -n 1 pdist_python(xs)
+
 
 .. parsed-literal::
 
@@ -111,6 +115,7 @@ Distance between scalars
 
 
 
+
 .. parsed-literal::
 
     array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -122,6 +127,7 @@ Distance between scalars
     # if we insert an extra dimension into x with np.newaxis
     # we get a (10, 1) matrix
     x[:, np.newaxis].shape
+
 
 
 
@@ -146,6 +152,7 @@ matching the next axis, x is stretechd to also be (10,10).
 
     # This is the pairwise distance matrix!
     x[:, None] - x
+
 
 
 
@@ -178,6 +185,7 @@ Distance between vectors
     print x.shape
     print x
 
+
 .. parsed-literal::
 
     (5, 2)
@@ -191,6 +199,7 @@ Distance between vectors
 .. code:: python
 
     x[:, None, :].shape
+
 
 
 
@@ -220,6 +229,7 @@ the square root of the sum of squares for the 5 x 5 collection of
 
 
 
+
 .. parsed-literal::
 
     array([[  0.  ,   2.83,   5.66,   8.49,  11.31],
@@ -237,10 +247,12 @@ Finally, we come to the anti-climax - a one-liner function!
 
     def pdist_numpy(xs):
         return np.sqrt(((xs[:,None,:] - xs)**2).sum(-1))
+
 .. code:: python
 
     print pdist_numpy(A)
     %timeit pdist_numpy(xs)
+
 
 .. parsed-literal::
 
@@ -257,10 +269,12 @@ Numexpr version
     def pdist_numexpr(xs):
         a = xs[:, np.newaxis, :]
         return np.sqrt(ne.evaluate('sum((a-xs)**2, axis=2)'))
+
 .. code:: python
 
     print pdist_numexpr(A)
     %timeit pdist_numexpr(xs)
+
 
 .. parsed-literal::
 
@@ -275,10 +289,12 @@ Numba version
 .. code:: python
 
     pdist_numba = jit(pdist_python)
+
 .. code:: python
 
     print pdist_numba(A)
     %timeit pdist_numba(xs)
+
 
 .. parsed-literal::
 
@@ -294,10 +310,12 @@ NumbaPro version
 
     import numbapro
     pdist_numbapro = numbapro.jit(pdist_python)
+
 .. code:: python
 
     pdist_numbapro(A)
     %timeit pdist_numbapro(xs)
+
 
 .. parsed-literal::
 
@@ -310,10 +328,12 @@ Parakeet version
 .. code:: python
 
     pdist_parakeet = parakeet.jit(pdist_python)
+
 .. code:: python
 
     print pdist_parakeet(A)
     %timeit pdist_parakeet(xs)
+
 
 .. parsed-literal::
 
@@ -343,6 +363,7 @@ over ther approaches are:
 .. code:: python
 
     %load_ext cythonmagic
+
 .. code:: python
 
     %%cython
@@ -366,10 +387,12 @@ over ther approaches are:
                     d += tmp * tmp
                 D[i, j] = sqrt(d)
         return np.asarray(D)
+
 .. code:: python
 
     print pdist_cython(A)
     %timeit pdist_cython(xs)
+
 
 .. parsed-literal::
 
@@ -411,6 +434,7 @@ shown below.
         }
     }
 
+
 .. parsed-literal::
 
     Writing pdist_c.c
@@ -423,6 +447,7 @@ shown below.
     ! gcc -O3 -bundle -undefined dynamic_lookup pdist_c.c -o pdist_c.so
     # Linux: 
     # ! gcc -O3 -fPIC -shared -std=c99 -lm pdist_c.c -o pdist_c.so
+
 .. code:: python
 
     from ctypes import CDLL, c_int, c_void_p
@@ -441,10 +466,12 @@ shown below.
         
         lib.pdist_c(n, p, xs, D)
         return D
+
 .. code:: python
 
     print pdist_c(A)
     %timeit pdist_c(xs)
+
 
 .. parsed-literal::
 
@@ -481,6 +508,7 @@ and use an appropriate C++ compiler.
         }
     }
 
+
 .. parsed-literal::
 
     Writing pdist_cpp.cpp
@@ -492,6 +520,7 @@ and use an appropriate C++ compiler.
     ! g++ -O3 -bundle -undefined dynamic_lookup pdist_cpp.cpp -o pdist_cpp.so
     # Linux: 
     # ! g++ -O3 -fPIC -shared pdist_cpp.cpp -o pdist_cpp.so
+
 .. code:: python
 
     from ctypes import CDLL, c_int, c_void_p
@@ -510,10 +539,12 @@ and use an appropriate C++ compiler.
         
         lib.pdist_cpp(n, p, xs, D)
         return D
+
 .. code:: python
 
     print pdist_cpp(A)
     %timeit pdist_cpp(xs)
+
 
 .. parsed-literal::
 
@@ -551,6 +582,7 @@ Fortran
         end do
     end subroutine
 
+
 .. parsed-literal::
 
     Writing pdist_fortran.f90
@@ -559,10 +591,12 @@ Fortran
 .. code:: python
 
     ! f2py -c -m flib pdist_fortran.f90 > /dev/null
+
 .. code:: python
 
     import flib
     print flib.pdist_fortran.__doc__
+
 
 .. parsed-literal::
 
@@ -593,10 +627,12 @@ Fortran
         D = np.empty((n,n), np.float, order='F')
         flib.pdist_fortran(xs, D)
         return D
+
 .. code:: python
 
     print pdist_fortran(A)
     %timeit pdist_fortran(xs)
+
 
 .. parsed-literal::
 
@@ -635,6 +671,7 @@ Bake-off
     from scipy.spatial.distance import pdist as pdist_scipy
     print 'Scipy'.ljust(w),
     %timeit pdist_scipy(xs)
+
 
 .. parsed-literal::
 
@@ -710,6 +747,7 @@ Recommendations for optimizing Python code
     %load_ext version_information
     
     %version_information numpy, scipy, numexpr, numba, numbapro, parakeet, cython, f2py,
+
 
 
 

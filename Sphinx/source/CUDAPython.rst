@@ -12,18 +12,22 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     from IPython.display import HTML, Image
+
 .. code:: python
 
     from timeit import default_timer as timer
+
 Why GPU Programming?
 --------------------
 
 .. code:: python
 
     Image(url='http://www.nvidia.com/docs/IO/143716/cpu-and-gpu.jpg')
+
 
 
 
@@ -39,6 +43,7 @@ Why GPU Programming?
 
 
 
+
 .. raw:: html
 
     <iframe width="560" height="315" src="https://www.youtube.com/embed/-P28LKWTzrI" frameborder="0" allowfullscreen></iframe>
@@ -48,6 +53,7 @@ Why GPU Programming?
 .. code:: python
 
     Image(url='http://www.nvidia.com/docs/IO/143716/how-gpu-acceleration-works.png')
+
 
 
 
@@ -101,6 +107,7 @@ mainstream in the scientific community.
 
 
 
+
 .. raw:: html
 
     <img src="http://www.frontiersin.org/files/Articles/70265/fgene-04-00266-HTML/image_m/fgene-04-00266-g001.jpg"/>
@@ -113,6 +120,7 @@ Inside a GPU
 .. code:: python
 
     Image(url='http://www.orangeowlsolutions.com/wp-content/uploads/2013/03/Fig1.png')
+
 
 
 
@@ -131,6 +139,7 @@ The streaming multiprocessor
 
 
 
+
 .. raw:: html
 
     <img src="http://www.orangeowlsolutions.com/wp-content/uploads/2013/03/Fig2.png"/>
@@ -143,6 +152,7 @@ The CUDA Core
 .. code:: python
 
     Image(url='http://www.orangeowlsolutions.com/wp-content/uploads/2013/03/Fig3.png')
+
 
 
 
@@ -161,6 +171,7 @@ Memory Hiearchy
 
 
 
+
 .. raw:: html
 
     <img src="http://www.orangeowlsolutions.com/wp-content/uploads/2013/03/Fig9.png"/>
@@ -173,6 +184,7 @@ Processing flow
 .. code:: python
 
     Image(url='http://upload.wikimedia.org/wikipedia/commons/thumb/5/59/CUDA_processing_flow_%28En%29.PNG/450px-CUDA_processing_flow_%28En%29.PNG')
+
 
 
 
@@ -191,6 +203,7 @@ CUDA Kernels
 
 
 
+
 .. raw:: html
 
     <img src="http://www.biomedcentral.com/content/supplementary/1756-0500-2-73-s2.png"/>
@@ -203,6 +216,7 @@ CUDA execution model
 .. code:: python
 
     Image(url='http://3dgep.com/wp-content/uploads/2011/11/Cuda-Execution-Model.png')
+
 
 
 
@@ -221,6 +235,7 @@ CUDA threads
 
 
 
+
 .. raw:: html
 
     <img src="http://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/grid-of-thread-blocks.png"/>
@@ -233,6 +248,7 @@ Memoery access levels
 .. code:: python
 
     Image(url='http://docs.nvidia.com/cuda/parallel-thread-execution/graphics/memory-hierarchy.png')
+
 
 
 
@@ -472,9 +488,11 @@ Getting Started with CUDA
     from numbapro import cuda, vectorize, guvectorize, check_cuda
     from numbapro import void, uint8 , uint32, uint64, int32, int64, float32, float64, f8
     import numpy as np
+
 .. code:: python
 
     check_cuda()
+
 
 .. parsed-literal::
 
@@ -537,6 +555,7 @@ This requires several steps:
 .. code:: python
 
     Image(url='https://code.msdn.microsoft.com/vstudio/site/view/file/95904/1/Grid-2.png')
+
 
 
 
@@ -646,6 +665,7 @@ be done in CUDA C.
             return
     
         c[i] = a[i] + b[i]
+
 Launching the kernel
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -680,6 +700,7 @@ Launching the kernel
     
     print c
 
+
 .. parsed-literal::
 
     Blocks per grid: 4
@@ -712,6 +733,7 @@ lot of boilerplate code.
             return
     
         c[i] = a[i] + b[i]
+
 Launching the kernel
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -731,6 +753,7 @@ Launching the kernel
     
     cu_add2[bpg, tpb](a, b, c)
     print c
+
 
 .. parsed-literal::
 
@@ -758,15 +781,18 @@ Vector addition with the ``vectorize`` decorator
                target='gpu')
     def cu_add(a, b):
         return a + b
+
 .. code:: python
 
     n = 100
     a = np.arange(n, dtype=np.float32)
     b = np.arange(n, dtype=np.float32)
+
 .. code:: python
 
     c = cu_add(a, b)
     print c
+
 
 .. parsed-literal::
 
@@ -794,6 +820,7 @@ Vector addition with the ``vectorize`` decorator
         if (i < c.shape[0]) and (j < c.shape[1]):
             c[i, j] = a[i, j] + b[i, j]
         cuda.syncthreads()
+
 Low level ``cuda.jit`` requires correct instantiation of the kernel with blockspergrid and threadsperblock
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -818,6 +845,7 @@ Low level ``cuda.jit`` requires correct instantiation of the kernel with blocksp
     print a[-5:, -5:]
     print b[-5:, -5:]
     print c[-5:, -5:]
+
 
 .. parsed-literal::
 
@@ -854,6 +882,7 @@ for you.
                target='gpu')
     def cu_vec_add_2d(a, b):
         return a + b
+
 .. code:: python
 
     n = 480
@@ -866,6 +895,7 @@ for you.
     print a[-5:, -5:]
     print b[-5:, -5:]
     print c[-5:, -5:]
+
 
 .. parsed-literal::
 
@@ -906,6 +936,7 @@ that lack a GPU.
         return a + b
     
     mc_add(a, b)
+
 
 
 
@@ -1020,6 +1051,7 @@ steps - and we will revisit this pattern with Hadoop/SPARK.
     
     print 'a =', a
 
+
 .. parsed-literal::
 
     a = [14 20 16 11 12  4  2  3  3 16  8 12 12 19  6 15 20 20 20 21  8  5 11 17]
@@ -1049,6 +1081,7 @@ Pure Python
             if z.real*z.real + z.imag*z.imag >= 4:
                 return i
         return max_iters
+
 .. code:: python
 
     def create_fractal(xmin, xmax, ymin, ymax, image, iters):
@@ -1063,6 +1096,7 @@ Pure Python
                 imag = ymin + y*pixel_size_y
                 color = mandel(real, imag, iters)
                 image[y, x]  = color    
+
 .. code:: python
 
     gimage = np.zeros((1024, 1536), dtype=np.uint8)
@@ -1075,6 +1109,7 @@ Pure Python
     
     print "Mandelbrot created on CPU in %f s" % dt
     plt.imshow(gimage);
+
 
 .. parsed-literal::
 
@@ -1094,6 +1129,7 @@ Numba
     # This is using the jit decorator as a function (to avoid copying and pasting code)
     import numba
     mandel_numba = numba.jit(restype=uint32, argtypes=[float32, float32, uint32])(mandel)
+
 .. code:: python
 
     @numba.jit
@@ -1109,6 +1145,7 @@ Numba
                 imag = ymin + y*pixel_size_y
                 color = mandel_numba(real, imag, iters)
                 image[y, x]  = color  
+
 .. code:: python
 
     gimage = np.zeros((1024, 1536), dtype=np.uint8)
@@ -1121,6 +1158,7 @@ Numba
     
     print "Mandelbrot created on CPU in %f s" % dt
     plt.imshow(gimage);
+
 
 .. parsed-literal::
 
@@ -1138,6 +1176,7 @@ CUDA
 
     # Reuse regular function on GUO by using jit decorator
     mandel_gpu = cuda.jit(restype=uint32, argtypes=[float32, float32, uint32], device=True)(mandel)
+
 .. code:: python
 
     @cuda.jit(argtypes=[float32, float32, float32, float32, uint8[:,:], uint32])
@@ -1157,6 +1196,7 @@ CUDA
                 imag = ymin + y*pixel_size_y
                 color = mandel_gpu(real, imag, iters)
                 image[y, x]  = color    
+
 .. code:: python
 
     gimage = np.zeros((1024, 1536), dtype=np.uint8)
@@ -1173,6 +1213,7 @@ CUDA
     
     print "Mandelbrot created on GPU in %f s" % dt
     plt.imshow(gimage);
+
 
 .. parsed-literal::
 
@@ -1204,6 +1245,7 @@ Matrix multiplication wiht ``cublas``
     blas.gemm('T', 'T', n, n, n, 1.0, A, B, 1.0, C)
     
     assert(np.allclose(np.dot(A, B), C))
+
 Random numbers with ``curand``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1226,6 +1268,7 @@ Random numbers with ``curand``
 
 
 
+
 .. parsed-literal::
 
     3.1409
@@ -1238,6 +1281,7 @@ FFT and IFFT
 .. code:: python
 
     import numbapro.cudalib.cufft as cufft 
+
 .. code:: python
 
     num = 4
@@ -1258,6 +1302,7 @@ FFT and IFFT
     
     x_cpu = np.fft.ifft(x_cpu)
     print "{:<20}".format('CPU  IFFT'), x_cpu
+
 
 .. parsed-literal::
 
@@ -1298,6 +1343,7 @@ Navie matrix multiply
 
 
 
+
 .. raw:: html
 
     <img src="http://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/matrix-multiplication-with-shared-memory.png"/>
@@ -1309,6 +1355,7 @@ Navie matrix multiply
     x1 = np.random.random((4,4))
     x2 = np.random.random((4,4))
     np.dot(x1, x2).shape
+
 
 
 
@@ -1333,6 +1380,7 @@ Kernel function (no shared memory)
         c[x, y] = 0
         for i in range(n):
             c[x, y] +=  a[x, i] * b[i, y]
+
 .. code:: python
 
     tpb = device.WARP_SIZE
@@ -1346,6 +1394,7 @@ Kernel function (no shared memory)
     C = np.empty((n, n), dtype=np.float32)
     cu_matmul[grid_dim, block_dim](A, B, C, n)
     assert(np.allclose(np.dot(A, B), C))
+
 Matrix multiply with shared memory
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1362,6 +1411,7 @@ shared mmeory use is optimized.
 
 
 
+
 .. raw:: html
 
     <img src="http://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/memory-hierarchy.png"/>
@@ -1374,6 +1424,7 @@ Using shared mmeory by using tiling to exploit locality
 .. code:: python
 
     Image(url="http://docs.nvidia.com/cuda/cuda-c-programming-guide/graphics/matrix-multiplication-with-shared-memory.png")
+
 
 
 
@@ -1424,6 +1475,7 @@ Kernel function (with shared memory)
         # Put accumulated dot product into output matrix
         if x < n and y < n:
             C[x, y] = acc
+
 .. code:: python
 
     k = 32
@@ -1436,6 +1488,7 @@ Kernel function (with shared memory)
     C = np.empty((n, n), dtype=np.float32)
     cu_matmul_sm[grid_dim, block_dim](A, B, C, n, tpb, bpg)
     assert(np.allclose(np.dot(A, B), C))
+
 Benchmark
 ^^^^^^^^^
 
@@ -1493,6 +1546,7 @@ Benchmark
     print "With shared memory:", "%.2f" % tcuda_opt, "s"
     print "Using CuBLAS:", "%.2f" % tcuda_blas, "s"
 
+
 .. parsed-literal::
 
     N = 256 x 256
@@ -1507,12 +1561,15 @@ Benchmark
     assert np.allclose(np_ans, unopt_ans)
     assert np.allclose(np_ans, opt_ans)
     assert np.allclose(np_ans, blas_ans)
+
 .. code:: python
 
     %load_ext version_information
+
 .. code:: python
 
     %version_information numpy, pandas, numba, numbapro  
+
 
 
 

@@ -10,6 +10,7 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 Linear Algebra and Linear Systems
 =================================
 
@@ -48,6 +49,7 @@ Consider a set of :math:`m` linear equations in :math:`n` unknowns:
                    b_m\end{matrix}\right]
     \end{align*}
     
+
 
 
 
@@ -185,6 +187,7 @@ Examples
 
 
 
+
 .. parsed-literal::
 
     2.2361
@@ -197,6 +200,7 @@ Examples
     
     w = np.array([1,1])
     linalg.norm(v-w)
+
 
 
 
@@ -248,6 +252,7 @@ Example
 
 
 
+
 .. parsed-literal::
 
     3
@@ -280,6 +285,7 @@ Example
 
 
 
+
 .. parsed-literal::
 
     array([[1, 1],
@@ -296,10 +302,12 @@ Example
     # We have n observations of p variables 
     n, p = 10, 4
     v = np.random.random((p,n))
+
 .. code:: python
 
     # The covariance matrix is a p by p matrix
     np.cov(v)
+
 
 
 
@@ -320,6 +328,7 @@ Example
     # divided by the number of degrees of freedom
     w = v - v.mean(1)[:, np.newaxis]
     w.dot(w.T)/(n - 1)
+
 
 
 
@@ -369,6 +378,7 @@ What is most important about the determinant:
     M = np.random.randint(100,size=(n,n))
     print(M)
     np.linalg.det(M)
+
 
 .. parsed-literal::
 
@@ -509,6 +519,7 @@ the basis :math:`v_1, v_2` via
     
 
 
+
 .. parsed-literal::
 
     [2 3]
@@ -542,11 +553,13 @@ the basis :math:`v_1, v_2` via
         ymin -= 0.05*yrng
         ymax += 0.05*yrng
         plt.axis([xmin, xmax, ymin, ymax])
+
 .. code:: python
 
     e1 = np.array([1,0])
     e2 = np.array([0,1])
     A = np.array([[2,1],[3,1]])
+
 .. code:: python
 
     # Here is a simple plot showing Ae_1 and Ae_2
@@ -558,6 +571,7 @@ the basis :math:`v_1, v_2` via
     plt.subplot(1,2,2)
     plot_vectors([A.dot(e1), A.dot(e2)])
     plt.tight_layout()
+
 
 
 .. image:: LinearAlgebraReview_files/LinearAlgebraReview_52_0.png
@@ -716,6 +730,7 @@ system*
     
     np.linalg.matrix_rank(A)
     np.linalg.det(A)
+
 
 
 

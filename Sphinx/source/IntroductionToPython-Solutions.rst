@@ -28,6 +28,7 @@ to them.
     type(my_variable)
 
 
+
 .. parsed-literal::
 
     2
@@ -48,6 +49,7 @@ though, great power comes with great responsibility. For example:
 
     my_varible = my_variable+1
     print (my_variable)
+
 
 .. parsed-literal::
 
@@ -74,6 +76,7 @@ different than C:
     print(a+b)
 
 
+
 ::
 
 
@@ -94,6 +97,7 @@ different than C:
     a = "1"
     b = 5
     print(int(a)+b)
+
 Note that the typing is dynamic. I.e. a variable that was initally say
 an integer can become another type (float, string, etc.) via
 reassignment.
@@ -106,6 +110,7 @@ reassignment.
     
     a = 1.0
     print(type(a))
+
 Python has some other special data types such as lists, tuples and
 dictionaries that we will address later.
 
@@ -113,10 +118,10 @@ Operators
 ---------
 
 | Python offers the usual operators such as +,-,/,\*,=,>,<,==,!=,&,\|,
-  (sum, difference, divide, product, assignment, greater than, less
-  than, equal - comparison,not equal, and, or, respectively).
+(sum, difference, divide, product, assignment, greater than, less than,
+equal - comparison,not equal, and, or, respectively).
 | Additionally, there are %,// and \*\* (modulo, floor division and 'to
-  the power'). Note a few specifics:
+the power'). Note a few specifics:
 
 .. code:: python
 
@@ -125,6 +130,7 @@ Operators
     print(3%4)
     print(3//4)
     print(3**4)
+
 Note the behavior of / when applied to integers! This is similar to the
 behavior of other strongly typed languages such as C/C++. The result of
 the integer division is the same as the floor division //. If you want
@@ -137,6 +143,7 @@ appropriately typecast).
     b = 4
     print(a/b)
     print(float(a)/float(b))
+
 Iterators
 ---------
 
@@ -147,6 +154,7 @@ that will be addressed later. Here are examples of each:
 
     for i in range(1,10):
          print(i)
+
 The most important thing to note above is that the range function gives
 us values up to, but not including, the upper limit.
 
@@ -156,6 +164,7 @@ us values up to, but not including, the upper limit.
     while i < 10:
         print(i)
         i+=1
+
 This is unremarkable, so we proceeed without further comment.
 
 Conditional Statements
@@ -170,6 +179,7 @@ Conditional Statements
         print("elif")
     else:
         print("else")
+
 Again, nothing remarkable here, just need to learn the syntax. Here, we
 should also mention spacing. Python is picky about indentation - you
 must start a newline after each conditional statemen (it is the same for
@@ -186,6 +196,7 @@ statement within the scope of that condition.
         print("elif")
     else:
         print("else")
+
 .. code:: python
 
     a = 23
@@ -196,6 +207,7 @@ statement within the scope of that condition.
         print("elif")
     else:
         print("else")
+
 Four spaces are customary, but you can use whatever you like.
 Consistency is necessary.
 
@@ -216,6 +228,7 @@ can lead to problems. The 'try/except' conditional can solve them!
     except:
       print(a, " is not a number") 
 
+
 Here, we have tried to add a number and a string. That generates an
 exception - but we have trapped the exception and informed the user of
 the problem. This is much preferable to the programming crashing with
@@ -225,6 +238,7 @@ some cryptic error like:
 
     a = "1"
     b = a + 2 
+
 
 Functions
 ---------
@@ -237,6 +251,7 @@ Functions
     Division(3.0,4.0)
     Division(3,4.0)
     Division(3.0,4)
+
 Notice that the function does not specify the types of the arguments,
 like you would see in statically typed languages. This is both useful
 and dangerous. For example:
@@ -246,6 +261,7 @@ and dangerous. For example:
     def Division(a, b):
         print(a/b)
     Division(2,"2")
+
 In a statically typed language, the programmer would have specified the
 type of a and b (float, int, etc.) and the compiler would have
 complained about the function being passed a variable of the wrong type.
@@ -263,8 +279,9 @@ This does not happen here, but we can use the try/except construction.
                print(float(a)/float(b))
     Division(2,"2")
     Division(2,0)
+
 Strings and String Handling
-===========================
+---------------------------
 
 One of the most important features of Python is its powerful and easy
 handling of strings. Defining strings is simple enough in most
@@ -281,6 +298,7 @@ http://www.tutorialspoint.com/python/python\_strings.htm
     newstring = a + "\n We can format strings for printing %.2f"
     print(newstring %b)
 
+
 Now let's try some other string operations:
 
 .. code:: python
@@ -288,6 +306,7 @@ Now let's try some other string operations:
     a = "ABC DEFG"
     print(a[1:3])
     print(a[0:5])
+
 There are several things to learn from the above. First, Python has
 associated an index to the string. Second the indexing starts at 0, and
 lastly, the upper limit again means 'up to but not including' (a[0:5]
@@ -307,14 +326,15 @@ prints elements 0,1,2,3,4).
     print(b)
     b.count('c')
 
+
 This is fun! What else can you do with strings in Python? Pretty much
 anything you can think of!
 
 Lists, Tuples, Dictionaries
-===========================
+---------------------------
 
 Lists
------
+~~~~~
 
 Lists are exactly as the name implies. They are lists of objects. The
 objects can be any data type (including lists), and it is allowed to mix
@@ -328,9 +348,11 @@ reverse, etc. the list.
     b_list = ["A","B","F","G","d","x","c",a_list,3]
     print(b_list)
 
+
 .. code:: python
 
     print(b_list[7:9])
+
 .. code:: python
 
     a = [1,2,3,4,5,6,7]
@@ -348,6 +370,7 @@ reverse, etc. the list.
     print(a)
     a.remove(a[4])
     print(a)
+
 Just like with strings, elements are indexed beginning with 0.
 
 Lists can be constructed using 'for' and some conditional statements.
@@ -357,6 +380,7 @@ These are called, 'list comprehensions'. For example:
 
     even_numbers = [x for x in range(100) if x % 2 == 0]
     print(even_numbers)
+
 List comprehensions can work on strings as well:
 
 .. code:: python
@@ -364,6 +388,7 @@ List comprehensions can work on strings as well:
     first_sentence = "It was a dark and stormy night."
     characters = [x for x in first_sentence]
     print(characters)
+
 For more on comprehensions see:
 https://docs.python.org/2/tutorial/datastructures.html?highlight=comprehensions
 
@@ -381,6 +406,7 @@ map(aFunction, aSequence). Consider the following examples:
     print(c)
     d = map(pow,a,b)
     print(d)
+
 Note that map is usually more efficient than the equivalent list
 comprehension or looping contruct.
 
@@ -395,12 +421,14 @@ changeable.
     a = (1,2,3,4)
     print(a)
     a[1] = 2
+
 .. code:: python
 
     a = (1,"string in a tuple",5.3)
     b = (a,1,2,3)
     print(a)
     print(b)
+
 
 As you can see, all of the other flexibility remains - so use tuples
 when you have a list that you do not want to modify.
@@ -417,8 +445,9 @@ variable names, like so:
     cats=(indoor_cat,outdoor_cat)
     print(cats)
 
+
 Dictionaries
-------------
+~~~~~~~~~~~~
 
 Dictionaries are unordered, keyed lists. Lists are ordered, and the
 index may be viewed as a key.
@@ -428,20 +457,24 @@ index may be viewed as a key.
     a = ["A","B","C","D"] #list example
     print(a[1])
 
+
 .. code:: python
 
     a = {'anItem': "A", 'anotherItem': "B",'athirdItem':"C",'afourthItem':"D"} # dictionary example
     print(a[1])
+
 .. code:: python
 
     a = {'anItem': "A", 'anotherItem': "B",'athirdItem':"C",'afourthItem':"D"} # dictionary example
     print(a['anItem'])
 
+
 .. code:: python
 
     print(a)
-                The dictionary does not order the items, and you cannot access them assuming an order (as an index does).  You access elements using the keys.
-                
+
+The dictionary does not order the items, and you cannot access them assuming an order (as an index does).  You access elements using the keys.
+
 Sets
 ~~~~
 
@@ -463,6 +496,7 @@ example:
     print(diff_fruits_reverse)
     citrus_or_fruits = citrus | fruits     # set union
     print(citrus_or_fruits)
+
 .. code:: python
 
     a_list = ["a", "a","a", "b",1,2,3,"d",1]
@@ -471,6 +505,7 @@ example:
     print(a_set)         # Creates a set with unique elements
     new_list = list(a_set) # Convert set to list
     print(new_list)        # Obtain a list with unique elements 
+
 More examples and details regarding sets can be found at:
 https://docs.python.org/2/library/sets.html
 
@@ -583,6 +618,7 @@ three and five print “FizzBuzz”.
             print("Buzz")
         else:
             print(i)
+
 
 .. parsed-literal::
 
@@ -710,6 +746,7 @@ y=3.
     x, y = y, x
     print x, y
 
+
 .. parsed-literal::
 
     4 4
@@ -741,6 +778,7 @@ distance between two points :math:`u` and :math:`v`, where :math:`u` and
         return ((v[0] - u[0])**2 + (v[1] - u[1])**2)**0.5
     
     euclidean(u, v)
+
 
 
 
@@ -792,6 +830,7 @@ example, we should get a count of 7 for 'a'.
     counter3 = Counter(s.lower())
     print counter3['a']
 
+
 .. parsed-literal::
 
     7
@@ -838,6 +877,7 @@ which contains 0 'a's, and the second is 'ritea' which contains 1 'a'.
     
     print count
 
+
 .. parsed-literal::
 
     34
@@ -872,6 +912,7 @@ which contains 0 'a's, and the second is 'ritea' which contains 1 'a'.
     print list(set(x))
     print len(x)
     print len(set(x))
+
 
 .. parsed-literal::
 
@@ -914,6 +955,7 @@ functions.
     xs = [-2, 0, 1.5]
     for x in xs:
         test_pow6(x)
+
 **8**. Create a list of the cubes of x for x in [0, 10] using
 
 -  a for loop
@@ -937,6 +979,7 @@ functions.
     print cubes2
     
     print map(lambda x: x**3, range(1, 11))
+
 
 .. parsed-literal::
 
@@ -972,6 +1015,7 @@ a, b and c less than 100.
                                      for c in range(b, 100)
                                      if a**2 + b**2 == c**2]
     print pythagorean_triples
+
 
 .. parsed-literal::
 
@@ -1027,6 +1071,7 @@ numbers and return a list of normalized numbers.
     
     xs = [1,2,3,4]
     print f(xs)
+
 
 .. parsed-literal::
 

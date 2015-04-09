@@ -12,15 +12,19 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     %load_ext cythonmagic
+
 .. code:: python
 
     from numba import jit, typeof, int32, int64, float32, float64
+
 .. code:: python
 
     import random
+
 Analysis of problems for parallelism
 ------------------------------------
 
@@ -173,9 +177,11 @@ processing for a furhter linear speed-up in the number of processors.
             if (x**2 + y**2) < 1:
                 s += 1
         return s/n
+
 .. code:: python
 
     stats = %prun -r -q pi_python(1000000)
+
 
 .. parsed-literal::
 
@@ -184,6 +190,7 @@ processing for a furhter linear speed-up in the number of processors.
 .. code:: python
 
     stats.sort_stats('time').print_stats(5);
+
 
 .. parsed-literal::
 
@@ -207,6 +214,7 @@ processing for a furhter linear speed-up in the number of processors.
     def pi_numpy(n):
         xs = np.random.uniform(-1, 1, (n,2))
         return 4.0*((xs**2).sum(axis=1).sum() < 1)/n
+
 .. code:: python
 
     @jit
@@ -218,6 +226,7 @@ processing for a furhter linear speed-up in the number of processors.
             if x**2 + y**2 < 1:
                 s += 1
         return s/n
+
 This usse the GNU Scientific lirbary. You may need to instal it
 
 .. code:: bash
@@ -260,6 +269,7 @@ and then
         for i in range(n):
             hits += s[i]
         return 4.0*hits/n
+
 
 
 
@@ -778,6 +788,7 @@ and then
     %timeit pi_numpy(n)
     %timeit pi_cython(n)
 
+
 .. parsed-literal::
 
     10 loops, best of 3: 127 ms per loop
@@ -817,6 +828,7 @@ Using Multiprocessing
 
 
 
+
 .. parsed-literal::
 
     4
@@ -833,6 +845,7 @@ Using Multiprocessing
         results = pool.map(pi_cython, [n/m]*m)
         pool.close()
         return np.mean(results)
+
 For small jobs, the cost of spawning processes dominates
 
 .. code:: python
@@ -840,6 +853,7 @@ For small jobs, the cost of spawning processes dominates
     n = int(1e5)
     %timeit pi_cython(n)
     %timeit pi_multiprocessing(n)
+
 
 .. parsed-literal::
 
@@ -854,6 +868,7 @@ For larger jobs, we see the expected linear speedup
     n = int(1e7)
     %timeit pi_numpy(n)
     %timeit pi_multiprocessing(n)
+
 
 .. parsed-literal::
 
@@ -904,6 +919,7 @@ for examples of communicating across processes with multiprocessing.
     print val.value
     print sum(arr)
 
+
 .. parsed-literal::
 
     500
@@ -923,6 +939,7 @@ at the command line.
 .. code:: python
 
     from IPython.parallel import Client, interactive
+
 **Direct view**
 
 .. code:: python
@@ -930,6 +947,7 @@ at the command line.
     rc = Client()
     print rc.ids
     dv = rc[:]
+
 
 .. parsed-literal::
 
@@ -946,6 +964,7 @@ engines.
 .. code:: python
 
     %px import numpy as np
+
 We can refer to indivudal engines using indexing and slice notation on
 the client - for example, to set random seeds.
 
@@ -953,11 +972,13 @@ the client - for example, to set random seeds.
 
     for i, r in enumerate(rc):
         r.execute('np.random.seed(123)')
+
 .. code:: python
 
     %%px
     
     np.random.random(3)
+
 
 
 .. parsed-literal::
@@ -988,9 +1009,11 @@ Another way to do this is via the ``scatter`` operation.
 .. code:: python
 
     dv.scatter('seed', [1,1,2,2], block=True)
+
 .. code:: python
 
     dv['seed']
+
 
 
 
@@ -1006,6 +1029,7 @@ Another way to do this is via the ``scatter`` operation.
     
     np.random.seed(seed)
     np.random.random(3)
+
 
 
 .. parsed-literal::
@@ -1037,11 +1061,13 @@ We set them to differnet seeds again to do the Monte Carlo integration.
 
     for i, r in enumerate(rc):
         r.execute('np.random.seed(%d)' % i)
+
 .. code:: python
 
     %%px 
     
     np.random.random(3)
+
 
 
 .. parsed-literal::
@@ -1075,9 +1101,11 @@ dictionary lookup syntax or use ``gather`` to concatenate the resutls.
     %%px
     
     x = np.random.random(3)
+
 .. code:: python
 
     dv['x']
+
 
 
 
@@ -1093,6 +1121,7 @@ dictionary lookup syntax or use ``gather`` to concatenate the resutls.
 .. code:: python
 
     dv.gather('x', block=True)
+
 
 
 
@@ -1112,11 +1141,13 @@ processor.
     n = 1e7
     x = np.random.uniform(-1, 1, (n, 2))
     n = (x[:, 0]**2 + x[:,1]**2 < 1).sum()
+
 .. code:: python
 
     %precision 8
     ns = dv['n']
     4*np.sum(ns)/(1e7*len(rc))
+
 
 
 
@@ -1142,6 +1173,7 @@ and if so, retrieve data from it.
 
 
 
+
 .. parsed-literal::
 
     <AsyncResult: scatter>
@@ -1151,6 +1183,7 @@ and if so, retrieve data from it.
 .. code:: python
 
     dv['s']
+
 
 
 
@@ -1169,6 +1202,7 @@ and if so, retrieve data from it.
 
 
 
+
 .. parsed-literal::
 
     <AsyncMapResult: gather>
@@ -1178,6 +1212,7 @@ and if so, retrieve data from it.
 .. code:: python
 
     dv.gather('s').get()
+
 
 
 
@@ -1194,6 +1229,7 @@ and if so, retrieve data from it.
 
 
 
+
 .. parsed-literal::
 
     False
@@ -1206,6 +1242,7 @@ and if so, retrieve data from it.
 
 
 
+
 .. parsed-literal::
 
     False
@@ -1215,6 +1252,7 @@ and if so, retrieve data from it.
 .. code:: python
 
     ar.get()
+
 
 
 
@@ -1235,6 +1273,7 @@ engine gets allocated all the long-running tasks.
 .. code:: python
 
     lv = rc.load_balanced_view()
+
 .. code:: python
 
     def wait(n):
@@ -1243,15 +1282,18 @@ engine gets allocated all the long-running tasks.
         return n
     
     dv['wait'] = wait
+
 .. code:: python
 
     intervals = [5,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5]
+
 .. code:: python
 
     %%time
     
     ar = dv.map(wait, intervals)
     ar.get()
+
 
 .. parsed-literal::
 
@@ -1265,6 +1307,7 @@ engine gets allocated all the long-running tasks.
     
     ar = lv.map(wait, intervals, balanced=True)
     ar.get()
+
 
 .. parsed-literal::
 
@@ -1287,10 +1330,12 @@ a %%px cell.
         for i in range(len(xs)):
             s += xs[i]
         return s
+
 .. code:: python
 
     %%px
     %load_ext cythonmagic
+
 .. code:: python
 
     %%px
@@ -1303,12 +1348,14 @@ a %%px cell.
         for i in range(n):
             s += xs[i]
         return s
+
 .. code:: python
 
     %%time
     %%px
     xs = np.random.random(1e7)
     s = python_loop(xs)
+
 
 .. parsed-literal::
 
@@ -1319,6 +1366,7 @@ a %%px cell.
 .. code:: python
 
     dv['s']
+
 
 
 
@@ -1335,6 +1383,7 @@ a %%px cell.
     xs = np.random.random(1e7)
     s = cython_loop(xs)
 
+
 .. parsed-literal::
 
     CPU times: user 37.3 ms, sys: 7.5 ms, total: 44.8 ms
@@ -1344,6 +1393,7 @@ a %%px cell.
 .. code:: python
 
     dv['s']
+
 
 
 
@@ -1373,9 +1423,11 @@ References
 .. code:: python
 
     %load_ext version_information
+
 .. code:: python
 
     %version_information numba, multiprocessing, cython
+
 
 
 

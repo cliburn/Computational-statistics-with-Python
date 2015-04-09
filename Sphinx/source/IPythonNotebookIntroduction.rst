@@ -9,7 +9,7 @@ In this lecture, we will introduce the notebook interface and
 demonstrate some of its features.
 
 Cells
-=====
+-----
 
 The IPython notebook has two types of cells:
 
@@ -23,7 +23,7 @@ while the code cells allow for coding in Python and access to many other
 packages, compilers, etc.
 
 Markdown
---------
+~~~~~~~~
 
 To enter a markdown cell, just choose the cell tab and set the type to
 'Markdown'.
@@ -31,10 +31,11 @@ To enter a markdown cell, just choose the cell tab and set the type to
 .. code:: python
 
     from IPython.display import Image
+
 .. code:: python
 
-    
     Image(filename='screenshot.png')
+
 
 
 
@@ -60,7 +61,7 @@ shortly, when we begin our introduction to Python. For the moment, we
 will highlight additional uses for code cells.
 
 Magic Commands
-~~~~~~~~~~~~~~
+--------------
 
 Magic commands work a lot like OS command line calls - and in fact, some
 are just that. To get a list of available magics:
@@ -71,10 +72,11 @@ are just that. To get a list of available magics:
 
 
 
+
 .. parsed-literal::
 
     Available line magics:
-    %alias  %alias_magic  %autocall  %automagic  %autosave  %bookmark  %cat  %cd  %clear  %colors  %config  %connect_info  %cp  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %install_default_config  %install_ext  %install_profiles  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff  %logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %popd  %pprint  %precision  %profile  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %qtconsole  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos  %xdel  %xmode
+    %alias  %alias_magic  %autocall  %automagic  %autosave  %bookmark  %cat  %cd  %clear  %colors  %config  %connect_info  %cp  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %install_default_config  %install_ext  %install_profiles  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff  %logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %popd  %pprint  %precision  %profile  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %qtconsole  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos  %xdel  %xmode
     
     Available cell magics:
     %%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%latex  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile
@@ -92,38 +94,434 @@ can omit the % when making calls to line magics.
     ls
 
 
+
 .. parsed-literal::
 
-    IntroductionToPython.ipynb         IPythonNotebookPolyglot.ipynb
-    IPythonNotebookIntroduction.ipynb  [0m[01;35mscreenshot.png[0m
+    AlgorithmicComplexity.ipynb
+    AlgorithmicComplexity.rst
+    [34mAlgorithmicComplexity_files[m[m/
+    Animation.ipynb
+    Animation.rst
+    [34mAnimation_files[m[m/
+    BlackBoxOptimization.ipynb
+    BlackBoxOptimization.rst
+    [34mBlackBoxOptimization_files[m[m/
+    CUDAPython.ipynb
+    CUDAPython.rst
+    [34mCUDAPython_files[m[m/
+    CalibratingODEs.ipynb
+    CalibratingODEs.rst
+    [34mCalibratingODEs_files[m[m/
+    ComputationalStatisticsMotivation.ipynb
+    ComputationalStatisticsMotivation.rst
+    [34mComputationalStatisticsMotivation_files[m[m/
+    ComputerArithmetic.ipynb
+    ComputerArithmetic.rst
+    [34mComputerArithmetic_files[m[m/
+    CrashCourseInC.ipynb
+    CrashCourseInC.rst
+    DataProcessing-Solutions.ipynb
+    DataProcessing-Solutions.rst
+    [34mDataProcessing-Solutions_files[m[m/
+    DataProcessing.ipynb
+    DataProcessing.rst
+    [34mDataProcessing_files[m[m/
+    DistributedComputing.ipynb
+    DistributedComputing.rst
+    EM_algorithm.ipynb
+    EM_algorithm.rst
+    [34mEM_algorithm_files[m[m/
+    FromCToPython.ipynb
+    FromCToPython.rst
+    FromCompiledToPython.ipynb
+    FromCompiledToPython.rst
+    FromJuliaToPython.ipynb
+    FromJuliaToPython.rst
+    [34mFromJuliaToPython_files[m[m/
+    FromPythonToC.ipynb
+    FromPythonToC.rst
+    Functions-Solutions.rst
+    Functions.ipynb
+    Functions.rst
+    FunctionsSolutions.ipynb
+    FunctionsSolutions.rst
+    GPUSAndCUDAC.rst
+    [34mGPUs and Cuda C_files[m[m/
+    GPUsAndCUDAC.ipynb
+    [34mGPUsAndCUDAC_files[m[m/
+    IP2.rst
+    IPythonNotebookIntroduction.ipynb
+    IPythonNotebookIntroduction.rst
+    [34mIPythonNotebookIntroduction_files[m[m/
+    IPythonNotebookPolyglot.ipynb
+    IPythonNotebookPolyglot.rst
+    [34mIPythonNotebookPolyglot_files[m[m/
+    IntroductionToPython-Solutions.ipynb
+    IntroductionToPython-Solutions.rst
+    IntroductionToPython.ipynb
+    IntroductionToPython.rst
+    LinearAlgebraMatrixDecomp-WithSoutions.ipynb
+    LinearAlgebraMatrixDecomp-WithSoutions.rst
+    LinearAlgebraMatrixDecomp.ipynb
+    LinearAlgebraMatrixDecomp.rst
+    LinearAlgebraReview.ipynb
+    LinearAlgebraReview.rst
+    [34mLinearAlgebraReview_files[m[m/
+    MCMC.ipynb
+    MCMC.rst
+    [34mMCMC_files[m[m/
+    Makefile
+    Makefile~
+    MakingCodeFast.ipynb
+    MakingCodeFast.rst
+    [34mMakingCodeFast_files[m[m/
+    MapReduce.ipynb
+    MapReduce.rst
+    MonteCarlo.ipynb
+    MonteCarlo.rst
+    [34mMonteCarlo_files[m[m/
+    MultivariateOptimizationAlgortihms.ipynb
+    MultivariateOptimizationAlgortihms.rst
+    OptimizationInOneDimension.ipynb
+    OptimizationInOneDimension.rst
+    [34mOptimizationInOneDimension_files[m[m/
+    Optimization_Bakeoff.ipynb
+    Optimization_Bakeoff.rst
+    PCA-Solutions.ipynb
+    PCA-Solutions.rst
+    [34mPCA-Solutions_files[m[m/
+    PCA.ipynb
+    PCA.rst
+    [34mPCA_files[m[m/
+    PyMC2.ipynb
+    PyMC2.rst
+    [34mPyMC2_files[m[m/
+    PyMC3.ipynb
+    PyMC3.rst
+    [34mPyMC3_files[m[m/
+    PyStan.ipynb
+    PyStan.rst
+    [34mPyStan_files[m[m/
+    ResamplingAndMonteCarloSimulations.ipynb
+    ResamplingAndMonteCarloSimulations.rst
+    [34mResamplingAndMonteCarloSimulations_files[m[m/
+    Spark.ipynb
+    Spark.rst
+    TextProcessing-Solutions.ipynb
+    TextProcessing-Solutions.rst
+    TextProcessing.ipynb
+    TextProcessing.rst
+    TextProcessingExtras.ipynb
+    TextProcessingExtras.rst
+    UsingNumpy-Solutions.ipynb
+    UsingNumpy-Solutions.rst
+    [34mUsingNumpy-Solutions_files[m[m/
+    UsingNumpy.ipynb
+    UsingNumpy.rst
+    [34mUsingNumpy_files[m[m/
+    UsingPandas.ipynb
+    UsingPandas.rst
+    [34mUsingPandas_files[m[m/
+    WorkingWithStructuredData.ipynb
+    WorkingWithStructuredData.rst
+    WritingParallelCode.ipynb
+    WritingParallelCode.rst
+    conf.py
+    index.rst
+    screenshot.png
 
 
 .. code:: python
 
     cp IntroductionToPython.ipynb IP2.ipynb
 
+
 .. code:: python
 
     ls
 
+
 .. parsed-literal::
 
-    IntroductionToPython.ipynb  IPythonNotebookIntroduction.ipynb  [0m[01;35mscreenshot.png[0m
-    IP2.ipynb                   IPythonNotebookPolyglot.ipynb
+    AlgorithmicComplexity.ipynb
+    AlgorithmicComplexity.rst
+    [34mAlgorithmicComplexity_files[m[m/
+    Animation.ipynb
+    Animation.rst
+    [34mAnimation_files[m[m/
+    BlackBoxOptimization.ipynb
+    BlackBoxOptimization.rst
+    [34mBlackBoxOptimization_files[m[m/
+    CUDAPython.ipynb
+    CUDAPython.rst
+    [34mCUDAPython_files[m[m/
+    CalibratingODEs.ipynb
+    CalibratingODEs.rst
+    [34mCalibratingODEs_files[m[m/
+    ComputationalStatisticsMotivation.ipynb
+    ComputationalStatisticsMotivation.rst
+    [34mComputationalStatisticsMotivation_files[m[m/
+    ComputerArithmetic.ipynb
+    ComputerArithmetic.rst
+    [34mComputerArithmetic_files[m[m/
+    CrashCourseInC.ipynb
+    CrashCourseInC.rst
+    DataProcessing-Solutions.ipynb
+    DataProcessing-Solutions.rst
+    [34mDataProcessing-Solutions_files[m[m/
+    DataProcessing.ipynb
+    DataProcessing.rst
+    [34mDataProcessing_files[m[m/
+    DistributedComputing.ipynb
+    DistributedComputing.rst
+    EM_algorithm.ipynb
+    EM_algorithm.rst
+    [34mEM_algorithm_files[m[m/
+    FromCToPython.ipynb
+    FromCToPython.rst
+    FromCompiledToPython.ipynb
+    FromCompiledToPython.rst
+    FromJuliaToPython.ipynb
+    FromJuliaToPython.rst
+    [34mFromJuliaToPython_files[m[m/
+    FromPythonToC.ipynb
+    FromPythonToC.rst
+    Functions-Solutions.rst
+    Functions.ipynb
+    Functions.rst
+    FunctionsSolutions.ipynb
+    FunctionsSolutions.rst
+    GPUSAndCUDAC.rst
+    [34mGPUs and Cuda C_files[m[m/
+    GPUsAndCUDAC.ipynb
+    [34mGPUsAndCUDAC_files[m[m/
+    IP2.ipynb
+    IP2.rst
+    IPythonNotebookIntroduction.ipynb
+    IPythonNotebookIntroduction.rst
+    [34mIPythonNotebookIntroduction_files[m[m/
+    IPythonNotebookPolyglot.ipynb
+    IPythonNotebookPolyglot.rst
+    [34mIPythonNotebookPolyglot_files[m[m/
+    IntroductionToPython-Solutions.ipynb
+    IntroductionToPython-Solutions.rst
+    IntroductionToPython.ipynb
+    IntroductionToPython.rst
+    LinearAlgebraMatrixDecomp-WithSoutions.ipynb
+    LinearAlgebraMatrixDecomp-WithSoutions.rst
+    LinearAlgebraMatrixDecomp.ipynb
+    LinearAlgebraMatrixDecomp.rst
+    LinearAlgebraReview.ipynb
+    LinearAlgebraReview.rst
+    [34mLinearAlgebraReview_files[m[m/
+    MCMC.ipynb
+    MCMC.rst
+    [34mMCMC_files[m[m/
+    Makefile
+    Makefile~
+    MakingCodeFast.ipynb
+    MakingCodeFast.rst
+    [34mMakingCodeFast_files[m[m/
+    MapReduce.ipynb
+    MapReduce.rst
+    MonteCarlo.ipynb
+    MonteCarlo.rst
+    [34mMonteCarlo_files[m[m/
+    MultivariateOptimizationAlgortihms.ipynb
+    MultivariateOptimizationAlgortihms.rst
+    OptimizationInOneDimension.ipynb
+    OptimizationInOneDimension.rst
+    [34mOptimizationInOneDimension_files[m[m/
+    Optimization_Bakeoff.ipynb
+    Optimization_Bakeoff.rst
+    PCA-Solutions.ipynb
+    PCA-Solutions.rst
+    [34mPCA-Solutions_files[m[m/
+    PCA.ipynb
+    PCA.rst
+    [34mPCA_files[m[m/
+    PyMC2.ipynb
+    PyMC2.rst
+    [34mPyMC2_files[m[m/
+    PyMC3.ipynb
+    PyMC3.rst
+    [34mPyMC3_files[m[m/
+    PyStan.ipynb
+    PyStan.rst
+    [34mPyStan_files[m[m/
+    ResamplingAndMonteCarloSimulations.ipynb
+    ResamplingAndMonteCarloSimulations.rst
+    [34mResamplingAndMonteCarloSimulations_files[m[m/
+    Spark.ipynb
+    Spark.rst
+    TextProcessing-Solutions.ipynb
+    TextProcessing-Solutions.rst
+    TextProcessing.ipynb
+    TextProcessing.rst
+    TextProcessingExtras.ipynb
+    TextProcessingExtras.rst
+    UsingNumpy-Solutions.ipynb
+    UsingNumpy-Solutions.rst
+    [34mUsingNumpy-Solutions_files[m[m/
+    UsingNumpy.ipynb
+    UsingNumpy.rst
+    [34mUsingNumpy_files[m[m/
+    UsingPandas.ipynb
+    UsingPandas.rst
+    [34mUsingPandas_files[m[m/
+    WorkingWithStructuredData.ipynb
+    WorkingWithStructuredData.rst
+    WritingParallelCode.ipynb
+    WritingParallelCode.rst
+    conf.py
+    index.rst
+    screenshot.png
 
 
 .. code:: python
 
     rm IP2.ipynb
+
 .. code:: python
 
     ls
 
 
+
 .. parsed-literal::
 
-    IntroductionToPython.ipynb         IPythonNotebookPolyglot.ipynb
-    IPythonNotebookIntroduction.ipynb  [0m[01;35mscreenshot.png[0m
+    AlgorithmicComplexity.ipynb
+    AlgorithmicComplexity.rst
+    [34mAlgorithmicComplexity_files[m[m/
+    Animation.ipynb
+    Animation.rst
+    [34mAnimation_files[m[m/
+    BlackBoxOptimization.ipynb
+    BlackBoxOptimization.rst
+    [34mBlackBoxOptimization_files[m[m/
+    CUDAPython.ipynb
+    CUDAPython.rst
+    [34mCUDAPython_files[m[m/
+    CalibratingODEs.ipynb
+    CalibratingODEs.rst
+    [34mCalibratingODEs_files[m[m/
+    ComputationalStatisticsMotivation.ipynb
+    ComputationalStatisticsMotivation.rst
+    [34mComputationalStatisticsMotivation_files[m[m/
+    ComputerArithmetic.ipynb
+    ComputerArithmetic.rst
+    [34mComputerArithmetic_files[m[m/
+    CrashCourseInC.ipynb
+    CrashCourseInC.rst
+    DataProcessing-Solutions.ipynb
+    DataProcessing-Solutions.rst
+    [34mDataProcessing-Solutions_files[m[m/
+    DataProcessing.ipynb
+    DataProcessing.rst
+    [34mDataProcessing_files[m[m/
+    DistributedComputing.ipynb
+    DistributedComputing.rst
+    EM_algorithm.ipynb
+    EM_algorithm.rst
+    [34mEM_algorithm_files[m[m/
+    FromCToPython.ipynb
+    FromCToPython.rst
+    FromCompiledToPython.ipynb
+    FromCompiledToPython.rst
+    FromJuliaToPython.ipynb
+    FromJuliaToPython.rst
+    [34mFromJuliaToPython_files[m[m/
+    FromPythonToC.ipynb
+    FromPythonToC.rst
+    Functions-Solutions.rst
+    Functions.ipynb
+    Functions.rst
+    FunctionsSolutions.ipynb
+    FunctionsSolutions.rst
+    GPUSAndCUDAC.rst
+    [34mGPUs and Cuda C_files[m[m/
+    GPUsAndCUDAC.ipynb
+    [34mGPUsAndCUDAC_files[m[m/
+    IP2.rst
+    IPythonNotebookIntroduction.ipynb
+    IPythonNotebookIntroduction.rst
+    [34mIPythonNotebookIntroduction_files[m[m/
+    IPythonNotebookPolyglot.ipynb
+    IPythonNotebookPolyglot.rst
+    [34mIPythonNotebookPolyglot_files[m[m/
+    IntroductionToPython-Solutions.ipynb
+    IntroductionToPython-Solutions.rst
+    IntroductionToPython.ipynb
+    IntroductionToPython.rst
+    LinearAlgebraMatrixDecomp-WithSoutions.ipynb
+    LinearAlgebraMatrixDecomp-WithSoutions.rst
+    LinearAlgebraMatrixDecomp.ipynb
+    LinearAlgebraMatrixDecomp.rst
+    LinearAlgebraReview.ipynb
+    LinearAlgebraReview.rst
+    [34mLinearAlgebraReview_files[m[m/
+    MCMC.ipynb
+    MCMC.rst
+    [34mMCMC_files[m[m/
+    Makefile
+    Makefile~
+    MakingCodeFast.ipynb
+    MakingCodeFast.rst
+    [34mMakingCodeFast_files[m[m/
+    MapReduce.ipynb
+    MapReduce.rst
+    MonteCarlo.ipynb
+    MonteCarlo.rst
+    [34mMonteCarlo_files[m[m/
+    MultivariateOptimizationAlgortihms.ipynb
+    MultivariateOptimizationAlgortihms.rst
+    OptimizationInOneDimension.ipynb
+    OptimizationInOneDimension.rst
+    [34mOptimizationInOneDimension_files[m[m/
+    Optimization_Bakeoff.ipynb
+    Optimization_Bakeoff.rst
+    PCA-Solutions.ipynb
+    PCA-Solutions.rst
+    [34mPCA-Solutions_files[m[m/
+    PCA.ipynb
+    PCA.rst
+    [34mPCA_files[m[m/
+    PyMC2.ipynb
+    PyMC2.rst
+    [34mPyMC2_files[m[m/
+    PyMC3.ipynb
+    PyMC3.rst
+    [34mPyMC3_files[m[m/
+    PyStan.ipynb
+    PyStan.rst
+    [34mPyStan_files[m[m/
+    ResamplingAndMonteCarloSimulations.ipynb
+    ResamplingAndMonteCarloSimulations.rst
+    [34mResamplingAndMonteCarloSimulations_files[m[m/
+    Spark.ipynb
+    Spark.rst
+    TextProcessing-Solutions.ipynb
+    TextProcessing-Solutions.rst
+    TextProcessing.ipynb
+    TextProcessing.rst
+    TextProcessingExtras.ipynb
+    TextProcessingExtras.rst
+    UsingNumpy-Solutions.ipynb
+    UsingNumpy-Solutions.rst
+    [34mUsingNumpy-Solutions_files[m[m/
+    UsingNumpy.ipynb
+    UsingNumpy.rst
+    [34mUsingNumpy_files[m[m/
+    UsingPandas.ipynb
+    UsingPandas.rst
+    [34mUsingPandas_files[m[m/
+    WorkingWithStructuredData.ipynb
+    WorkingWithStructuredData.rst
+    WritingParallelCode.ipynb
+    WritingParallelCode.rst
+    conf.py
+    index.rst
+    screenshot.png
 
 
 We can make all the above system calls in one cell, by using the cell
@@ -139,16 +537,273 @@ magic, %%system
 
 
 
+
 .. parsed-literal::
 
-    ['IntroductionToPython.ipynb',
+    ['AlgorithmicComplexity.ipynb',
+     'AlgorithmicComplexity.rst',
+     'AlgorithmicComplexity_files',
+     'Animation.ipynb',
+     'Animation.rst',
+     'Animation_files',
+     'BlackBoxOptimization.ipynb',
+     'BlackBoxOptimization.rst',
+     'BlackBoxOptimization_files',
+     'CUDAPython.ipynb',
+     'CUDAPython.rst',
+     'CUDAPython_files',
+     'CalibratingODEs.ipynb',
+     'CalibratingODEs.rst',
+     'CalibratingODEs_files',
+     'ComputationalStatisticsMotivation.ipynb',
+     'ComputationalStatisticsMotivation.rst',
+     'ComputationalStatisticsMotivation_files',
+     'ComputerArithmetic.ipynb',
+     'ComputerArithmetic.rst',
+     'ComputerArithmetic_files',
+     'CrashCourseInC.ipynb',
+     'CrashCourseInC.rst',
+     'DataProcessing-Solutions.ipynb',
+     'DataProcessing-Solutions.rst',
+     'DataProcessing-Solutions_files',
+     'DataProcessing.ipynb',
+     'DataProcessing.rst',
+     'DataProcessing_files',
+     'DistributedComputing.ipynb',
+     'DistributedComputing.rst',
+     'EM_algorithm.ipynb',
+     'EM_algorithm.rst',
+     'EM_algorithm_files',
+     'FromCToPython.ipynb',
+     'FromCToPython.rst',
+     'FromCompiledToPython.ipynb',
+     'FromCompiledToPython.rst',
+     'FromJuliaToPython.ipynb',
+     'FromJuliaToPython.rst',
+     'FromJuliaToPython_files',
+     'FromPythonToC.ipynb',
+     'FromPythonToC.rst',
+     'Functions-Solutions.rst',
+     'Functions.ipynb',
+     'Functions.rst',
+     'FunctionsSolutions.ipynb',
+     'FunctionsSolutions.rst',
+     'GPUSAndCUDAC.rst',
+     'GPUs and Cuda C_files',
+     'GPUsAndCUDAC.ipynb',
+     'GPUsAndCUDAC_files',
      'IP2.ipynb',
+     'IP2.rst',
      'IPythonNotebookIntroduction.ipynb',
+     'IPythonNotebookIntroduction.rst',
+     'IPythonNotebookIntroduction_files',
      'IPythonNotebookPolyglot.ipynb',
-     'screenshot.png',
+     'IPythonNotebookPolyglot.rst',
+     'IPythonNotebookPolyglot_files',
+     'IntroductionToPython-Solutions.ipynb',
+     'IntroductionToPython-Solutions.rst',
      'IntroductionToPython.ipynb',
+     'IntroductionToPython.rst',
+     'LinearAlgebraMatrixDecomp-WithSoutions.ipynb',
+     'LinearAlgebraMatrixDecomp-WithSoutions.rst',
+     'LinearAlgebraMatrixDecomp.ipynb',
+     'LinearAlgebraMatrixDecomp.rst',
+     'LinearAlgebraReview.ipynb',
+     'LinearAlgebraReview.rst',
+     'LinearAlgebraReview_files',
+     'MCMC.ipynb',
+     'MCMC.rst',
+     'MCMC_files',
+     'Makefile',
+     'Makefile~',
+     'MakingCodeFast.ipynb',
+     'MakingCodeFast.rst',
+     'MakingCodeFast_files',
+     'MapReduce.ipynb',
+     'MapReduce.rst',
+     'MonteCarlo.ipynb',
+     'MonteCarlo.rst',
+     'MonteCarlo_files',
+     'MultivariateOptimizationAlgortihms.ipynb',
+     'MultivariateOptimizationAlgortihms.rst',
+     'OptimizationInOneDimension.ipynb',
+     'OptimizationInOneDimension.rst',
+     'OptimizationInOneDimension_files',
+     'Optimization_Bakeoff.ipynb',
+     'Optimization_Bakeoff.rst',
+     'PCA-Solutions.ipynb',
+     'PCA-Solutions.rst',
+     'PCA-Solutions_files',
+     'PCA.ipynb',
+     'PCA.rst',
+     'PCA_files',
+     'PyMC2.ipynb',
+     'PyMC2.rst',
+     'PyMC2_files',
+     'PyMC3.ipynb',
+     'PyMC3.rst',
+     'PyMC3_files',
+     'PyStan.ipynb',
+     'PyStan.rst',
+     'PyStan_files',
+     'ResamplingAndMonteCarloSimulations.ipynb',
+     'ResamplingAndMonteCarloSimulations.rst',
+     'ResamplingAndMonteCarloSimulations_files',
+     'Spark.ipynb',
+     'Spark.rst',
+     'TextProcessing-Solutions.ipynb',
+     'TextProcessing-Solutions.rst',
+     'TextProcessing.ipynb',
+     'TextProcessing.rst',
+     'TextProcessingExtras.ipynb',
+     'TextProcessingExtras.rst',
+     'UsingNumpy-Solutions.ipynb',
+     'UsingNumpy-Solutions.rst',
+     'UsingNumpy-Solutions_files',
+     'UsingNumpy.ipynb',
+     'UsingNumpy.rst',
+     'UsingNumpy_files',
+     'UsingPandas.ipynb',
+     'UsingPandas.rst',
+     'UsingPandas_files',
+     'WorkingWithStructuredData.ipynb',
+     'WorkingWithStructuredData.rst',
+     'WritingParallelCode.ipynb',
+     'WritingParallelCode.rst',
+     'conf.py',
+     'index.rst',
+     'screenshot.png',
+     'AlgorithmicComplexity.ipynb',
+     'AlgorithmicComplexity.rst',
+     'AlgorithmicComplexity_files',
+     'Animation.ipynb',
+     'Animation.rst',
+     'Animation_files',
+     'BlackBoxOptimization.ipynb',
+     'BlackBoxOptimization.rst',
+     'BlackBoxOptimization_files',
+     'CUDAPython.ipynb',
+     'CUDAPython.rst',
+     'CUDAPython_files',
+     'CalibratingODEs.ipynb',
+     'CalibratingODEs.rst',
+     'CalibratingODEs_files',
+     'ComputationalStatisticsMotivation.ipynb',
+     'ComputationalStatisticsMotivation.rst',
+     'ComputationalStatisticsMotivation_files',
+     'ComputerArithmetic.ipynb',
+     'ComputerArithmetic.rst',
+     'ComputerArithmetic_files',
+     'CrashCourseInC.ipynb',
+     'CrashCourseInC.rst',
+     'DataProcessing-Solutions.ipynb',
+     'DataProcessing-Solutions.rst',
+     'DataProcessing-Solutions_files',
+     'DataProcessing.ipynb',
+     'DataProcessing.rst',
+     'DataProcessing_files',
+     'DistributedComputing.ipynb',
+     'DistributedComputing.rst',
+     'EM_algorithm.ipynb',
+     'EM_algorithm.rst',
+     'EM_algorithm_files',
+     'FromCToPython.ipynb',
+     'FromCToPython.rst',
+     'FromCompiledToPython.ipynb',
+     'FromCompiledToPython.rst',
+     'FromJuliaToPython.ipynb',
+     'FromJuliaToPython.rst',
+     'FromJuliaToPython_files',
+     'FromPythonToC.ipynb',
+     'FromPythonToC.rst',
+     'Functions-Solutions.rst',
+     'Functions.ipynb',
+     'Functions.rst',
+     'FunctionsSolutions.ipynb',
+     'FunctionsSolutions.rst',
+     'GPUSAndCUDAC.rst',
+     'GPUs and Cuda C_files',
+     'GPUsAndCUDAC.ipynb',
+     'GPUsAndCUDAC_files',
+     'IP2.rst',
      'IPythonNotebookIntroduction.ipynb',
+     'IPythonNotebookIntroduction.rst',
+     'IPythonNotebookIntroduction_files',
      'IPythonNotebookPolyglot.ipynb',
+     'IPythonNotebookPolyglot.rst',
+     'IPythonNotebookPolyglot_files',
+     'IntroductionToPython-Solutions.ipynb',
+     'IntroductionToPython-Solutions.rst',
+     'IntroductionToPython.ipynb',
+     'IntroductionToPython.rst',
+     'LinearAlgebraMatrixDecomp-WithSoutions.ipynb',
+     'LinearAlgebraMatrixDecomp-WithSoutions.rst',
+     'LinearAlgebraMatrixDecomp.ipynb',
+     'LinearAlgebraMatrixDecomp.rst',
+     'LinearAlgebraReview.ipynb',
+     'LinearAlgebraReview.rst',
+     'LinearAlgebraReview_files',
+     'MCMC.ipynb',
+     'MCMC.rst',
+     'MCMC_files',
+     'Makefile',
+     'Makefile~',
+     'MakingCodeFast.ipynb',
+     'MakingCodeFast.rst',
+     'MakingCodeFast_files',
+     'MapReduce.ipynb',
+     'MapReduce.rst',
+     'MonteCarlo.ipynb',
+     'MonteCarlo.rst',
+     'MonteCarlo_files',
+     'MultivariateOptimizationAlgortihms.ipynb',
+     'MultivariateOptimizationAlgortihms.rst',
+     'OptimizationInOneDimension.ipynb',
+     'OptimizationInOneDimension.rst',
+     'OptimizationInOneDimension_files',
+     'Optimization_Bakeoff.ipynb',
+     'Optimization_Bakeoff.rst',
+     'PCA-Solutions.ipynb',
+     'PCA-Solutions.rst',
+     'PCA-Solutions_files',
+     'PCA.ipynb',
+     'PCA.rst',
+     'PCA_files',
+     'PyMC2.ipynb',
+     'PyMC2.rst',
+     'PyMC2_files',
+     'PyMC3.ipynb',
+     'PyMC3.rst',
+     'PyMC3_files',
+     'PyStan.ipynb',
+     'PyStan.rst',
+     'PyStan_files',
+     'ResamplingAndMonteCarloSimulations.ipynb',
+     'ResamplingAndMonteCarloSimulations.rst',
+     'ResamplingAndMonteCarloSimulations_files',
+     'Spark.ipynb',
+     'Spark.rst',
+     'TextProcessing-Solutions.ipynb',
+     'TextProcessing-Solutions.rst',
+     'TextProcessing.ipynb',
+     'TextProcessing.rst',
+     'TextProcessingExtras.ipynb',
+     'TextProcessingExtras.rst',
+     'UsingNumpy-Solutions.ipynb',
+     'UsingNumpy-Solutions.rst',
+     'UsingNumpy-Solutions_files',
+     'UsingNumpy.ipynb',
+     'UsingNumpy.rst',
+     'UsingNumpy_files',
+     'UsingPandas.ipynb',
+     'UsingPandas.rst',
+     'UsingPandas_files',
+     'WorkingWithStructuredData.ipynb',
+     'WorkingWithStructuredData.rst',
+     'WritingParallelCode.ipynb',
+     'WritingParallelCode.rst',
+     'conf.py',
+     'index.rst',
      'screenshot.png']
 
 
@@ -160,12 +815,17 @@ within the IPython notebook if you install the rpy2 package
 
     pip install rpy2
 
+Python as Glue
+--------------
+
 .. code:: python
 
     %load_ext rpy2.ipython 
+
 .. code:: python
 
     %matplotlib inline
+
 .. code:: python
 
     %%R
@@ -176,7 +836,8 @@ within the IPython notebook if you install the rpy2 package
     splom(mtcars[c(1,3,4,5,6)], main="MTCARS Data")
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_25_0.png
+
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_26_0.png
 
 
 Matlab works too:
@@ -189,9 +850,10 @@ Matlab works too:
 
     !pip install --upgrade pymatbridge
 
+
 .. parsed-literal::
 
-    Requirement already up-to-date: pymatbridge in /home/bitnami/anaconda/lib/python2.7/site-packages
+    Requirement already up-to-date: pymatbridge in /Users/cliburn/anaconda/lib/python2.7/site-packages
     Cleaning up...
 
 
@@ -200,6 +862,25 @@ Matlab works too:
     import pymatbridge as pymat
     ip = get_ipython()
     pymat.load_ipython_extension(ip)
+
+
+.. parsed-literal::
+
+    Starting MATLAB on ZMQ socket ipc:///tmp/pymatbridge
+    Send 'exit' command to kill the server
+    .MATLAB started and connected!
+
+
+.. parsed-literal::
+
+    /Users/cliburn/anaconda/lib/python2.7/site-packages/IPython/nbformat/current.py:19: UserWarning: IPython.nbformat.current is deprecated.
+    
+    - use IPython.nbformat for read/write/validate public API
+    - use IPython.nbformat.vX directly to composing notebooks of a particular version
+    
+      """)
+
+
 .. code:: python
 
     %%matlab
@@ -211,64 +892,26 @@ Matlab works too:
     surf(X,Y,V)
     title('Gridded Data Set', 'fontweight','b');
 
-::
 
 
-    ---------------------------------------------------------------------------
-    RuntimeError                              Traceback (most recent call last)
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_30_0.png
 
-    <ipython-input-17-8ef3de53fe4f> in <module>()
-    ----> 1 get_ipython().run_cell_magic(u'matlab', u'', u"\nxgv = -1.5:0.1:1.5;\nygv = -3:0.1:3;\n[X,Y] = ndgrid(xgv,ygv);\nV = exp(-(X.^2 + Y.^2));\nsurf(X,Y,V)\ntitle('Gridded Data Set', 'fontweight','b');")
-    
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/interactiveshell.pyc in run_cell_magic(self, magic_name, line, cell)
-       2160             magic_arg_s = self.var_expand(line, stack_depth)
-       2161             with self.builtin_trap:
-    -> 2162                 result = fn(magic_arg_s, cell)
-       2163             return result
-       2164 
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/pymatbridge/matlab_magic.pyc in matlab(self, line, cell, local_ns)
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/magic.pyc in <lambda>(f, *a, **k)
-        191     # but it's overkill for just that one bit of state.
-        192     def magic_deco(arg):
-    --> 193         call = lambda f, *a, **k: f(*a, **k)
-        194 
-        195         if callable(arg):
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/pymatbridge/matlab_magic.pyc in matlab(self, line, cell, local_ns)
-        215             e_s += "\n-----------------------"
-        216             e_s += "\nAre you sure Matlab is started?"
-    --> 217             raise RuntimeError(e_s)
-        218 
-        219 
-
-
-    RuntimeError: There was an error running the code:
-     
-    xgv = -1.5:0.1:1.5;
-    ygv = -3:0.1:3;
-    [X,Y] = ndgrid(xgv,ygv);
-    V = exp(-(X.^2 + Y.^2));
-    surf(X,Y,V)
-    title('Gridded Data Set', 'fontweight','b');
-    -----------------------
-    Are you sure Matlab is started?
-
-
-And it is also OK if you prefer Octave. Just type
-
-.. code:: bash
-
-    pip install oct2py
 
 .. code:: python
 
-    %load_ext octavemagic
+    ! pip install oct2py
+
+
+.. parsed-literal::
+
+    Requirement already satisfied (use --upgrade to upgrade): oct2py in /Users/cliburn/anaconda/lib/python2.7/site-packages
+    Cleaning up...
+
+
+.. code:: python
+
+    %load_ext oct2py.ipython
+
 .. code:: python
 
     %%octave
@@ -280,48 +923,57 @@ And it is also OK if you prefer Octave. Just type
     [Q,R] = qr(A)
     [V,D] = eig(A)
 
-::
 
 
-    ---------------------------------------------------------------------------
-    IndexError                                Traceback (most recent call last)
+.. parsed-literal::
 
-    <ipython-input-23-fd6df88570f6> in <module>()
-    ----> 1 get_ipython().run_cell_magic(u'octave', u'', u'\nA = reshape(1:4,2,2); \nb = [36; 88];\nA\\b\n[L,U,P] = lu(A)\n[Q,R] = qr(A)\n[V,D] = eig(A)')
+    ans =
     
+           60
+           -8
+    
+    L =
+    
+      1.00000  0.00000
+      0.50000  1.00000
+    
+    U =
+    
+            2        4
+            0        1
+    
+    P =
+    
+    Permutation Matrix
+    
+       0   1
+       1   0
+    
+    Q =
+    
+      -0.44721  -0.89443
+      -0.89443  0.44721
+    
+    R =
+    
+      -2.23607  -4.91935
+      0.00000  -0.89443
+    
+    V =
+    
+      -0.90938  -0.56577
+      0.41597  -0.82456
+    
+    D =
+    
+    Diagonal Matrix
+    
+      -0.37228        0
+            0  5.37228
 
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/interactiveshell.pyc in run_cell_magic(self, magic_name, line, cell)
-       2160             magic_arg_s = self.var_expand(line, stack_depth)
-       2161             with self.builtin_trap:
-    -> 2162                 result = fn(magic_arg_s, cell)
-       2163             return result
-       2164 
 
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/extensions/octavemagic.pyc in octave(self, line, cell, local_ns)
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/magic.pyc in <lambda>(f, *a, **k)
-        191     # but it's overkill for just that one bit of state.
-        192     def magic_deco(arg):
-    --> 193         call = lambda f, *a, **k: f(*a, **k)
-        194 
-        195         if callable(arg):
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/extensions/octavemagic.pyc in octave(self, line, cell, local_ns)
-        327         except (oct2py.Oct2PyError) as exception:
-        328             msg = exception.message
-    --> 329             msg = msg.split('# ___<end_pre_call>___ #')[1]
-        330             msg = msg.split('# ___<start_post_call>___ #')[0]
-        331             raise OctaveMagicError('Octave could not complete execution.  '
-
-
-    IndexError: list index out of range
-
-
-We will redo these examples in Python
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python <-> R <-> Matlab <-> Octave
+----------------------------------
 
 .. code:: python
 
@@ -329,6 +981,7 @@ We will redo these examples in Python
     import numpy as np
     import statsmodels.api as sm 
     from pandas.tools.plotting import scatter_matrix
+
 .. code:: python
 
     # First we will load the mtcars dataset and do a scatterplot matrix
@@ -338,7 +991,8 @@ We will redo these examples in Python
     scatter_matrix(df[[0,2,3,4,5]], alpha=0.3, figsize=(8, 8), diagonal='kde', marker='o');
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_35_0.png
+
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_36_0.png
 
 
 .. code:: python
@@ -358,7 +1012,8 @@ We will redo these examples in Python
     plt.title('Gridded Data Set');
 
 
-.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_36_0.png
+
+.. image:: IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_37_0.png
 
 
 .. code:: python
@@ -381,6 +1036,7 @@ We will redo these examples in Python
     print "R =\n", R, '\n'
     print 'V =\n', V, '\n'
     print "D =\nDiagonal matrix\n", np.diag(abs(D)), '\n'
+
 
 .. parsed-literal::
 
@@ -419,6 +1075,9 @@ We will redo these examples in Python
     
 
 
+More Glue: Julia and Perl
+-------------------------
+
 Using Julia
 ~~~~~~~~~~~
 
@@ -426,60 +1085,10 @@ Using Julia
 
     %load_ext julia.magic
 
-::
 
+.. parsed-literal::
 
-    ---------------------------------------------------------------------------
-    ImportError                               Traceback (most recent call last)
-
-    <ipython-input-30-5bcfdab8fb0a> in <module>()
-    ----> 1 get_ipython().magic(u'load_ext julia.magic')
-    
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/interactiveshell.pyc in magic(self, arg_s)
-       2203         magic_name, _, magic_arg_s = arg_s.partition(' ')
-       2204         magic_name = magic_name.lstrip(prefilter.ESC_MAGIC)
-    -> 2205         return self.run_line_magic(magic_name, magic_arg_s)
-       2206 
-       2207     #-------------------------------------------------------------------------
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/interactiveshell.pyc in run_line_magic(self, magic_name, line)
-       2124                 kwargs['local_ns'] = sys._getframe(stack_depth).f_locals
-       2125             with self.builtin_trap:
-    -> 2126                 result = fn(*args,**kwargs)
-       2127             return result
-       2128 
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/magics/extension.pyc in load_ext(self, module_str)
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/magic.pyc in <lambda>(f, *a, **k)
-        191     # but it's overkill for just that one bit of state.
-        192     def magic_deco(arg):
-    --> 193         call = lambda f, *a, **k: f(*a, **k)
-        194 
-        195         if callable(arg):
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/magics/extension.pyc in load_ext(self, module_str)
-         61         if not module_str:
-         62             raise UsageError('Missing module name.')
-    ---> 63         res = self.shell.extension_manager.load_extension(module_str)
-         64 
-         65         if res == 'already loaded':
-
-
-    /home/bitnami/anaconda/lib/python2.7/site-packages/IPython/core/extensions.pyc in load_extension(self, module_str)
-         96             if module_str not in sys.modules:
-         97                 with prepended_to_syspath(self.ipython_extension_dir):
-    ---> 98                     __import__(module_str)
-         99             mod = sys.modules[module_str]
-        100             if self._call_load_ipython_extension(mod):
-
-
-    ImportError: No module named julia.magic
+    Initializing Julia interpreter. This may take some time...
 
 
 .. code:: python
@@ -487,9 +1096,13 @@ Using Julia
     %%julia
     1 + sin(3)
 
+
+
+
 .. parsed-literal::
 
-    ERROR: Cell magic `%%julia` not found.
+    1.1411200080598671
+
 
 
 .. code:: python
@@ -500,11 +1113,31 @@ Using Julia
         s += 1/n - 1/(n+1)
     end
     s # an expression on the last line (if it doesn't end with ";") is printed as "Out"
+
+
+
+
+.. parsed-literal::
+
+    0.6930971830599458
+
+
+
 .. code:: python
 
     %%julia
     f(x) = x + 1
     f([1,1,2,3,5,8])
+
+
+
+
+.. parsed-literal::
+
+    [2, 2, 3, 4, 6, 9]
+
+
+
 Using Perl
 ~~~~~~~~~~
 
@@ -516,5 +1149,12 @@ Using Perl
     use warnings;
      
     print "Hello World!\n";
+
+
+.. parsed-literal::
+
+    Hello World!
+
+
 We hope these give you an idea of the power and flexibility this
 notebook environment provides!

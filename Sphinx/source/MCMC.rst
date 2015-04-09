@@ -13,14 +13,17 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     from mpl_toolkits.mplot3d import Axes3D
     import scipy.stats as stats
     from functools import partial
+
 .. code:: python
 
     np.random.seed(1234)
+
 Outline of topics for MCMC
 --------------------------
 
@@ -151,6 +154,7 @@ below. Some general points:
     plt.legend();
 
 
+
 .. image:: MCMC_files/MCMC_7_0.png
 
 
@@ -193,6 +197,7 @@ grid resolution and :math:`d` is the size of :math:`\theta`.
     plt.xlabel(r'$\theta$', fontsize=14)
     plt.ylabel('Density', fontsize=16)
     plt.legend();
+
 
 
 .. image:: MCMC_files/MCMC_9_0.png
@@ -371,6 +376,7 @@ works.
     nmcmc = len(samples)//2
     print "Efficiency = ", naccept/niters
 
+
 .. parsed-literal::
 
     Efficiency =  0.19
@@ -386,6 +392,7 @@ works.
     plt.plot(thetas, post.pdf(thetas), c='red', linestyle='--', alpha=0.5, label='True posterior')
     plt.xlim([0,1]);
     plt.legend(loc='best');
+
 
 
 .. image:: MCMC_files/MCMC_13_0.png
@@ -412,6 +419,7 @@ practice.
                 theta = theta_p
             samples.append(theta)
         return samples
+
 .. code:: python
 
     n = 100
@@ -422,6 +430,7 @@ practice.
     niters = 100
     
     sampless = [mh_coin(niters, n, h, theta, lik, prior, sigma) for theta in np.arange(0.1, 1, 0.2)]
+
 .. code:: python
 
     # Convergence of multiple chains
@@ -430,6 +439,7 @@ practice.
         plt.plot(samples, '-o')
     plt.xlim([0, niters])
     plt.ylim([0, 1]);
+
 
 
 .. image:: MCMC_files/MCMC_17_0.png
@@ -629,11 +639,13 @@ Setup
     def bern(theta, z, N):
         """Bernoulli likelihood with N trials and z successes."""
         return np.clip(theta**z * (1-theta)**(N-z), 0, 1)
+
 .. code:: python
 
     def bern2(theta1, theta2, z1, z2, N1, N2):
         """Bernoulli likelihood with N trials and z successes."""
         return bern(theta1, z1, N1) * bern(theta2, z2, N2)
+
 .. code:: python
 
     def make_thetas(xmin, xmax, n):
@@ -641,6 +653,7 @@ Setup
         widths =(xs[1:] - xs[:-1])/2.0
         thetas = xs[:-1]+ widths
         return thetas
+
 .. code:: python
 
     def make_plots(X, Y, prior, likelihood, posterior, projection=None):
@@ -657,11 +670,13 @@ Setup
         ax[1].set_title('Likelihood')
         ax[2].set_title('Posteior')     
         plt.tight_layout()
+
 .. code:: python
 
     thetas1 = make_thetas(0, 1, 101)
     thetas2 = make_thetas(0, 1, 101)
     X, Y = np.meshgrid(thetas1, thetas2)
+
 Analytic solution
 ^^^^^^^^^^^^^^^^^
 
@@ -680,6 +695,7 @@ Analytic solution
     posterior = stats.beta(a + z1, b + N1 - z1).pdf(X) * stats.beta(a + z2, b + N2 - z2).pdf(Y)
     make_plots(X, Y, prior, likelihood, posterior)
     make_plots(X, Y, prior, likelihood, posterior, projection='3d')
+
 
 
 .. image:: MCMC_files/MCMC_29_0.png
@@ -701,6 +717,7 @@ Grid approximation
         pmf = pdf * area
         pmf /= pmf.sum()
         return pmf
+
 .. code:: python
 
     _prior = bern2(X, Y, 2, 8, 10, 10) + bern2(X, Y, 8, 2, 10, 10)
@@ -710,6 +727,7 @@ Grid approximation
     posterior_grid /= posterior_grid.sum()
     make_plots(X, Y, prior_grid, likelihood, posterior_grid)
     make_plots(X, Y, prior_grid, likelihood, posterior_grid, projection='3d')
+
 
 
 .. image:: MCMC_files/MCMC_32_0.png
@@ -749,6 +767,7 @@ Metropolis
             theta = new_theta
         if i >= burnin:
             thetas[i-burnin] = theta
+
 .. code:: python
 
     kde = stats.gaussian_kde(thetas.T)
@@ -756,6 +775,7 @@ Metropolis
     posterior_metroplis = kde(XY).reshape(X.shape)
     make_plots(X, Y, prior(X, Y), lik(X, Y), posterior_metroplis)
     make_plots(X, Y, prior(X, Y), lik(X, Y), posterior_metroplis, projection='3d')
+
 
 
 .. image:: MCMC_files/MCMC_35_0.png
@@ -794,6 +814,7 @@ Gibbs
         
         if i >= burnin:
             thetas[i-burnin] = theta
+
 .. code:: python
 
     kde = stats.gaussian_kde(thetas.T)
@@ -801,6 +822,7 @@ Gibbs
     posterior_gibbs = kde(XY).reshape(X.shape)
     make_plots(X, Y, prior(X, Y), lik(X, Y), posterior_gibbs)
     make_plots(X, Y, prior(X, Y), lik(X, Y), posterior_gibbs, projection='3d')
+
 
 
 .. image:: MCMC_files/MCMC_38_0.png
@@ -858,9 +880,11 @@ this is typicaly done numerically - repeat
                 lb = y
         else:
             xs.append(x)
+
 .. code:: python
 
     plt.hist(xs, 20);
+
 
 
 .. image:: MCMC_files/MCMC_41_0.png
@@ -1001,6 +1025,7 @@ and
 .. code:: python
 
     from numpy.random import gamma as rgamma # rename so we can use gamma for parameter name
+
 .. code:: python
 
     def lambda_update(alpha, beta, y, t):
@@ -1023,6 +1048,7 @@ and
             lambdas_[i,:] = lambda_
             
         return betas_, lambdas_
+
 Setup
 ^^^^^
 
@@ -1035,6 +1061,7 @@ Setup
     y = np.array([5, 1, 5, 14, 3, 19, 1, 1, 4, 22], np.int)
     t = np.array([94.32, 15.72, 62.88, 125.76, 5.24, 31.44, 1.05, 1.05, 2.10, 10.48], np.float)
     niter = 1000
+
 .. code:: python
 
     betas, lambdas = gibbs(niter, y, t, alpha, gamma, delta)
@@ -1042,6 +1069,7 @@ Setup
     print '%.3f' % betas.std(ddof=1)
     print lambdas.mean(axis=0)
     print lambdas.std(ddof=1, axis=0)
+
 
 .. parsed-literal::
 
@@ -1062,13 +1090,14 @@ Setup
         plt.title('Trace for $\lambda$%d' % i)
 
 
+
 .. image:: MCMC_files/MCMC_51_0.png
 
 
 LaTeX for Markov chain diagram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                \documentclass[10pt]{article}
+\documentclass[10pt]{article}
 \usepackage[usenames]{color}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -1086,4 +1115,4 @@ semithick]
 \path (A) edge  [loop above] node {0} (A);
 \path (B) edge  [loop above] node {$1-\frac{\theta}{1-\theta}$} (B);
 \end{tikzpicture}
-                
+

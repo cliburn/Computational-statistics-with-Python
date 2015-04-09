@@ -10,13 +10,16 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     from __future__ import division
+
 .. code:: python
 
     import scipy.stats as stats
     import seaborn as sns
+
 Topics
 ------
 
@@ -87,9 +90,11 @@ Obviosuly, this can be easily scaled to any other range :math:`(a, b)`.
     
     # setting the seed
     rng.current = 1
+
 .. code:: python
 
     [rng() for i in range(10)]
+
 
 
 
@@ -116,16 +121,19 @@ Inverst transform method
     def expon_pdf(x, lmabd=1):
         """PDF of exponential distribution."""
         return lmabd*np.exp(-lmabd*x)
+
 .. code:: python
 
     def expon_cdf(x, lambd=1):
         """CDF of exponetial distribution."""
         return 1 - np.exp(-lambd*x)
+
 .. code:: python
 
     def expon_icdf(p, lambd=1):
         """Inverse CDF of exponential distribution - i.e. quantile function."""
         return -np.log(1-p)/lambd
+
 .. code:: python
 
     dist = stats.expon()
@@ -151,6 +159,7 @@ Inverst transform method
         plt.plot(x, expon_pdf(x), linewidth=2)
         plt.axis([0,4,0,1])
         plt.title('Histogram of exponential PRNGs');
+
 
 
 .. image:: MonteCarlo_files/MonteCarlo_13_0.png
@@ -185,6 +194,7 @@ using interpolation.
             return np.array(map(pointwise, np.array(xs)))
     
         return ufunclike
+
 .. code:: python
 
     from statsmodels.distributions.empirical_distribution import ECDF
@@ -201,6 +211,7 @@ using interpolation.
     
     plt.hist(x, 25, histtype='step', color='red', normed=True, linewidth=1)
     plt.hist(ys, 25, histtype='step', color='blue', normed=True, linewidth=1);
+
 
 
 .. image:: MonteCarlo_files/MonteCarlo_16_0.png
@@ -254,6 +265,7 @@ Rejection sampling (Accept-reject method)
     
         plt.axis([-4,4,0,0.4])
         plt.title('Histogram of accepted samples', fontsize=20);
+
 Mixture representations
 ^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -289,6 +301,7 @@ Student's T distribution with :math:`\nu` degrees fo freedom.
     
         plt.axis([-4,4,0,0.4])
         plt.title('Histogram of accepted samples', fontsize=20);
+
 Ad-hoc methods - e.g. Box-Muller for generating normally distributed random numbers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -321,9 +334,11 @@ Note:
     theta = 2*np.pi*u2
     x = r*np.cos(theta)
     y = r*np.sin(theta)
+
 .. code:: python
 
     sns.jointplot(x, y, kind='scatter');
+
 Using a random number generator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -341,9 +356,11 @@ e.g. PDF, CDF and quantiles.
     
     rs = npr.beta(a=0.5, b=0.5, size=1000)
     plt.hist(rs, bins=20, histtype='step', normed=True, linewidth=1);
+
 .. code:: python
 
     %load_ext rpy2.ipython
+
 .. code:: python
 
     %%R
@@ -354,6 +371,7 @@ e.g. PDF, CDF and quantiles.
     print(pbeta(xs, 0.5, 0.5))
     print(qbeta(xs, 0.5, 0.5))
     print(rbeta(n, 0.5, 0.5))
+
 .. code:: python
 
     # Using scipy
@@ -367,11 +385,13 @@ e.g. PDF, CDF and quantiles.
     print rv.cdf(xs) # equivalent of pbeta
     print rv.ppf(xs) # equvialent of qbeta
     print rv.rvs(n) # equivalent of rbeta
+
 .. code:: python
 
     # And here is a plot of the PDF for the beta distribution
     xs = np.linspace(0, 1, 100)
     plt.plot(xs, ss.beta.pdf(xs, a=0.5, b=0.5));
+
 Monte Carlo integration
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -444,6 +464,7 @@ minimum value of the function is 1 at :math:`x=0` and :math:`e` at
     plt.scatter(pts[:, 0], pts[:, 1])
     plt.xlim([0,1])
     plt.ylim([0, np.e]);
+
 .. code:: python
 
     # Check analytic solution
@@ -453,6 +474,7 @@ minimum value of the function is 1 at :math:`x=0` and :math:`e` at
     x = symbols('x')
     expr = integrate(exp(x), (x,0,1))
     expr.evalf()
+
 .. code:: python
 
     # Using numerical quadrature
@@ -465,6 +487,7 @@ minimum value of the function is 1 at :math:`x=0` and :math:`e` at
     
     from scipy import integrate
     integrate.quad(exp, 0, 1)
+
 .. code:: python
 
     # Monte Carlo approximation
@@ -476,6 +499,7 @@ minimum value of the function is 1 at :math:`x=0` and :math:`e` at
         volume = np.e * 1 # volume of region
         sol = (volume * count)/n
         print '%10d %.6f' % (n, sol)
+
 Montioring variance
 ~~~~~~~~~~~~~~~~~~~
 
@@ -497,10 +521,12 @@ For the example, we willl try to etsimate the function
 
     def f(x):
         return x * np.cos(71*x) + np.sin(13*x)
+
 .. code:: python
 
     x = np.linspace(0, 1, 100)
     plt.plot(x, f(x));
+
 Exact solution
 ^^^^^^^^^^^^^^
 
@@ -510,6 +536,7 @@ Exact solution
     
     x = symbols('x')
     integrate(x * cos(71*x) + sin(13*x), (x, 0,1)).evalf(6)
+
 Using multiple independent sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -517,16 +544,19 @@ Using multiple independent sequences
 
     n = 100
     reps = 1000
+
 .. code:: python
 
     x = f(np.random.random((n, reps)))
     y = 1/np.arange(1, n+1)[:, None] * np.cumsum(x, axis=0)
     upper, lower = np.percentile(y, [2.5, 97.5], axis=1)
+
 .. code:: python
 
     plt.plot(np.arange(1, n+1), y, c='grey', alpha=0.02)
     plt.plot(np.arange(1, n+1), y[:, 0], c='red', linewidth=1);
     plt.plot(np.arange(1, n+1), upper, 'b', np.arange(1, n+1), lower, 'b');
+
 
 Using bootstrap
 ^^^^^^^^^^^^^^^
@@ -536,11 +566,13 @@ Using bootstrap
     xb = np.random.choice(x[:,0], (n, reps), replace=True)
     yb = 1/np.arange(1, n+1)[:, None] * np.cumsum(xb, axis=0)
     upper, lower = np.percentile(yb, [2.5, 97.5], axis=1)
+
 .. code:: python
 
     plt.plot(np.arange(1, n+1)[:, None], yb, c='grey', alpha=0.02)
     plt.plot(np.arange(1, n+1), yb[:, 0], c='red', linewidth=1)
     plt.plot(np.arange(1, n+1), upper, 'b', np.arange(1, n+1), lower, 'b');
+
 Monte Carlo swindles (Variance reduction techniques)
 ----------------------------------------------------
 
@@ -578,6 +610,7 @@ Monte Carlo
 
     h_true = 1 - stats.cauchy().cdf(3)
     h_true
+
 Direct Monte Carlo integration is inefficient since only 10% of the samples give inforrmation about the tail
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -588,6 +621,7 @@ Direct Monte Carlo integration is inefficient since only 10% of the samples give
     x = stats.cauchy().rvs(n)
     h_mc = 1.0/n * np.sum(x > 3)
     h_mc, np.abs(h_mc - h_true)/h_true
+
 We are trying to estimate the quantity
 
 .. math::
@@ -616,6 +650,7 @@ where :math:`y_i \sim \mathcal{U}(0, 1)`.
     y = stats.uniform().rvs(n)
     h_cv = 1.0/n * np.sum(3.0/(np.pi * (9 + y**2)))
     h_cv, np.abs(h_cv - h_true)/h_true
+
 Importance sampling
 ~~~~~~~~~~~~~~~~~~~
 
@@ -679,6 +714,7 @@ sampling.
     x = np.linspace(4, 10, 100)
     plt.plot(x, stats.expon(5).pdf(x))
     plt.plot(x, stats.norm().pdf(x));
+
 Expected answer
 ^^^^^^^^^^^^^^^
 
@@ -690,10 +726,12 @@ integration.
 .. code:: python
 
     %precision 10
+
 .. code:: python
 
     h_true =1 - stats.norm().cdf(5)
     h_true
+
 Using direct Monte Carlo integration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -704,6 +742,7 @@ Using direct Monte Carlo integration
     h_mc = 1.0/n * np.sum(y > 5)
     # estimate and relative error
     h_mc, np.abs(h_mc - h_true)/h_true 
+
 Using importance sampling
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -714,6 +753,7 @@ Using importance sampling
     h_is = 1.0/n * np.sum(stats.norm().pdf(y)/stats.expon(loc=5).pdf(y))
     # estimate and relative error
     h_is, np.abs(h_is- h_true)/h_true
+
 Quasi-random numbers
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -730,11 +770,13 @@ functions.
 .. code:: python
 
     ! pip install ghalton &> /dev/null
+
 .. code:: python
 
     import ghalton
     
     gen2 = ghalton.Halton(2)
+
 .. code:: python
 
     plt.figure(figsize=(10,5))
@@ -748,24 +790,29 @@ functions.
     plt.scatter(ys[:, 0], ys[:,1])
     plt.axis([-0.05, 1.05, -0.05, 1.05])
     plt.title('Quasi-random', fontsize=20);
+
 Quasi-Monte Carlo integration can reduce variance
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
     % precision 4
+
 .. code:: python
 
     h_true = 1 - stats.cauchy().cdf(3)
+
 .. code:: python
 
     n = 10
+
 .. code:: python
 
     x = stats.uniform().rvs((n, 5))
     y = 3.0/(np.pi * (9 + x**2))
     h_mc = np.sum(y, 0)/n
     zip(h_mc, 100*np.abs(h_mc - h_true)/h_true)
+
 .. code:: python
 
     gen1 = ghalton.Halton(1)
@@ -773,3 +820,4 @@ Quasi-Monte Carlo integration can reduce variance
     y = 3.0/(np.pi * (9 + x**2))
     h_qmc = np.sum(y, 0)/n
     zip(h_qmc, 100*np.abs(h_qmc - h_true)/h_true)
+

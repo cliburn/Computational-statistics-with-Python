@@ -11,6 +11,7 @@
     %precision 4
     np.random.seed(1)
     plt.style.use('ggplot')
+
 Computer numbers and mathematics
 ================================
 
@@ -45,10 +46,12 @@ Given a set of weights, we want to nromalize them so that the sum = 1.
         """Returns normalized set of weights that sum to 1."""
         s = sum(ws)
         return [w/s for w in ws]
+
 .. code:: python
 
     ws = [1,2,3,4,5]
     normalize(ws)
+
 
 
 
@@ -79,6 +82,7 @@ likelihood for each data point.
 
 
 
+
 .. parsed-literal::
 
     False
@@ -99,6 +103,7 @@ We use an equality condition to exit some loop.
         if s == 1.0:
             break
     print i
+
 
 .. parsed-literal::
 
@@ -128,12 +133,14 @@ Calculating variance
     
         v = (ss - (s*s)/n)/(n-1)
         return v
+
 .. code:: python
 
     # What is the sample variance for numbers from a normal distribution with variance 1?
     np.random.seed(4)
     xs = np.random.normal(1e9, 1, 1000)
     var(xs)
+
 
 
 
@@ -160,6 +167,7 @@ bit representation, the maximumm is 2^63 - 1 and the minimum is -2^63 -
 
 
 
+
 .. parsed-literal::
 
     9223372036854775807
@@ -169,6 +177,7 @@ bit representation, the maximumm is 2^63 - 1 and the minimum is -2^63 -
 .. code:: python
 
     2**63-1 == sys.maxint
+
 
 
 
@@ -183,6 +192,7 @@ bit representation, the maximumm is 2^63 - 1 and the minimum is -2^63 -
     # Python handles "overflow" of integers gracefully by 
     # swithing from integers to "long" abritrary precsion numbers
     sys.maxint + 1
+
 
 
 
@@ -205,6 +215,7 @@ Here are some common workarounds.
     
     print float(1)/3
 
+
 .. parsed-literal::
 
     0.333333333333
@@ -216,6 +227,7 @@ Here are some common workarounds.
     
     print (0.0 + 1)/3
     print (1.0 * 1)/3
+
 
 .. parsed-literal::
 
@@ -234,6 +246,7 @@ Here are some common workarounds.
     
     print (1/3)
     print (1//3)
+
 
 .. parsed-literal::
 
@@ -275,6 +288,7 @@ integer overflow in C - it does not happen in Python.
         return x+1;
     }
 
+
 .. parsed-literal::
 
     Writing demo.c
@@ -283,12 +297,14 @@ integer overflow in C - it does not happen in Python.
 .. code:: python
 
     ! clang -emit-llvm -c demo.c -o demo.o
+
 .. code:: python
 
     import bitey
     import demo
     
     demo.limit(), demo.overflow()
+
 
 
 
@@ -317,12 +333,14 @@ if the expoennt is an unsigned 8-bit number, it can rerpesent the range
 .. code:: python
 
     from IPython.display import Image
+
 Binary represetnation of a floating point number
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
     Image(url='http://www.dspguide.com/graphics/F_4_2.gif')
+
 
 
 
@@ -341,6 +359,7 @@ first add the small numbers before the large numbers.
 .. code:: python
 
     Image(url='http:///fig1.jpg')
+
 
 
 
@@ -363,6 +382,7 @@ given at https://docs.python.org/2/library/sys.html#sys.float_info
     
     print sys.float_info
 
+
 .. parsed-literal::
 
     sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
@@ -374,6 +394,7 @@ Floating point numbers may not be precise
 .. code:: python
 
     '%.20f' % (0.1 * 0.1 * 100)
+
 
 
 
@@ -407,6 +428,7 @@ Floating point numbers may not be precise
             break
     print i
 
+
 .. parsed-literal::
 
     999
@@ -417,6 +439,7 @@ Floating point numbers may not be precise
 
     # Loss of precision
     1 + 6.022e23 - 6.022e23
+
 
 
 
@@ -439,6 +462,7 @@ Associative law does not necessarily hold
 
 
 
+
 .. parsed-literal::
 
     1.0000
@@ -448,6 +472,7 @@ Associative law does not necessarily hold
 .. code:: python
 
     1 + 6.022e23 - 6.022e23
+
 
 
 
@@ -469,6 +494,7 @@ Distributive law does not hold
 
 
 
+
 .. parsed-literal::
 
     False
@@ -483,6 +509,7 @@ Distributive law does not hold
 
 
 
+
 .. parsed-literal::
 
     0.0000
@@ -493,6 +520,7 @@ Distributive law does not hold
 
     # when multiplying lots of small numbers, work in log space
     np.sum(np.log(probs))
+
 
 
 
@@ -574,12 +602,14 @@ can be sure that :math:`g(x) \approx f(x)`.
     
     def f(x):
         return (1 - np.cos(x))/(x*x)
+
 .. code:: python
 
     x = np.linspace(-4e-8, 4e-8, 100)
     plt.plot(x,f(x));
     plt.axvline(1.1e-8, color='red')
     plt.xlim([-4e-8, 4e-8]);
+
 
 
 .. image:: ComputerArithmetic_files/ComputerArithmetic_52_0.png
@@ -594,6 +624,7 @@ can be sure that :math:`g(x) \approx f(x)`.
     print '%.30f' % np.cos(1.1e-8)
     print '%.30f' % (1 - np.cos(1.1e-8)) # exact answer is 6.05e-17
     print '%2f' % ((1 - np.cos(1.1e-8))/(1.1e-8*1.1e-8))
+
 
 .. parsed-literal::
 
@@ -611,12 +642,14 @@ can be sure that :math:`g(x) \approx f(x)`.
     
     def f1(x):
         return 2*np.sin(x/2)**2/(x*x)
+
 .. code:: python
 
     x = np.linspace(-4e-8, 4e-8, 100)
     plt.plot(x,f1(x));
     plt.axvline(1.1e-8, color='red')
     plt.xlim([-4e-8, 4e-8]);
+
 
 
 .. image:: ComputerArithmetic_files/ComputerArithmetic_56_0.png
@@ -633,6 +666,7 @@ Stable and unstable versions of variance
     def sum_of_squers_var(x):
         n = len(x)
         return (1.0/(n*(n-1))*(n*np.sum(x**2) - (np.sum(x))**2))
+
 This should set off warning bells - big number minus big number!
 
 .. code:: python
@@ -642,6 +676,7 @@ This should set off warning bells - big number minus big number!
         n = len(x)
         xbar = np.mean(x)
         return 1.0/(n-1)*np.sum((x - xbar)**2)
+
 Much better - at least the squaring occurs after the subtraction
 
 .. code:: python
@@ -654,16 +689,19 @@ Much better - at least the squaring occurs after the subtraction
             m += (x[i]-m)/i
             s += (x[i]-m)**2
         return s/(len(x) -1 )
+
 Classic algorithm from Knuth's Art of Computer Programming
 
 .. code:: python
 
     x_ = np.random.uniform(0,1,1e6)
     x = 1e12 + x_
+
 .. code:: python
 
     # correct answer
     np.var(x_)
+
 
 
 
@@ -679,6 +717,7 @@ Classic algorithm from Knuth's Art of Computer Programming
 
 
 
+
 .. parsed-literal::
 
     737870500.8189
@@ -691,6 +730,7 @@ Classic algorithm from Knuth's Art of Computer Programming
 
 
 
+
 .. parsed-literal::
 
     0.0835
@@ -700,6 +740,7 @@ Classic algorithm from Knuth's Art of Computer Programming
 .. code:: python
 
     welford_var(x)
+
 
 
 
@@ -804,12 +845,14 @@ Poorly conditioned problems
     x2 = 1.57079
     t1 = np.tan(x1)
     t2 = np.tan(x2)
+
 .. code:: python
 
     print 't1 =', t1
     print 't2 =', t2
     print '% change in x =', 100.0*(x2-x1)/x1
     print '% change in tan(x) =', (100.0*(t2-t1)/t1)
+
 
 .. parsed-literal::
 
@@ -829,9 +872,11 @@ and b are given.
     A = 0.5*np.array([[1,1], [1+1e-10, 1-1e-10]])
     b1 = np.array([2,2])
     b2 = np.array([2.01, 2])
+
 .. code:: python
 
     np.linalg.solve(A, b1)
+
 
 
 
@@ -844,6 +889,7 @@ and b are given.
 .. code:: python
 
     np.linalg.solve(A, b2)
+
 
 
 
@@ -865,6 +911,7 @@ they are roughly equivalent for our purpsoes.
 
 
 
+
 .. parsed-literal::
 
     19999973849.2252
@@ -874,6 +921,7 @@ they are roughly equivalent for our purpsoes.
 .. code:: python
 
     np.linalg.cond(A, 'fro')
+
 
 
 

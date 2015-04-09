@@ -12,6 +12,7 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 Code Optimization Overview
 --------------------------
 
@@ -134,6 +135,7 @@ References:
     ! pip install --pre line-profiler &> /dev/null
     ! pip install psutil &> /dev/null
     ! pip install memory_profiler &> /dev/null
+
 Create an Ipython profile
 
 ::
@@ -161,6 +163,7 @@ timers before and after the code block, and measuring the difference.
         """Function sleeps for nsec seconds."""
         import time
         time.sleep(nsec) 
+
 .. code:: python
 
     import timeit
@@ -169,6 +172,7 @@ timers before and after the code block, and measuring the difference.
     f()
     elapsed = timeit.default_timer() - start
     elapsed
+
 
 
 
@@ -190,6 +194,7 @@ In the IPython notebook, individual functions can also be timed using
 
     %timeit f(0.5)
 
+
 .. parsed-literal::
 
     1 loops, best of 3: 500 ms per loop
@@ -198,6 +203,7 @@ In the IPython notebook, individual functions can also be timed using
 .. code:: python
 
     %timeit -n2 -r4 f(0.5)
+
 
 .. parsed-literal::
 
@@ -224,6 +230,7 @@ this provdes 3 readouts:
     
     f(1)
     f(0.5)
+
 
 .. parsed-literal::
 
@@ -277,6 +284,7 @@ Profiling Newton iterations
                 return i, z
             z -= step
         return i, z
+
 .. code:: python
 
     def plot_newton_iters(p, pprime, n=200, extent=[-1,1,-1,1], cmap='hsv'):
@@ -288,6 +296,7 @@ Profiling Newton iterations
                 z = x + y*1j
                 m[s, r] = newton(z, p, pprime)[0]
         plt.imshow(m, cmap=cmap, extent=extent)
+
 .. code:: python
 
     def f(x):
@@ -295,9 +304,11 @@ Profiling Newton iterations
     
     def fprime(x):
         return 3*x**2
+
 .. code:: python
 
     stats = %prun -r -q plot_newton_iters(f, fprime)
+
 
 .. parsed-literal::
 
@@ -311,6 +322,7 @@ Profiling Newton iterations
 
     # Restrict to 10 lines
     stats.sort_stats('time').print_stats(10);
+
 
 .. parsed-literal::
 
@@ -339,6 +351,7 @@ Profiling Newton iterations
     # Restrict using regular expression match
     stats.sort_stats('time').print_stats(r'ipython');
 
+
 .. parsed-literal::
 
              1088832 function calls (1088459 primitive calls) in 1.938 seconds
@@ -361,9 +374,11 @@ Using the line profiler
 .. code:: python
 
     %load_ext line_profiler
+
 .. code:: python
 
     lstats = %lprun -r -f plot_newton_iters plot_newton_iters(f, fprime)
+
 
 
 .. image:: MakingCodeFast_files/MakingCodeFast_25_0.png
@@ -372,6 +387,7 @@ Using the line profiler
 .. code:: python
 
     lstats.print_stats()
+
 
 .. parsed-literal::
 
@@ -410,9 +426,11 @@ file.
 .. code:: python
 
     %load_ext memory_profiler
+
 .. code:: python
 
     %memit np.random.random((1000, 1000))
+
 
 .. parsed-literal::
 
@@ -432,6 +450,7 @@ file.
             pinc += phrase
         del pmul, pjoi, pinc
 
+
 .. parsed-literal::
 
     Overwriting foo.py
@@ -442,6 +461,7 @@ file.
     import foo
     
     %mprun -f foo.foo foo.foo(10000);
+
 
 .. parsed-literal::
 
@@ -478,6 +498,7 @@ unique elements in common between them.
 
     xs = np.random.randint(0, 1000, 10000)
     ys = np.random.randint(0, 1000, 10000)
+
 .. code:: python
 
     # This is easy to solve using a nested loop
@@ -493,6 +514,7 @@ unique elements in common between them.
     
     %timeit -n1 -r1 common1(xs, ys)
 
+
 .. parsed-literal::
 
     1 loops, best of 1: 14.7 s per loop
@@ -507,6 +529,7 @@ unique elements in common between them.
     
     %timeit -n1 -r1 common2(xs, ys)
 
+
 .. parsed-literal::
 
     1 loops, best of 1: 2.82 ms per loop
@@ -515,6 +538,7 @@ unique elements in common between them.
 .. code:: python
 
     assert(sorted(common1(xs, ys)) == sorted(common2(xs, ys)))
+
 Algorithms example
 ^^^^^^^^^^^^^^^^^^
 
@@ -594,6 +618,7 @@ Output
     %timeit -r1 -n1 io5(xs)
     %timeit -r1 -n1 io6(xs)
 
+
 .. parsed-literal::
 
     1 loops, best of 1: 1.64 s per loop
@@ -653,6 +678,7 @@ Input
     %timeit -r1 -n1 io15(xs)
     %timeit -r1 -n1 io16(xs)
 
+
 .. parsed-literal::
 
     1 loops, best of 1: 805 ms per loop
@@ -685,12 +711,14 @@ Matrix Multiplication
                 for k in range(n):
                     w[i, j] += u[i, k] * v[k, j]
         return w
+
 .. code:: python
 
     u = np.reshape(np.arange(6), (2,3))
     v = np.reshape(np.arange(9), (3,3))
     
     np.testing.assert_array_almost_equal(mult(u, v), u.dot(v))
+
 Pairwise distance matrix
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -702,12 +730,14 @@ Pairwise distance matrix
         for i in range(n):
             s += (u[i] - v[i])**2
         return np.sqrt(s)
+
 .. code:: python
 
     u = np.array([4,5])
     v = np.array([1,1])
     
     np.testing.assert_almost_equal(dist(u, v), np.linalg.norm(u-v))
+
 .. code:: python
 
     def pdist(vs, dist=dist):
@@ -717,6 +747,7 @@ Pairwise distance matrix
             for j in range(n):
                 m[i, j] = dist(vs[i], vs[j])
         return m
+
 .. code:: python
 
     from scipy.spatial.distance import squareform, pdist as sp_pdist
@@ -724,6 +755,7 @@ Pairwise distance matrix
     vs = np.array([[0,0], [1,2], [2,3], [3,4]])
     
     np.testing.assert_array_almost_equal(pdist(vs), squareform(sp_pdist(vs)))
+
 Word count
 ~~~~~~~~~~
 
@@ -738,8 +770,10 @@ Word count
             for word in words:
                 wc[word] = wc.get(word, 0) + 1
         return wc
+
 .. code:: python
 
     docs = ['hello, there handsome!', 'hi, there, beautiful']
     
     word_count(docs)
+

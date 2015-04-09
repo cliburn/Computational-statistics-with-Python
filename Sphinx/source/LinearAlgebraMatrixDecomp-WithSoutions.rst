@@ -11,6 +11,7 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 **Reference**
 
 `SciPy's official tutorial on Linear
@@ -202,6 +203,7 @@ Let do this with numpy:
     print(L)
     print(U)
 
+
 .. parsed-literal::
 
     [[1 3 4]
@@ -305,6 +307,7 @@ Now, with numpy:
     print(L)
     print(A)
 
+
 .. parsed-literal::
 
     [[  1.   3.   5.]
@@ -396,6 +399,7 @@ algorithms used to calculate eigenvalues, but here is a numpy example:
     print(u)
 
 
+
 .. parsed-literal::
 
     [[-0.+0.j  1.+0.j  1.+0.j]
@@ -416,6 +420,7 @@ eigenvalues (even if all entries are real).
     print(np.dot(V,np.dot(np.diag(u), la.inv(V))))
     print(u)
 
+
 .. parsed-literal::
 
     [[ 0  1]
@@ -435,6 +440,7 @@ eigenvalues (even if all entries are real).
     u, V = la.eig(A)
     print(u)
     print np.real_if_close(u)
+
 
 .. parsed-literal::
 
@@ -516,6 +522,7 @@ Example
 
 
 
+
 .. parsed-literal::
 
     array([ 1.,  1.,  1.,  1.])
@@ -526,6 +533,7 @@ Example
 
     b = np.array([19.01,11.05,14.07,14.05])
     la.solve(A,b)
+
 
 
 
@@ -568,6 +576,7 @@ Example
     U, s, V = np.linalg.svd(A)
     print(s)
     print(max(s)/min(s))
+
 
 .. parsed-literal::
 
@@ -613,6 +622,7 @@ using numpy
     
 
 
+
 .. parsed-literal::
 
     [[ 1  2  3]
@@ -640,6 +650,7 @@ hand and using numpy
     
     A=np.array([[4,2,3],[2,4,5],[3,5,8]])
     np.linalg.cholesky(A)
+
 
 
 
@@ -678,12 +689,14 @@ Test your function for correctness.
         else:
            return np.dot(np.dot((V.T).dot(np.diag(s**(-1))), U.T),b)
             
+
 .. code:: python
 
     A = np.array([[1,1],[1,2]])
     b = np.array([3,1])
     print(np.linalg.solve(A,b))
     print(svdsolver(A,b))
+
 
 
 .. parsed-literal::

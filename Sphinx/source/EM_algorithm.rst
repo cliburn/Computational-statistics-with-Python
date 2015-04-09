@@ -12,14 +12,17 @@
     np.random.seed(1234)
     
     np.set_printoptions(formatter={'all':lambda x: '%.3f' % x})
+
 .. code:: python
 
     from IPython.display import Image
     from numpy.core.umath_tests import matrix_multiply as mm
+
 .. code:: python
 
     from scipy.optimize import minimize
     from scipy.stats import bernoulli, binom
+
 Outline
 -------
 
@@ -48,6 +51,7 @@ is shown below.
 .. code:: python
 
     Image(filename='figs/jensen.png')
+
 
 
 
@@ -94,6 +98,7 @@ Solving for complete likelihood using minimization
 
     def neg_loglik(thetas, n, xs, zs):
         return -np.sum([binom(n, thetas[z]).logpmf(x) for (x, z) in zip(xs, zs)])
+
 .. code:: python
 
     m = 10
@@ -106,6 +111,7 @@ Solving for complete likelihood using minimization
     
     xs = map(sum, [coin_A.rvs(m), coin_A.rvs(m), coin_B.rvs(m), coin_A.rvs(m), coin_B.rvs(m)])
     zs = [0, 0, 1, 0, 1]
+
 Exact solution
 ^^^^^^^^^^^^^^
 
@@ -113,6 +119,7 @@ Exact solution
 
     xs = np.array(xs)
     xs
+
 
 
 
@@ -130,6 +137,7 @@ Exact solution
 
 
 
+
 .. parsed-literal::
 
     (0.73333333333333328, 0.10000000000000001)
@@ -144,6 +152,7 @@ Numerical estimate
     bnds = [(0,1), (0,1)]
     minimize(neg_loglik, [0.5, 0.5], args=(m, xs, zs), 
              bounds=bnds, method='tnc', options={'maxiter': 100})
+
 
 
 
@@ -194,6 +203,7 @@ likelihood. See illustratioin below.
 
     # Image from http://www.nature.com/nbt/journal/v26/n8/extref/nbt1406-S1.pdf
     Image(filename='figs/em.png', width=800)
+
 
 
 
@@ -349,6 +359,7 @@ First explicit solution
             break
         ll_old = ll_new
 
+
 .. parsed-literal::
 
     Iteration: 1
@@ -405,6 +416,7 @@ Vectorizing ...
             break
         ll_old = ll_new
 
+
 .. parsed-literal::
 
     Iteration: 1
@@ -458,6 +470,7 @@ Vectorizing ...
             break
         ll_old = ll_new
 
+
 .. parsed-literal::
 
     Iteration: 1
@@ -496,6 +509,7 @@ Writing as a function
                 break
             ll_old = ll_new
         return i, thetas, ll_new
+
 Checking
 ~~~~~~~~
 
@@ -509,6 +523,7 @@ Checking
     for theta in thetas:
         print theta
     print ll
+
 Make up some data
 ~~~~~~~~~~~~~~~~~
 
@@ -522,6 +537,7 @@ Make up some data
     xs = np.concatenate([np.random.binomial(n, p0, n/2), np.random.binomial(n, p1, n/2)])
     xs = np.column_stack([xs, n-xs])
     np.random.shuffle(xs)
+
 EM with multiple random starts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -533,12 +549,14 @@ EM with multiple random starts
     for theta in thetas:
         print theta
     print ll
+
 Gaussian mixture models
 -----------------------
 
 .. code:: python
 
     import scipy.stats as st
+
 .. code:: python
 
     def f(x, y):
@@ -546,9 +564,11 @@ Gaussian mixture models
         return (0.1*st.multivariate_normal([0,0], 1*np.eye(2)).pdf(z) +
                 0.4*st.multivariate_normal([3,3], 2*np.eye(2)).pdf(z) +
                 0.5*st.multivariate_normal([0,5], 3*np.eye(2)).pdf(z))
+
 .. code:: python
 
     f(np.arange(3), np.arange(3))
+
 .. code:: python
 
     s = 200
@@ -562,6 +582,7 @@ Gaussian mixture models
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(X, Y, Z, cmap='jet')
     plt.title('Gaussian Mxixture Model');
+
 A mixture of :math:`k` Gaussians has the following PDF
 
 .. raw:: latex
@@ -637,6 +658,7 @@ constraint that :math:`\sum_{j=1}^k w_j = 1`), we get
 
     from scipy.stats import multivariate_normal as mvn
 
+
 .. code:: python
 
     def em_gmm_orig(xs, pis, mus, sigmas, tol=0.01, max_iter=100):
@@ -690,6 +712,7 @@ constraint that :math:`\sum_{j=1}^k w_j = 1`), we get
             ll_old = ll_new
     
         return ll_new, pis, mus, sigmas
+
 Vectorized version
 ------------------
 
@@ -736,6 +759,7 @@ Vectorized version
             ll_old = ll_new
     
         return ll_new, pis, mus, sigmas
+
 Vectorization with Einstein summation notation
 ----------------------------------------------
 
@@ -775,6 +799,7 @@ Vectorization with Einstein summation notation
             ll_old = ll_new
     
         return ll_new, pis, mus, sigmas
+
 Comparison of EM routines
 -------------------------
 
@@ -795,10 +820,12 @@ Comparison of EM routines
     pis /= pis.sum()
     mus = np.random.random((2,2))
     sigmas = np.array([np.eye(2)] * 2)
+
 .. code:: python
 
     %%time
     ll1, pis1, mus1, sigmas1 = em_gmm_orig(xs, pis, mus, sigmas)
+
 .. code:: python
 
     intervals = 101
@@ -817,10 +844,12 @@ Comparison of EM routines
     plt.axis([-8,6,-6,8])
     ax.axes.set_aspect('equal')
     plt.tight_layout()
+
 .. code:: python
 
     %%time
     ll2, pis2, mus2, sigmas2 = em_gmm_vect(xs, pis, mus, sigmas)
+
 .. code:: python
 
     intervals = 101
@@ -839,15 +868,18 @@ Comparison of EM routines
     plt.axis([-8,6,-6,8])
     ax.axes.set_aspect('equal')
     plt.tight_layout()
+
 .. code:: python
 
     %%time
     ll3, pis3, mus3, sigmas3 = em_gmm_eins(xs, pis, mus, sigmas)
+
 .. code:: python
 
     # %timeit em_gmm_orig(xs, pis, mus, sigmas)
     %timeit em_gmm_vect(xs, pis, mus, sigmas)
     %timeit em_gmm_eins(xs, pis, mus, sigmas)
+
 .. code:: python
 
     intervals = 101

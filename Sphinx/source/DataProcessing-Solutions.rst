@@ -12,6 +12,7 @@
 
 
 
+
 .. parsed-literal::
 
     u'%.4f'
@@ -19,7 +20,7 @@
 
 
 Data science is OSEMN
----------------------
+=====================
 
 According to a popular model, the elements of data science are
 
@@ -51,6 +52,7 @@ Remote data
 
     ! wget http://www.gutenberg.org/cache/epub/11/pg11.txt -O alice.txt
 
+
 .. parsed-literal::
 
     --2015-01-14 20:23:09--  http://www.gutenberg.org/cache/epub/11/pg11.txt
@@ -70,6 +72,7 @@ Remote data
 
     ! curl http://www.gutenberg.org/cache/epub/11/pg11.txt > alice.txt
 
+
 .. parsed-literal::
 
       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -83,10 +86,12 @@ Remote data
 
     import urllib2
     text = urllib2.urlopen('http://www.gutenberg.org/cache/epub/11/pg11.txt').read()
+
 .. code:: python
 
     import requests
     test = requests.get('http://www.gutenberg.org/cache/epub/11/pg11.txt').text
+
 Plain text files
 ~~~~~~~~~~~~~~~~
 
@@ -105,10 +110,12 @@ drink occur in the same sentence in Alice in Wonderland.
     import os
     if not os.path.exists('alice.txt'):
         ! wget http://www.gutenberg.org/cache/epub/11/pg11.txt -O alice.txt
+
 .. code:: python
 
     # now read the book into memory, clean out blank lines and convert to lowercase
     alice = open('alice.txt', 'r').read().replace('\r\n', ' ').lower()
+
 .. code:: python
 
     # split into sentence
@@ -117,6 +124,7 @@ drink occur in the same sentence in Alice in Wonderland.
     
     stop_pattern = '\.|\?|\!'
     sentences = re.split(stop_pattern, alice)
+
 .. code:: python
 
     # find sentences that contain both 'alice' and 'drink'
@@ -126,6 +134,7 @@ drink occur in the same sentence in Alice in Wonderland.
     for i, sentence in enumerate(sentences):
         if 'alice' in sentence and 'drink' in sentence:
             print i, sentence, '\n'
+
 
 .. parsed-literal::
 
@@ -157,6 +166,7 @@ comments or a header row in the file.
     bob,72,1.75
     david,84,1.82
 
+
 .. parsed-literal::
 
     Overwriting example.csv
@@ -173,6 +183,7 @@ comments or a header row in the file.
             name, wt, ht = line
             wt, ht = map(float, (wt, ht))
             print 'BMI of %s = %.2f' % (name, wt/(ht*ht))
+
 
 .. parsed-literal::
 
@@ -191,6 +202,7 @@ comments or a header row in the file.
     df.columns = ['name', 'wt', 'ht']
     df['bmi'] = df['wt']/(df['ht']*df['ht'])
     df
+
 
 
 
@@ -268,6 +280,7 @@ dictionary. Here is an example from http://json.org/example
         }
     }
 
+
 .. parsed-literal::
 
     Overwriting example.json
@@ -277,10 +290,12 @@ dictionary. Here is an example from http://json.org/example
 
     import json
     data = json.load(open('example.json'))
+
 .. code:: python
 
     # data is a nested Python dictionary
     data
+
 
 
 
@@ -303,6 +318,7 @@ dictionary. Here is an example from http://json.org/example
 
     # and can be parsed using standard key lookups
     data['glossary']['GlossDiv']['GlossList']
+
 
 
 
@@ -330,6 +346,7 @@ scraping*.
 
     !pip install Scrapy
 
+
 .. parsed-literal::
 
     Requirement already satisfied (use --upgrade to upgrade): Scrapy in /Users/cliburn/anaconda/lib/python2.7/site-packages
@@ -341,6 +358,7 @@ scraping*.
     if os.path.exists('dmoz'):
         %rm -rf dmoz
     ! scrapy startproject dmoz
+
 
 .. parsed-literal::
 
@@ -361,6 +379,7 @@ scraping*.
         title = scrapy.Field()
         link = scrapy.Field()
         desc = scrapy.Field()
+
 
 .. parsed-literal::
 
@@ -390,6 +409,7 @@ scraping*.
                 item['desc'] = sel.xpath('text()').extract()
                 yield item
 
+
 .. parsed-literal::
 
     Writing dmoz/dmoz/spiders/dmoz_spider.py
@@ -400,6 +420,7 @@ scraping*.
     %%bash
     cd dmoz
     scrapy crawl dmoz --nolog -o scraped_data.json
+
 .. code:: python
 
     dmoz = json.load(open('dmoz/scraped_data.json'))
@@ -407,6 +428,7 @@ scraping*.
         if item['title'] and item['link']:
             if item['link'][0].startswith('http'):
                 print '%s: %s' % (item['title'][0], item['link'][0])
+
 
 .. parsed-literal::
 
@@ -459,6 +481,7 @@ The main concepts associated with HDF5 are
 
     import h5py
     import numpy as np
+
 .. code:: python
 
     # creating a HDF5 file
@@ -478,6 +501,7 @@ The main concepts associated with HDF5 are
     
             expt1['counts'][:] = range(100)
             expt2['values'][:] = np.random.random(1000)
+
 .. code:: python
 
     with h5py.File('example.hdf5') as f:
@@ -486,6 +510,7 @@ The main concepts associated with HDF5 are
         print project.attrs['date']
         print project['expt1']['counts'][:10]
         print project['expt2']['values'][:10]
+
 
 .. parsed-literal::
 
@@ -516,6 +541,7 @@ customers."
 
 
 
+
 .. raw:: html
 
     <img src="http://lh4.ggpht.com/_oKo6zFhdD98/SWFPtyfHJFI/AAAAAAAAAMc/GdrlzeBNsZM/s800/ChinookDatabaseSchema1.1.png"/>
@@ -529,11 +555,13 @@ customers."
     # first connect to database and get a cursor for executing commands
     conn = sqlite3.connect('Chinook.db')
     cr = conn.cursor()
+
 .. code:: python
 
     # What tables are in the database?
     cr.execute("select name from sqlite_master where type = 'table';")
     print cr.fetchall()
+
 
 .. parsed-literal::
 
@@ -545,6 +573,7 @@ customers."
     # What is the structure of the Album table?
     cr.execute("select sql from sqlite_master where type = 'table' and name = 'Album';" )
     print cr.fetchone()[0]
+
 
 .. parsed-literal::
 
@@ -565,6 +594,7 @@ customers."
     cr.execute("select sql from sqlite_master where type = 'table' and name = 'Artist';" )
     print cr.fetchone()[0]
 
+
 .. parsed-literal::
 
     CREATE TABLE [Artist]
@@ -580,6 +610,7 @@ customers."
     # List a few items
     cr.execute("select * from Album limit 6")
     cr.fetchall()
+
 
 
 
@@ -607,6 +638,7 @@ customers."
 
 
 
+
 .. parsed-literal::
 
     [(u'Aerosmith',)]
@@ -618,6 +650,7 @@ customers."
     # clean up
     cr.close()
     conn.close()
+
 Scrubbing data
 --------------
 
@@ -651,6 +684,7 @@ with ``pandas``.
     edgar,m,1.77,93
     fanny,f,45,1.45
 
+
 .. parsed-literal::
 
     Overwriting bad_data.csv
@@ -664,9 +698,11 @@ with ``pandas``.
     import pandas as pd
     
     df = pd.read_csv('bad_data.csv', comment='#')
+
 .. code:: python
 
     df.describe()
+
 
 
 
@@ -736,12 +772,14 @@ Something is strange - the average height is 31 meters!
     plt.boxplot([df.weight, df.height]),;
 
 
+
 .. image:: DataProcessing-Solutions_files/DataProcessing-Solutions_50_0.png
 
 
 .. code:: python
 
     df[df.height > 2]
+
 
 
 
@@ -789,6 +827,7 @@ Something is strange - the average height is 31 meters!
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -812,6 +851,7 @@ Something is strange - the average height is 31 meters!
 .. code:: python
 
     df
+
 
 
 
@@ -886,6 +926,7 @@ Something is strange - the average height is 31 meters!
     
     df['BMI'] = df['weight']/(df['height']*df['height'])
     df
+
 
 
 
@@ -965,6 +1006,7 @@ Something is strange - the average height is 31 meters!
 
 
 
+
 .. parsed-literal::
 
     gender
@@ -997,9 +1039,11 @@ Exercises
     
     with open('hello.txt', 'w') as f:
         f.write(s)
+
 .. code:: python
 
     ! cat hello.txt
+
 
 .. parsed-literal::
 
@@ -1018,6 +1062,7 @@ file 'hello.txt' that begin wtih 'Hello' or 'The'.
     for line in open('hello.txt'):
         if line.startswith('Hello') or line.startswith('The'):
             print line,
+
 
 .. parsed-literal::
 
@@ -1049,6 +1094,7 @@ create a pandas DataFrame for the file ``ugh.csv``.
     Notes: weight is in kg 
     Note: height is in meters
 
+
 .. parsed-literal::
 
     Overwriting ugh.csv
@@ -1059,6 +1105,7 @@ create a pandas DataFrame for the file ``ugh.csv``.
     # The cleaned table should look like this
     import pandas as pd
     pd.read_csv('clean_ugh.csv')
+
 
 
 
@@ -1140,6 +1187,7 @@ create a pandas DataFrame for the file ``ugh.csv``.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -1214,6 +1262,7 @@ plot a title of 'name (date)' where name and date are attributes of the
 
 
 
+
 .. parsed-literal::
 
     <matplotlib.text.Text at 0x114220190>
@@ -1236,6 +1285,7 @@ refer to the "Chinook.db" schema shown below.
     from IPython.display import Image
     
     Image(url='http://lh4.ggpht.com/_oKo6zFhdD98/SWFPtyfHJFI/AAAAAAAAAMc/GdrlzeBNsZM/s800/ChinookDatabaseSchema1.1.png')
+
 
 
 
@@ -1263,6 +1313,7 @@ refer to the "Chinook.db" schema shown below.
         cr.execute(sql)
         for row in cr.fetchall():
             print row
+
 
 .. parsed-literal::
 

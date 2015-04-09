@@ -11,6 +11,7 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 Algorithmic complexity
 ----------------------
 
@@ -38,6 +39,7 @@ can be done conveniently with matic functions.
     
     %timeit -n1 f()
 
+
 .. parsed-literal::
 
     1 loops, best of 3: 2 s per loop
@@ -49,6 +51,7 @@ can be done conveniently with matic functions.
     %%time
     
     f()
+
 
 .. parsed-literal::
 
@@ -134,6 +137,7 @@ Comparing complexity of :math:`\mathcal{O}(n^2)` (e.g. bubble sort) and :math:`\
     plt.legend(['$\mathcal{O}(n^2)$', '$\mathcal{O}(n \log n)$'], loc='best', fontsize=20);
 
 
+
 .. image:: AlgorithmicComplexity_files/AlgorithmicComplexity_9_0.png
 
 
@@ -153,9 +157,11 @@ Ranking of common Big O complexity classes
 .. code:: python
 
     from IPython.display import Image
+
 .. code:: python
 
     Image(url='http://bigocheatsheet.com/img/big-o-complexity.png')
+
 
 
 
@@ -181,6 +187,7 @@ dicitonary.
     r = np.random.randint(100000)
     %timeit -n3 r in alist
 
+
 .. parsed-literal::
 
     3 loops, best of 3: 1.28 ms per loop
@@ -192,6 +199,7 @@ dicitonary.
     
     adict = dict.fromkeys(alist)
     %timeit -n3 r in adict
+
 
 .. parsed-literal::
 
@@ -234,6 +242,7 @@ can :math:`n` and :math:`p` be before you run out of RAM to store them?
     print sys.getsizeof('a')
     print sys.getsizeof('hello world')
 
+
 .. parsed-literal::
 
     24
@@ -252,6 +261,7 @@ can :math:`n` and :math:`p` be before you run out of RAM to store them?
     print np.ones((100,100), dtype='f4').nbytes
     print np.ones((100,100), dtype='float').nbytes # default is 64 bits or 8 bytes
     print np.ones((100,100), dtype='complex').nbytes
+
 
 .. parsed-literal::
 

@@ -6,6 +6,7 @@
     import numpy as np
     %precision 4
     import os, sys, glob
+
 Using SQLite3
 -------------
 
@@ -35,6 +36,7 @@ observation is censored. 1 is uncensored
     import statsmodels.api as sm
     heart = sm.datasets.heart.load_pandas().data
     heart.take(np.random.choice(len(heart), 6))
+
 
 
 
@@ -97,6 +99,7 @@ observation is censored. 1 is uncensored
 
     import sqlite3
     conn = sqlite3.connect('heart.db')
+
 Creating and populating a table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -108,6 +111,7 @@ Creating and populating a table
                  (survival integer, censors integer, age real)''')
     
     c.executemany("insert into transplant(survival, censors, age) values (?, ?, ?)", heart.values);
+
 SQL queries
 ~~~~~~~~~~~
 
@@ -131,6 +135,7 @@ Selecting all columns, first 10 rows
     for row in c.execute('''select * from transplant limit 5;'''):
         print row
 
+
 .. parsed-literal::
 
     (15, 1, 54.3)
@@ -151,6 +156,7 @@ Using where to filter rows
     where censors=0 and age < 40 limit 5;'''):
         print row
 
+
 .. parsed-literal::
 
     (1775, 0, 33.3)
@@ -168,6 +174,7 @@ Using SQL functions
     for row in c.execute('''select count(*), avg(age) from transplant where censors=0 and age < 40;'''):
         print row
 
+
 .. parsed-literal::
 
     (9, 31.43333333333333)
@@ -184,6 +191,7 @@ Using groupby to find number of cnesored and uncensored subjects and thier avera
     '''
     for row in c.execute(query):
         print row
+
 
 .. parsed-literal::
 
@@ -204,6 +212,7 @@ Using having to filter grouped results
     for row in c.execute(query):
         print row
 
+
 .. parsed-literal::
 
     (0, 24, 41.729166666666664)
@@ -221,6 +230,7 @@ Using order by to sort results
     '''
     for row in c.execute(query):
         print row
+
 
 .. parsed-literal::
 
@@ -248,6 +258,7 @@ Reading into a numpy structured array
     arr.dtype.names = ['survival', 'censors', 'age']
     print '\n'.join(map(str, arr))
 
+
 .. parsed-literal::
 
     (875, 0, 38.900001525878906)
@@ -273,6 +284,7 @@ Reading into a numpy regular array
     result = c.execute(query).fetchall()
     arr = np.fromiter(chain.from_iterable(result), dtype=np.float)
     print arr.reshape(-1,3)
+
 
 .. parsed-literal::
 
@@ -321,6 +333,7 @@ of joins.
     for i in range(5):
         c1.execute('''insert into t1(ID, Name, Value) values (%d, '%s', %.2f)''' % (i, ascii_lowercase[i], i*i));
         c1.execute('''insert into t2(ID, Name, Value, Age) values (%d, '%s', %.2f, %d)''' % (i*2, ascii_lowercase[i*2], i*i+5, 10*i));
+
 Cartesian product
 ^^^^^^^^^^^^^^^^^
 
@@ -332,6 +345,7 @@ Cartesian product
     '''
     for row in c1.execute(query):
         print row
+
 
 .. parsed-literal::
 
@@ -375,6 +389,7 @@ Inner joins
     for row in c1.execute(query):
         print row
 
+
 .. parsed-literal::
 
     (u'0', u'0', 0.0, 5.0, 0.0)
@@ -391,6 +406,7 @@ Inner joins
     '''
     for row in c1.execute(query):
         print row
+
 
 .. parsed-literal::
 
@@ -409,6 +425,7 @@ Inner joins
     '''
     for row in c1.execute(query):
         print row
+
 
 .. parsed-literal::
 
@@ -432,6 +449,7 @@ Self-joins
     
     for row in c1.execute('select * from t1;'):
         print row
+
 
 .. parsed-literal::
 
@@ -459,6 +477,7 @@ Self-joins
     for row in c1.execute(query):
         print row
 
+
 .. parsed-literal::
 
     (u'2', u'c', 4.0, 8.0)
@@ -480,6 +499,7 @@ In which we convert a dataframe into a normalized database.
     df = pd.DataFrame([names, tests, values1, values2]).T
     df.columns = ['names', 'tests', 'values1', 'values2']
     df
+
 
 
 
@@ -563,6 +583,7 @@ In which we convert a dataframe into a normalized database.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -612,6 +633,7 @@ In which we convert a dataframe into a normalized database.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -657,6 +679,7 @@ In which we convert a dataframe into a normalized database.
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -694,6 +717,7 @@ In which we convert a dataframe into a normalized database.
        [0,0,1,10.6], [1,0,1,13.2], [0,1,1,322], [1,1,1,214], [2,0,1,10.3], [3,1,1,343], [0,2,1,145]
     ], columns=['name_id', 'test_id', 'visit_id', 'value'])
     value_table
+
 
 
 
@@ -836,6 +860,7 @@ matrix and a list of count data at every iteration.
     import h5py
     
     f = h5py.File('simulation.h5')
+
 .. code:: python
 
     for i in range(10): # iterations in simulation
@@ -844,9 +869,11 @@ matrix and a list of count data at every iteration.
         group = f.create_group('Iteration%03d' % i)
         group.create_dataset('xs', data=xs)
         group.create_dataset('ys', data=ys)
+
 .. code:: python
 
     f.keys()
+
 
 
 
@@ -871,6 +898,7 @@ matrix and a list of count data at every iteration.
 
 
 
+
 .. parsed-literal::
 
     [u'xs', u'ys']
@@ -882,6 +910,7 @@ matrix and a list of count data at every iteration.
     g8 = f['Iteration008']
     print g8['xs'][2:5,2:5,2:5]
     print g8['ys'][-10:]
+
 
 .. parsed-literal::
 
@@ -905,12 +934,15 @@ Interfacing withPandas
 .. code:: python
 
     import pandas as pd
+
 .. code:: python
 
     df = pd.read_sql('select * from transplant;', conn)
+
 .. code:: python
 
     df.take(np.random.randint(0, len(df), 6))
+
 
 
 
@@ -972,9 +1004,11 @@ Interfacing withPandas
 .. code:: python
 
     df1 = pd.read_sql('select t1.name, t2.value, t2.age from t1, t2 where t1.name = t2.name;', conn1)
+
 .. code:: python
 
     df1
+
 
 
 
@@ -1039,12 +1073,14 @@ Interfacing withPandas
     c1.close()
     conn.close()
     conn1.close()
+
 .. code:: python
 
     store = pd.HDFStore('dump.h5')
     store['transplant'] = df
     store['tables'] = df1
     store.close()
+
 
 .. parsed-literal::
 
@@ -1059,6 +1095,7 @@ Interfacing withPandas
 
     transplant_df = pd.read_hdf('dump.h5', 'transplant')
     transplant_df.take(np.random.randint(0, len(df), 6))
+
 
 
 
@@ -1124,6 +1161,7 @@ Interfacing withPandas
 
 
 
+
 .. raw:: html
 
     <div style="max-height:1000px;max-width:1500px;overflow:auto;">
@@ -1185,6 +1223,7 @@ Interfacing withPandas
 
 
 
+
 .. parsed-literal::
 
     <class 'pandas.io.pytables.HDFStore'>
@@ -1196,9 +1235,11 @@ Interfacing withPandas
 .. code:: python
 
     store = pd.HDFStore('dump.h5')
+
 .. code:: python
 
     store.keys()
+
 
 
 
@@ -1211,3 +1252,4 @@ Interfacing withPandas
 .. code:: python
 
     store.close()
+

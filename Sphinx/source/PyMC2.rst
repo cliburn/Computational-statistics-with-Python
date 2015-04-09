@@ -12,11 +12,13 @@
     %precision 4
     plt.style.use('ggplot')
 
+
 .. code:: python
 
     np.random.seed(1234)
     import pymc
     import scipy.stats as stats
+
 PyMC2
 -----
 
@@ -47,6 +49,7 @@ coin tosses. The likelihood is binomial, and we use a beta prior.
     p = pymc.Beta('p', alpha=alpha, beta=beta)
     y = pymc.Binomial('y', n=n, p=p, value=h, observed=True)
     m = pymc.Model([p, y])
+
 .. code:: python
 
     mc = pymc.MCMC(m, )
@@ -55,6 +58,7 @@ coin tosses. The likelihood is binomial, and we use a beta prior.
     x = np.linspace(0, 1, 100)
     plt.plot(x, stats.beta.pdf(x, alpha, beta), label='prior');
     plt.legend(loc='best');
+
 
 .. parsed-literal::
 
@@ -72,6 +76,7 @@ conjugate prior if we have good reasons not to.
     p = pymc.TruncatedNormal('p', mu=0.3, tau=10, a=0, b=1)
     y = pymc.Binomial('y', n=n, p=p, value=h, observed=True)
     m = pymc.Model([p, y])
+
 .. code:: python
 
     mc = pymc.MCMC(m)
@@ -82,6 +87,7 @@ conjugate prior if we have good reasons not to.
     a, b = (0 - 0.3) / 0.1, (1 - 0.3) / 0.1
     plt.plot(x, stats.truncnorm.pdf(x, a, b, 0.3, 0.1), label='prior');
     plt.legend(loc='best');
+
 
 .. parsed-literal::
 
@@ -117,6 +123,7 @@ Estimating mean and standard deviation of normal distribution
     mc = pymc.MCMC(m)
     mc.sample(iter=11000, burn=10000)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 11000 of 11000 complete in 3.2 sec
@@ -130,6 +137,7 @@ Estimating mean and standard deviation of normal distribution
     plt.subplot(122)
     plt.hist(np.sqrt(1.0/tau.trace()), 15, histtype='step', normed=True, label='post');
     plt.legend(loc='best');
+
 
 
 .. image:: PyMC2_files/PyMC2_12_0.png
@@ -189,9 +197,11 @@ deterministic function of the parameters :math:`a`, :math:`b` and
     x = np.linspace(0, 1, n)
     y_obs = a*x + b + np.random.normal(0, sigma, n)
     data = pd.DataFrame(np.array([x, y_obs]).T, columns=['x', 'y'])
+
 .. code:: python
 
     data.plot(x='x', y='y', kind='scatter', s=50);
+
 
 
 .. image:: PyMC2_files/PyMC2_16_0.png
@@ -216,6 +226,7 @@ deterministic function of the parameters :math:`a`, :math:`b` and
     mc = pymc.MCMC(m)
     mc.sample(iter=11000, burn=10000)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 11000 of 11000 complete in 6.1 sec
@@ -230,12 +241,14 @@ deterministic function of the parameters :math:`a`, :math:`b` and
     plt.plot(xp, abar*xp + bbar, linewidth=2, c='red');
 
 
+
 .. image:: PyMC2_files/PyMC2_18_0.png
 
 
 .. code:: python
 
     pymc.Matplot.plot(mc)
+
 
 .. parsed-literal::
 
@@ -303,6 +316,7 @@ parameters for the logistic model.
     # define invlogit function
     def invlogit(x):
         return pymc.exp(x) / (1 + pymc.exp(x))
+
 .. code:: python
 
     # observed data
@@ -323,6 +337,7 @@ parameters for the logistic model.
     mc = pymc.MCMC(m)
     mc.sample(iter=11000, burn=10000)
 
+
 .. parsed-literal::
 
      [-----------------100%-----------------] 11000 of 11000 complete in 6.9 sec
@@ -330,6 +345,7 @@ parameters for the logistic model.
 .. code:: python
 
     beta.stats()
+
 
 
 
@@ -359,12 +375,14 @@ parameters for the logistic model.
     plt.ylabel('Risk of death');
 
 
+
 .. image:: PyMC2_files/PyMC2_24_0.png
 
 
 .. code:: python
 
     pymc.Matplot.plot(mc)
+
 
 .. parsed-literal::
 
@@ -402,6 +420,7 @@ county and floor.
 
     radon = pd.read_csv('radon.csv')[['county', 'floor', 'log_radon']]
     radon.head()
+
 
 
 
@@ -473,6 +492,7 @@ definitions into a function to avoid repetition.
         y = pymc.Normal('y', mu=mu, tau=tau, value=y, observed=True)
     
         return locals()
+
 Pooled model
 ^^^^^^^^^^^^
 
@@ -485,6 +505,7 @@ linear regression model.
     plt.xticks([0, 1], ['Basement', 'No basement'], fontsize=20);
 
 
+
 .. image:: PyMC2_files/PyMC2_31_0.png
 
 
@@ -493,6 +514,7 @@ linear regression model.
     m = pymc.Model(make_model(radon.floor, radon.log_radon))
     mc = pymc.MCMC(m)
     mc.sample(iter=1100, burn=1000)
+
 
 .. parsed-literal::
 
@@ -506,6 +528,7 @@ linear regression model.
     xp = np.array([0, 1])
     plt.plot(mc.trace('slope')()*xp[:, None] + mc.trace('intercept')(), c='red', alpha=0.1)
     plt.plot(xp, abar*xp + bbar, linewidth=2, c='red');
+
 
 
 .. image:: PyMC2_files/PyMC2_33_0.png
@@ -539,6 +562,7 @@ a model for each county.
         n += 1
         if n > 3:
             break
+
 
 .. parsed-literal::
 
@@ -607,11 +631,13 @@ distributions
         return a[county]*x + b[county]
     
     y = pymc.Normal('y', mu=mu, tau=tau, value=radon.log_radon, observed=True)
+
 .. code:: python
 
     m = pymc.Model([y, mu, tau, a, b])
     mc = pymc.MCMC(m)
     mc.sample(iter=110000, burn=100000)
+
 
 .. parsed-literal::
 
@@ -621,6 +647,7 @@ distributions
 
     abar = a.stats()['mean']
     bbar = b.stats()['mean']
+
 .. code:: python
 
     xp = np.array([0, 1])
@@ -632,6 +659,7 @@ distributions
         plt.title(radon.county[idx].unique()[0])
         if i >= 3:
             break
+
 
 
 .. image:: PyMC2_files/PyMC2_40_0.png

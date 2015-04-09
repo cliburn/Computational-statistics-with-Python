@@ -10,9 +10,11 @@
     %matplotlib inline
     %precision 4
     plt.style.use('ggplot')
+
 .. code:: python
 
     %install_ext http://raw.github.com/jrjohansson/version_information/master/version_information.py
+
 
 .. parsed-literal::
 
@@ -70,10 +72,12 @@ Computes and print, based on the data in populations.txt...
     # download the data locally
     if not os.path.exists('populations.txt'):
         ! wget http://scipy-lectures.github.io/_downloads/populations.txt
+
 .. code:: python
 
     # peek at the file to see its structure
     ! head -n 6 populations.txt
+
 
 .. parsed-literal::
 
@@ -93,6 +97,7 @@ Computes and print, based on the data in populations.txt...
 
 
 
+
 .. parsed-literal::
 
     array([[ 1900, 30000,  4000, 48300],
@@ -108,11 +113,13 @@ Computes and print, based on the data in populations.txt...
     # provide convenient named variables
     populations = data[:, 1:]
     year, hare, lynx, carrot = data.T
+
 .. code:: python
 
     # The mean and std of the populations of each species for the years in the period
     print "Mean (hare, lynx, carrot):", populations.mean(axis=0)
     print "Std (hare, lynx, carrot):", populations.std(axis=0)
+
 
 .. parsed-literal::
 
@@ -126,6 +133,7 @@ Computes and print, based on the data in populations.txt...
     print "Year with largest population (hare, lynx, carrot)", 
     print year[np.argmax(populations, axis=0)]
 
+
 .. parsed-literal::
 
     Year with largest population (hare, lynx, carrot) [1903 1904 1900]
@@ -136,6 +144,7 @@ Computes and print, based on the data in populations.txt...
     # Which species has the largest population for each year.
     species = ['hare', 'lynx', 'carrot']
     zip(year, np.take(species, np.argmax(populations, axis=1)))
+
 
 
 
@@ -170,6 +179,7 @@ Computes and print, based on the data in populations.txt...
     # Which years any of the populations is above 50000
     print year[np.any(populations > 50000, axis=1)]
 
+
 .. parsed-literal::
 
     [1902 1903 1904 1912 1913 1914 1915]
@@ -179,6 +189,7 @@ Computes and print, based on the data in populations.txt...
 
     # The top 2 years for each species when they had the lowest populations.
     print year[np.argsort(populations, axis=0)[:2]]
+
 
 .. parsed-literal::
 
@@ -191,6 +202,7 @@ Computes and print, based on the data in populations.txt...
     plt.plot(year, lynx, 'r-', year, np.gradient(hare), 'b--')
     plt.legend(['lynx', 'grad(hare)'], loc='best')
     print np.corrcoef(lynx, np.gradient(hare))
+
 
 .. parsed-literal::
 
@@ -226,6 +238,7 @@ the following attributes:
     print 'shape', x.shape
     print 'strides', x.strides
 
+
 .. parsed-literal::
 
     [1 2 3 4 5 6]
@@ -241,6 +254,7 @@ the following attributes:
     print 'dytpe', x.dtype
     print 'shape', x.shape
     print 'strides', x.strides
+
 
 .. parsed-literal::
 
@@ -258,6 +272,7 @@ the following attributes:
     print 'dytpe', x.dtype
     print 'shape', x.shape
     print 'strides', x.strides
+
 
 .. parsed-literal::
 
@@ -278,6 +293,7 @@ Creating arrays
     print x_list, '\n'
     x_array = np.array(x_list)
     print x_array
+
 
 .. parsed-literal::
 
@@ -300,6 +316,7 @@ Creating arrays
     print np.eye(3), '\n'
     print np.diag([1,2,3]), '\n'
     print np.fromfunction(lambda i, j: (i-2)**2+(j-2)**2, (5,5))
+
 
 .. parsed-literal::
 
@@ -338,6 +355,7 @@ Array indexing
 
 
 
+
 .. parsed-literal::
 
     array([[ 84, 108,  96,  93,  82, 115],
@@ -363,6 +381,7 @@ Array indexing
     print(xs[::2,::2])
     print(xs[2:5,2:5])
 
+
 .. parsed-literal::
 
     84
@@ -384,6 +403,7 @@ Array indexing
     #  Indexing with list of integers
     print(xs[0, [1,2,4,5]])
 
+
 .. parsed-literal::
 
     [108  96  82 115]
@@ -395,6 +415,7 @@ Array indexing
     print(xs[xs % 2 == 0])
     xs[xs % 2 == 0] = 0 # set even entries to zero
     print(xs)
+
 
 .. parsed-literal::
 
@@ -421,6 +442,7 @@ Array indexing
     print np.tril(a, -1), '\n'
     print np.diag(np.diag(a)), '\n'
     print np.triu(a, 1)
+
 
 .. parsed-literal::
 
@@ -455,6 +477,7 @@ Broadcasting, row, column and matrix operations
     print(xs.max(axis=0)) # max of each col
     print(xs.max(axis=1)) # max of each row
 
+
 .. parsed-literal::
 
     137
@@ -467,6 +490,7 @@ Broadcasting, row, column and matrix operations
     # A funcitonal rather than object-oriented approacha also wokrs
     print(np.max(xs, axis=0))
     print(np.max(xs, axis=1))
+
 
 .. parsed-literal::
 
@@ -491,6 +515,7 @@ Broadcasting, row, column and matrix operations
     print(row_means)
     print(xs + row_means)
 
+
 .. parsed-literal::
 
     (array([[ 0,  1,  2,  3,  4,  5],
@@ -511,6 +536,7 @@ Broadcasting, row, column and matrix operations
     # convert matrix to have zero mean and unit standard deviation using col summary statistics
     print((xs - xs.mean(axis=0))/xs.std(axis=0))
 
+
 .. parsed-literal::
 
     [[-1. -1. -1. -1. -1. -1.]
@@ -521,6 +547,7 @@ Broadcasting, row, column and matrix operations
 
     # convert matrix to have zero mean and unit standard deviation using row summary statistics
     print((xs - xs.mean(axis=1)[:, np.newaxis])/xs.std(axis=1)[:, np.newaxis])
+
 
 .. parsed-literal::
 
@@ -534,6 +561,7 @@ Broadcasting, row, column and matrix operations
     # e.g. create the 12x12 multiplication toable
     u = np.arange(1, 13)
     u[:,None] * u[None,:]
+
 
 
 
@@ -578,17 +606,21 @@ Calculate the pairwise distance matrix between the following points
                     s += (pts[i,k] - pts[j,k])**2
                 m[i, j] = s**0.5
         return m
+
 .. code:: python
 
     def distance_matrix_np(pts):
         """Returns matrix of pairwise Euclidean distances. Vectorized numpy version."""
         return np.sum((pts[None,:] - pts[:, None])**2, -1)**0.5
+
 .. code:: python
 
     pts = np.array([(0,0), (4,0), (4,3), (0,3)])
+
 .. code:: python
 
     distance_matrix_py(pts)
+
 
 
 
@@ -607,6 +639,7 @@ Calculate the pairwise distance matrix between the following points
 
 
 
+
 .. parsed-literal::
 
     array([[ 0.,  4.,  5.,  3.],
@@ -621,6 +654,7 @@ Calculate the pairwise distance matrix between the following points
     # Broaccasting and vectorization is faster than looping
     %timeit distance_matrix_py(pts)
     %timeit distance_matrix_np(pts)
+
 
 .. parsed-literal::
 
@@ -643,6 +677,7 @@ computtionally efficient than using an explicit loop over each element.
     plt.plot(xs, ys);
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_44_0.png
 
 
@@ -657,6 +692,7 @@ computtionally efficient than using an explicit loop over each element.
     print xs*xs
     print xs**3
     print xs < 5
+
 
 .. parsed-literal::
 
@@ -683,6 +719,7 @@ in future lectures.
     
     print matrix_multiply.signature
 
+
 .. parsed-literal::
 
     (m,n),(n,p)->(m,p)
@@ -696,6 +733,7 @@ in future lectures.
     ws = matrix_multiply(us, vs) 
     print ws.shape
     print ws
+
 
 .. parsed-literal::
 
@@ -735,12 +773,14 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
     import numpy.random as npr
     npr.seed(123) # fix seed for reproducible results
+
 .. code:: python
 
     # 10 trials of rolling a fair 6-sided 100 times
     roll = 1.0/6
     x = npr.multinomial(100, [roll]*6, 10)
     x
+
 
 
 
@@ -767,6 +807,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
     plt.axis([-1.05, 1.05, -1.05, 1.05]);
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_53_0.png
 
 
@@ -776,6 +817,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
     x = np.arange(10)
     npr.shuffle(x)
     x
+
 
 
 
@@ -789,6 +831,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
     # radnom permutations
     npr.permutation(10)
+
 
 
 
@@ -806,6 +849,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
 
 
+
 .. parsed-literal::
 
     array([14, 16, 15, 12, 19, 11, 13, 10, 18, 17])
@@ -816,6 +860,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
     # radnom selection with replacement
     npr.choice(x, (5, 10), replace=True) # this is default
+
 
 
 
@@ -838,6 +883,7 @@ Reference <http://docs.scipy.org/doc/numpy/reference/routines.random.html>`__
 
 
 
+
 .. parsed-literal::
 
     3.1416
@@ -853,14 +899,17 @@ refernce <http://docs.scipy.org/doc/scipy-0.14.0/reference/stats.html>`__
 .. code:: python
 
     import scipy.stats as stats
+
 .. code:: python
 
     # Create a "frozen" distribution - i.e. a partially applied function
     dist = stats.norm(10, 2)
+
 .. code:: python
 
     #  same a rnorm
     dist.rvs(10)
+
 
 
 
@@ -878,6 +927,7 @@ refernce <http://docs.scipy.org/doc/scipy-0.14.0/reference/stats.html>`__
 
 
 
+
 .. parsed-literal::
 
     array([ 0.0088,  0.0301,  0.076 ,  0.141 ,  0.1919,  0.1919,  0.141 ,
@@ -892,6 +942,7 @@ refernce <http://docs.scipy.org/doc/scipy-0.14.0/reference/stats.html>`__
 
 
 
+
 .. parsed-literal::
 
     array([ 0.0062,  0.0228,  0.0668,  0.1587,  0.3085,  0.5   ,  0.6915,
@@ -903,6 +954,7 @@ refernce <http://docs.scipy.org/doc/scipy-0.14.0/reference/stats.html>`__
 
     # same as qnorm
     dist.ppf(dist.cdf(np.linspace(5, 15, 11)))
+
 
 
 
@@ -922,12 +974,14 @@ scipy.linagl.blas and scipy.linalg.lapack.
 .. code:: python
 
     import scipy.linalg as la
+
 .. code:: python
 
     A = np.array([[1,2],[3,4]])
     b = np.array([1,4])
     print(A)
     print(b)
+
 
 .. parsed-literal::
 
@@ -949,6 +1003,7 @@ scipy.linagl.blas and scipy.linalg.lapack.
     print(la.inv(A))
     print(A.T)
 
+
 .. parsed-literal::
 
     [[ 7 10]
@@ -967,6 +1022,7 @@ scipy.linagl.blas and scipy.linalg.lapack.
     print(x)
     print(np.dot(A, x) - b)
 
+
 .. parsed-literal::
 
     [ 2.  -0.5]
@@ -980,6 +1036,7 @@ Matrix decompositions
 
     A = np.floor(npr.normal(100, 15, (6, 10)))
     print(A)
+
 
 .. parsed-literal::
 
@@ -997,6 +1054,7 @@ Matrix decompositions
     print(np.dot(P.T, A))
     print
     print(np.dot(L, U))
+
 
 .. parsed-literal::
 
@@ -1021,6 +1079,7 @@ Matrix decompositions
     print(A)
     print
     print(np.dot(Q, R))
+
 
 .. parsed-literal::
 
@@ -1048,6 +1107,7 @@ Matrix decompositions
         S[i,i] = _s
     print(reduce(np.dot, [U, S, V]))
 
+
 .. parsed-literal::
 
     [[  94.   82.  125.  108.  105.   88.   99.   82.   97.  112.]
@@ -1062,6 +1122,7 @@ Matrix decompositions
 
     B = np.cov(A)
     print(B)
+
 
 .. parsed-literal::
 
@@ -1079,6 +1140,7 @@ Matrix decompositions
     print(np.dot(B, V))
     print
     print(np.real(np.dot(V, np.diag(u))))
+
 
 .. parsed-literal::
 
@@ -1103,6 +1165,7 @@ Matrix decompositions
     print(np.dot(C.T, C))
     print
     print(B)
+
 
 .. parsed-literal::
 
@@ -1133,6 +1196,7 @@ Finding the covariance matrix
     cov = np.dot(u.T, u)/(10-1)
     print cov, '\n'
     print np.cov(x.T)
+
 
 .. parsed-literal::
 
@@ -1241,6 +1305,7 @@ solved in the same way
     plt.plot(x, y, 'o')
     plt.plot(xi, yi, 'r-');
 
+
 .. parsed-literal::
 
     ('lstsq solution                ', array([ 5.5899, -1.4177]))
@@ -1267,6 +1332,7 @@ solved in the same way
     plt.plot(xi, yi, 'r-');
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_84_0.png
 
 
@@ -1284,6 +1350,7 @@ solved in the same way
     plt.plot(x, y, 'bo')
     plt.plot(x, p(x), 'r-')
     list(zip(b, p.coeffs))
+
 
 
 
@@ -1323,6 +1390,7 @@ Exercises
     print "Row", m.mean(1)
     print "Columne", m.mean(0)
 
+
 .. parsed-literal::
 
     [[ 0  1  2  3]
@@ -1359,6 +1427,7 @@ Do this in the following ways:
     print np.array([[u_ * v_ for v_ in v] for u_ in u])
     print
     print u[:,None] * v[None,:]
+
 
 .. parsed-literal::
 
@@ -1419,6 +1488,7 @@ Hint: Use the following numpy functions - ``np.random.random``,
     xs[(xs < 0.1).any(axis=1), :] = 0
     print xs
 
+
 .. parsed-literal::
 
     [[ 0.5117  0.9098  0.2184  0.3631  0.855   0.7114]
@@ -1469,6 +1539,7 @@ and :math:`2\pi` (includsive).
     plt.scatter(xs[idx], np.sin(xs[idx]))
     plt.plot(xs, np.sin(xs), xs, np.cos(xs));
 
+
 .. parsed-literal::
 
     [ 0.      0.6347  1.2693  1.904   2.5387  3.1733  3.808   4.4427  5.0773
@@ -1517,6 +1588,7 @@ and :math:`2\pi` (includsive).
     print
     print m.diagonal(offset=1)
 
+
 .. parsed-literal::
 
     [[  1   2   3   4   5   6   7   8   9  10]
@@ -1548,8 +1620,8 @@ and :math:`2\pi` (includsive).
     ])
 
 In other words, find the invertible matrix :math:`P` and the diagonal
-matrix :math:`D` such that $A = PDP^{-1} $. Confirm by calculating the
-value of $PDP^{-1} $.
+matrix :math:`D` such that :math:`A = PDP^{-1} `. Confirm by calculating
+the value of :math:`PDP^{-1} `.
 
 -  Do this mnaully
 -  Then use numpy.linalg functions to do the same
@@ -1575,6 +1647,7 @@ value of $PDP^{-1} $.
     print
     
     np.real_if_close(np.round(dotm(P, D, la.inv(P)), 6))
+
 
 .. parsed-literal::
 
@@ -1610,6 +1683,7 @@ of Python ...
     init_printing()
     
     x = symbols('x')
+
 .. code:: python
 
     M = Matrix([
@@ -1617,9 +1691,11 @@ of Python ...
         [6, -1, 0],
         [-1,-2,-1]
     ])
+
 .. code:: python
 
     M
+
 
 
 
@@ -1637,6 +1713,7 @@ of Python ...
 
 
 
+
 .. math::
 
     \operatorname{Poly}{\left( x^{3} + x^{2} - 12 x, x, domain=\mathbb{Z} \right)}
@@ -1647,6 +1724,7 @@ of Python ...
 
     # eigenvalues are the roots
     roots(poly)
+
 
 
 
@@ -1700,11 +1778,13 @@ values of the matrix :math:`m`.
         plt.figure(figsize=(6,6))
         plt.quiver(X, Y, U, V, C, angles='xy', scale_units='xy', scale=1)
         plt.axis([xmin, xmax, ymin, ymax]);
+
 .. code:: python
 
     ### Example usage
     m = np.array([[1,2],[3,4]])
     plot_matrix_transform(m)
+
 
 
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_107_0.png
@@ -1727,6 +1807,7 @@ values of the matrix :math:`m`.
     print
     print A4, la.det(A4)
 
+
 .. parsed-literal::
 
     [[2 0]
@@ -1746,6 +1827,7 @@ values of the matrix :math:`m`.
 
     print A3.dot(A3.T)
 
+
 .. parsed-literal::
 
     [[ 1.  0.]
@@ -1755,6 +1837,7 @@ values of the matrix :math:`m`.
 .. code:: python
 
     print A4.dot(A4.T)
+
 
 .. parsed-literal::
 
@@ -1769,6 +1852,7 @@ values of the matrix :math:`m`.
     plot_matrix_transform(A1)
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_111_0.png
 
 
@@ -1777,6 +1861,7 @@ values of the matrix :math:`m`.
     # A singluar matrix collapses one vector onto another
     # The determinant is zero becasue the parallelogram area is zero
     plot_matrix_transform(A2)
+
 
 
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_112_0.png
@@ -1790,6 +1875,7 @@ values of the matrix :math:`m`.
     plot_matrix_transform(A3)
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_113_0.png
 
 
@@ -1801,6 +1887,7 @@ values of the matrix :math:`m`.
     plot_matrix_transform(A4)
 
 
+
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_114_0.png
 
 
@@ -1808,6 +1895,7 @@ values of the matrix :math:`m`.
 
     # The tranpose of an orthogonal matrix is its inverse
     plot_matrix_transform(A3.T)
+
 
 
 .. image:: UsingNumpy-Solutions_files/UsingNumpy-Solutions_115_0.png
@@ -1825,6 +1913,7 @@ values of the matrix :math:`m`.
     M = transform(u, v)
     print u, M.dot(u)
     print v, M.dot(v)
+
 
 .. parsed-literal::
 
@@ -1859,6 +1948,7 @@ values of the matrix :math:`m`.
     plt.plot(x, p50(x), 'r-.', linewidth=2)
     plt.legend(['Data', 'Constant', 'Qaudratic', 'Order 5', 'Order 50'], loc='best', fontsize=20);
 
+
 .. parsed-literal::
 
     /Users/cliburn/anaconda/lib/python2.7/site-packages/numpy/lib/polynomial.py:588: RankWarning: Polyfit may be poorly conditioned
@@ -1874,6 +1964,7 @@ values of the matrix :math:`m`.
     %load_ext version_information
     
     %version_information numpy, scipy
+
 
 
 
