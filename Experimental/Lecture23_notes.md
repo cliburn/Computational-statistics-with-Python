@@ -55,18 +55,8 @@
 - Categories of algorithms
     - Big matrix manipulations (matrix decomposition is key)
     - Continuous optimization - order 0, 1, 2
-	    - Most convenient = [scipy.optimize](http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize)
-	    - For convex optimization [cvxpy](http://www.cvxpy.org/en/latest/)
 	- EM algorithm has wide applicability in both frequentist and Bayesian domains
-	- Graph algorithms
-	    - Most convenient = [networkx](http://networkx.github.io/)
-	    - Fastest on single and multi-core machines = [graph-tool](https://graph-tool.skewed.de/)
-		- For cluster = [Spark GraphX](https://spark.apache.org/graphx/))
 	- Monte Carlo methods, MCMC and simulations
-- [Machine learning](https://www.cbinsights.com/blog/python-tools-machine-learning/)
-    - 	[sklearn](http://scikit-learn.org/stable/)
-    - MADLib in [SQL](https://github.com/madlib/madlib) or [Python](https://github.com/pivotalsoftware/pymadlib)
-    - [Spark MLLib](https://spark.apache.org/mllib/)
 - Making code fast
     - Make it run, make it right, make it fast
     - Python has amazing profiling tools - use them
@@ -78,3 +68,41 @@
 		- Skip OpenMP (except within Cython) and MPI
 - Big data
     - [Spark](http://spark.apache.org/) is the killer app
+
+### Libraries worth knowing about
+
+### Data management
+
+- [cvskit](https://csvkit.readthedocs.org/en/0.9.1/)
+- [SQLalchemy](http://www.sqlalchemy.org/)
+- [redis](https://github.com/andymccurdy/redis-py)
+
+#### Statisticcs
+
+- [pandas](http://pandas.pydata.org/)
+- [statsmodels](http://statsmodels.sourceforge.net/)
+- [Rpy2](http://rpy.sourceforge.net/)
+
+#### Graphics
+
+- [seaborn](http://stanford.edu/~mwaskom/software/seaborn/)
+- [ggplot](https://github.com/yhat/ggplot)
+- [Bokeh](http://bokeh.pydata.org/en/latest/)
+
+#### Optimization
+
+- [scipy.optimize](http://docs.scipy.org/doc/scipy/reference/optimize.html#module-scipy.optimize)
+- [cvxpy](http://www.cvxpy.org/en/latest/)
+
+####  Graph algorithms
+
+- [networkx](http://networkx.github.io/)
+-  [graph-tool](https://graph-tool.skewed.de/)
+- [Spark GraphX](https://spark.apache.org/graphx/))
+
+####  Machine learning
+
+- [Machine learning](https://www.cbinsights.com/blog/python-tools-machine-learning/)
+- 	[sklearn](http://scikit-learn.org/stable/)
+- MADLib in [SQL](https://github.com/madlib/madlib) or [Python](https://github.com/pivotalsoftware/pymadlib)
+- [Spark MLLib](https://spark.apache.org/mllib/)
