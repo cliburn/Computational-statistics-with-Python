@@ -1,0 +1,25 @@
+exppow.lo: exppow.c ../config.h /usr/include/math.h \
+  /usr/include/sys/cdefs.h /usr/include/sys/_symbol_aliasing.h \
+  /usr/include/sys/_posix_availability.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h ../gsl/gsl_cdf.h \
+  ../gsl/gsl_sf_gamma.h ../gsl/gsl_sf_result.h
+
+../config.h:
+
+/usr/include/math.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/sys/_symbol_aliasing.h:
+
+/usr/include/sys/_posix_availability.h:
+
+/usr/include/Availability.h:
+
+/usr/include/AvailabilityInternal.h:
+
+../gsl/gsl_cdf.h:
+
+../gsl/gsl_sf_gamma.h:
+
+../gsl/gsl_sf_result.h:

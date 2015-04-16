@@ -1,0 +1,117 @@
+hyperg_2F1.lo: hyperg_2F1.c ../config.h ../gsl/gsl_math.h \
+  /usr/include/math.h /usr/include/sys/cdefs.h \
+  /usr/include/sys/_symbol_aliasing.h \
+  /usr/include/sys/_posix_availability.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h ../gsl/gsl_sys.h \
+  ../gsl/gsl_inline.h ../gsl/gsl_machine.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/limits.h \
+  /usr/include/limits.h /usr/include/machine/limits.h \
+  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
+  /usr/include/sys/syslimits.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/float.h \
+  ../gsl/gsl_precision.h ../gsl/gsl_types.h ../gsl/gsl_nan.h \
+  ../gsl/gsl_pow_int.h ../gsl/gsl_minmax.h ../gsl/gsl_errno.h \
+  /usr/include/stdio.h /usr/include/_types.h /usr/include/sys/_types.h \
+  /usr/include/machine/_types.h /usr/include/i386/_types.h \
+  /usr/include/sys/_types/_va_list.h /usr/include/sys/_types/_size_t.h \
+  /usr/include/sys/_types/_null.h /usr/include/sys/_types/_off_t.h \
+  /usr/include/sys/_types/_ssize_t.h /usr/include/secure/_stdio.h \
+  /usr/include/secure/_common.h /usr/include/errno.h \
+  /usr/include/sys/errno.h /usr/include/sys/_types/_errno_t.h \
+  ../gsl/gsl_sf_exp.h ../gsl/gsl_sf_result.h ../gsl/gsl_sf_pow_int.h \
+  ../gsl/gsl_sf_gamma.h ../gsl/gsl_sf_psi.h ../gsl/gsl_sf_hyperg.h \
+  error.h eval.h
+
+../config.h:
+
+../gsl/gsl_math.h:
+
+/usr/include/math.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/sys/_symbol_aliasing.h:
+
+/usr/include/sys/_posix_availability.h:
+
+/usr/include/Availability.h:
+
+/usr/include/AvailabilityInternal.h:
+
+../gsl/gsl_sys.h:
+
+../gsl/gsl_inline.h:
+
+../gsl/gsl_machine.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/limits.h:
+
+/usr/include/limits.h:
+
+/usr/include/machine/limits.h:
+
+/usr/include/i386/limits.h:
+
+/usr/include/i386/_limits.h:
+
+/usr/include/sys/syslimits.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/float.h:
+
+../gsl/gsl_precision.h:
+
+../gsl/gsl_types.h:
+
+../gsl/gsl_nan.h:
+
+../gsl/gsl_pow_int.h:
+
+../gsl/gsl_minmax.h:
+
+../gsl/gsl_errno.h:
+
+/usr/include/stdio.h:
+
+/usr/include/_types.h:
+
+/usr/include/sys/_types.h:
+
+/usr/include/machine/_types.h:
+
+/usr/include/i386/_types.h:
+
+/usr/include/sys/_types/_va_list.h:
+
+/usr/include/sys/_types/_size_t.h:
+
+/usr/include/sys/_types/_null.h:
+
+/usr/include/sys/_types/_off_t.h:
+
+/usr/include/sys/_types/_ssize_t.h:
+
+/usr/include/secure/_stdio.h:
+
+/usr/include/secure/_common.h:
+
+/usr/include/errno.h:
+
+/usr/include/sys/errno.h:
+
+/usr/include/sys/_types/_errno_t.h:
+
+../gsl/gsl_sf_exp.h:
+
+../gsl/gsl_sf_result.h:
+
+../gsl/gsl_sf_pow_int.h:
+
+../gsl/gsl_sf_gamma.h:
+
+../gsl/gsl_sf_psi.h:
+
+../gsl/gsl_sf_hyperg.h:
+
+error.h:
+
+eval.h:

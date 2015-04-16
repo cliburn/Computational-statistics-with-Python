@@ -1,0 +1,198 @@
+sphinx-build -b latex -d build/doctrees   source build/latex
+Running Sphinx v1.3.1
+loading pickled environment... done
+building [mo]: targets for 0 po files that are out of date
+building [latex]: all documents
+updating environment: 0 added, 6 changed, 0 removed
+reading sources... [ 16%] BlackBoxOptimization
+reading sources... [ 33%] CalibratingODEs
+reading sources... [ 50%] MCMC
+reading sources... [ 66%] PCA-Solutions
+reading sources... [ 83%] UsingNumpy-Solutions
+reading sources... [100%] index
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+processing ComputationalStatisticsinPython.tex... index IntroductionToPythonSolutions IPythonNotebookIntroduction FunctionsSolutions DataProcessingSolutions TextProcessingSolutions TextProcessingExtras WorkingWithStructuredData UsingNumpySolutions UsingPandas ComputationalStatisticsMotivation ComputerArithmetic AlgorithmicComplexity LinearAlgebraReview PCASolutions OptimizationInOneDimension BlackBoxOptimization CalibratingODEs MultivariateOptimizationAlgortihms EMAlgorithm MonteCarlo ResamplingAndMonteCarloSimulations MCMC PyMC2 PyMC3 PyStan Animation CrashCourseInC MakingCodeFast FromCToPython FromCompiledToPython FromJuliaToPython FromPythonToC Optimization_Bakeoff WritingParallelCode CUDAPython GPUSAndCUDAC DistributedComputing MapReduce Spark ModulesAndPackaging ReveiwAndTrends 
+resolving references...
+writing... done
+copying images... OptimizationInOneDimension_files/OptimizationInOneDimension_16_0.png UsingNumpySolutions_files/UsingNumpySolutions_14_1.png UsingNumpySolutions_files/UsingNumpySolutions_117_1.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_93_0.png PyMC2_files/PyMC2_8_1.png PCASolutions_files/PCASolutions_18_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_55_1.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_24_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_30_0.png MCMC_files/MCMC_34_1.png MCMC_files/MCMC_34_0.png MakingCodeFast_files/MakingCodeFast_20_1.png PyMC2_files/PyMC2_34_1.png Animation_files/Animation_9_0.png MCMC_files/MCMC_16_0.png MCMC_files/MCMC_28_0.png PyMC2_files/PyMC2_32_0.png ComputerArithmetic_files/ComputerArithmetic_56_0.png UsingNumpySolutions_files/UsingNumpySolutions_84_1.png EMAlgorithm_files/EMAlgorithm_19_0.png PyMC2_files/PyMC2_18_4.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_106_0.png UsingNumpySolutions_files/UsingNumpySolutions_93_1.png OptimizationInOneDimension_files/OptimizationInOneDimension_46_1.png UsingNumpySolutions_files/UsingNumpySolutions_111_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_70_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_104_0.png ComputerArithmetic_files/ComputerArithmetic_52_0.png EMAlgorithm_files/EMAlgorithm_5_0.png PCASolutions_files/PCASolutions_41_0.png BlackBoxOptimization_files/BlackBoxOptimization_107_0.png IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_37_0.png MCMC_files/MCMC_50_0.png IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_38_0.png IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_8_0.png ComputationalStatisticsMotivation_files/ComputationalStatisticsMotivation_19_0.png PyMC2_files/PyMC2_23_0.png PyMC2_files/PyMC2_39_2.png MCMC_files/MCMC_37_1.png PCASolutions_files/PCASolutions_30_0.png ./spectral.png PyMC3_files/PyMC3_9_0.png UsingNumpySolutions_files/UsingNumpySolutions_52_0.png IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_31_0.png MCMC_files/MCMC_9_0.png PyMC3_files/PyMC3_15_0.png PyMC2_files/PyMC2_39_1.png PCASolutions_files/PCASolutions_58_0.png PyMC3_files/PyMC3_37_1.png OptimizationInOneDimension_files/OptimizationInOneDimension_30_0.png PyMC2_files/PyMC2_5_1.png MCMC_files/MCMC_31_1.png PyMC3_files/PyMC3_31_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_101_0.png UsingPandas_files/UsingPandas_7_0.png MCMC_files/MCMC_28_1.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_48_0.png UsingNumpySolutions_files/UsingNumpySolutions_110_0.png PyMC3_files/PyMC3_25_0.png PCASolutions_files/PCASolutions_26_0.png PyMC2_files/PyMC2_11_0.png UsingNumpySolutions_files/UsingNumpySolutions_43_0.png MonteCarlo_files/MonteCarlo_15_0.png UsingNumpySolutions_files/UsingNumpySolutions_114_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_62_0.png MCMC_files/MCMC_31_0.png LinearAlgebraReview_files/LinearAlgebraReview_52_0.png PyMC2_files/PyMC2_39_3.png GPUsAndCUDAC_files/GPUsAndCUDAC_6_0.jpe MakingCodeFast_files/MakingCodeFast_25_0.png OptimizationInOneDimension_files/OptimizationInOneDimension_11_0.png OptimizationInOneDimension_files/OptimizationInOneDimension_12_0.png BlackBoxOptimization_files/BlackBoxOptimization_98_0.png OptimizationInOneDimension_files/OptimizationInOneDimension_33_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_80_0.png PyMC2_files/PyMC2_24_1.png PyMC2_files/PyMC2_15_0.png UsingNumpySolutions_files/UsingNumpySolutions_83_0.png DataProcessingSolutions_files/DataProcessingSolutions_67_1.png OptimizationInOneDimension_files/OptimizationInOneDimension_24_0.png AlgorithmicComplexity_files/AlgorithmicComplexity_9_0.png UsingNumpySolutions_files/UsingNumpySolutions_113_0.png MonteCarlo_files/MonteCarlo_12_0.png PyMC2_files/PyMC2_18_2.png PyMC3_files/PyMC3_23_0.png PyMC3_files/PyMC3_20_0.png PyMC3_files/PyMC3_14_0.png OptimizationInOneDimension_files/OptimizationInOneDimension_25_0.png MCMC_files/MCMC_40_0.png PyMC3_files/PyMC3_19_0.png PyMC2_files/PyMC2_39_0.png PyMC3_files/PyMC3_6_0.png DataProcessingSolutions_files/DataProcessingSolutions_50_0.png CUDAPython_files/CUDAPython_73_1.png PyStan_files/PyStan_9_0.png PCASolutions_files/PCASolutions_56_0.png PyMC3_files/PyMC3_11_1.png MCMC_files/MCMC_7_0.png PyStan_files/PyStan_14_0.png PyMC2_files/PyMC2_17_0.png UsingNumpySolutions_files/UsingNumpySolutions_106_0.png UsingNumpySolutions_files/UsingNumpySolutions_112_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_95_0.png PyMC3_files/PyMC3_27_0.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_103_0.png PyMC2_files/PyMC2_24_2.png FromJuliaToPython_files/FromJuliaToPython_10_1.png CUDAPython_files/CUDAPython_77_1.png BlackBoxOptimization_files/BlackBoxOptimization_94_0.png PyMC2_files/PyMC2_30_0.png PCASolutions_files/PCASolutions_14_0.png PyMC2_files/PyMC2_18_3.png PyMC2_files/PyMC2_34_3.png PyMC2_files/PyMC2_34_2.png MCMC_files/MCMC_12_0.png UsingNumpySolutions_files/UsingNumpySolutions_82_1.png ResamplingAndMonteCarloSimulations_files/ResamplingAndMonteCarloSimulations_39_0.png PyMC2_files/PyMC2_34_4.png IPythonNotebookIntroduction_files/IPythonNotebookIntroduction_27_0.png MCMC_files/MCMC_37_0.png OptimizationInOneDimension_files/OptimizationInOneDimension_34_0.png CUDAPython_files/CUDAPython_69_1.png
+copying TeX support files...
+done
+build succeeded, 79 warnings.
+Running LaTeX files through pdflatex...
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C build/latex all-pdf
+pdflatex  'ComputationalStatisticsinPython.tex'
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./ComputationalStatisticsinPython.tex
+LaTeX2e <2014/05/01>
+Babel <3.9k> and hyphenation patterns for 78 languages loaded.
+(./sphinxmanual.cls
+Document Class: sphinxmanual 2009/06/02 Document class (Sphinx manual)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/size10.clo)))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/utf8.def
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/t1enc.dfu)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ot1enc.dfu)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/omsenc.dfu)))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/cmap/cmap.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/fontenc.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/t1enc.def)<<t1.cmap>>)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/babel/babel.sty
+(/usr/local/texlive/2014/texmf-dist/tex/generic/babel-english/english.ldf
+(/usr/local/texlive/2014/texmf-dist/tex/generic/babel/babel.def)))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/times.sty) (./fncychap.sty
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/tools/longtable.sty)
+(./sphinx.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/textcomp.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ts1enc.def
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ts1enc.dfu)))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/fancybox/fancybox.sty
+Style option: `fancybox' v1.4 <2010/05/15> (tvz)
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/titlesec/titlesec.sty)
+(./tabulary.sty (/usr/local/texlive/2014/texmf-dist/tex/latex/tools/array.sty))
+ (/usr/local/texlive/2014/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2014/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/framed/framed.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/color.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/color.cfg)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/pdftex-def/pdftex.def
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
+Style option: `fancyvrb' v2.7a, with DG/SPQR fixes, and firstline=lastline fix 
+<2008/02/07> (tvz)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/keyval.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/threeparttable/threeparttable.sty
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/mdwtools/footnote.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/wrapfig/wrapfig.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/parskip/parskip.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/upquote/upquote.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/graphics.cfg)))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/pdftex/pdfcolor.tex)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/auxhook.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/hyperref.cfg)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/url/url.sty))
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/hypcap.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/float/float.sty))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/multirow/multirow.sty)
+Writing index file ComputationalStatisticsinPython.idx
+(./ComputationalStatisticsinPython.aux)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/grfext.sty)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
+(/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(./ComputationalStatisticsinPython.out) (./ComputationalStatisticsinPython.out)
+
+Underfull \hbox (badness 10000) in paragraph at lines 128--128
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/t1phv.fd)<<ot1.cmap>><<oml
+.cmap>><<oms.cmap>><<omx.cmap>> [1{/usr/local/texlive/2014/texmf-var/fonts/map/
+pdftex/updmap/pdftex.map}] [2] (./ComputationalStatisticsinPython.toc)
+Adding blank page after the table of contents.
+[1] [2] [1] [2]
+Chapter 1.
+
+Overfull \hbox (12.24939pt too wide) in paragraph at lines 137--139
+\T1/ptm/m/n/10 This lec-ture is based loosely on the on-line tu-to-rial : [][]h
+ttp://www.afterhoursprogramming.com/tutorial/Python/Introduction/[][] 
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/t1pcr.fd) [3]
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ts1pcr.fd) [4] [5]
+[6] [7] [8] [9] (/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+ [10]
+Underfull \vbox (badness 10000) detected at line 837
+[11] [12] [13] [14] [15] [16] [17] [18]
+Chapter 2.
+<IPythonNotebookIntroduction_8_0.png, id=497, 1219.55624pt x 1003.75pt>
+<use IPythonNotebookIntroduction_8_0.png>
+<use IPythonNotebookIntroduction_8_0.png> [19] [20 <./IPythonNotebookIntroducti
+on_8_0.png>]
+
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `utf8'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.1276 ...thmicComplexity\PYGZus{}files^^[[m^^[[m/
+                                                  
+? ! Interruption.
+\GenericError  ...                                
+                                                  \endgroup 
+l.1276 ...thmicComplexity\PYGZus{}files^^[[m^^[[m/
+                                                  
+? Type <return> to proceed, S to scroll future error messages,
+R to run without stopping, Q to run quietly,
+I to insert something, E to edit your file,
+H for help, X to quit.
+? 
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `utf8'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.1276 ...thmicComplexity\PYGZus{}files^^[[m^^[[m/
+                                                  
+? 
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `utf8'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.1276 ...thmicComplexity\PYGZus{}files^^[[m^^[[m/
+                                                  
+? 
+! Package inputenc Error: Keyboard character used is undefined
+(inputenc)                in inputencoding `utf8'.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.1279 ^^[[34mAnimation\PYGZus{}files^^[[m^^[[m/
+                                                
+? 
+! Emergency stop.
+ ...                                              
+                                                  
+l.1279 ^^[[34mAnimation\PYGZus{}files^^[[m^^[[m/
+                                                
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on ComputationalStatisticsinPython.log.

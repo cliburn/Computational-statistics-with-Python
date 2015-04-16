@@ -1,0 +1,10 @@
+inline.lo: inline.c ../build.h ../gsl/gsl_complex_math.h \
+  ../gsl/gsl_inline.h ../gsl/gsl_complex.h
+
+../build.h:
+
+../gsl/gsl_complex_math.h:
+
+../gsl/gsl_inline.h:
+
+../gsl/gsl_complex.h:

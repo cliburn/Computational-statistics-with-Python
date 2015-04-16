@@ -1,0 +1,10 @@
+chisqinv.lo: chisqinv.c ../config.h ../gsl/gsl_cdf.h \
+  ../gsl/gsl_sf_gamma.h ../gsl/gsl_sf_result.h
+
+../config.h:
+
+../gsl/gsl_cdf.h:
+
+../gsl/gsl_sf_gamma.h:
+
+../gsl/gsl_sf_result.h:

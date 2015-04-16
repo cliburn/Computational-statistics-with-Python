@@ -1,0 +1,7 @@
+version.lo: version.c config.h gsl_version.h gsl/gsl_types.h
+
+config.h:
+
+gsl_version.h:
+
+gsl/gsl_types.h:

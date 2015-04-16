@@ -234,6 +234,7 @@ html_static_path = ['_static']
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
 # html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
+html_sidebars = {'**': ['my_custom_sidebar.html', 'searchbox.html']}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -292,7 +293,13 @@ latex_elements = {
 #'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+'preamble': '''
+    \\usepackage{amsfonts}
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    %% \\usepackage{lmodern}
+    %% \\DeclareUnicodeCharacter{00A0}{ }
+    '''
 
 # Latex figure (float) alignment
 #'figure_align': 'htbp',

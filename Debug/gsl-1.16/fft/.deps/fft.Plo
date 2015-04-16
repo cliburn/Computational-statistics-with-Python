@@ -1,0 +1,332 @@
+fft.lo: fft.c ../config.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/stddef.h \
+  /usr/include/stdlib.h /usr/include/Availability.h \
+  /usr/include/AvailabilityInternal.h /usr/include/_types.h \
+  /usr/include/sys/_types.h /usr/include/sys/cdefs.h \
+  /usr/include/sys/_symbol_aliasing.h \
+  /usr/include/sys/_posix_availability.h /usr/include/machine/_types.h \
+  /usr/include/i386/_types.h /usr/include/sys/wait.h \
+  /usr/include/sys/_types/_pid_t.h /usr/include/sys/_types/_id_t.h \
+  /usr/include/sys/signal.h /usr/include/sys/appleapiopts.h \
+  /usr/include/machine/signal.h /usr/include/i386/signal.h \
+  /usr/include/machine/_mcontext.h /usr/include/i386/_mcontext.h \
+  /usr/include/mach/i386/_structs.h \
+  /usr/include/sys/_types/_sigaltstack.h \
+  /usr/include/sys/_types/_ucontext.h \
+  /usr/include/sys/_types/_pthread_attr_t.h \
+  /usr/include/sys/_types/_sigset_t.h /usr/include/sys/_types/_size_t.h \
+  /usr/include/sys/_types/_uid_t.h /usr/include/sys/resource.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/stdint.h \
+  /usr/include/stdint.h /usr/include/sys/_types/_int8_t.h \
+  /usr/include/sys/_types/_int16_t.h /usr/include/sys/_types/_int32_t.h \
+  /usr/include/sys/_types/_int64_t.h /usr/include/_types/_uint8_t.h \
+  /usr/include/_types/_uint16_t.h /usr/include/_types/_uint32_t.h \
+  /usr/include/_types/_uint64_t.h /usr/include/sys/_types/_intptr_t.h \
+  /usr/include/sys/_types/_uintptr_t.h /usr/include/_types/_intmax_t.h \
+  /usr/include/_types/_uintmax_t.h /usr/include/sys/_types/_timeval.h \
+  /usr/include/machine/endian.h /usr/include/i386/endian.h \
+  /usr/include/sys/_endian.h /usr/include/libkern/_OSByteOrder.h \
+  /usr/include/libkern/i386/_OSByteOrder.h /usr/include/alloca.h \
+  /usr/include/sys/_types/_ct_rune_t.h /usr/include/sys/_types/_rune_t.h \
+  /usr/include/sys/_types/_wchar_t.h /usr/include/sys/_types/_null.h \
+  /usr/include/machine/types.h /usr/include/i386/types.h \
+  /usr/include/sys/_types/___offsetof.h /usr/include/sys/_types/_dev_t.h \
+  /usr/include/sys/_types/_mode_t.h /usr/include/string.h \
+  /usr/include/sys/_types/_rsize_t.h /usr/include/sys/_types/_errno_t.h \
+  /usr/include/sys/_types/_ssize_t.h /usr/include/strings.h \
+  /usr/include/secure/_string.h /usr/include/secure/_common.h \
+  /usr/include/math.h ../gsl/gsl_errno.h /usr/include/stdio.h \
+  /usr/include/sys/_types/_va_list.h /usr/include/sys/_types/_off_t.h \
+  /usr/include/secure/_stdio.h /usr/include/errno.h \
+  /usr/include/sys/errno.h ../gsl/gsl_types.h ../gsl/gsl_complex.h \
+  ../gsl/gsl_fft_complex.h ../gsl/gsl_math.h ../gsl/gsl_sys.h \
+  ../gsl/gsl_inline.h ../gsl/gsl_machine.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/limits.h \
+  /usr/include/limits.h /usr/include/machine/limits.h \
+  /usr/include/i386/limits.h /usr/include/i386/_limits.h \
+  /usr/include/sys/syslimits.h \
+  /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/float.h \
+  ../gsl/gsl_precision.h ../gsl/gsl_nan.h ../gsl/gsl_pow_int.h \
+  ../gsl/gsl_minmax.h ../gsl/gsl_fft.h ../gsl/gsl_fft_complex_float.h \
+  ../templates_on.h bitreverse.c complex_internal.h bitreverse.h \
+  ../templates_off.h factorize.c factorize.h c_init.c c_main.c c_pass.h \
+  c_pass_2.c c_pass_3.c c_pass_4.c c_pass_5.c c_pass_6.c c_pass_7.c \
+  c_pass_n.c c_radix2.c ../gsl/gsl_fft_halfcomplex.h \
+  ../gsl/gsl_fft_real.h ../gsl/gsl_fft_halfcomplex_float.h \
+  ../gsl/gsl_fft_real_float.h hc_init.c hc_main.c hc_pass.h hc_pass_2.c \
+  hc_pass_3.c hc_pass_4.c hc_pass_5.c hc_pass_n.c hc_radix2.c \
+  hc_unpack.c real_init.c real_main.c real_pass.h real_pass_2.c \
+  real_pass_3.c real_pass_4.c real_pass_5.c real_pass_n.c real_radix2.c \
+  real_unpack.c
+
+../config.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/stddef.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/Availability.h:
+
+/usr/include/AvailabilityInternal.h:
+
+/usr/include/_types.h:
+
+/usr/include/sys/_types.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/sys/_symbol_aliasing.h:
+
+/usr/include/sys/_posix_availability.h:
+
+/usr/include/machine/_types.h:
+
+/usr/include/i386/_types.h:
+
+/usr/include/sys/wait.h:
+
+/usr/include/sys/_types/_pid_t.h:
+
+/usr/include/sys/_types/_id_t.h:
+
+/usr/include/sys/signal.h:
+
+/usr/include/sys/appleapiopts.h:
+
+/usr/include/machine/signal.h:
+
+/usr/include/i386/signal.h:
+
+/usr/include/machine/_mcontext.h:
+
+/usr/include/i386/_mcontext.h:
+
+/usr/include/mach/i386/_structs.h:
+
+/usr/include/sys/_types/_sigaltstack.h:
+
+/usr/include/sys/_types/_ucontext.h:
+
+/usr/include/sys/_types/_pthread_attr_t.h:
+
+/usr/include/sys/_types/_sigset_t.h:
+
+/usr/include/sys/_types/_size_t.h:
+
+/usr/include/sys/_types/_uid_t.h:
+
+/usr/include/sys/resource.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/sys/_types/_int8_t.h:
+
+/usr/include/sys/_types/_int16_t.h:
+
+/usr/include/sys/_types/_int32_t.h:
+
+/usr/include/sys/_types/_int64_t.h:
+
+/usr/include/_types/_uint8_t.h:
+
+/usr/include/_types/_uint16_t.h:
+
+/usr/include/_types/_uint32_t.h:
+
+/usr/include/_types/_uint64_t.h:
+
+/usr/include/sys/_types/_intptr_t.h:
+
+/usr/include/sys/_types/_uintptr_t.h:
+
+/usr/include/_types/_intmax_t.h:
+
+/usr/include/_types/_uintmax_t.h:
+
+/usr/include/sys/_types/_timeval.h:
+
+/usr/include/machine/endian.h:
+
+/usr/include/i386/endian.h:
+
+/usr/include/sys/_endian.h:
+
+/usr/include/libkern/_OSByteOrder.h:
+
+/usr/include/libkern/i386/_OSByteOrder.h:
+
+/usr/include/alloca.h:
+
+/usr/include/sys/_types/_ct_rune_t.h:
+
+/usr/include/sys/_types/_rune_t.h:
+
+/usr/include/sys/_types/_wchar_t.h:
+
+/usr/include/sys/_types/_null.h:
+
+/usr/include/machine/types.h:
+
+/usr/include/i386/types.h:
+
+/usr/include/sys/_types/___offsetof.h:
+
+/usr/include/sys/_types/_dev_t.h:
+
+/usr/include/sys/_types/_mode_t.h:
+
+/usr/include/string.h:
+
+/usr/include/sys/_types/_rsize_t.h:
+
+/usr/include/sys/_types/_errno_t.h:
+
+/usr/include/sys/_types/_ssize_t.h:
+
+/usr/include/strings.h:
+
+/usr/include/secure/_string.h:
+
+/usr/include/secure/_common.h:
+
+/usr/include/math.h:
+
+../gsl/gsl_errno.h:
+
+/usr/include/stdio.h:
+
+/usr/include/sys/_types/_va_list.h:
+
+/usr/include/sys/_types/_off_t.h:
+
+/usr/include/secure/_stdio.h:
+
+/usr/include/errno.h:
+
+/usr/include/sys/errno.h:
+
+../gsl/gsl_types.h:
+
+../gsl/gsl_complex.h:
+
+../gsl/gsl_fft_complex.h:
+
+../gsl/gsl_math.h:
+
+../gsl/gsl_sys.h:
+
+../gsl/gsl_inline.h:
+
+../gsl/gsl_machine.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/limits.h:
+
+/usr/include/limits.h:
+
+/usr/include/machine/limits.h:
+
+/usr/include/i386/limits.h:
+
+/usr/include/i386/_limits.h:
+
+/usr/include/sys/syslimits.h:
+
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/6.0/include/float.h:
+
+../gsl/gsl_precision.h:
+
+../gsl/gsl_nan.h:
+
+../gsl/gsl_pow_int.h:
+
+../gsl/gsl_minmax.h:
+
+../gsl/gsl_fft.h:
+
+../gsl/gsl_fft_complex_float.h:
+
+../templates_on.h:
+
+bitreverse.c:
+
+complex_internal.h:
+
+bitreverse.h:
+
+../templates_off.h:
+
+factorize.c:
+
+factorize.h:
+
+c_init.c:
+
+c_main.c:
+
+c_pass.h:
+
+c_pass_2.c:
+
+c_pass_3.c:
+
+c_pass_4.c:
+
+c_pass_5.c:
+
+c_pass_6.c:
+
+c_pass_7.c:
+
+c_pass_n.c:
+
+c_radix2.c:
+
+../gsl/gsl_fft_halfcomplex.h:
+
+../gsl/gsl_fft_real.h:
+
+../gsl/gsl_fft_halfcomplex_float.h:
+
+../gsl/gsl_fft_real_float.h:
+
+hc_init.c:
+
+hc_main.c:
+
+hc_pass.h:
+
+hc_pass_2.c:
+
+hc_pass_3.c:
+
+hc_pass_4.c:
+
+hc_pass_5.c:
+
+hc_pass_n.c:
+
+hc_radix2.c:
+
+hc_unpack.c:
+
+real_init.c:
+
+real_main.c:
+
+real_pass.h:
+
+real_pass_2.c:
+
+real_pass_3.c:
+
+real_pass_4.c:
+
+real_pass_5.c:
+
+real_pass_n.c:
+
+real_radix2.c:
+
+real_unpack.c:

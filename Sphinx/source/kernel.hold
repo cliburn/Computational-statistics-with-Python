@@ -1,0 +1,8 @@
+
+__global void square_kernel(float *d_out, float *d_in){
+  
+  int i = thread.Idx;   # This is a unique identifier of the thread   
+  float f = d_in[i]     # Why this statement?
+  d_out[i] = f*f;       # d_out is what we will copy back to the host memory
+
+}

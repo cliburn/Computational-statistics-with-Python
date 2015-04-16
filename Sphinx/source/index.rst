@@ -11,26 +11,26 @@ Contents:
 .. toctree::
    :maxdepth: 2
    	      
-   IntroductionToPython-Solutions.rst 
+   IntroductionToPythonSolutions.rst 
    IPythonNotebookIntroduction.rst
-   Functions-Solutions.rst 
-   DataProcessing-Solutions.rst 
-   TextProcessing-Solutions.rst 
+   FunctionsSolutions.rst 
+   DataProcessingSolutions.rst 
+   TextProcessingSolutions.rst 
    TextProcessingExtras.rst 
    WorkingWithStructuredData.rst 
-   UsingNumpy-Solutions.rst 
+   UsingNumpySolutions.rst 
    UsingPandas.rst 
    ComputationalStatisticsMotivation.rst
    ComputerArithmetic.rst
    AlgorithmicComplexity.rst
    LinearAlgebraReview.rst 
-   LinearAlgebraMatrixDecomp-WithSoutions.rst 
-   PCA-Solutions.rst 
+   LinearAlgebraMatrixDecompWithSolutions.rst
+   PCASolutions.rst 
    OptimizationInOneDimension.rst 
    BlackBoxOptimization.rst
    CalibratingODEs.rst
    MultivariateOptimizationAlgortihms.rst 
-   EM_algorithm.rst 
+   EMAlgorithm.rst 
    MonteCarlo.rst 
    ResamplingAndMonteCarloSimulations.rst 
    MCMC.rst 
@@ -47,10 +47,14 @@ Contents:
    Optimization_Bakeoff.rst 
    WritingParallelCode.rst 
    CUDAPython.rst
-   GPUSAndCUDAC.rst
+   GPUsAndCUDAC.rst
    DistributedComputing.rst
    MapReduce.rst
    Spark.rst
+   ModulesAndPackaging.rst
+   Jupyter.rst
+   MultiKernel.rst
+   ReveiwAndTrends.rst
 
 Indices and tables
 ==================

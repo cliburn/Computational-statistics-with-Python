@@ -1,0 +1,10 @@
+minmax.lo: minmax.c ../config.h ../build.h ../gsl/gsl_minmax.h \
+  ../gsl/gsl_inline.h
+
+../config.h:
+
+../build.h:
+
+../gsl/gsl_minmax.h:
+
+../gsl/gsl_inline.h:

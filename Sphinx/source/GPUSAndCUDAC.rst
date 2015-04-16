@@ -15,7 +15,6 @@
 
 .. code:: python
 
-    
     from IPython.display import HTML, Image
 
 Writing CUDA in C
@@ -30,16 +29,10 @@ Memory
 GPUs or GPGPUs are complex devices, but to get started, one really just
 needs to understand a more simplistic view.
 
-.. code:: python
+.. figure:: ./GPUCPUOverview.png
+   :alt: GPUs and CPUs
 
-    Image ('./GPUCPUOverview.jpg')
-
-
-
-
-.. image:: GPUsAndCUDAC_files/GPUsAndCUDAC_6_0.jpe
-
-
+   GPUs and CPUs
 
 The most important thing to understand about memory, is that the CPU can
 access both main memory (host) and GPU memory (device). The device sees
@@ -104,7 +97,7 @@ Kernel Code
 
 .. parsed-literal::
 
-    Writing kernel.hold
+    Overwriting kernel.hold
 
 
 CPU Code
@@ -150,7 +143,7 @@ CPU Code
 
 .. parsed-literal::
 
-    Writing shared_mem_example.cu
+    Overwriting main.hold
 
 
 Shared Memory
@@ -232,7 +225,7 @@ Lifted from: https://www.cac.cornell.edu/vw/gpu/shared\_mem\_exec.aspx
 
 .. parsed-literal::
 
-    Writing shared_mem_ex.cu
+    Overwriting shared_mem_ex.cu
 
 
 Makefile
@@ -268,7 +261,5 @@ Compile
 .. parsed-literal::
 
     nvcc  -c shared_mem_ex.cu
-    make: nvcc: Command not found
-    make: *** [shared_mem.o] Error 127
 
 
