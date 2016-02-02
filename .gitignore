@@ -1,3 +1,5 @@
+*.pxd
+*.pyx
 *.ipynb_checkpoints
 *.pyc
 *.png

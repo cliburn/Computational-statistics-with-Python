@@ -1,5 +1,0 @@
-flatinv.lo: flatinv.c ../config.h ../gsl/gsl_cdf.h
-
-../config.h:
-
-../gsl/gsl_cdf.h:

@@ -55,7 +55,8 @@ Contents:
    Jupyter.rst
    MultiKernel.rst
    ReveiwAndTrends.rst
-
+   WrappingRLibraries.rst
+   
 Indices and tables
 ==================
 

@@ -39,8 +39,8 @@ Expectation Maximizatio (EM) Algorithm
 Jensen's inequality
 -------------------
 
-For a convex function :math:`f`, :math:`E[f(x) \geq f(E[x])`. Flip the
-signe for a concave function.
+For a convex function :math:`f`, :math:`E[f(x)] \geq f(E[x])`. Flip the
+sign for a concave function.
 
 A function :math:`f(x)` is convex if :math:`f''(x) \geq 0` everywhere in
 its domain. For example, if :math:`f(x) = \log x`,
