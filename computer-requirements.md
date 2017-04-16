@@ -1,3 +1,9 @@
+Title: Computer Requirements
+Date: 2017-04-16
+Category: Duke
+Tags: Translation,Lesson,Programming,Python
+
+
 #硬件要求
 ----------------------------------------
 
@@ -39,4 +45,4 @@ HPC（高性能计算）相关的课程，推荐使用亚马逊云服务 AWS，�
 	- sql
 	- Module version information
 - Pip 安装的 Python 模块 (有很多了)
-    - 也不需要 root 权限 (跟 anaconda 一样安装到个人目录)
+    - 也不需要 root 权限 (跟 anaconda 一样安装到个人目录).

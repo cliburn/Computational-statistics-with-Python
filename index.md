@@ -1,3 +1,8 @@
+Title: Outline of STA663
+Date: 2017-04-16
+Category: Duke
+Tags: Translation,Lesson,Programming,Python
+
 Duke 大学 STA 663 课程教学大纲
 ========================================
 ----------------------------------------
