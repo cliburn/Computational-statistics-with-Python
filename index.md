@@ -126,7 +126,7 @@ Lecture 1
 上机实验课1
 ----------------------------------------
 
-参考本课程 Github 项目中[上级实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab01/Exercises01.ipynb 这个文件。
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab01/Exercises01.ipynb 这个文件。
 
 Lecture 2
 ----------------------------------------
@@ -172,7 +172,8 @@ Lecture 3
 上机实验课2
 ----------------------------------------
 
-参考本课程 Github 项目中[上级实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) GitLab/GitExercises.ipynb 这个文件。（译者注：这个文件不存在啊。）
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab02/Exercises02.ipynb 这个文件。
+
 
 
 Lecture 4
@@ -201,7 +202,7 @@ Lecture 4
 上机实验课3
 ----------------------------------------
 
-参考本课程 Github 项目中[上级实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab02/Exercises02.ipynb 这个文件。
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab03/Exercises03.ipynb 这个文件。
 
 Lecture 5
 ----------------------------------------
@@ -249,7 +250,7 @@ Lecture 6
 上机实验课4
 ----------------------------------------
 
-参考本课程 Github 项目中[上级实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab03/Exercises03.ipynb 这个文件。
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab04/Exercises04.ipynb 这个文件。
 
 
 Lecture 7
@@ -280,7 +281,7 @@ Lecture 8
 上机实验课5
 ----------------------------------------
 
-参考本课程 Github 项目中[上级实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab04/Exercises04.ipynb 这个文件。
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab05/Exercises05.ipynb 这个文件。
 
 
 Lecture 9
@@ -291,235 +292,236 @@ Lecture 9
 - 单根查找和优化（Univariate root finding and optimization）
     - 黄金分割搜索（Golden section search）
     - 二分搜索（Bisection）
-	- Newton-Raphson and secant methods
-- General approach to optimization
-	- Know the problem
-	- Multiple random starts
-	- Combining algorithms
-	- Graphing progress
+	- 牛顿-拉普森算法（Newton-Raphson）以及割线法（secant methods）
+- 常规优化途径
+	- 理解问题
+	- 多次随机启动
+	- 结合算法
+	- 过程可视化
 
 Lecture 10
 ----------------------------------------
 
-- Practical optimization
-- Convexity, local optima and constraints
-- Condition number
-- Root finding
-- Optimization for univariate scalar functions
-- Optimization for multivariate scalar functions
-- Visualizaiton of progress
-- Application examples
-    - Curve fitting
-    - Fitting ODEs
-	- Graph dispaly using a spring model
-	- Multivariate logistic regression
+- 优化实践（Practical optimization）
+- 凸性、局部最优与约束（Convexity, local optima and constraints）
+- 条件数（Condition number）
+- 求根问题（Root finding）
+- 单变量标量函数优化（Optimization for univariate scalar functions）
+- 多变量标量函数优化（Optimization for multivariate scalar functions）
+- 过程可视化
+- 应用实例
+    - 曲线拟合
+    - 拟合方程
+	- 实用弹簧模型进行图形显示（Graph dispaly using a spring model）
+	- 多元逻辑回归分析法（Multivariate logistic regression）
 
 上机实验课6
 ----------------------------------------
 
-See Lab05/Exercises05.ipynb in the course Github repository. 
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab06/Exercises06.ipynb 这个文件。
 
 Lecture 11
 ----------------------------------------
 
-- Multivariate and Constrained optimization
-    - Review of vector calculus
-    - Innner products
-	- Conjugaate gradients
-	- Newton methods (2nd order)
-	- Quasi-newton methods (1st order)
+- 多变量和约束优化（Multivariate and Constrained optimization）
+    - 向量积分复习（Review of vector calculus）
+    - 向量内积（Innner products）
+	- 共轭梯度（Conjugate gradients）
+	- 牛顿法 (2nd order)
+	- 拟牛顿算法 (1st order)
 	- Powells and Nelder Mead (0th order)
-    - Lagrange multipliers
+    - 拉格朗日乘数法（Lagrange multipliers）
 
 Lecture 12
 ----------------------------------------
 
-- The EM algorithm
-    - Convex and concave functions
-    - Jensen's inequality
-    - Missing data setup
-    - Toy example - coin flipping with 2 biased coins
-    - Gaussian mixture model
-	- Code vectorization example
+- EM 算法
+    - 凸凹函数
+    - 詹森不等式（Jensen's inequality）
+    - 缺失数据设置
+    - 玩具案例-翻硬币与两枚偏见硬币（2 biased coins）
+    - 高斯混合模型
+	- 向量化代码示例
 
 上机实验课7
 ----------------------------------------
 
-Coming soon
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab07/Exercises07.ipynb 这个文件。
 
-Lecture 13 - Mid-term exams
+Lecture 13 - 期中考试
 ----------------------------------------
 
-- Monday 23 January 4:40 - 6:25 (1 hour 45 minutes)
+- 周一 1月 23号 4:40 - 6:25 (105 分钟)
 
 Lecture 14
 ----------------------------------------
 
-- Background and introduction
-    - What are Monte Carlo methods
-    - Applications in general
-    - Applications in statistics
-    - Monte Carlo optimization
-- Where do random numbers come from?
-    - Psudo-random number genrators
-        - Linear conruential generators
-    - Getting one distribution from another
-        - The inverse transform
-        - Rejection sampling
-        - Mixture representations
--  Monte Carlo integration
-    - Basic concepts
-    - Quasi-random numbers
-- Monte Carlo swindles
+- 背景知识
+    - 简介蒙特卡罗方法（Monte Carlo methods）
+    - 常见的应用
+    - 统计学中的应用
+    - 蒙特卡罗优化
+- 如何获得随机数
+    -伪随机数生成器
+        - 线性同余发生器（Linear congruential generators）
+    - 从一个分布中获取另外一个分布
+        - 反向变化
+        - 拒绝采样方法
+        - 混合表示
+-  蒙特卡罗积分
+    - 基本概念
+    - 拟随机数字
+- 蒙特卡罗诈骗
 
 上机实验课8
 ----------------------------------------
 
-Coming soon
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab08/Exercises08.ipynb 这个文件。
 
 Lecture 15
 ----------------------------------------
 
-- Resampling methods
-    - Bootstrap
-	- Jackknife
-	- Permuation sampling
-	- Cross-validation
-- Conducting a simulation experiment (case study)
-	- Experimental design
-    - Variables to study
-    - Levels of variables (factorial, Latin hypercube)
-    - Code documentation
-    - Recording results
-    - Reporting
-    - Reproducible analysis with `make` and $\LaTeX$
+- 重采样方法
+    - Bootstrap 算法
+	- Jackknife 折刀法
+	- 转列采样（Permuation sampling）
+	- 交叉验证（Cross-validation）
+- 进行模拟实验(案例研究)
+	- 实验设计
+    - 研究的变量
+    - 变量层次（阶乘，超立方）（Levels of variables (factorial, Latin hypercube)）
+    - 代码文档
+    - 结果记录
+    - 汇报
+    - 可重现分析，使用 `make`和 $\LaTeX$
 
 Lecture 16
 ----------------------------------------
 
 - MCMC (1)
-	- Toy problem - rats on drugs
-    - Monte Carlo estimation
-    - Importance sampling
-    - Metropolis-Hasting
-    - Gibbs sampling
-    - Hamiltonian sampling
-	- Assessing convergence
-	- Using `pystan`
-	- Using `pymc2`
-	- Using `emcee`
+	- 玩具温体 - 吃药的老鼠
+    - 蒙特卡罗估计
+    - 权重抽样
+    - Metropolis-Hasting 采样
+    - Gibbs 吉布斯采样
+    - Hamiltonian 哈密顿采样
+	- 收敛性评估
+	- 使用 `pystan`
+	- 使用 `pymc2`
+	- 使用 `emcee`
 
 上机实验课9
 ----------------------------------------
 
-Coming soon
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab09/Exercises09.ipynb 这个文件。
 
 Lecture 17
 ----------------------------------------
 
-- MCMC (2)
-    - Gaussian mixture model revisited
-    - Gibbs sampling
-    - Infinite mixture model with the Dirichlet process
+- MCMC算法（马尔可夫链蒙特卡罗(Markov Chain Monte Carlo)）(2)
+    - 回顾高斯混合模型（Gaussian mixture model revisited）
+    - 吉布斯采样（Gibbs sampling）
+    - 狄利克雷过程的无限混合模型（Infinite mixture model with the Dirichlet process）
 
 Lecture 18
 ----------------------------------------
 
-- Profiling 
-    - Premature optimization is the root of all evil
-    - Using `%time` and `%timeit`
-    - Profiling with `%prun`
-	- Line profiler
-	- Memory profiler
-- Code optimization
-    - Use appropriate data structure
-    - Use appropriate algorithm
-    - Use known Python idioms
-    - Use optimized modules
-    - Caching and memorization
-    - Vectorize and broadcast
-    - Views 
-    - Stride tricks
+- 分析（Profiling）
+    - 过早的优化是万恶之源（Premature optimization is the root of all evil）
+    - 使用 `%time` 和 `%timeit`
+    - 使用`%prun` 进行分析
+	- 行分析（Line profiler）
+	- 内存分析（Memory profiler）
+- 代码优化
+    - 使用合适的数据结构
+    - 使用恰当的算法
+    - 使用 Python 语言风格
+    - 使用优化过的模块
+    - 缓存和记忆
+    - 向量化和广播
+    - 纵览全局（Views）
+    - 跨过技巧
 
 上机实验课10
 ----------------------------------------
 
-Coming soon
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab10/Exercises10.ipynb 这个文件。
 
 Lecture 19
 ----------------------------------------
 
-- JIT compilation with `numba`
-- Optimization with `cython`
-- Wrapping C code
-- Wrapping C++ code
-- Wrapping Fortran code
+- JIT（just in time） 编译，使用 `numba`
+- 利用 `cython` 优化性能
+- 包装利用 C 代码
+- 包装利用 C++ 代码
+- 包装利用 Fortran 代码
 
 Lecture 20
 ----------------------------------------
 
-- [Why modern CPUs are starving and what can be done about it](http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf)
-- Parallel programming patterns
+- [为什么现代 CPU 性能依然不够用，以及该怎么解决这个问题](http://www.pytables.org/docs/CISE-12-2-ScientificPro.pdf)
+- 并行编程模式
 - Amdahl's and GustClassifying points with the Gustafson's laws
-- Parallel programming examples
-    - JIT compilation with `numba`
-	- Toy example - fractals 
-    - Using `joblib`
-    - Using `multiprocessing`
-    - Using `IPython.Parallel`
-    - Using `MPI4py`
+- 并行编程样例
+    - JIT（just in time） 编译，使用 `numba`
+	- 玩具样例 - 分型
+    - 使用 `joblib`
+    - 使用 `multiprocessing`
+    - 使用 `IPython.Parallel`
+    - 使用 `MPI4py`
 
 上机实验课11
 ----------------------------------------
 
-Coming soon
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab11/Exercises11.ipynb 这个文件。
 
 Lecture 21
 ----------------------------------------
 
-- GPU computing
-	- Introduction to CUDA
-	- Vanilla matrix multiplication
-	- Matrix multiplication with shared memory
-	- JIT compilation with `numba`
-	- Example: Large-scale GMMs with CUDA
+- GPU 运算
+	- 简介 CUDA
+	- Vanilla 矩阵乘法
+	- 共享内存的矩阵乘法
+	- JIT（just in time） 编译，使用 `numba`
+	- 样例: 利用 CUDA 的大尺度高斯模型（GMMs）
 
 Lecture 22
 ----------------------------------------
 
-- Map-reduce and Spark ([AWS](https://aws.amazon.com/articles/4926593393724923))
+-  "Map（映射）"和"Reduce（归约）" 以及 Spark ([AWS](https://aws.amazon.com/articles/4926593393724923))
 
-    - Problem - k-mer counting for DNA sequences
-    - Small scale map-reduce using Python
-    - Using `hadoop` with `mrjob`
-    - Using `spark` with `pyspark`
-    - Using `MLib` for large-scale machine learning
+    - 问题 - k-mer DNA序列计数
+    - 使用 Python 进行小规模 "Map（映射）"和"Reduce（归约）"
+    -  通过 `mrjob`使用`hadoop`
+    - 通过`pyspark`使用`spark`
+    - 使用`MLib` 进行大规模机器学习
 
 上机实验课12
 ----------------------------------------
 
-Coming soon
+
+参考本课程 Github 项目中[上机实验目录下](https://github.com/Kivy-CN/Computational-statistics-with-Python-CN/tree/master/Labs/) Lab12/Exercises12.ipynb 这个文件。
 
 
-Supplementary Mateiral
+参考资料
 ========================================
 
-SM 1 
+第一部分
 ----------------------------------------
 
-- Using the command line
-    - The Unix philosophy and `bash`
-    - Remote computing with `ssh`
-    - Version control with `git`
-    - Documents with $\LaTeX$
-    - Automation with `make`
+- 使用命令后
+    - Unix 哲学以及 `bash`
+    - 使用 `ssh` 远程登录
+    - 使用 `git` 进行版本控制
+    - 利用 $\LaTeX$ 编写文档
+    - 通过`make`实现自动化
 
-SM 2
+第二部分
 ----------------------------------------
 
-- Graphics in Python
-    - Using `matplotlib`
-    - Using `seaborn`
-    - Using `bokeh`
-    - [Using `daft`](http://daft-pgm.org/)
+- Python 中的可视化
+    - 使用 `matplotlib`
+    - 使用  `seaborn`
+    - 使用  `bokeh`
+    - [使用  `daft`](http://daft-pgm.org/)
 
