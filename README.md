@@ -5,9 +5,9 @@ Tags: Translation,Lesson,Programming,Python
 
 
 
-#基于 Python 的计算机统计学
+# 基于 Python 的计算机统计学
 
-#####译者的话
+##### 译者的话
 
 
 
