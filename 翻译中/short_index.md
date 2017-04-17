@@ -1,0 +1,25 @@
+STA 663 Course Outline
+---
+
+- [x] Lecture 1: Python and the IPython notebook (J)
+- [x] Lecture 2: Functional programming (C)
+- [x] Lecture 3: Python for data science (C)
+- [x] Lecture 4: Using `numpy` and `pandas` (C)
+- [x] Lecture 5: Computer arithmetic and algorithms (C)
+- [x] Lecture 6: Linear algebra and matrices I (J)
+- [x] Lecture 7: Linear algebra and matrices II (J)
+- [x] Lecture 8: PCA
+- [x] Lecture 9: Univariate optimization
+- [x] Lecture 10: Multivariate optimization
+- [ ] Lecture 11: Constrained optimization
+- [ ] Lecture 12: Expectation-Maximization I
+- [ ] Lecture 13: Expectation-Maximization II
+- [ ] Lecture 14: Random numbers and Monte Carlo methods
+- [ ] Lecture 15: Computational inference and simulation experiments
+- [ ] Lecture 16: MCMC I
+- [ ] Lecture 17: MCMC II
+- [ ] Lecture 18: Profiling and code optimization
+- [ ] Lecture 19: Compiling to native code for speed
+- [ ] Lecture 20: Parallel programming
+- [ ] Lecture 21: GPU computing
+- [ ] Lecture 22: MapReduce and SPARK

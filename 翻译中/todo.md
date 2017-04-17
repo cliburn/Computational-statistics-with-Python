@@ -1,0 +1,31 @@
+To do list
+----------------------------------------
+
+- [ ] Applications of matrix decompositions
+    - [ ] LU
+    - [ ] QR
+    - [ ] SVD
+    - [ ] PCA
+    - [ ] Cholesky
+- [ ] Optimization
+	- [ ] IRLS
+	- [ ] Gradient descent
+	- [ ] Stochastic gradietn descent
+	- [ ] Conjugate gradient
+	- [ ] EM algorithm
+	- [ ] Dynamic programming and Viterbi algorithm
+- [ ] Simulation
+	- [ ] Simple MCMC
+	- [ ] Particle filter
+	- [ ] ABC
+	- [ ] Tempering
+	- [ ] Bootstrap
+	- [ ] Jackknife
+	- [ ] Permutation resampling
+	- [ ] GMMs in PyMC
+	- [ ] Similar implementaitons in PyStan and Emcee
+- [ ] HPC
+	- [ ] Intefacing with R libraries via CythonRemath
+	- [ ] Interfacing with Egien (via Ceygen?)
+	- [ ] Improve CythonGSL and CythonRmath exampels
+	- [ ] Add annotate view description for Cython module
