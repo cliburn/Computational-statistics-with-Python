@@ -1,0 +1,713 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/20B_AuxiliaryVariableMCMC.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:16:42 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Auxiliary Variables in MCMC proposals &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Bonus Material: The Humble For Loop" href="Extras_01_The_Humble_For_Loop.html" />
+    <link rel="prev" title="Metropolis and Gibbs Sampling" href="20A_MCMC.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Extras_01_The_Humble_For_Loop.html" title="Bonus Material: The Humble For Loop"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="20A_MCMC.html" title="Metropolis and Gibbs Sampling"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-auxiliary-variables-in-mcmc-proposals">
+<h1>Using Auxiliary Variables in MCMC proposals<a class="headerlink" href="#using-auxiliary-variables-in-mcmc-proposals" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="slice-sampling">
+<h2>Slice sampling<a class="headerlink" href="#slice-sampling" title="Permalink to this headline">¶</a></h2>
+<p>Slice sampling is a simple MCMC algorithm that introduces the idea of
+auxiliary variables. The motivation for slice sampling is that if we can
+sample uniformly from the region under the graph of the target
+distribution, we will have random samples from the target distribution.
+In the univariate case, the algorithm is as follows</p>
+<ul class="simple">
+<li>start with some <span class="math">\(x\)</span> where <span class="math">\(p(x) \ne 0\)</span></li>
+<li>repeat<ul>
+<li>sample <span class="math">\(y\)</span> (auxiliary variable) uniformly from 0 to
+<span class="math">\(f(x)\)</span></li>
+<li>draw a horizontal line at <span class="math">\(y\)</span> within <span class="math">\(p(x)\)</span> (this may
+consist of multiple intervals)</li>
+<li>sample <span class="math">\(x\)</span> from the horizontal segments</li>
+</ul>
+</li>
+</ul>
+<p>The auxiliary <span class="math">\(y\)</span> variable allows us to sample <span class="math">\((x, y)\)</span>
+points that are in the region under the graph of the target
+distribution. Only the <span class="math">\(x\)</span> variable is used for the Monte Carlo
+samples - the <span class="math">\(y\)</span> variables are simply discarded. This works
+because the joint disribution is constructed so that it factors
+<span class="math">\(p(x, y) = p(y \mid x) p(x)\)</span> and so projecting leaves just
+<span class="math">\(p(x)\)</span>. The slice sampler is a Markov Chain Monte Carlo method
+since the next <span class="math">\((x, y)\)</span> position depends only on the current
+position. Like Gibbs sampling, there is no tuning process and all
+proposals are accepted. For slice sampling, you either need the inverse
+distribution function or some way to estimate it. Later we will see that
+Hamiltonian Monte Carlo also uses auxiliary variables to generate a new
+proposal in an analogous way.</p>
+<p>A toy example illustrates the process - Suppose we want to draw random
+samples from the posterior distribution <span class="math">\(\mathcal{N}(0, 1)\)</span> using
+slice sampling</p>
+<p>Start with some value <span class="math">\(x\)</span> - sample <span class="math">\(y\)</span> from
+<span class="math">\(\mathcal{U}(0, f(x))\)</span> - this is the horizontal &#8220;slice&#8221; that gives
+the method its name - sample the next <span class="math">\(x\)</span> from <span class="math">\(f^{-1}(y)\)</span> -
+this is typically done numerically - repeat</p>
+<p>Will sketch picture in class to show what is going on.</p>
+</div>
+<div class="section" id="a-simple-slice-sampler-example">
+<h2>A simple slice sampler example<a class="headerlink" href="#a-simple-slice-sampler-example" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dist</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span>
+
+<span class="n">niters</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">niters</span><span class="p">:</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="n">rb</span> <span class="o">=</span> <span class="n">x</span>
+    <span class="k">while</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">lb</span><span class="p">):</span>
+        <span class="n">lb</span> <span class="o">-=</span> <span class="n">w</span>
+    <span class="k">while</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">rb</span><span class="p">):</span>
+        <span class="n">rb</span> <span class="o">+=</span> <span class="n">w</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">lb</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">rb</span><span class="p">):</span>
+            <span class="n">lb</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lb</span> <span class="o">=</span> <span class="n">y</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_5_0.png" src="_images/20B_AuxiliaryVariableMCMC_5_0.png" />
+<p>Notes on the slice sampler:</p>
+<ul class="simple">
+<li>the slice may consist of disjoint pieces for multimodal distributions</li>
+<li>the slice can be a rectangular hyperslab for multivariable posterior
+distributions</li>
+<li>sampling from the slice (i.e. finding the boundaries at level
+<span class="math">\(y\)</span>) is non-trivial and may involve iterative rejection steps -
+see figure below (from Wikimedia) for a typical approach - the blue
+bars represent disjoint pieces of the true slice through a bimodal
+distribution and the black lines are the proposal distribution
+approximating the true slice</li>
+</ul>
+<div class="figure" id="id5">
+<img alt="Slice sampling algorithm from Wikipedia" src="http://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Summary_of_slice_sampling.png/750px-Summary_of_slice_sampling.png" />
+<p class="caption"><span class="caption-text">Slice sampling algorithm from Wikipedia</span></p>
+</div>
+</div>
+<div class="section" id="hamiltonian-monte-carlo-hmc">
+<h2>Hamiltonian Monte Carlo (HMC)<a class="headerlink" href="#hamiltonian-monte-carlo-hmc" title="Permalink to this headline">¶</a></h2>
+<p>HMC uses an auxiliary variable corresponding to the momentum of
+particles in a potential energy well to generate proposal distributions
+that can make use of gradient information in the posterior distribution.
+For reversibility to be maintained, the total energy of the particle has
+to be conserved - hence we are interested in Hamiltonian systems. The
+main attraction of HMC is that it works much better than other methods
+when variables of interest are highly correlated. Because we have to
+solve problems involving momentum, we need to understand how to
+numerically solve differential equations in a way that is both accurate
+(i.e. second order) and preserves total energy (necessary for a
+Hamiltonian system).</p>
+<p>Example adapted from <a class="reference external" href="https://theclevermachine.wordpress.com/2012/11/18/mcmc-hamiltonian-monte-carlo-a-k-a-hybrid-monte-carlo/">MCMC: Hamiltonian Monte Carlo (a.k.a. Hybrid Monte
+Carlo)</a></p>
+</div>
+<div class="section" id="hamiltonian-systems">
+<h2>Hamiltonian systems<a class="headerlink" href="#hamiltonian-systems" title="Permalink to this headline">¶</a></h2>
+<p>In a Hamiltonian system, we consider particles with position <span class="math">\(x\)</span>
+and momentum (or velocity if we assume unit mass) <span class="math">\(v\)</span>. The total
+energy of the system <span class="math">\(H(x, v) = K(v) + U(x)\)</span>, where <span class="math">\(K\)</span> is
+the kinetic energy and <span class="math">\(U\)</span> is the potential energy, is conserved.
+Such a system satisfies the following Hamiltonian equations</p>
+<div class="math">
+\[\begin{split}\begin{align}
+\frac{dx}{dt} &amp;= &amp; \frac{\delta H}{dv} \\
+\frac{dv}{dt} &amp;= &amp; -\frac{\delta H}{dx}
+\end{align}\end{split}\]</div>
+<p>Since <span class="math">\(K\)</span> depends only on <span class="math">\(v\)</span> and <span class="math">\(U\)</span> depends only on
+<span class="math">\(x\)</span>, we have</p>
+<div class="math">
+\[\begin{split}\begin{align}
+\frac{dx}{dt} &amp;= &amp; \frac{\delta K}{dv} \\
+\frac{dv}{dt} &amp;= &amp; -\frac{\delta U}{dx}
+\end{align}\end{split}\]</div>
+<div class="section" id="harmonic-oscillator">
+<h3>Harmonic oscillator<a class="headerlink" href="#harmonic-oscillator" title="Permalink to this headline">¶</a></h3>
+<p>We will consider solving a classical Hamiltonian system - that of a
+undamped spring governed by the second order differential equation</p>
+<div class="math">
+\[x'' + x = 0\]</div>
+<p>We convert this to two first order ODEs by using a dummy variable
+<span class="math">\(x' = v\)</span> to get</p>
+<div class="math">
+\[\begin{split}\begin{align}
+x' &amp;= v \\
+v' &amp;= -x
+\end{align}\end{split}\]</div>
+<p>From the Hamiltonian equations above, this is equivalent to a system
+with kinetic energy <span class="math">\(K(v) = \frac{1}{2}v^2\)</span> and potential energy
+<span class="math">\(U(x) = \frac{1}{2}x^2\)</span>.</p>
+<p>Writing in matrix form,</p>
+<div class="math">
+\[\begin{split}A = \pmatrix{ x' \\ v' } = \pmatrix{0 &amp; 1 \\ -1 &amp; 0} \pmatrix{x \\ v}\end{split}\]</div>
+<p>and in general, for the state vector <span class="math">\(x\)</span>,</p>
+<div class="math">
+\[x' = Ax\]</div>
+<p>We note that <span class="math">\(A\)</span> is anti- or skew-symmetric (<span class="math">\(A^T = -A\)</span>),
+and hence has purely imaginary eigenvalues. Solving
+<span class="math">\(|A - \lambda I = 0\)</span>, we see that the eigenvalues and eigenvectors
+are <span class="math">\(i, \pmatrix{1\\i}\)</span> and <span class="math">\(-i, \pmatrix{1\\-i}\)</span>. Since the
+eigenvalues are pure imaginary, we see that the solution for the initial
+conditions <span class="math">\((x,v) = (1, 0)\)</span> is <span class="math">\(x(t) = e^{it}\)</span> and the orbit
+just goes around a circle with a period of <span class="math">\(2\pi\)</span>, neither growing
+nor decaying. Another weay of seeing this is that the Hamiltonian
+<span class="math">\(H(u, v)\)</span> or sum of potential (<span class="math">\(U(x)) = \frac{1}{2}x^2\)</span>) and
+kinetic energy (<span class="math">\(K(v) = \frac{1}{2}v^2\)</span>) is constant, i.e. in
+vector form, <span class="math">\((x^T x) = \text{constant}\)</span>.</p>
+</div>
+</div>
+<div class="section" id="finite-difference-methods">
+<h2>Finite difference methods<a class="headerlink" href="#finite-difference-methods" title="Permalink to this headline">¶</a></h2>
+<p>We want to find a finite difference approximation to <span class="math">\(u' = Au\)</span>
+that is <strong>accurate</strong> and <strong>preserves total energy</strong>. If total energy is
+not preserved, the orbit will either spiral in towards zero or outwards
+away from the unit circle. If the accuracy is poor, the orbit will not
+be close to its starting value after <span class="math">\(t = 2\pi\)</span>. This gives us an
+easy way to visualize how good our numerical scheme is. We can also
+compare the numerical scheme to the Taylor series to evaluate its
+accuracy.</p>
+<div class="section" id="forward-euler">
+<h3>Forward Euler<a class="headerlink" href="#forward-euler" title="Permalink to this headline">¶</a></h3>
+<p>The simplest finite difference scheme for integrating ODEs is the
+forward Euler</p>
+<div class="math">
+\[\frac{u_{n+1} - u_n}{\Delta t} = A u_n\]</div>
+<p>Rearranging terms, we get</p>
+<div class="math">
+\[u_{n+1} = u_n + \Delta t A u_n = \left( I + \Delta t A \right) u_n\]</div>
+<p>Since the eigenvalues of <span class="math">\(A\)</span> are <span class="math">\(\pm i\)</span>, we see that the
+eigenvalues of the forward Euler matrix are <span class="math">\(1 \pm i\)</span>. Since the
+absolute value of the eigenvalues is greater than 1, we expect
+<strong>growing</strong> solutions - i.e. the solution will spiral away from the unit
+circle.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f_euler</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">orbit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">N</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">A</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">orbit</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="n">orbit</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">orbit</span> <span class="o">=</span> <span class="n">f_euler</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="accuracy">
+<h4>Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span> <span class="o">-</span> <span class="n">orbit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.3600318484671193</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="conservation-of-energy">
+<h4>Conservation of energy<a class="headerlink" href="#conservation-of-energy" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">p</span> <span class="o">@</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">orbit</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_17_0.png" src="_images/20B_AuxiliaryVariableMCMC_17_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;square&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_18_0.png" src="_images/20B_AuxiliaryVariableMCMC_18_0.png" />
+</div>
+<div class="section" id="accuracy-and-conservation-of-energy">
+<h4>Accuracy and conservation of energy<a class="headerlink" href="#accuracy-and-conservation-of-energy" title="Permalink to this headline">¶</a></h4>
+<p>We can see that forward Euler is not very accurate and also does not
+preserve energy since the orbit spirals away from the unit circle.</p>
+</div>
+</div>
+<div class="section" id="the-trapezoidal-method">
+<h3>The trapezoidal method<a class="headerlink" href="#the-trapezoidal-method" title="Permalink to this headline">¶</a></h3>
+<p>The trapezoidal method uses the following scheme</p>
+<div class="math">
+\[\frac{u_{n+1} - u_n}{\Delta t} = \frac{1}{2}  ( A u_{n+1} + A u_{n})\]</div>
+<p>This is an implicit scheme (because <span class="math">\(u_{n+1}\)</span> appears on the RHS)
+whose solution is</p>
+<div class="math">
+\[u_{n+1} = \left(I - \frac{\Delta t}{2} A \right)^{-1} \left(I + \frac{\Delta t}{2} A \right) u_{n} = B u_n\]</div>
+<p>By inspection, we see that the eigenvalues are the complex conjugates of</p>
+<div class="math">
+\[\frac{1 + \frac{\Delta t}{2} i}{1 - \frac{\Delta t}{2} i}\]</div>
+<p>whose absolute value is 1 - hence, energy is conserved. If we expand the
+matrix <span class="math">\(B\)</span> using the geometric series and compare with the Taylor
+expansion, we see that the trapezoidal method has local truncation error
+<span class="math">\(O(h^3)\)</span> and hence accuracy <span class="math">\(O(h^2)\)</span>, where <span class="math">\(h\)</span> is the
+time step.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">trapezoidal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+    <span class="n">orbit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="n">p</span><span class="p">))</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">N</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">)</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">orbit</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="n">orbit</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">orbit</span> <span class="o">=</span> <span class="n">trapezoidal</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="id1">
+<h4>Accuracy<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span> <span class="o">-</span> <span class="n">orbit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.005039305635733781</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Conservation of energy<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">p</span> <span class="o">@</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">orbit</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_26_0.png" src="_images/20B_AuxiliaryVariableMCMC_26_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;square&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_27_0.png" src="_images/20B_AuxiliaryVariableMCMC_27_0.png" />
+</div>
+</div>
+<div class="section" id="the-leapfrog-method">
+<h3>The leapfrog method<a class="headerlink" href="#the-leapfrog-method" title="Permalink to this headline">¶</a></h3>
+<p>The leapfrog method uses a second order difference to update
+<span class="math">\(u_n\)</span>. The algorithm simplifies to the following explicit scheme:</p>
+<ul class="simple">
+<li>First take one half-step for v</li>
+<li>Then take a full step for u</li>
+<li>Then take one final half step for v</li>
+</ul>
+<p>It performs as well as the trapezoidal method, with the advantage of
+being an explicit scheme and cheaper to calculate, so the leapfrog
+method is used in HMC.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">leapfrog</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">orbit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">N</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">orbit</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="n">orbit</span>
+</pre></div>
+</div>
+<div class="section" id="if-we-don-t-care-about-the-intermediate-steps-it-is-more-efficient-to-just-take-1-2-steps-at-the-beginning-and-end">
+<h4>If we don&#8217;t care about the intermediate steps, it is more efficient to just take 1/2 steps at the beginning and end<a class="headerlink" href="#if-we-don-t-care-about-the-intermediate-steps-it-is-more-efficient-to-just-take-1-2-steps-at-the-beginning-and-end" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">leapfrog2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">N</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+        <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+
+    <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+    <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="n">u</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">orbit</span> <span class="o">=</span> <span class="n">leapfrog</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h4>Accuracy<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">la</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span> <span class="o">-</span> <span class="n">orbit</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.0025229913808033464</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h4>Conservation of energy<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">p</span> <span class="o">@</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">orbit</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_37_0.png" src="_images/20B_AuxiliaryVariableMCMC_37_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;square&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_38_0.png" src="_images/20B_AuxiliaryVariableMCMC_38_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="from-hamiltonians-to-probability-distributions">
+<h2>From Hamiltonians to probability distributions<a class="headerlink" href="#from-hamiltonians-to-probability-distributions" title="Permalink to this headline">¶</a></h2>
+<p>The physical analogy considers the negative log likelihood of the target
+distribution <span class="math">\(p(x)\)</span> to correspond to a potential energy well, with
+a collection of particles moving on the surface of the well. The state
+of each particle is given only by its position and momentum (or velocity
+if we assume unit mass for each particle). In a Hamiltonian system, the
+total energy <span class="math">\(H(x,, v) = U(x) + K(v)\)</span> is conserved. From
+statistical mechanics, the probability of each state is related to the
+total energy of the system</p>
+<div class="math">
+\[\begin{split}\begin{align}
+p(x, v) &amp; \propto e^{-H(x, v)} \\
+&amp;= e^{-U(x) - K(v)} \\
+&amp;= e^{-P(x)}e^{-K(v)} \\
+&amp; \propto p(x) \, p(v)
+\end{align}\end{split}\]</div>
+<p>Since the joint distribution factorizes <span class="math">\(p(x, v) = p(x)\, p(v)\)</span>,
+we can select an initial random <span class="math">\(v\)</span> for a particle, numerically
+integrate using a finite difference method such as the leapfrog and then
+use the updated <span class="math">\(x^*\)</span> as the new proposal. The acceptance ratio
+for the new <span class="math">\(x^*\)</span> is</p>
+<div class="math">
+\[\frac{ e^{ -U(x^*)-K(v^*) }} { e^{-U(x)-K(v)} } = e^{U(x)-U(x^*)+K(x)-K(x^*)}\]</div>
+<p>If our finite difference scheme was exact, the acceptance ration would
+be 1 since energy is conserved with Hamiltonian dynamics. However, as we
+have seen, the leapfrog method does not conserve energy perfectly and an
+accept/reject step is still needed.</p>
+<div class="section" id="example-of-hmc">
+<h3>Example of HMC<a class="headerlink" href="#example-of-hmc" title="Permalink to this headline">¶</a></h3>
+<p>We will explore how HMC works when the target distribution is bivariate
+normal centered at zero</p>
+<div class="math">
+\[x \sim N(0, \Sigma)\]</div>
+<p>In practice of course, the target distribution will be the posterior
+distribution and depend on both data and distributional parameters.</p>
+<p>The potential energy or negative log likelihood is proportional to</p>
+<div class="math">
+\[U(x) = \frac{x^T\Sigma^{-1} x}{2}\]</div>
+<p>The kinetic energy is given by</p>
+<div class="math">
+\[K(v) = \frac{v^T v}{2}\]</div>
+<p>where the initial <span class="math">\(v_0\)</span> is chosen at random from the unit normal
+at each step.</p>
+<p>To find the time updates, we use the Hamiltonian equations and find the
+first derivatives of total energy with respect to <span class="math">\(x\)</span> and
+<span class="math">\(v\)</span></p>
+<div class="math">
+\[\begin{split}\begin{align}
+x' &amp;= \frac{\delta K}{\delta v} &amp;= v \\
+v' &amp;= -\frac{\delta U}{\delta x} &amp;= -\Sigma^{-1} x \\
+\end{align}\end{split}\]</div>
+<p>giving us the block matrix</p>
+<div class="math">
+\[\begin{split}A = \pmatrix{0 &amp; 1 \\ -\Sigma^{-1} &amp; 0}\end{split}\]</div>
+<p>By using the first derivatives, we are making use of the gradient
+information on the log posterior to guide the proposal distribution.</p>
+<div class="section" id="this-is-what-the-target-distribution-should-look-like">
+<h4>This is what the target distribution should look like<a class="headerlink" href="#this-is-what-the-target-distribution-should-look-like" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">],[</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_42_0.png" src="_images/20B_AuxiliaryVariableMCMC_42_0.png" />
+</div>
+<div class="section" id="this-is-the-hmc-posterior">
+<h4>This is the HMC posterior<a class="headerlink" href="#this-is-the-hmc-posterior" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">E</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Total energy.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">u0</span> <span class="o">@</span> <span class="n">tau</span> <span class="o">@</span> <span class="n">u0</span> <span class="o">+</span> <span class="n">v0</span> <span class="o">@</span> <span class="n">v0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">u</span> <span class="o">@</span> <span class="n">tau</span><span class="nd">@u</span> <span class="o">+</span> <span class="n">v</span> <span class="o">@</span> <span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">leapfrog</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Leapfrog finite difference scheme.&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">h</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span> <span class="o">@</span> <span class="n">u</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">v</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">h</span> <span class="o">*</span> <span class="n">A</span> <span class="o">@</span> <span class="n">u</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="n">h</span> <span class="o">*</span> <span class="n">v</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">h</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="n">A</span> <span class="o">@</span> <span class="n">u</span>
+
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">tau</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+
+<span class="n">orbit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">niter</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">orbit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+    <span class="n">v0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">leapfrog</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+    <span class="c1"># accept-reject</span>
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">orbit</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">E</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">orbit</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">orbit</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u0</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">orbit</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">orbit</span><span class="p">[:</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[:</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">orbit</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">orbit</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">niter</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Reds&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span><span class="mf">3.5</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20B_AuxiliaryVariableMCMC_47_0.png" src="_images/20B_AuxiliaryVariableMCMC_47_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Auxiliary Variables in MCMC proposals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#slice-sampling">Slice sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-simple-slice-sampler-example">A simple slice sampler example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hamiltonian-monte-carlo-hmc">Hamiltonian Monte Carlo (HMC)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hamiltonian-systems">Hamiltonian systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finite-difference-methods">Finite difference methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-hamiltonians-to-probability-distributions">From Hamiltonians to probability distributions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="20A_MCMC.html"
+                          title="Previous page">&larr; Metropolis and Gibbs Sampling</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="Extras_01_The_Humble_For_Loop.html"
+                          title="Next page">&rarr; Bonus Material: The Humble For Loop</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/20B_AuxiliaryVariableMCMC.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Extras_01_The_Humble_For_Loop.html" title="Bonus Material: The Humble For Loop"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="20A_MCMC.html" title="Metropolis and Gibbs Sampling"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/20B_AuxiliaryVariableMCMC.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:16:57 GMT -->
+</html>

@@ -1,0 +1,1013 @@
+
+Using ``ipyparallel``
+=====================
+
+Parallel execution is tightly integrated with Jupyter in the
+``ipyparallel`` package. Install with
+
+.. code:: bash
+
+    conda install ipyparallel
+    ipcluster nbextension enable
+
+`Official
+documentation <https://ipyparallel.readthedocs.org/en/latest/>`__
+
+.. code:: python
+
+    import numpy as np
+
+Starting engines
+----------------
+
+We will only use engines on local cores which does not require any setup
+- see
+`docs <https://ipyparallel.readthedocs.org/en/latest/process.html>`__
+for detailed instructions on how to set up a remote cluster, including
+setting up to use Amazon EC2 clusters.
+
+You can start a cluster on the ``IPython Clusters`` tab in the main
+Jupyter browser window or via the command line with
+
+::
+
+    ipcluster start -n <put desired number of engines to run here>
+
+The main advantage of developing parallel applications using
+``ipyparallel`` is that it can be done interactively within Jupyter.
+
+Basic concepts of ``ipyparallel``
+---------------------------------
+
+.. code:: python
+
+    from ipyparallel import Client
+
+The client connects to the cluster of "remote" engines that perfrom the
+actual computation. These engines may be on the same machine or on a
+cluster.
+
+.. code:: python
+
+    rc = Client()
+
+.. code:: python
+
+    rc.ids
+
+
+
+
+.. parsed-literal::
+
+    []
+
+
+
+A view provides access to a subset of the engines available to the
+client. Jobs are submitted to the engines via the view. A direct view
+allows the user to explicitly send work specific engines. The load
+balanced view is like the ``Pool`` object in ``multiprocessing``, and
+manages the scheduling and distribution of jobs for you.
+
+**Direct view**
+
+.. code:: python
+
+    dv = rc[:]
+
+Add 10 sets of 3 numbers in parallel using all engines.
+
+.. code:: python
+
+    dv.map_sync(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+Add 10 sets of 3 numbers in parallel using only alternate engines.
+
+.. code:: python
+
+    rc[::2].map_sync(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+Add 10 sets of 3 numbers using a specific engine.
+
+.. code:: python
+
+    rc[2].map_sync(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+**Load balanced view**
+
+Use this when you have many jobs that take different amounts of time to
+complete.
+
+.. code:: python
+
+    lv = rc.load_balanced_view()
+
+.. code:: python
+
+    lv.map_sync(lambda x: sum(x), np.random.random((10, 100000)))
+
+
+
+
+.. parsed-literal::
+
+    [49859.841956016848,
+     49870.081709239821,
+     49943.641182764761,
+     50036.652427205641,
+     50068.404147389781,
+     49992.029384113026,
+     49955.070276994411,
+     50125.980933489096,
+     50022.922095057918,
+     50034.625115371957]
+
+
+
+Calling functions with apply
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In contrast to ``map``, ``apply`` is just a simple function call run on
+all remote engines, and has the usual function signature
+``apply(f, *args, **kwargs)``. It is a primitive on which other more
+useful functions (such as ``map``) are built upon.
+
+.. code:: python
+
+    rc[1:3].apply_sync(lambda x, y: x**2 + y**2, 3, 4)
+
+
+
+
+.. parsed-literal::
+
+    [25, 25]
+
+
+
+.. code:: python
+
+    rc[1:3].apply_sync(lambda x, y: x**2 + y**2, x=3, y=4)
+
+
+
+
+.. parsed-literal::
+
+    [25, 25]
+
+
+
+Synchronous and asynchronous jobs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We have used the ``map_sync`` and ``apply_sync`` methods. The ``sync``
+suffix indicate that we want to run a synchronous job. Synchronous jobs
+``block`` until all the computation is done and return the result.
+
+.. code:: python
+
+    res = dv.map_sync(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+.. code:: python
+
+    res
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+In contrast, asynchronous jobs return immediately so that you can do
+other work, but returns a ``AsyncMapResult`` object, similar to the
+``future`` object returned by the ``concurrent.futures`` package. You
+can query its status, cancel running jobs and retrieve results once they
+have been computed.
+
+.. code:: python
+
+    res = dv.map_async(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+.. code:: python
+
+    res
+
+
+
+
+.. parsed-literal::
+
+    <AsyncMapResult: <lambda>:finished>
+
+
+
+.. code:: python
+
+    res.done()
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    res.get()
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+There is also a ``map`` method that by default uses asynchronous mode,
+but you can change this by setting the ``block`` attribute or function
+argument.
+
+.. code:: python
+
+    res = dv.map(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+.. code:: python
+
+    res.get()
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+Change blocking mode for just one job.
+
+.. code:: python
+
+    res = dv.map(lambda x, y, z: x + y + z, range(10), range(10), range(10), block=True)
+
+.. code:: python
+
+    res
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+Change blocking mode for this view so that all jobs are synchronous.
+
+.. code:: python
+
+    dv.block = True
+
+.. code:: python
+
+    res = dv.map(lambda x, y, z: x + y + z, range(10), range(10), range(10))
+
+.. code:: python
+
+    res
+
+
+
+
+.. parsed-literal::
+
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+
+
+Remote function decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``@remote`` decorator results in functions that will execute
+simultaneously on all engines in a view. For example, you can use this
+decorator if you always want to run :math:`n` independent parallel MCMC
+chains.
+
+.. code:: python
+
+    @dv.remote(block = True)
+    def f1(n):
+        import numpy as np
+        return np.random.rand(n)
+
+.. code:: python
+
+    f1(4)
+
+
+
+
+.. parsed-literal::
+
+    [array([ 0.14291698,  0.43179052,  0.01988482,  0.34954953]),
+     array([ 0.17649555,  0.24990395,  0.55351823,  0.08560618]),
+     array([ 0.58286124,  0.54516206,  0.11319046,  0.58497964]),
+     array([ 0.47768026,  0.6619128 ,  0.01443178,  0.35109978]),
+     array([ 0.2927628 ,  0.76033203,  0.99378694,  0.40169856]),
+     array([ 0.26566942,  0.25636252,  0.08508869,  0.49019879]),
+     array([ 0.16307286,  0.08510121,  0.79460886,  0.95521201]),
+     array([ 0.73906763,  0.06665074,  0.99133771,  0.61957675])]
+
+
+
+The @parallel decorator breaks up elementwise operations and distributes
+them.
+
+.. code:: python
+
+    @dv.parallel(block = True)
+    def f2(x):
+        return x
+
+.. code:: python
+
+    f2(range(15))
+
+
+
+
+.. parsed-literal::
+
+    [range(0, 2),
+     range(2, 4),
+     range(4, 6),
+     range(6, 8),
+     range(8, 10),
+     range(10, 12),
+     range(12, 14),
+     range(14, 15)]
+
+
+
+.. code:: python
+
+    @dv.parallel(block = True)
+    def f3(x):
+        return sum(x)
+
+.. code:: python
+
+    f3(range(15))
+
+
+
+
+.. parsed-literal::
+
+    [1, 5, 9, 13, 17, 21, 25, 14]
+
+
+
+.. code:: python
+
+    @dv.parallel(block = True)
+    def f4(x, y):
+        return x + y
+
+.. code:: python
+
+    f4(np.arange(10), np.arange(10))
+
+
+
+
+.. parsed-literal::
+
+    array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18])
+
+
+
+Example: Use the ``@parallel`` decorator to speed up Mandelbrot calculations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def mandel1(x, y, max_iters=80):
+        c = complex(x, y)
+        z = 0.0j
+        for i in range(max_iters):
+            z = z*z + c
+            if z.real*z.real + z.imag*z.imag >= 4:
+                return i
+        return max_iters
+
+.. code:: python
+
+    @dv.parallel(block = True)
+    def mandel2(x, y, max_iters=80):
+        c = complex(x, y)
+        z = 0.0j
+        for i in range(max_iters):
+            z = z*z + c
+            if z.real*z.real + z.imag*z.imag >= 4:
+                return i
+        return max_iters
+
+.. code:: python
+
+    x = np.arange(-2, 1, 0.01)
+    y = np.arange(-1, 1, 0.01)
+    X, Y = np.meshgrid(x, y)
+
+.. code:: python
+
+    %%time
+    im1 = np.reshape(list(map(mandel1, X.ravel(), Y.ravel())), (len(y), len(x)))
+
+
+.. parsed-literal::
+
+    CPU times: user 883 ms, sys: 5.73 ms, total: 889 ms
+    Wall time: 886 ms
+
+
+.. code:: python
+
+    %%time
+    im2 = np.reshape(mandel2.map(X.ravel(), Y.ravel()),  (len(y), len(x)))
+
+
+.. parsed-literal::
+
+    CPU times: user 41.7 ms, sys: 10.1 ms, total: 51.8 ms
+    Wall time: 238 ms
+
+
+.. code:: python
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    axes[0].grid(False)
+    axes[0].imshow(im1, cmap='jet')
+    axes[1].grid(False)
+    axes[1].imshow(im2, cmap='jet')
+    pass
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-39-dd87f9e85fd0> in <module>()
+    ----> 1 fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+          2 axes[0].grid(False)
+          3 axes[0].imshow(im1, cmap='jet')
+          4 axes[1].grid(False)
+          5 axes[1].imshow(im2, cmap='jet')
+
+
+    NameError: name 'plt' is not defined
+
+
+Functions with dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Modules imported locally are NOT available in the remote engines.
+
+.. code:: python
+
+    import time
+    import datetime
+
+.. code:: python
+
+    def g1(x):
+        time.sleep(0.1)
+        now = datetime.datetime.now()
+        return (now, x)
+
+This fails with an Exception because the ``time`` and ``datetime``
+modules are not imported in the remote engines.
+
+.. code:: python
+
+    dv.map_sync(g1, range(10))
+
+The simplest fix is to import the module(s) *within* the function
+
+.. code:: python
+
+    def g2(x):
+        import time, datetime
+        time.sleep(0.1)
+        now = datetime.datetime.now()
+        return (now, x)
+
+.. code:: python
+
+    dv.map_sync(g2, range(5))
+
+Alternatively, you can simultaneously import both locally and in the
+remote engines with the ``sync_import`` context manager.
+
+.. code:: python
+
+    with dv.sync_imports():
+        import time
+        import datetime
+
+Now the ``g1`` function will work.
+
+.. code:: python
+
+    dv.map_sync(g1, range(5))
+
+Finally, there is also a ``require`` decorator that can be used. This
+will force the remote engine to import all packages given.
+
+.. code:: python
+
+    from ipyparallel import require
+
+.. code:: python
+
+    @require('scipy.stats')
+    def g3(x):
+        return scipy.stats.norm(0,1).pdf(x)
+
+.. code:: python
+
+    dv.map(g3, np.arange(-3, 4))
+
+
+
+
+.. parsed-literal::
+
+    [0.0044318484119380075,
+     0.053990966513188063,
+     0.24197072451914337,
+     0.3989422804014327,
+     0.24197072451914337,
+     0.053990966513188063,
+     0.0044318484119380075]
+
+
+
+Moving data around
+~~~~~~~~~~~~~~~~~~
+
+We can send data to remote engines with ``push`` and retrieve them with
+``pull``, or using the dictionary interface. For example, you can use
+this to distribute a large lookup table to all engines once instead of
+repeatedly as a function argument.
+
+.. code:: python
+
+    dv.push(dict(a=3, b=2))
+
+
+
+
+.. parsed-literal::
+
+    [None, None, None, None, None, None, None, None]
+
+
+
+.. code:: python
+
+    def f(x):
+        global a, b
+        return a*x + b
+
+.. code:: python
+
+    dv.map_sync(f, range(5))
+
+
+
+
+.. parsed-literal::
+
+    [2, 5, 8, 11, 14]
+
+
+
+.. code:: python
+
+    dv.pull(('a', 'b'))
+
+
+
+
+.. parsed-literal::
+
+    [[3, 2], [3, 2], [3, 2], [3, 2], [3, 2], [3, 2], [3, 2], [3, 2]]
+
+
+
+You can also use the dictionary interface as an alternative to push and pull
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    dv['c'] = 5
+
+.. code:: python
+
+    dv['a']
+
+
+
+
+.. parsed-literal::
+
+    [3, 3, 3, 3, 3, 3, 3, 3]
+
+
+
+.. code:: python
+
+    dv['c']
+
+
+
+
+.. parsed-literal::
+
+    [5, 5, 5, 5, 5, 5, 5, 5]
+
+
+
+Working with compiled code
+--------------------------
+
+Numba
+~~~~~
+
+Using ``numba.jit`` is straightforward.
+
+.. code:: python
+
+    with dv.sync_imports():
+        import numba
+
+
+.. parsed-literal::
+
+    importing numba on engine(s)
+
+
+.. code:: python
+
+    @numba.jit
+    def f_numba(x):
+        return np.sum(x)
+
+.. code:: python
+
+    dv.map(f_numba, np.random.random((6, 4)))
+
+
+
+
+.. parsed-literal::
+
+    [2.716251188406655,
+     3.3501024198081355,
+     1.2128058239293429,
+     2.470809789295683,
+     1.5966680572355045,
+     1.4741036625128765]
+
+
+
+Cython
+~~~~~~
+
+We need to do some extra work to make sure the shared libary compiled
+with cython is available to the remote engines:
+
+-  Compile a ``named`` shared module with the ``-n`` flag
+-  Use ``np.ndarray[dtype, ndim]`` in place of memroy views
+
+   -  for example, double[:] becomes np.ndarray[np.float64\_t, ndim=1]
+
+-  Move the shared library to the ``site-packages`` directory
+
+   -  Cython magic moules can be found in ``~/.ipython/cython``
+
+-  Import the modules remtoely in the usual ways
+
+.. code:: python
+
+    %load_ext cython
+
+.. code:: python
+
+    %%cython -n cylib
+    
+    import cython
+    import numpy as np
+    cimport numpy as np
+    
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def f(np.ndarray[np.float64_t, ndim=1] x):
+        x.setflags(write=True)
+        cdef int i
+        cdef int n = x.shape[0]
+        cdef double s = 0
+    
+        for i in range(n):
+            s += x[i]
+        return s
+
+Copy the compiled module in ``site-packages`` so that the remote engines can import it
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import os
+    import glob
+    import site
+    import shutil
+    src = glob.glob(os.path.join(os.path.expanduser('~/'), '.ipython', 'cython', 'cylib*so'))[0]
+    dst = site.getsitepackages()[0]
+    shutil.copy(src, dst)
+
+
+
+
+.. parsed-literal::
+
+    '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/cylib.cpython-35m-darwin.so'
+
+
+
+.. code:: python
+
+    with dv.sync_imports():
+        import cylib
+
+
+.. parsed-literal::
+
+    importing cylib on engine(s)
+
+
+Using parallel magic commands
+-----------------------------
+
+In practice, most users will simply use the ``%px`` magic to execute
+code in parallel from within the notebook. This is the simplest way to
+use ``ipyparallel``.
+
+.. code:: python
+
+    dv.map(cylib.f, np.random.random((6, 4)))
+
+
+
+
+.. parsed-literal::
+
+    [2.168044406764153,
+     1.5397865482262518,
+     1.9485467821075622,
+     1.7876752529163262,
+     1.4543499166104137,
+     1.2174838209641248]
+
+
+
+%px
+~~~
+
+This sends the command to all targeted engines.
+
+.. code:: python
+
+    %px import numpy as np
+    %px a = np.random.random(4)
+    %px a.sum()
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[0:3]: [0m1.5615548360839382
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[1:3]: [0m1.0675242165661705
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[2:3]: [0m1.618559279515392
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[3:3]: [0m0.8601123648745338
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[4:3]: [0m0.94585364087709756
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[5:3]: [0m2.1944225493785345
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[6:3]: [0m1.3628167748489548
+
+
+
+.. parsed-literal::
+
+    [0;31mOut[7:3]: [0m1.8217725882889713
+
+
+List comprehensions in parallel
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``scatter`` method partitions and distributes data to all engines.
+The ``gather`` method does the reverse. Together with ``%px``, we can
+simulate parallel list comprehensions.
+
+.. code:: python
+
+    dv.scatter('a', np.random.randint(0, 10, 10))
+    %px print(a)
+
+
+.. parsed-literal::
+
+    [stdout:0] [1 2]
+    [stdout:1] [1 4]
+    [stdout:2] [3]
+    [stdout:3] [8]
+    [stdout:4] [3]
+    [stdout:5] [5]
+    [stdout:6] [1]
+    [stdout:7] [4]
+
+
+.. code:: python
+
+    dv.gather('a')
+
+
+
+
+.. parsed-literal::
+
+    array([1, 2, 1, 4, 3, 8, 3, 5, 1, 4])
+
+
+
+.. code:: python
+
+    dv.scatter('xs', range(24))
+    %px y = [x**2 for x in xs]
+    np.array(dv.gather('y'))
+
+
+
+
+.. parsed-literal::
+
+    array([  0,   1,   4,   9,  16,  25,  36,  49,  64,  81, 100, 121, 144,
+           169, 196, 225, 256, 289, 324, 361, 400, 441, 484, 529])
+
+
+
+Running magic functions in parallel
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %%px --target [1,3]
+    %matplotlib inline
+    import seaborn as sns
+    x = np.random.normal(np.random.randint(-10, 10), 1, 100)
+    sns.kdeplot(x);
+
+
+
+.. parsed-literal::
+
+    [output:1]
+
+
+
+.. image:: 11C_IPyParallel_files/11C_IPyParallel_114_1.png
+
+
+
+.. parsed-literal::
+
+    [output:3]
+
+
+
+.. image:: 11C_IPyParallel_files/11C_IPyParallel_114_3.png
+
+
+Running in non-blocking mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %%px --target [1,3] --noblock
+    %matplotlib inline
+    import seaborn as sns
+    x = np.random.normal(np.random.randint(-10, 10), 1, 100)
+    sns.kdeplot(x);
+
+
+
+
+.. parsed-literal::
+
+    <AsyncResult: execute>
+
+
+
+.. code:: python
+
+    %pxresult
+
+
+
+.. parsed-literal::
+
+    [output:1]
+
+
+
+.. image:: 11C_IPyParallel_files/11C_IPyParallel_117_1.png
+
+
+
+.. parsed-literal::
+
+    [output:3]
+
+
+
+.. image:: 11C_IPyParallel_files/11C_IPyParallel_117_3.png
+

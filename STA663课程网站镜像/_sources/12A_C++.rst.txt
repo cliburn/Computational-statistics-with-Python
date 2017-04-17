@@ -1,0 +1,1358 @@
+
+Using C++
+=========
+
+-  Lecture 11 will cover the baiscs of C++ progamming.
+-  Lecture 12 will cover how to call C++ libraries from Python using
+   ``pybind11``
+
+Since we are mainly learning C++ to wrap for use in Python, we will
+ignore C++ I/O.
+
+The compilation process
+-----------------------
+
+.. figure:: http://www.codingunit.com/images/preprocessor-compiler-linker.jpg
+   :alt: Compilation process
+
+   Compilation process
+
+Hello, world
+~~~~~~~~~~~~
+
+.. code:: python
+
+    %mkdir hello
+    %cd hello
+
+
+.. parsed-literal::
+
+    mkdir: hello: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch/hello
+
+
+.. code:: python
+
+    %%file hello.cpp
+    
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+                    
+    int main() {
+        cout << "Hello, world" << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting hello.cpp
+
+
+.. code:: python
+
+    ! g++ hello.cpp -o hello
+
+.. code:: python
+
+    ! ./hello
+
+
+.. parsed-literal::
+
+    Hello, world
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+A simple function
+~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %mkdir add1
+    %cd add1
+
+
+.. parsed-literal::
+
+    mkdir: add1: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch/add1
+
+
+.. code:: python
+
+    %%file add.cpp
+    
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    double add(double a, double b) {
+        return a + b;
+    }
+    
+    int main() {
+        double a = 1.0, b= 2.0;
+        
+        double c = add(a, b);
+        
+        cout << a << " + " << b << " = " << c << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting add.cpp
+
+
+.. code:: python
+
+    ! g++ add.cpp -o add
+
+.. code:: python
+
+    ! ./add
+
+
+.. parsed-literal::
+
+    1 + 2 = 3
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+Using header files
+~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %mkdir add2
+    %cd add2
+
+
+.. parsed-literal::
+
+    mkdir: add2: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch/add2
+
+
+.. code:: python
+
+    %%file add.hpp
+    
+    #pragma once
+    double add(double a, double b);
+
+
+.. parsed-literal::
+
+    Overwriting add.hpp
+
+
+.. code:: python
+
+    %%file add.cpp
+    
+    double add(double a, double b) {
+        return a + b;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting add.cpp
+
+
+.. code:: python
+
+    %%file add_driver.cpp
+    
+    #include "add.hpp"
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    int main() {
+        double a = 1.0, b = 2.0;
+        
+        double c = add(a, b);
+        
+        cout << a << " + " << b  << " = " << c << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting add_driver.cpp
+
+
+.. code:: python
+
+    %%bash
+    
+    g++ add_driver.cpp add.cpp -o add_driver
+    ./add_driver
+
+
+.. parsed-literal::
+
+    1 + 2 = 3
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+Notes:
+^^^^^^
+
+-  ``#pragma once`` is non-standard but very widely supported
+-  if you want to be pedantic, use traditional guards
+
+.. code:: cpp
+
+    %%file src/add.hpp
+
+    #ifndef ADD_HPP
+    #define ADD_HPP
+    double add(double a, double b);
+    #endif /* ADD_HPP */
+
+Using ``make``
+~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %mkdir add3
+    %cp add2/add.cpp add2/add.hpp add2/add_driver.cpp add3/
+    %cd add3
+
+
+.. parsed-literal::
+
+    mkdir: add3: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch/add3
+
+
+.. code:: python
+
+    %%file Makefile
+    
+    add_driver: add_driver.o add.o
+    	g++ add_driver.o add.o -o add_driver
+        
+    add_driver.o: add_driver.cpp add.hpp
+    	g++ -c add_driver.cpp
+    
+    add.o: add.cpp
+    	g++ -c add.cpp
+        
+    .PHONY: clean
+    clean: 
+    	rm add_driver *.o
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    ! make
+
+
+.. parsed-literal::
+
+    g++ -c add_driver.cpp
+    g++ -c add.cpp
+    g++ add_driver.o add.o -o add_driver
+
+
+.. code:: python
+
+    ! make clean
+
+
+.. parsed-literal::
+
+    rm add_driver *.o
+
+
+.. code:: python
+
+    ! make
+
+
+.. parsed-literal::
+
+    g++ -c add_driver.cpp
+    g++ -c add.cpp
+    g++ add_driver.o add.o -o add_driver
+
+
+A reusable Makefile
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = add_driver
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./add_driver
+
+
+.. parsed-literal::
+
+    rm -f add_driver add.o add_driver.o
+    g++ -c -Wall -std=c++11 add.cpp -o add.o
+    g++ -c -Wall -std=c++11 add_driver.cpp -o add_driver.o
+    g++ add.o add_driver.o -o add_driver
+    1 + 2 = 3
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+Linking to a library
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %mkdir linker
+    %cd linker
+
+
+.. parsed-literal::
+
+    mkdir: linker: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch/linker
+
+
+.. code:: python
+
+    %%file test_linker.cpp
+    
+    #include <cmath>
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    int main() {
+        cout << "2^10 = " << pow(2, 10) << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting test_linker.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = test_linker
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    ! make
+
+
+.. parsed-literal::
+
+    g++ -c -Wall -std=c++11 test_linker.cpp -o test_linker.o
+    g++ test_linker.o -o test_linker
+
+
+.. code:: python
+
+    ! ./test_linker
+
+
+.. parsed-literal::
+
+    2^10 = 1024
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+Arrays, pointers and dereferencing
+----------------------------------
+
+.. code:: python
+
+    %mkdir arrays
+    %cd arrays
+
+
+.. parsed-literal::
+
+    mkdir: arrays: File exists
+    [Errno 20] Not a directory: 'arrays'
+    /Users/cliburn/git-teach/sta-663-2017-public/scratch
+
+
+.. code:: python
+
+    %%file arrays.cpp
+    
+    #include <cmath>
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    int main() {
+        
+        // pointers and address-of opertor
+        int a = 1, b = 2;
+        int *p = &a, *q = &b;
+        
+        cout << a << ", " << b << endl;
+        cout << *p << ", " << *q << endl;
+        cout << p << ", " << q << endl;
+    
+        // An array name is just a pointer
+        int ms[] = {1,2,3,4};
+        
+        // using indexing
+        cout << ms[0] << ", " << ms[1] << endl;
+        // using pointer arithmetic
+        cout << *(ms) << ", " << *(ms + 0) << ", " << *(ms + 2) << endl; 
+        cout << 2[ms] << ", " << 3[ms] << endl; // wait, what??
+        
+        // size of an array
+        cout << sizeof(ms)/sizeof(*ms) << endl;    
+    }
+
+
+.. parsed-literal::
+
+    Overwriting arrays.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = arrays
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make
+    ./arrays
+
+
+.. parsed-literal::
+
+    g++ -c -Wall -std=c++11 arrays.cpp -o arrays.o
+    g++ arrays.o -o arrays
+    1, 2
+    1, 2
+    0x7fff56a6b4fc, 0x7fff56a6b4f8
+    1, 2
+    1, 1, 3
+    3, 4
+    4
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public
+
+
+Loops in C++
+------------
+
+.. code:: python
+
+    %mkdir loops
+    %cd loops
+
+
+.. parsed-literal::
+
+    mkdir: loops: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/loops
+
+
+.. code:: python
+
+    %%file loops.cpp
+    
+    #include <cmath>
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    int main() {
+        double xs[] = {0,1,2,3,4,5,6,7,8,9};    
+       
+        // looping with an index
+        for (int i=0; i<sizeof(xs)/sizeof(*xs); i++) {
+            cout << pow(xs[i], 2) << " ";
+        }
+        cout << endl;
+        
+        // looping with an iterator
+        for (auto it=std::begin(xs); it!=std::end(xs); it++) {
+            cout << pow(*it, 2) << " ";
+        }
+        cout << endl;
+        
+        // ranged for loop
+        for (auto x : xs) {
+            cout << pow(x, 2) << " ";
+        }
+        cout << endl;
+        
+    }
+
+
+.. parsed-literal::
+
+    Overwriting loops.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = loops
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./loops
+
+
+.. parsed-literal::
+
+    rm -f loops loops.o
+    g++ -c -Wall -std=c++11 loops.cpp -o loops.o
+    g++ loops.o -o loops
+    0 1 4 9 16 25 36 49 64 81 
+    0 1 4 9 16 25 36 49 64 81 
+    0 1 4 9 16 25 36 49 64 81 
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public
+
+
+Functions in C++
+----------------
+
+.. code:: python
+
+    %mkdir funcs1
+    %cd funcs1
+
+
+.. parsed-literal::
+
+    mkdir: funcs1: File exists
+    /Users/cliburn/git-teach/sta-663-2017-public/funcs1
+
+
+.. code:: python
+
+    %%file funcs1.cpp
+    
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    double sum(double *xs, int n) {
+        double s = 0.0;
+        
+        for (int i=0; i<n; i++) {
+            s += xs[i];
+        }
+        return s;
+    }    
+    
+    void triple(double *xs, double * ys, int n) {   
+         for (int i=0; i<n; i++) {
+            ys[i] = 3 * xs[i];
+        }
+    }
+        
+    int main() {
+        double xs[] = {1,2,3,4};
+        int n = sizeof(xs)/sizeof(*xs);
+        
+        cout << sum(xs, n) << endl;
+        
+        double ys[n];
+        
+        triple(xs, ys, n);
+            for (auto y : ys) {
+            cout << y << " ";
+        }
+        cout << endl;    
+    }
+
+
+.. parsed-literal::
+
+    Overwriting funcs1.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = funcs1
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make
+    ./funcs1
+
+
+.. parsed-literal::
+
+    g++ -c -Wall -std=c++11 funcs1.cpp -o funcs1.o
+    g++ funcs1.o -o funcs1
+    10
+    3 6 9 12 
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach/sta-663-2017-public
+
+
+Anonymous functions
+-------------------
+
+.. code:: python
+
+    %mkdir funcs2
+    %cd funcs2
+
+
+.. parsed-literal::
+
+    mkdir: funcs2: File exists
+    [Errno 20] Not a directory: 'funcs2'
+    /Users/cliburn/git-teach/sta-663-2017-public
+
+
+.. code:: python
+
+    %%file funcs2.cpp
+    
+    #include <iostream>
+    using std::cout;
+    using std::endl;
+            
+    int main() {
+        double k = 5.0;
+        double a = 1.0, b = 2.0;
+        
+        auto add1 = [](int a, int b) { return a + b; };
+        auto add2 = [k](int a, int b) { return a + b + k; };
+        auto add3 = [&k](int a, int b) { return a + b + k; };
+    
+        k *= 2;
+        
+        cout << "Lambda: " << add1(a, b) << endl;
+        cout << "Lambda with capture by value: " << add2(a, b) << endl;
+        cout << "Lmabda with capture by reference: " << add3(a, b) << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting funcs2.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = funcs2
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./funcs2
+
+
+.. parsed-literal::
+
+    rm -f funcs2 funcs2.o
+    g++ -c -Wall -std=c++11 funcs2.cpp -o funcs2.o
+    g++ funcs2.o -o funcs2
+    Lambda: 3
+    Lambda with capture by value: 8
+    Lmabda with capture by reference: 13
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach
+
+
+Templates
+---------
+
+.. code:: python
+
+    %mkdir templates
+    %cd templates
+
+
+.. parsed-literal::
+
+    mkdir: templates: File exists
+    /Users/cliburn/git-teach/templates
+
+
+.. code:: python
+
+    %%file templates.cpp
+    
+    #include <iostream>
+    #include <vector>
+    #include <list>
+    #include <numeric>
+    using std::cout;
+    using std::endl;
+    using std::list;
+    using std::vector;
+    
+    template<typename T>
+    T sum(vector<T> xs) {
+        T s = 0.0;
+        for (auto x : xs) {
+            s += x;
+        }
+        return s;
+    }
+    
+    int main(){
+        vector<int> ns = {1,2,3};
+        vector<double> xs = {4.5, 6.4, 7.8};
+        
+        // sum works with integers
+        cout << "Sum of ints: " << sum(ns) << endl;
+        
+        // sum works with doubles
+        cout << "Sum of doubles: " << sum(xs) << endl;
+        
+        // iota from the numeric library behaves like range
+        list<int> ys(10);
+        std::iota(ys.begin(), ys.end(), -3);
+        
+        // accumulate from the numeric library behavses like reduce with default operation of addition   
+        cout << "Sum from iota: " << std::accumulate(ys.begin(), ys.end(), 6.0) << endl;
+    
+        // Note that the initial value determines the template type
+        cout << "Sum of doubles using accumulate: " << std::accumulate(xs.begin(), xs.end(), 0.0) << endl;
+        cout << "Surpise: " << std::accumulate(xs.begin(), xs.end(), 0) << endl;
+    
+    
+        // The binary operation can be user-defined
+        auto op = std::multiplies<int>();
+        cout << "Product of ints: " << std::accumulate(ns.begin(), ns.end(), 1, op) << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting templates.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = templates
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./templates
+
+
+.. parsed-literal::
+
+    rm -f templates templates.o
+    g++ -c -Wall -std=c++11 templates.cpp -o templates.o
+    g++ templates.o -o templates
+    Sum of ints: 6
+    Sum of doubles: 18.7
+    Sum from iota: 21
+    Sum of doubles using accumulate: 18.7
+    Surpise: 17
+    Product of ints: 6
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach
+
+
+Function pointers
+-----------------
+
+.. code:: python
+
+    %mkdir func_ptrs
+    %cd func_ptrs
+
+
+.. parsed-literal::
+
+    mkdir: func_ptrs: File exists
+    /Users/cliburn/git-teach/func_ptrs
+
+
+.. code:: python
+
+    %%file func_ptrs.cpp
+    
+    #include <numeric>
+    #include <functional>
+    #include <iostream>
+    #include <vector>
+    using std::cout;
+    using std::endl;
+    using std::vector;
+        
+    double sum(vector<double> xs) {
+        return std::accumulate(xs.begin(), xs.end(), 0.0);
+    }
+    
+    double prod(vector<double> xs) {
+        return std::accumulate(xs.begin(), xs.end(), 1.0, std::multiplies<double>());
+    }
+     
+    // funciton pointers in C++ are easy    
+    using func = std::function<double(double)>;
+          
+    // now you can pass in a funciton as an argument
+    double mystery(double x, func f) {
+        return f(x);
+    }
+    
+    double foo(double x) {
+        return 2*x + 1;
+    }
+    
+    double bar(double x) {
+        return 42*x;
+    }
+    
+    int main() {
+        vector<double> xs = {1.2, 2.3};
+        cout << sum(xs) << endl;
+        cout << prod(xs) << endl;  
+        
+        // auto can crate iterables of functions!
+        auto funcs = {sum, prod};    
+        for (auto f: funcs) {
+            cout << f(xs) << endl;   
+        }
+        
+        int x = 2;    
+        cout << mystery(x, foo) << endl;
+        cout << mystery(x, bar) << endl;
+        cout << mystery(x, [](double x) {return x*x;}) << endl;
+        
+    }
+
+
+.. parsed-literal::
+
+    Overwriting func_ptrs.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+     
+    # File names
+    EXEC = func_ptrs
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./func_ptrs
+
+
+.. parsed-literal::
+
+    rm -f func_ptrs func_ptrs.o
+    g++ -c -Wall -std=c++11 func_ptrs.cpp -o func_ptrs.o
+    g++ func_ptrs.o -o func_ptrs
+    3.5
+    2.76
+    3.5
+    2.76
+    5
+    84
+    4
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach
+
+
+Using a numeric library
+-----------------------
+
+We show the Armadillo numeric library here; in the next lecture, we will
+show the competing Eigen libary.
+
+.. code:: python
+
+    %mkdir numeric
+    %cd numeric
+
+
+.. parsed-literal::
+
+    mkdir: numeric: File exists
+    /Users/cliburn/git-teach/numeric
+
+
+.. code:: python
+
+    %%file numeric.cpp
+    
+    #include <iostream>
+    #include <fstream>
+    #include <armadillo>
+    using std::cout;
+    using std::ofstream;
+            
+    int main() 
+    {
+        using namespace arma;
+    
+        vec u = linspace<vec>(0,1,5);
+        vec v = ones<vec>(5);
+        mat A = randu<mat>(4,5); // uniform random deviates
+        mat B = randn<mat>(4,5); // normal random deviates
+    
+        cout << "\nVecotrs in Armadillo\n";
+        cout << u << endl;
+        cout << v << endl;
+        cout << u.t() * v << endl;
+    
+        cout << "\nRandom matrices in Armadillo\n";
+        cout << A << endl;
+        cout << B << endl;
+        cout << A * B.t() << endl;
+        cout << A * v << endl;
+    
+        cout << "\nQR in Armadillo\n";
+        mat Q, R;
+        qr(Q, R, A.t() * A);
+        cout << Q << endl;
+        cout << R << endl;
+    }
+
+
+.. parsed-literal::
+
+    Overwriting numeric.cpp
+
+
+.. code:: python
+
+    %%file Makefile
+    # Declaration of variables
+    CC = g++
+    CC_FLAGS = -Wall -std=c++11
+    LD_FLAGS = -larmadillo # Add library for linking
+    
+    # File names
+    EXEC = numeric
+    SOURCES = $(wildcard *.cpp)
+    OBJECTS = $(SOURCES:.cpp=.o)
+     
+    # Main target
+    $(EXEC): $(OBJECTS)
+    	$(CC) $(LD_FLAGS) $(OBJECTS) -o $(EXEC)
+     
+    # To obtain object files
+    %.o: %.cpp
+    	$(CC) -c $(CC_FLAGS) $< -o $@
+     
+    # To remove generated files
+    clean:
+    	rm -f $(EXEC) $(OBJECTS)
+
+
+.. parsed-literal::
+
+    Overwriting Makefile
+
+
+.. code:: python
+
+    %%bash
+    
+    make clean
+    make
+    ./numeric
+
+
+.. parsed-literal::
+
+    rm -f numeric numeric.o
+    g++ -c -Wall -std=c++11 numeric.cpp -o numeric.o
+    g++ -larmadillo  numeric.o -o numeric
+    
+    Vecotrs in Armadillo
+            0
+       0.2500
+       0.5000
+       0.7500
+       1.0000
+    
+       1.0000
+       1.0000
+       1.0000
+       1.0000
+       1.0000
+    
+       2.5000
+    
+    
+    Random matrices in Armadillo
+       7.8264e-06   5.3277e-01   6.7930e-01   8.3097e-01   6.7115e-01
+       1.3154e-01   2.1896e-01   9.3469e-01   3.4572e-02   7.6982e-03
+       7.5561e-01   4.7045e-02   3.8350e-01   5.3462e-02   3.8342e-01
+       4.5865e-01   6.7886e-01   5.1942e-01   5.2970e-01   6.6842e-02
+    
+      -0.7649   1.2041  -0.7020   1.1862   0.8284
+       1.7313   0.0937   1.6814  -0.8631   0.9426
+       0.1454  -0.6920   0.2742   0.6810   0.2091
+       0.7032   0.2610   0.1752   1.3165  -0.5897
+    
+       1.7063   1.1075   0.5238   0.9563
+      -0.4457   1.7973   0.1490   0.3544
+      -0.4095   2.2726   0.2990   0.4551
+       0.7857   1.3368   0.1140   1.2487
+    
+       2.7142
+       1.3275
+       1.6230
+       2.2535
+    
+    
+    QR in Armadillo
+      -0.6776   0.6377   0.3253   0.0944  -0.1395
+      -0.3188  -0.4409   0.3521   0.4177   0.6368
+      -0.5524  -0.2366  -0.7774   0.1504  -0.1092
+      -0.2443  -0.5816   0.4071  -0.1709  -0.6380
+      -0.2727  -0.0688  -0.0099  -0.8745   0.3950
+    
+      -1.1785e+00  -1.3394e+00  -2.1015e+00  -1.3527e+00  -1.0229e+00
+            0e+00  -8.3421e-01  -9.7607e-01  -9.9515e-01  -5.3245e-01
+            0e+00        0e+00  -4.6336e-01   7.6793e-02  -4.0376e-03
+            0e+00        0e+00        0e+00  -2.0273e-01  -3.2745e-01
+            0e+00        0e+00        0e+00        0e+00   1.1102e-16
+    
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /Users/cliburn/git-teach
+

@@ -1,0 +1,858 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/15C_MonteCarloIntegration.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:12:54 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Numerical Evaluation of Integrals &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Probabilistic Graphical Models with pgmpy" href="16_PGM.html" />
+    <link rel="prev" title="Resampling and Monte Carlo Simulations" href="15B_ResamplingAndSimulation.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="16_PGM.html" title="Probabilistic Graphical Models with pgmpy"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="15B_ResamplingAndSimulation.html" title="Resampling and Monte Carlo Simulations"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+</div>
+<div class="section" id="numerical-evaluation-of-integrals">
+<h1>Numerical Evaluation of Integrals<a class="headerlink" href="#numerical-evaluation-of-integrals" title="Permalink to this headline">¶</a></h1>
+<p>Integration problems are common in statistics whenever we are dealing
+with continuous distributions. For example the expectation of a function
+is an integration problem</p>
+<div class="math">
+\[E[f(x)] = \int{f(x) \, p(x) \, dx}\]</div>
+<p>In Bayesian statistics, we need to solve the integration problem for the
+marginal likelihood or evidence</p>
+<div class="math">
+\[p(X \mid \alpha) = \int{p(X \mid \theta) \, p(\theta \mid \alpha) d\theta}\]</div>
+<p>where <span class="math">\(\alpha\)</span> is a hyperparameter and <span class="math">\(p(X \mid \alpha)\)</span>
+appears in the denominator of Bayes theorem</p>
+<div class="math">
+\[p(\theta | X) = \frac{p(X \mid \theta) \, p(\theta \mid \alpha)}{p(X \mid \alpha)}\]</div>
+<p>In general, there is no closed form solution to these integrals, and we
+have to approximate them numerically. The first step is to check if
+there is some <strong>reparameterization</strong> that will simplify the problem.
+Then, the general approaches to solving integration problems are</p>
+<ol class="arabic simple">
+<li>Numerical quadrature</li>
+<li>Importance sampling, adaptive importance sampling and variance
+reduction techniques (Monte Carlo swindles)</li>
+<li>Markov Chain Monte Carlo</li>
+<li>Asymptotic approximations (Laplace method and its modern version in
+variational inference)</li>
+</ol>
+<p>This lecture will review the concepts for quadrature and Monte Carlo
+integration.</p>
+<div class="section" id="quadrature">
+<h2>Quadrature<a class="headerlink" href="#quadrature" title="Permalink to this headline">¶</a></h2>
+<p>You may recall from Calculus that integrals can be numerically evaluated
+using quadrature methods such as Trapezoid and Simpson&#8217;s&#8216;s rules. This
+is easy to do in Python, but has the drawback of the complexity growing
+as <span class="math">\(O(n^d)\)</span> where <span class="math">\(d\)</span> is the dimensionality of the data, and
+hence infeasible once <span class="math">\(d\)</span> grows beyond a modest number.</p>
+<div class="section" id="integrating-functions">
+<h3>Integrating functions<a class="headerlink" href="#integrating-functions" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">quad</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">71</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">13</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_6_0.png" src="_images/15C_MonteCarloIntegration_6_0.png" />
+<div class="section" id="exact-solution">
+<h4>Exact solution<a class="headerlink" href="#exact-solution" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">integrate</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">integrate</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="mi">71</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="mi">13</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.0202549</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-quadrature">
+<h4>Using quadrature<a class="headerlink" href="#using-quadrature" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">quad</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.02025493910239419</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multiple-integration">
+<h4>Multiple integration<a class="headerlink" href="#multiple-integration" title="Permalink to this headline">¶</a></h4>
+<p>Following the <code class="docutils literal"><span class="pre">scipy.integrate</span></code>
+<a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/tutorial/integrate.html">documentation</a>,
+we integrate</p>
+<div class="math">
+\[I=\int_{y=0}^{1/2}\int_{x=0}^{1-2y} x y \, dx\, dy\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x y&#39;</span><span class="p">)</span>
+<span class="n">integrate</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.0104166666666667</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">nquad</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">bounds_y</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">bounds_x</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="p">]</span>
+
+<span class="n">y</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">nquad</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="p">[</span><span class="n">bounds_x</span><span class="p">,</span> <span class="n">bounds_y</span><span class="p">])</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.010416666666666668</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="monte-carlo-integration">
+<h2>Monte Carlo integration<a class="headerlink" href="#monte-carlo-integration" title="Permalink to this headline">¶</a></h2>
+<p>The basic idea of Monte Carlo integration is very simple and only
+requires elementary statistics. Suppose we want to find the value of</p>
+<div class="math">
+\[I = \int_a^b f(x) dx\]</div>
+<p>in some region with volume <span class="math">\(V\)</span>. Monte Carlo integration estimates
+this integral by estimating the fraction of random points that fall
+below <span class="math">\(f(x)\)</span> multiplied by <span class="math">\(V\)</span>.</p>
+<p>In a statistical context, we use Monte Carlo integration to estimate the
+expectation</p>
+<div class="math">
+\[E[g(X)] = \int_X g(x) p(x) dx\]</div>
+<p>with</p>
+<div class="math">
+\[\bar{g_n} = \frac{1}{n} \sum_{i=1}^n g(x_i)\]</div>
+<p>where <span class="math">\(x_i \sim p\)</span> is a draw from the density <span class="math">\(p\)</span>.</p>
+<p>We can estimate the Monte Carlo variance of the approximation as</p>
+<div class="math">
+\[v_n = \frac{1}{n^2} \sum_{o=1}^n (g(x_i) - \bar{g_n})^2)\]</div>
+<p>Also, from the Central Limit Theorem,</p>
+<div class="math">
+\[\frac{\bar{g_n} - E[g(X)]}{\sqrt{v_n}} \sim \mathcal{N}(0, 1)\]</div>
+<p>The convergence of Monte Carlo integration is
+<span class="math">\(\mathcal{0}(n^{1/2})\)</span> and independent of the dimensionality.
+Hence Monte Carlo integration generally beats numerical integration for
+moderate- and high-dimensional integration since numerical integration
+(quadrature) converges as <span class="math">\(\mathcal{0}(n^{d})\)</span>. Even for low
+dimensional problems, Monte Carlo integration may have an advantage when
+the volume to be integrated is concentrated in a very small region and
+we can use information from the distribution to draw samples more often
+in the region of importance.</p>
+<p>An elementary, readable description of Monte Carlo integration and
+variance reduction techniques can be found
+<a class="reference external" href="https://www.cs.dartmouth.edu/~wjarosz/publications/dissertation/appendixA.pdf">here</a>.</p>
+<div class="section" id="intuition-behind-monte-carlo-integration">
+<h3>Intuition behind Monte Carlo integration<a class="headerlink" href="#intuition-behind-monte-carlo-integration" title="Permalink to this headline">¶</a></h3>
+<p>We want to find some integral</p>
+<div class="math">
+\[I = \int{f(x)} \, dx\]</div>
+<p>Consider the expectation of a function <span class="math">\(g(x)\)</span> with respect to some
+distribution <span class="math">\(p(x)\)</span>. By definition, we have</p>
+<div class="math">
+\[E[g(x)] = \int{g(x) \, p(x) \, dx}\]</div>
+<p>If we choose <span class="math">\(g(x) = f(x)/p(x)\)</span>, then we have</p>
+<div class="math">
+\[\begin{split}\begin{align}
+E[g(x)] &amp;= \int{\frac{f(x}{p(x)} \, p(x) \, dx} \\
+&amp;= \int{f(x) dx} \\
+&amp;= I
+\end{align}\end{split}\]</div>
+<p>By the law of large numbers, the average converges on the expectation,
+so we have</p>
+<div class="math">
+\[I \approx \bar{g_n} = \frac{1}{n} \sum_{i=1}^n g(x_i)\]</div>
+<p>If <span class="math">\(f(x)\)</span> is a proper integral (i.e. bounded), and <span class="math">\(p(x)\)</span> is
+the uniform distribution, then <span class="math">\(g(x) = f(x)\)</span> and this is known as
+ordinary Monte Carlo. If the integral of <span class="math">\(f(x)\)</span> is improper, then
+we need to use another distribution with the same support as
+<span class="math">\(f(x)\)</span>.</p>
+</div>
+<div class="section" id="intuition-for-error-rate">
+<h3>Intuition for error rate<a class="headerlink" href="#intuition-for-error-rate" title="Permalink to this headline">¶</a></h3>
+<p>We will just work this out for a proper integral <span class="math">\(f(x)\)</span> defined in
+the unit cube and bounded by <span class="math">\(|f(x)| \le 1\)</span>. Draw a random uniform
+vector <span class="math">\(x\)</span> in the unit cube. Then</p>
+<div class="math">
+\[\begin{split}\begin{align}
+E[f(x_i)] &amp;= \int{f(x) p(x) dx} = I \\
+\text{Var}[f(x_i)] &amp;= \int{(f(x_i) - I )^2 p(x) \, dx} \\
+&amp;= \int{f(x)^2 \, p(x) \, dx} - 2I \int(f(x) \, p(x) \, dx + I^2 \int{p(x) \, dx} \\
+&amp; \le \int{f(x)^2 \, p(x) \, dx}  + I^2 \\
+&amp; \le \int{f(x)^2 \, p(x) \, dx} \\
+&amp; \le \int{p(x) \, dx} = 1
+\end{align}\end{split}\]</div>
+<p>Now consider summing over many such IID draws
+<span class="math">\(S_n = f(x_1) + f(x_2) + \cdots + f(x_n)\)</span>. We have</p>
+<div class="math">
+\[\begin{split}\begin{align}
+E[S_n] &amp;= nI \\
+\text{Var}[S_n] &amp; \le n
+\end{align}\end{split}\]</div>
+<p>and as expected, we see that <span class="math">\(I \approx S_n/n\)</span>. From Chebyshev&#8217;s
+inequality,</p>
+<div class="math">
+\[\begin{align}
+P \left( \left| \frac{s_n}{n} - I \right| \ge \epsilon \right)  &amp;=
+P \left( \left| s_n - nI \right| \ge n \epsilon \right) &amp; \le \frac{\text{Var}[s_n]}{n^2 \epsilon^2} &amp; \le
+\frac{1}{n \epsilon^2} = \delta
+\end{align}\]</div>
+<p>Suppose we want 1% accuracy and 99% confidence - i.e. set
+<span class="math">\(\epsilon = \delta = 0.01\)</span>. The above inequality tells us that we
+can achieve this with just <span class="math">\(n = 1/(\delta \epsilon^2) = 1,000,000\)</span>
+samples, regardless of the data dimensionality.</p>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>We want to estimate the following integral <span class="math">\(\int_0^1 e^x dx\)</span>. The
+minimum value of the function is 1 at <span class="math">\(x=0\)</span> and <span class="math">\(e\)</span> at
+<span class="math">\(x=1\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">e</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_19_0.png" src="_images/15C_MonteCarloIntegration_19_0.png" />
+<div class="section" id="analytic-solution">
+<h4>Analytic solution<a class="headerlink" href="#analytic-solution" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">integrate</span><span class="p">,</span> <span class="n">exp</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">expr</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.71828182845905</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h4>Using quadrature<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">integrate</span>
+
+<span class="n">y</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.7182818284590453</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h4>Monte Carlo integration<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="mi">10</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">sol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%10d</span><span class="s1"> </span><span class="si">%.6f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">sol</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>       <span class="mi">10</span> <span class="mf">1.657995</span>
+      <span class="mi">100</span> <span class="mf">1.736252</span>
+     <span class="mi">1000</span> <span class="mf">1.712426</span>
+    <span class="mi">10000</span> <span class="mf">1.718823</span>
+   <span class="mi">100000</span> <span class="mf">1.718524</span>
+  <span class="mi">1000000</span> <span class="mf">1.718875</span>
+ <span class="mi">10000000</span> <span class="mf">1.718498</span>
+<span class="mi">100000000</span> <span class="mf">1.718227</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="monitoring-variance-in-monte-carlo-integration">
+<h3>Monitoring variance in Monte Carlo integration<a class="headerlink" href="#monitoring-variance-in-monte-carlo-integration" title="Permalink to this headline">¶</a></h3>
+<p>We are often interested in knowing how many iterations it takes for
+Monte Carlo integration to &#8220;converge&#8221;. To do this, we would like some
+estimate of the variance, and it is useful to inspect such plots. One
+simple way to get confidence intervals for the plot of Monte Carlo
+estimate against number of iterations is simply to do many such
+simulations.</p>
+<p>For the example, we will try to estimate the function (again)</p>
+<div class="math">
+\[f(x) = x \cos 71 x + \sin 13x, \ \  0 \le x \le 1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">71</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">13</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_28_0.png" src="_images/15C_MonteCarloIntegration_28_0.png" />
+<div class="section" id="single-mc-integration-estimate">
+<h4>Single MC integration estimate<a class="headerlink" href="#single-mc-integration-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">0.13559989390095498</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-multiple-independent-sequences-to-monitor-convergence">
+<h4>Using multiple independent sequences to monitor convergence<a class="headerlink" href="#using-multiple-independent-sequences-to-monitor-convergence" title="Permalink to this headline">¶</a></h4>
+<p>We vary the sample size from 1 to 100 and calculate the value of
+<span class="math">\(y = \sum{x}/n\)</span> for 1000 replicates. We then plot the 2.5th and
+97.5th percentile of the 1000 values of <span class="math">\(y\)</span> to see how the
+variation in <span class="math">\(y\)</span> changes with sample size. The blue lines indicate
+the 2.5th and 97.5th percentiles, and the red line a sample path.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">reps</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">reps</span><span class="p">)))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">upper</span><span class="p">,</span> <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">y</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">upper</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lower</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_33_0.png" src="_images/15C_MonteCarloIntegration_33_0.png" />
+</div>
+<div class="section" id="using-bootstrap-to-monitor-convergence">
+<h4>Using bootstrap to monitor convergence<a class="headerlink" href="#using-bootstrap-to-monitor-convergence" title="Permalink to this headline">¶</a></h4>
+<p>If it is too expensive to do 1000 replicates, we can use a bootstrap
+instead.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">x</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">reps</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">yb</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">upper</span><span class="p">,</span> <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">yb</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">yb</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">yb</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">upper</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">lower</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_36_0.png" src="_images/15C_MonteCarloIntegration_36_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="variance-reduction">
+<h2>Variance Reduction<a class="headerlink" href="#variance-reduction" title="Permalink to this headline">¶</a></h2>
+<p>With independent samples, the variance of the Monte Carlo estimate is</p>
+<div class="math">
+\[\begin{split}\begin{align}
+\text{Var}[\bar{g_n}] &amp;= \text{Var} \left[ \frac{1}{N}\sum_{i=1}^{N} \frac{f(x_i)}{p(x_i)} \right] \\
+&amp;= \frac{1}{N^2} \sum_{i=1}^{N}  \text{Var} \left[ \frac{f(x_i)}{p(x_i)} \right] \\
+&amp;= \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}[Y_i] \\
+&amp;= \frac{1}{N} \text{Var}[Y_i]
+\end{align}\end{split}\]</div>
+<p>where <span class="math">\(Y_i = f(x_i)/p(x_i)\)</span>. The objective of Monte Carlo swindles
+is to make <span class="math">\(\text{Var}[\bar{g_n}]\)</span> as small as possible for the
+same number of samples.</p>
+<div class="section" id="change-of-variables">
+<h3>Change of variables<a class="headerlink" href="#change-of-variables" title="Permalink to this headline">¶</a></h3>
+<p>The Cauchy distribution is given by</p>
+<div class="math">
+\[f(x) = \frac{1}{\pi (1 + x^2)}, \ \ -\infty \lt x \lt \infty\]</div>
+<p>Suppose we want to integrate the tail probability <span class="math">\(P(X &gt; 3)\)</span> using
+Monte Carlo. One way to do this is to draw many samples form a Cauchy
+distribution, and count how many of them are greater than 3, but this is
+extremely inefficient.</p>
+<div class="section" id="only-10-of-samples-will-be-used">
+<h4>Only 10% of samples will be used<a class="headerlink" href="#only-10-of-samples-will-be-used" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+
+<span class="n">h_true</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cauchy</span><span class="p">()</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.10241638234956674</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">cauchy</span><span class="p">()</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">h_mc</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">h_mc</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_mc</span> <span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.14000000000000001</span><span class="p">,</span> <span class="mf">0.36696880702301304</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-change-of-variables-lets-us-use-100-of-draws">
+<h4>A change of variables lets us use 100% of draws<a class="headerlink" href="#a-change-of-variables-lets-us-use-100-of-draws" title="Permalink to this headline">¶</a></h4>
+<p>We are trying to estimate the quantity</p>
+<div class="math">
+\[\int_3^\infty \frac{1}{\pi (1 + x^2)} dx\]</div>
+<p>Using the substitution <span class="math">\(y = 3/x\)</span> (and a little algebra), we get</p>
+<div class="math">
+\[\int_0^1 \frac{3}{\pi(9 + y^2)} dy\]</div>
+<p>Hence, a much more efficient MC estimator is</p>
+<div class="math">
+\[\frac{1}{n} \sum_{i=1}^n \frac{3}{\pi(9 + y_i^2)}\]</div>
+<p>where <span class="math">\(y_i \sim \mathcal{U}(0, 1)\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">h_cv</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mf">3.0</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+<span class="n">h_cv</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_cv</span> <span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.10213456867129996</span><span class="p">,</span> <span class="mf">0.0027516464827364996</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="monte-carlo-swindles">
+<h3>Monte Carlo swindles<a class="headerlink" href="#monte-carlo-swindles" title="Permalink to this headline">¶</a></h3>
+<p>Apart from change of variables, there are several general techniques for
+variance reduction, sometimes known as Monte Carlo swindles since these
+methods improve the accuracy and convergence rate of Monte Carlo
+integration without increasing the number of Monte Carlo samples. Some
+Monte Carlo swindles are:</p>
+<ul class="simple">
+<li>importance sampling</li>
+<li>stratified sampling</li>
+<li>control variates</li>
+<li>antithetic variates</li>
+<li>conditioning swindles including Rao-Blackwellization and independent
+variance decomposition</li>
+</ul>
+<p>Most of these techniques are not particularly computational in nature,
+so we will not cover them in the course. I expect you will learn them
+elsewhere. We will illustrate importance sampling and antithetic
+variables here as examples.</p>
+</div>
+<div class="section" id="antithetic-variables">
+<h3>Antithetic variables<a class="headerlink" href="#antithetic-variables" title="Permalink to this headline">¶</a></h3>
+<p>The idea behind antithetic variables is to choose two sets of random
+numbers that are negatively correlated, then take their average, so that
+the total variance of the estimator is smaller than it would be with two
+sets of IID random variables.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">71</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">13</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">integrate</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">integrate</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="mi">71</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="mi">13</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">sol</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.02025493910239406</span>
+</pre></div>
+</div>
+<div class="section" id="vanilla-monte-carlo">
+<h4>Vanilla Monte Carlo<a class="headerlink" href="#vanilla-monte-carlo" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">sol</span><span class="p">)</span><span class="o">/</span><span class="n">sol</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.019429826681871879</span><span class="p">,</span> <span class="mf">0.04073635651783584</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="antithetic-variables-use-first-half-of-u-supplemented-with-1-u">
+<h4>Antithetic variables use first half of <code class="docutils literal"><span class="pre">u</span></code> supplemented with <code class="docutils literal"><span class="pre">1-u</span></code><a class="headerlink" href="#antithetic-variables-use-first-half-of-u-supplemented-with-1-u" title="Permalink to this headline">¶</a></h4>
+<p>This works because the random draws are now negatively correlated, and
+hence the sum of the variances will be less than in the IID case, while
+the expectation is unchanged.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">u</span><span class="p">[:</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="o">-</span><span class="n">u</span><span class="p">[:</span><span class="n">n</span><span class="o">//</span><span class="mi">2</span><span class="p">]]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">sol</span><span class="p">)</span><span class="o">/</span><span class="n">sol</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.021069877090343692</span><span class="p">,</span> <span class="mf">0.04023403792180801</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="importance-sampling">
+<h3>Importance sampling<a class="headerlink" href="#importance-sampling" title="Permalink to this headline">¶</a></h3>
+<p>Ordinary Monte Carlo sampling evaluates</p>
+<div class="math">
+\[E[g(X)] = \int_X g(x)\, p(x) \, dx\]</div>
+<p>Using another distribution <span class="math">\(h(x)\)</span> - the so-called &#8220;importance
+function&#8221;, we can rewrite the above expression as an expectation with
+respect to <span class="math">\(h\)</span></p>
+<div class="math">
+\[E_p[g(x)] \ = \  \int_X g(x) \frac{p(x)}{h(x)} h(x) dx \ = \ E_h\left[ \frac{g(X) p(X)}{h(X)} \right]\]</div>
+<p>giving us the new estimator</p>
+<div class="math">
+\[\bar{g_n} = \frac{1}{n} \sum_{i=1}^n \frac{p(x_i)}{h(x_i)} g(x_i)\]</div>
+<p>where <span class="math">\(x_i \sim g\)</span> is a draw from the density <span class="math">\(h\)</span>. This is
+helpful if the distribution <span class="math">\(h\)</span> has a similar shape as the
+function <span class="math">\(f(x)\)</span> that we are integrating over, since we will draw
+more samples from places where the integrand makes a larger or more
+&#8220;important&#8221; contribution. This is very dependent on a good choice for
+the importance function <span class="math">\(h\)</span>. Two simple choices for <span class="math">\(h\)</span> are
+scaling</p>
+<div class="math">
+\[h(x) = \frac{1}{a} p(x/a)\]</div>
+<p>and translation</p>
+<div class="math">
+\[h(x) = p*(x - a)\]</div>
+<p>In these cases, the parameter <span class="math">\(a\)</span> is typically chosen using some
+adaptive algorithm, giving rise to adaptive importance sampling.
+Alternatively, a different distribution can be chosen as shown in the
+example below.</p>
+<div class="section" id="id3">
+<h4>Example<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p>Suppose we want to estimate the tail probability of
+<span class="math">\(\mathcal{N}(0, 1)\)</span> for <span class="math">\(P(X &gt; 5)\)</span>. Regular MC integration
+using samples from <span class="math">\(\mathcal{N}(0, 1)\)</span> is hopeless since nearly
+all samples will be rejected. However, we can use the exponential
+density truncated at 5 as the importance function and use importance
+sampling.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">expon</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_54_0.png" src="_images/15C_MonteCarloIntegration_54_0.png" />
+</div>
+<div class="section" id="expected-answer">
+<h4>Expected answer<a class="headerlink" href="#expected-answer" title="Permalink to this headline">¶</a></h4>
+<p>We expect about 3 draws out of 10,000,000 from <span class="math">\(\mathcal{N}(0, 1)\)</span>
+to have a value greater than 5. Hence simply sampling from
+<span class="math">\(\mathcal{N}(0, 1)\)</span> is hopelessly inefficient for Monte Carlo
+integration.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">precision</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;</span><span class="si">%.10f</span><span class="s1">&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">h_true</span> <span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.0000002867</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-direct-monte-carlo-integration">
+<h4>Using direct Monte Carlo integration<a class="headerlink" href="#using-direct-monte-carlo-integration" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">h_mc</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">)</span>
+<span class="c1"># estimate and relative error</span>
+<span class="n">h_mc</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_mc</span> <span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.0000000000</span><span class="p">,</span> <span class="mf">1.0000000000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-importance-sampling">
+<h4>Using importance sampling<a class="headerlink" href="#using-importance-sampling" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">expon</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">h_is</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="n">stats</span><span class="o">.</span><span class="n">expon</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+<span class="c1"># estimate and relative error</span>
+<span class="n">h_is</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_is</span><span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.0000002944</span><span class="p">,</span> <span class="mf">0.0270524683</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="quasi-random-numbers">
+<h2>Quasi-random numbers<a class="headerlink" href="#quasi-random-numbers" title="Permalink to this headline">¶</a></h2>
+<p>Recall that the convergence of Monte Carlo integration is
+<span class="math">\(\mathcal{0}(n^{1/2})\)</span>. One issue with simple Monte Carlo is that
+randomly chosen points tend to be clumped. Clumping reduces accuracy
+since nearby points provide little additional information about the
+function begin estimated. One way to address this is to split the space
+into multiple integration regions, then sum them up. This is known as
+<strong>stratified sampling</strong>. Another alternative is to use quasi-random
+numbers which fill space more efficiently than random sequences</p>
+<p>It turns out that if we use quasi-random or low discrepancy sequences,
+we can get convergence approaching <span class="math">\(\mathcal{0}(1/n)\)</span>. There are
+several such generators, but their use in statistical settings is
+limited to cases where we are integrating with respect to uniform
+distributions. The regularity can also give rise to errors when
+estimating integrals of periodic functions. However, these quasi-Monte
+Carlo methods are used in computational finance models.</p>
+<p>Run</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>! pip install ghalton
+</pre></div>
+</div>
+<p>if <code class="docutils literal"><span class="pre">ghalton</span></code> is not installed.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ghalton</span>
+
+<span class="n">gen</span> <span class="o">=</span> <span class="n">ghalton</span><span class="o">.</span><span class="n">Halton</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xs</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Pseudo-random&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gen</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ys</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">ys</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Quasi-random&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/15C_MonteCarloIntegration_65_0.png" src="_images/15C_MonteCarloIntegration_65_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">h_true</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cauchy</span><span class="p">()</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span><span class="o">.</span><span class="n">rvs</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">3.0</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">h_mc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
+<span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">h_mc</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_mc</span> <span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mf">0.0995639331</span><span class="p">,</span> <span class="mf">2.7851493922</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1013519751</span><span class="p">,</span> <span class="mf">1.0392939477</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1018614640</span><span class="p">,</span> <span class="mf">0.5418257479</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1006039674</span><span class="p">,</span> <span class="mf">1.7696533966</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1030816150</span><span class="p">,</span> <span class="mf">0.6495373689</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">gen1</span> <span class="o">=</span> <span class="n">ghalton</span><span class="o">.</span><span class="n">Halton</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">gen1</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">3.0</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="mi">9</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">h_qmc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">n</span>
+<span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">h_qmc</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_qmc</span> <span class="o">-</span> <span class="n">h_true</span><span class="p">)</span><span class="o">/</span><span class="n">h_true</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mf">0.1026632536</span><span class="p">,</span> <span class="mf">0.2410466633</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1023042949</span><span class="p">,</span> <span class="mf">0.1094428682</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1026741252</span><span class="p">,</span> <span class="mf">0.2516617574</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1029118212</span><span class="p">,</span> <span class="mf">0.4837496311</span><span class="p">),</span>
+ <span class="p">(</span><span class="mf">0.1026111501</span><span class="p">,</span> <span class="mf">0.1901724534</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Numerical Evaluation of Integrals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quadrature">Quadrature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#monte-carlo-integration">Monte Carlo integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variance-reduction">Variance Reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quasi-random-numbers">Quasi-random numbers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="15B_ResamplingAndSimulation.html"
+                          title="Previous page">&larr; Resampling and Monte Carlo Simulations</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="16_PGM.html"
+                          title="Next page">&rarr; Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/15C_MonteCarloIntegration.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="16_PGM.html" title="Probabilistic Graphical Models with pgmpy"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="15B_ResamplingAndSimulation.html" title="Resampling and Monte Carlo Simulations"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/15C_MonteCarloIntegration.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:12 GMT -->
+</html>

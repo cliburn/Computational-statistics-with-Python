@@ -1,0 +1,1173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/20A_MCMC.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:15:37 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Metropolis and Gibbs Sampling &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using Auxiliary Variables in MCMC proposals" href="20B_AuxiliaryVariableMCMC.html" />
+    <link rel="prev" title="PyStan" href="19B_Pystan.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="20B_AuxiliaryVariableMCMC.html" title="Using Auxiliary Variables in MCMC proposals"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="19B_Pystan.html" title="PyStan"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="metropolis-and-gibbs-sampling">
+<h1>Metropolis and Gibbs Sampling<a class="headerlink" href="#metropolis-and-gibbs-sampling" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://sites.google.com/site/doingbayesiandataanalysis/">Kruschke&#8217;s
+book</a>
+begins with a fun example of a politician visiting a chain of islands to
+canvas support - being callow, the politician uses a simple rule to
+determine which island to visit next. Each day, the politician chooses a
+neighboring island and compares the populations there with the
+population of the current island. If the neighboring island has a larger
+population, the politician goes over. If the neighboring island has a
+smaller population, then the politician visits with probability
+<span class="math">\(p = p_\text{neighbor} / p_\text{current}\)</span>; otherwise the
+politician stays on the same island. After doing this for many days, the
+politician will end up spending time on each island proportional to the
+population of each island - in other words, estimating the distribution
+of island populations correctly. How a simple comparison of only two
+states at a time can lead to accurate estimation of a probability
+density is the topic of the next few lectures.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+</pre></div>
+</div>
+<div class="section" id="island-hopping">
+<h2>Island hopping<a class="headerlink" href="#island-hopping" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_islands</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">101</span><span class="p">):</span>
+    <span class="n">islands</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">islands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">islands</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">islands</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">hop</span><span class="p">(</span><span class="n">islands</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">pop</span> <span class="o">=</span> <span class="n">islands</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">niter</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+    <span class="n">thetas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+        <span class="c1"># generate sample from proposal distribution</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">next_pos</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">k</span>
+        <span class="c1"># evaluate unnormalized target distribution at proposed position</span>
+        <span class="n">next_pop</span> <span class="o">=</span> <span class="n">islands</span><span class="p">[</span><span class="n">next_pos</span><span class="p">]</span>
+        <span class="c1"># calculate acceptance probability</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">next_pop</span><span class="o">/</span><span class="n">pop</span><span class="p">)</span>
+        <span class="c1"># use uniform random to decide accept/reject proposal</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">next_pos</span>
+            <span class="n">pop</span> <span class="o">=</span> <span class="n">next_pop</span>
+        <span class="n">thetas</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
+    <span class="k">return</span> <span class="n">thetas</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">islands</span> <span class="o">=</span> <span class="n">make_islands</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">hop</span><span class="p">(</span><span class="n">islands</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">niter</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="true-population-proportions">
+<h3>True population proportions<a class="headerlink" href="#true-population-proportions" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">islands</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">y</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_8_0.png" src="_images/20A_MCMC_8_0.png" />
+</div>
+<div class="section" id="estimated-population-proportions">
+<h3>Estimated population proportions<a class="headerlink" href="#estimated-population-proportions" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">thetas</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">y</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_10_0.png" src="_images/20A_MCMC_10_0.png" />
+</div>
+<div class="section" id="generic-metropolis-scheme">
+<h3>Generic Metropolis scheme<a class="headerlink" href="#generic-metropolis-scheme" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">metroplis</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">proposal</span><span class="p">,</span> <span class="n">niter</span><span class="p">,</span> <span class="n">nburn</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">post</span> <span class="o">=</span> <span class="p">[</span><span class="n">current</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+        <span class="n">proposed</span> <span class="o">=</span> <span class="n">proposal</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">target</span><span class="p">(</span><span class="n">proposed</span><span class="p">)</span><span class="o">/</span><span class="n">target</span><span class="p">(</span><span class="n">current</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="n">proposed</span>
+        <span class="n">post</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">post</span><span class="p">[</span><span class="n">nburn</span><span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="apply-to-island-hooper">
+<h3>Apply to island hooper<a class="headerlink" href="#apply-to-island-hooper" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">islands</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+<span class="n">proposal</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">metroplis</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">proposal</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">post</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">y</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_14_0.png" src="_images/20A_MCMC_14_0.png" />
+</div>
+</div>
+<div class="section" id="bayesian-data-analysis">
+<h2>Bayesian Data Analysis<a class="headerlink" href="#bayesian-data-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The fundamental objective of Bayesian data analysis is to determine the
+posterior distribution</p>
+<div class="math">
+\[p(\theta \ | \ X) = \frac{p(X \ | \ \theta) p(\theta)}{p(X)}\]</div>
+<p>where the denominator is</p>
+<div class="math">
+\[p(X) = \int d\theta^* p(X \ | \ \theta^*) p(\theta^*)\]</div>
+<p>Here,</p>
+<ul class="simple">
+<li><span class="math">\(p(X \ | \ \theta)\)</span> is the likelihood,</li>
+<li><span class="math">\(p(\theta)\)</span> is the prior and</li>
+<li><span class="math">\(p(X)\)</span> is a normalizing constant also known as the evidence or
+marginal likelihood</li>
+</ul>
+<p>The computational issue is the difficulty of evaluating the integral in
+the denominator. There are many ways to address this difficulty,
+including:</p>
+<ul class="simple">
+<li>In cases with conjugate priors (with conjugate priors, the posterior
+has the same distribution family as the prior), we can get closed
+form solutions</li>
+<li>We can use numerical integration</li>
+<li>We can approximate the functions used to calculate the posterior with
+simpler functions and show that the resulting approximate posterior
+is &#8220;close&#8221; to true posterior (variational Bayes)</li>
+<li>We can use Monte Carlo methods, of which the most important is Markov
+Chain Monte Carlo (MCMC). In simple Monte Carlo inegration, we want
+to estimate the integral <span class="math">\(f(x) \, p(x) dx\)</span>. Wtih Bayesian
+models, the distribution <span class="math">\(p(x)\)</span> in the integral is the
+posterior</li>
+</ul>
+<div class="math">
+\[p(x) = p(\theta \ | \ X) = \frac{p(X \ | \ \theta) p(\theta)}{\int d\theta^* p(X \ | \ \theta^*) p(\theta^*) }\]</div>
+<ul class="simple">
+<li>MCMC allows to sample from the posterior distribution - the samples</li>
+</ul>
+<p>will not be independent unlike simple Monte Carlo integration, but this
+is OK as we can compensate for the auto-correlation by drawing a larger
+number of samples.</p>
+<div class="section" id="motivating-example">
+<h3>Motivating example<a class="headerlink" href="#motivating-example" title="Permalink to this headline">¶</a></h3>
+<p>We will use the toy example of estimating the bias of a coin given a
+sample consisting of <span class="math">\(n\)</span> tosses to illustrate a few of the
+approaches.</p>
+<div class="section" id="analytical-solution">
+<h4>Analytical solution<a class="headerlink" href="#analytical-solution" title="Permalink to this headline">¶</a></h4>
+<p>If we use a beta distribution as the prior, then the posterior
+distribution has a closed form solution. This is shown in the example
+below. Some general points:</p>
+<ul class="simple">
+<li>We need to choose a prior distribution family (i.e. the beta here) as
+well as its parameters (here a=10, b=10)<ul>
+<li>The prior distribution may be relatively uninformative (i.e. more
+flat) or informative (i.e. more peaked)</li>
+</ul>
+</li>
+<li>The posterior depends on both the prior and the data<ul>
+<li>As the amount of data becomes large, the posterior approximates
+the MLE</li>
+<li>An informative prior takes more data to shift than an
+uninformative one</li>
+</ul>
+</li>
+<li>Of course, it is also important the model used (i.e. the likelihood)
+is appropriate for the fitting the data</li>
+<li>The mode of the posterior distribution is known as the maximum a
+posteriori (MAP) estimate (cf MLE which is the mode of the
+likelihood)</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">61</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">h</span><span class="o">/</span><span class="n">n</span>
+<span class="n">rv</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="n">rv</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">h</span><span class="o">+</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">h</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+<span class="n">ci</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">interval</span><span class="p">(</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prior&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="n">stats</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">((</span><span class="n">h</span><span class="o">+</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MAP&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">mu</span><span class="o">/</span><span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MLE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ci</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ci</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95% CI&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">r&#39;$\theta$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Density&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_19_0.png" src="_images/20A_MCMC_19_0.png" />
+</div>
+<div class="section" id="numerical-integration">
+<h4>Numerical integration<a class="headerlink" href="#numerical-integration" title="Permalink to this headline">¶</a></h4>
+<p>One simple way of numerical integration is to estimate the values on a
+grid of values for <span class="math">\(\theta\)</span>. To calculate the posterior, we find
+the prior and the likelihood for each value of <span class="math">\(\theta\)</span>, and for
+the marginal likelihood, we replace the integral with the equivalent sum</p>
+<div class="math">
+\[p(X) = \sum_{\theta^*} p(X | \theta^*) p(\theta^*)\]</div>
+<p>One advantage of this is that the prior does not have to be conjugate
+(although the example below uses the same beta prior for ease of
+comparison), and so we are not restricted in our choice of an
+appropriate prior distribution. For example, the prior can be a mixture
+distribution or estimated empirically from data. The disadvantage, of
+course, is that this is computationally very expensive when we need to
+estimate multiple parameters, since the number of grid points grows as
+<span class="math">\(\mathcal{O}(n^d)\)</span>, where <span class="math">\(n\)</span> defines the grid resolution
+and <span class="math">\(d\)</span> is the size of <span class="math">\(\theta\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">post</span> <span class="o">=</span> <span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">thetas</span><span class="p">)</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+<span class="c1"># Normalzie so volume is 1</span>
+<span class="n">post</span> <span class="o">/=</span> <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">thetas</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prior&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">n</span><span class="o">*</span><span class="n">stats</span><span class="o">.</span><span class="n">binom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">thetas</span><span class="p">)</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior&#39;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">r&#39;$\theta$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Density&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_21_0.png" src="_images/20A_MCMC_21_0.png" />
+</div>
+</div>
+<div class="section" id="markov-chain-monte-carlo-mcmc">
+<h3>Markov Chain Monte Carlo (MCMC)<a class="headerlink" href="#markov-chain-monte-carlo-mcmc" title="Permalink to this headline">¶</a></h3>
+<p>This lecture will only cover the basic ideas of MCMC and the 3 common
+variants - Metroplis, Metropolis-Hastings and Gibbs sampling. All code
+will be built from the ground up to illustrate what is involved in
+fitting an MCMC model, but only toy examples will be shown since the
+goal is conceptual understanding. More realistic computational examples
+will be shown in coming lectures using the <code class="docutils literal"><span class="pre">pymc3</span></code> and <code class="docutils literal"><span class="pre">pystan</span></code>
+packages.</p>
+<p>In Bayesian statistics, we want to estimate the posterior distribution,
+but this is often intractable due to the high-dimensional integral in
+the denominator (marginal likelihood). A few other ideas we have
+encountered that are also relevant here are Monte Carlo integration with
+independent samples and the use of proposal distributions (e.g.
+rejection and importance sampling). As we have seen from the Monte Carlo
+integration lectures, we can approximate the posterior
+<span class="math">\(p(\theta | X)\)</span> if we can somehow draw many samples that come from
+the posterior distribution. With vanilla Monte Carlo integration, we
+need the samples to be independent draws from the posterior
+distribution, which is a problem if we do not actually know what the
+posterior distribution is (because we cannot integrate the marginal
+likelihood).</p>
+<p>With MCMC, we draw samples from a (simple) proposal distribution so that
+each draw depends only on the state of the previous draw (i.e. the
+samples form a Markov chain). Under certain conditions, the Markov chain
+will have a unique stationary distribution. In addition, not all samples
+are used - instead we set up acceptance criteria for each draw based on
+comparing successive states with respect to a target distribution that
+ensure that the stationary distribution is the posterior distribution of
+interest. The nice thing is that this target distribution only needs to
+be proportional to the posterior distribution, which means we don&#8217;t need
+to evaluate the potentially intractable marginal likelihood, which is
+just a normalizing constant. We can find such a target distribution
+easily, since <code class="docutils literal"><span class="pre">posterior</span></code> <span class="math">\(\propto\)</span> <code class="docutils literal"><span class="pre">likelihood</span></code>
+<span class="math">\(\times\)</span> <code class="docutils literal"><span class="pre">prior</span></code>. After some time, the Markov chain of accepted
+draws will converge to the stationary distribution, and we can use those
+samples as (correlated) draws from the posterior distribution, and find
+functions of the posterior distribution in the same way as for vanilla
+Monte Carlo integration.</p>
+<p>There are several flavors of MCMC, but the simplest to understand is the
+Metropolis-Hastings random walk algorithm, and we will start there.</p>
+<div class="section" id="metropolis-hastings-random-walk-algorithm-for-estimating-the-bias-of-a-coin">
+<h4>Metropolis-Hastings random walk algorithm for estimating the bias of a coin<a class="headerlink" href="#metropolis-hastings-random-walk-algorithm-for-estimating-the-bias-of-a-coin" title="Permalink to this headline">¶</a></h4>
+<p>To carry out the Metropolis-Hastings algorithm, we need to draw random
+samples from the following distributions</p>
+<ul class="simple">
+<li>the standard uniform distribution</li>
+<li>a proposal distribution <span class="math">\(p(x)\)</span> that we choose to be
+<span class="math">\(\mathcal{N}(0, \sigma)\)</span></li>
+<li>the target distribution <span class="math">\(g(x)\)</span> which is proportional to the
+posterior probability</li>
+</ul>
+<p>Given an initial guess for <span class="math">\(\theta\)</span> with positive probability of
+being drawn, the Metropolis-Hastings algorithm proceeds as follows</p>
+<ul class="simple">
+<li>Choose a new proposed value (<span class="math">\(\theta_p\)</span>) such that
+<span class="math">\(\theta_p = \theta + \Delta\theta\)</span> where
+<span class="math">\(\Delta \theta \sim \mathcal{N}(0, \sigma)\)</span></li>
+<li>Caluculate the ratio</li>
+</ul>
+<div class="math">
+\[\rho = \frac{g(\theta_p \ | \ X)}{g(\theta \ | \ X)}\]</div>
+<p>where <span class="math">\(g\)</span> is the posterior probability.</p>
+<ul class="simple">
+<li>If the proposal distribution is not symmetrical, we need to weight
+the acceptance probability to maintain detailed balance
+(reversibility) of the stationary distribution, and instead calculate</li>
+</ul>
+<div class="math">
+\[\rho = \frac{g(\theta_p \ | \ X) p(\theta \ | \ \theta_p)}{g(\theta \ | \ X) p(\theta_p \ | \ \theta)}\]</div>
+<p>Since we are taking ratios, the denominator cancels any distribution
+proportional to <span class="math">\(g\)</span> will also work - so we can use</p>
+<div class="math">
+\[\rho = \frac{p(X | \theta_p ) p(\theta_p)}{p(X | \theta ) p(\theta)}\]</div>
+<ul class="simple">
+<li>If <span class="math">\(\rho \ge 1\)</span>, then set <span class="math">\(\theta = \theta_p\)</span></li>
+<li>If <span class="math">\(\rho \lt 1\)</span>, then set <span class="math">\(\theta = \theta_p\)</span> with
+probability <span class="math">\(\rho\)</span>, otherwise set <span class="math">\(\theta = \theta\)</span> (this
+is where we use the standard uniform distribution)</li>
+<li>Repeat the earlier steps</li>
+</ul>
+<p>After some number of iterations <span class="math">\(k\)</span>, the samples
+<span class="math">\(\theta_{k+1}, \theta_{k+2}, \dots\)</span> will be samples from the
+posterior distributions. Here are initial concepts to help your
+intuition about why this is so:</p>
+<ul class="simple">
+<li>We accept a proposed move to <span class="math">\(\theta_{k+1}\)</span> whenever the
+density of the (unnormalized) target distribution at
+<span class="math">\(\theta_{k+1}\)</span> is larger than the value of <span class="math">\(\theta_k\)</span> -
+so <span class="math">\(\theta\)</span> will more often be found in places where the target
+distribution is denser</li>
+<li>If this was all we accepted, <span class="math">\(\theta\)</span> would get stuck at a
+local mode of the target distribution, so we also accept occasional
+moves to lower density regions - it turns out that the correct
+probability of doing so is given by the ratio <span class="math">\(\rho\)</span></li>
+<li>The acceptance criteria only looks at ratios of the target
+distribution, so the denominator cancels out and does not matter -
+that is why we only need samples from a distribution proportional to
+the posterior distribution</li>
+<li>So, <span class="math">\(\theta\)</span> will be expected to bounce around in such a way
+that its spends its time in places proportional to the density of the
+posterior distribution - that is, <span class="math">\(\theta\)</span> is a draw from the
+posterior distribution.</li>
+</ul>
+<p>Additional notes:</p>
+<p>Different proposal distributions can be used for Metropolis-Hastings:</p>
+<ul class="simple">
+<li>The independence sampler uses a proposal distribution that is
+independent of the current value of <span class="math">\(\theta\)</span>. In this case the
+proposal distribution needs to be similar to the posterior
+distribution for efficiency, while ensuring that the acceptance ratio
+is bounded in the tail region of the posterior.</li>
+<li>The random walk sampler (used in this example) takes a random step
+centered at the current value of <span class="math">\(\theta\)</span> - efficiency is a
+trade-off between small step size with high probability of acceptance
+and large step sizes with low probability of acceptance. Note
+(picture will be sketched in class) that the random walk may take a
+long time to traverse narrow regions of the probability distribution.
+Changing the step size (e.g. scaling <span class="math">\(\Sigma\)</span> for a
+multivariate normal proposal distribution) so that a target
+proportion of proposals are accepted is known as <em>tuning</em>.</li>
+<li>Much research is being conducted on different proposal distributions
+for efficient sampling of the posterior distribution.</li>
+</ul>
+<p>We will first see a numerical example and then try to understand why it
+works.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">target</span><span class="p">(</span><span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">theta</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">theta</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">lik</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span><span class="o">.</span><span class="n">pmf</span><span class="p">(</span><span class="n">h</span><span class="p">)</span><span class="o">*</span><span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">61</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">lik</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">binom</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="n">naccept</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="n">niters</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">niters</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
+    <span class="n">theta_p</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">target</span><span class="p">(</span><span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta_p</span><span class="p">)</span><span class="o">/</span><span class="n">target</span><span class="p">(</span><span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta</span> <span class="p">))</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">rho</span><span class="p">:</span>
+        <span class="n">naccept</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta_p</span>
+    <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span>
+<span class="n">nmcmc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Efficiency = &quot;</span><span class="p">,</span> <span class="n">naccept</span><span class="o">/</span><span class="n">niters</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Efficiency</span> <span class="o">=</span>  <span class="mf">0.1797</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">post</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">h</span><span class="o">+</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">h</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">nmcmc</span><span class="p">:],</span> <span class="mi">40</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prior&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">prior</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">nmcmc</span><span class="p">),</span> <span class="mi">40</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thetas</span><span class="p">,</span> <span class="n">post</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">thetas</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;True posterior&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_25_0.png" src="_images/20A_MCMC_25_0.png" />
+</div>
+<div class="section" id="assessing-for-convergence">
+<h4>Assessing for convergence<a class="headerlink" href="#assessing-for-convergence" title="Permalink to this headline">¶</a></h4>
+<p>Trace plots are often used to informally assess for stochastic
+convergence. Rigorous demonstration of convergence is an unsolved
+problem, but simple ideas such as running multiple chains and checking
+that they are converging to similar distributions are often employed in
+practice.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mh_coin</span><span class="p">(</span><span class="n">niters</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">[</span><span class="n">theta</span><span class="p">]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">niters</span><span class="p">:</span>
+        <span class="n">theta_p</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">target</span><span class="p">(</span><span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta_p</span><span class="p">)</span><span class="o">/</span><span class="n">target</span><span class="p">(</span><span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta</span> <span class="p">))</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="n">rho</span><span class="p">:</span>
+            <span class="n">theta</span> <span class="o">=</span> <span class="n">theta_p</span>
+        <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">61</span>
+<span class="n">lik</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">binom</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">niters</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">sampless</span> <span class="o">=</span> <span class="p">[</span><span class="n">mh_coin</span><span class="p">(</span><span class="n">niters</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">lik</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Convergence of multiple chains</span>
+
+<span class="k">for</span> <span class="n">samples</span> <span class="ow">in</span> <span class="n">sampless</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">niters</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_29_0.png" src="_images/20A_MCMC_29_0.png" />
+</div>
+<div class="section" id="why-does-metropolis-hastings-work">
+<h4>Why does Metropolis-Hastings work?<a class="headerlink" href="#why-does-metropolis-hastings-work" title="Permalink to this headline">¶</a></h4>
+<p>There are two main ideas - first that the samples generated by MCMC
+constitute a Markov chain, and that this Markov chain has a unique
+stationary distribution that is always reached if we generate a very
+large number of samples. The second idea is to show that this stationary
+distribution is exactly the posterior distribution that we are looking
+for. We will only give the intuition here as a refresher.</p>
+</div>
+<div class="section" id="one-there-is-a-unique-stationary-state">
+<h4>One: There is a unique stationary state<a class="headerlink" href="#one-there-is-a-unique-stationary-state" title="Permalink to this headline">¶</a></h4>
+<p>Since possible transitions depend only on the current and the proposed
+values of <span class="math">\(\theta\)</span>, the successive values of <span class="math">\(\theta\)</span> in a
+Metropolis-Hastings sample constitute a Markov chain. Recall that for a
+Markov chain with a transition matrix <span class="math">\(T\)</span></p>
+<div class="math">
+\[\pi = \pi T\]</div>
+<p>means that <span class="math">\(\pi\)</span> is a stationary distribution. If it is possible
+to go from any state to any other state, then the matrix is irreducible.
+If in addition, it is not possible to get stuck in an oscillation, then
+the matrix is also aperiodic or mixing. For finite state spaces,
+irreducibility and aperiodicity guarantee the existence of a unique
+stationary state. For continuous state space, we need an additional
+property of positive recurrence - starting from any state, the expected
+time to come back to the original state must be finite. If we have all 3
+properties of irreducibility, aperiodicity and positive recurrence, then
+there is a unique stationary distribution. The term ergodic is a little
+confusing - most standard definitions take ergodicity to be equivalent
+to irreducibility, but often Bayesian texts take ergodicity to mean
+irreducibility, aperiodicity and positive recurrence, and we will follow
+the latter convention. For another intuitive perspective, the random
+walk Metropolis-Hasting algorithm is analogous to a diffusion process.
+Since all states are communicating (by design), eventually the system
+will settle into an equilibrium state. This is analogous to converging
+on the stationary state.</p>
+</div>
+<div class="section" id="two-the-stationary-state-is-the-posterior-probability-distribution">
+<h4>Two: The stationary state is the posterior probability distribution<a class="headerlink" href="#two-the-stationary-state-is-the-posterior-probability-distribution" title="Permalink to this headline">¶</a></h4>
+<p>We will consider the simplest possible scenario for an explicit
+calculation. Suppose we have a two-state system where the posterior
+probabilities are <span class="math">\(\theta\)</span> and <span class="math">\(1 - \theta\)</span>. Suppose
+<span class="math">\(\theta \lt 0.5\)</span>. So we have the following picture with the
+Metropolis-Hastings algorithm:</p>
+<div class="figure" id="id2">
+<img alt="Markov chain" src="mcmc.png" />
+<p class="caption"><span class="caption-text">Markov chain</span></p>
+</div>
+<p>and we find the stationary distribution
+<span class="math">\(\pi = \left( \begin{array}{cc} p &amp; 1-p \end{array} \right)\)</span> by
+solving</p>
+<div class="math">
+\[\begin{split}\begin{align}
+\left( \begin{array}{cc} p &amp; 1-p \end{array} \right) &amp;=
+\left( \begin{array}{cc} p &amp; 1-p \end{array} \right) \left(
+\begin{array}{cc}
+0 &amp; 1  \\
+\frac{\theta}{1-\theta} &amp; 1-\frac{\theta}{1-\theta}
+\end{array}
+\right)
+\end{align}\end{split}\]</div>
+<p>to be
+<span class="math">\(\pi = \left( \begin{array}{cc} \theta &amp; 1-\theta \end{array} \right)\)</span>,
+which is the posterior distribution.</p>
+<p>The final point is that a stationary distribution has to follow the
+detailed balance (reversibility) criterion that says that the
+probability of being in state <span class="math">\(x\)</span> and moving to state <span class="math">\(y\)</span>
+must be the same as the probability of being in state <span class="math">\(y\)</span> and
+moving to state <span class="math">\(x\)</span>. Or, more briefly,</p>
+<div class="math">
+\[\pi(x)T(x \to y) = \pi(y)T(y \to x)\]</div>
+<p>and the need to make sure that this condition is true accounts for the
+strange looking acceptance criterion</p>
+<div class="math">
+\[\min \left(1, \frac{g(\theta_p \ | \ X) p(\theta \ | \ \theta_p)}{g(\theta \ | \ X) p(\theta_p \ | \ \theta)} \right)\]</div>
+</div>
+</div>
+<div class="section" id="intuition">
+<h3>Intuition<a class="headerlink" href="#intuition" title="Permalink to this headline">¶</a></h3>
+<p>We want the stationary distribution <span class="math">\(\pi(x)\)</span> to be the posterior
+distribution <span class="math">\(P(x)\)</span>. So we set</p>
+<div class="math">
+\[P(x)T(x \to y) = P(y)T(y \to x)\]</div>
+<p>Rearranging, we get</p>
+<div class="math">
+\[\frac{T(x \to y)}{T(y \to x)} = \frac{P(y)}{P(x)}\]</div>
+<p>We split the transition probability into separate proposal <span class="math">\(q\)</span> and
+acceptance <span class="math">\(A\)</span> parts, and after a little algebraic rearrangement
+get</p>
+<div class="math">
+\[\frac{A(x \to y)}{A(y \to x)} = \frac{P(y) \, q(y \to x)}{P(x) \, q(x \to y)}\]</div>
+<p>An acceptance probability that meets this condition is</p>
+<div class="math">
+\[A(x \to y) = \min \left(1, \frac{P(y) \, q(y \to x)}{P(x) \, q(x \to y)} \right)\]</div>
+<p>since <span class="math">\(A\)</span> in the numerator and denominator are both bounded above
+by 1.</p>
+<p>See <a class="reference external" href="https://eml.berkeley.edu/reprints/misc/understanding.pdf">Chib and
+Greenberg</a>
+for algebraic details.</p>
+</div>
+<div class="section" id="the-gibbs-sampler">
+<h3>The Gibbs sampler<a class="headerlink" href="#the-gibbs-sampler" title="Permalink to this headline">¶</a></h3>
+<p>Suppose we have a vector of parameters
+<span class="math">\(\theta = (\theta_1, \theta_2, \dots, \theta_k)\)</span>, and we want to
+estimate the joint posterior distribution <span class="math">\(p(\theta | X)\)</span>. Suppose
+we can find and draw random samples from all the conditional
+distributions</p>
+<div class="math">
+\[\begin{split}p(\theta_1 | \theta_2, \dots \theta_k, X) \\
+p(\theta_2 | \theta_1, \dots \theta_k, X) \\
+\dots \\
+p(\theta_k | \theta_1, \theta_2, \dots, X)\end{split}\]</div>
+<p>With Gibbs sampling, the Markov chain is constructed by sampling from
+the conditional distribution for each parameter <span class="math">\(\theta_i\)</span> in
+turn, treating all other parameters as observed. When we have finished
+iterating over all parameters, we are said to have completed one cycle
+of the Gibbs sampler. Since hierarchical models are typically set up as
+products of conditional distributions, the Gibbs sampler is ubiquitous
+in Bayesian modeling. Where it is difficult to sample from a conditional
+distribution, we can sample using a Metropolis-Hastings algorithm
+instead - this is known as Metropolis within Gibbs.</p>
+<p>Gibbs sampling is a type of random walk through parameter space, and
+hence can be thought of as a Metropolis-Hastings algorithm with a
+special proposal distribution. At each iteration in the cycle, we are
+drawing a proposal for a new value of a particular parameter, where the
+proposal distribution <em>is</em> the conditional posterior probability of that
+parameter. This means that the proposal move is <em>always</em> accepted.
+Hence, if we can draw samples from the conditional distributions, Gibbs
+sampling can be much more efficient than regular Metropolis-Hastings.
+More formally, we want to show that</p>
+<div class="math">
+\[\frac{P(y) \, q(y \to x)}{P(x) \, q(x \to y)} = 1\]</div>
+<p>We start by noting that <span class="math">\(P(x_{-i}\)</span> is the same as
+<span class="math">\(P(y_{-i})\)</span> since apart from the component <span class="math">\(i\)</span>, the old
+state and the proposed new state are identical in Gibbs sampling. We
+also recall that</p>
+<div class="math">
+\[P(x_i \mid x_{-i}) \, P(x_{-i}) = P(x_i, x_{-i} = P(x)\]</div>
+<p>by definition of conditional probability. So we have</p>
+<div class="math">
+\[\begin{align}
+\frac{P(y) \, q(y \to x)}{P(x) \, q(x \to y)} &amp;= \frac{P(y_i \mid y_{-1}) \, P(y_{-i})\, P(x_i \mid x_{-i}) }{P(x_i \mid x_{-i}) \, P(x_{-i})\, P(y_i \mid y_{-1})} &amp;= 1
+\end{align}\]</div>
+<p><strong>Advantages of Gibbs sampling</strong></p>
+<ul class="simple">
+<li>No need to tune proposal distribution</li>
+<li>Proposals are always accepted</li>
+</ul>
+<p><strong>Disadvantages of Gibbs sampling</strong></p>
+<ul class="simple">
+<li>Need to be able to derive conditional probability distributions</li>
+<li>Need to be able to (cheaply) draw random samples from conditional
+probability distributions</li>
+<li>Can be very slow if parameters are correlated because you cannot take
+&#8220;diagonal&#8221; steps (draw picture to illustrate)</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h3>Motivating example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>We will use the toy example, familiar from the EM lecture, of estimating
+the bias of two coins given sample pairs <span class="math">\((z_1, n_1)\)</span> and
+<span class="math">\((z_2, n_2)\)</span> where <span class="math">\(z_i\)</span> is the number of heads in
+<span class="math">\(n_i\)</span> tosses for coin <span class="math">\(i\)</span>.</p>
+<div class="section" id="setup">
+<h4>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bern</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bernoulli likelihood with N trials and z successes.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">theta</span><span class="o">**</span><span class="n">z</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">theta</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="n">z</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">bern2</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bernoulli likelihood with N trials and z successes.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">bern</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">N1</span><span class="p">)</span> <span class="o">*</span> <span class="n">bern</span><span class="p">(</span><span class="n">theta2</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">N2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">make_thetas</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">widths</span> <span class="o">=</span><span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">xs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="mf">2.0</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span> <span class="n">widths</span>
+    <span class="k">return</span> <span class="n">thetas</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+
+<span class="k">def</span> <span class="nf">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">posterior</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">posterior</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ax_</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span> <span class="n">ax_</span><span class="o">.</span><span class="n">_axis3don</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">posterior</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Prior&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Likelihood&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Posteior&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">thetas1</span> <span class="o">=</span> <span class="n">make_thetas</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="n">thetas2</span> <span class="o">=</span> <span class="n">make_thetas</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">thetas1</span><span class="p">,</span> <span class="n">thetas2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="analytic-solution">
+<h4>Analytic solution<a class="headerlink" href="#analytic-solution" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">z1</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">N1</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">z2</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">N2</span> <span class="o">=</span> <span class="mi">14</span>
+
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+<span class="n">likelihood</span> <span class="o">=</span> <span class="n">bern2</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">)</span>
+<span class="n">posterior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">z1</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">N1</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">z2</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">N2</span> <span class="o">-</span> <span class="n">z2</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">posterior</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">posterior</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_40_0.png" src="_images/20A_MCMC_40_0.png" />
+<img alt="_images/20A_MCMC_40_1.png" src="_images/20A_MCMC_40_1.png" />
+</div>
+<div class="section" id="grid-approximation">
+<h4>Grid approximation<a class="headerlink" href="#grid-approximation" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">c2d</span><span class="p">(</span><span class="n">thetas1</span><span class="p">,</span> <span class="n">thetas2</span><span class="p">,</span> <span class="n">pdf</span><span class="p">):</span>
+    <span class="n">width1</span> <span class="o">=</span> <span class="n">thetas1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">thetas1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">width2</span> <span class="o">=</span> <span class="n">thetas2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">thetas2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">width1</span> <span class="o">*</span> <span class="n">width2</span>
+    <span class="n">pmf</span> <span class="o">=</span> <span class="n">pdf</span> <span class="o">*</span> <span class="n">area</span>
+    <span class="n">pmf</span> <span class="o">/=</span> <span class="n">pmf</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">pmf</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">_prior</span> <span class="o">=</span> <span class="n">bern2</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="n">bern2</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">prior_grid</span> <span class="o">=</span> <span class="n">c2d</span><span class="p">(</span><span class="n">thetas1</span><span class="p">,</span> <span class="n">thetas2</span><span class="p">,</span> <span class="n">_prior</span><span class="p">)</span>
+<span class="n">_likelihood</span> <span class="o">=</span> <span class="n">bern2</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">posterior_grid</span> <span class="o">=</span> <span class="n">_likelihood</span> <span class="o">*</span> <span class="n">prior_grid</span>
+<span class="n">posterior_grid</span> <span class="o">/=</span> <span class="n">posterior_grid</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior_grid</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">posterior_grid</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior_grid</span><span class="p">,</span> <span class="n">likelihood</span><span class="p">,</span> <span class="n">posterior_grid</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_43_0.png" src="_images/20A_MCMC_43_0.png" />
+<img alt="_images/20A_MCMC_43_1.png" src="_images/20A_MCMC_43_1.png" />
+</div>
+<div class="section" id="metropolis">
+<h4>Metropolis<a class="headerlink" href="#metropolis" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">z1</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">N1</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">z2</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">N2</span> <span class="o">=</span> <span class="mi">14</span>
+
+<span class="n">prior</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">:</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta1</span><span class="p">)</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta2</span><span class="p">)</span>
+<span class="n">lik</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">bern2</span><span class="p">,</span> <span class="n">z1</span><span class="o">=</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="o">=</span><span class="n">z2</span><span class="p">,</span> <span class="n">N1</span><span class="o">=</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="o">=</span><span class="n">N2</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">:</span> <span class="n">prior</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">)</span> <span class="o">*</span> <span class="n">lik</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">)</span>
+
+<span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">niters</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">burnin</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">niters</span><span class="o">-</span><span class="n">burnin</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
+    <span class="n">new_theta</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">()</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">target</span><span class="p">(</span><span class="o">*</span><span class="n">new_theta</span><span class="p">)</span><span class="o">/</span><span class="n">target</span><span class="p">(</span><span class="o">*</span><span class="n">theta</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">p</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">new_theta</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">burnin</span><span class="p">:</span>
+        <span class="n">thetas</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">burnin</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">kde</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gaussian_kde</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">XY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+<span class="n">posterior_metroplis</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">XY</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">lik</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">posterior_metroplis</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">lik</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">posterior_metroplis</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_46_0.png" src="_images/20A_MCMC_46_0.png" />
+<img alt="_images/20A_MCMC_46_1.png" src="_images/20A_MCMC_46_1.png" />
+</div>
+<div class="section" id="gibbs">
+<h4>Gibbs<a class="headerlink" href="#gibbs" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">z1</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">N1</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">z2</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">N2</span> <span class="o">=</span> <span class="mi">14</span>
+
+<span class="n">prior</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">:</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta1</span><span class="p">)</span> <span class="o">*</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">theta2</span><span class="p">)</span>
+<span class="n">lik</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">bern2</span><span class="p">,</span> <span class="n">z1</span><span class="o">=</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="o">=</span><span class="n">z2</span><span class="p">,</span> <span class="n">N1</span><span class="o">=</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="o">=</span><span class="n">N2</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">:</span> <span class="n">prior</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">)</span> <span class="o">*</span> <span class="n">lik</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">)</span>
+
+<span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">niters</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">burnin</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span>
+
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">niters</span><span class="o">-</span><span class="n">burnin</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="p">[</span><span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">z1</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">N1</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">(),</span> <span class="n">theta</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="p">[</span><span class="n">theta</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">z2</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">N2</span> <span class="o">-</span> <span class="n">z2</span><span class="p">)</span><span class="o">.</span><span class="n">rvs</span><span class="p">()]</span>
+
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">burnin</span><span class="p">:</span>
+        <span class="n">thetas</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="n">burnin</span><span class="p">]</span> <span class="o">=</span> <span class="n">theta</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">kde</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">gaussian_kde</span><span class="p">(</span><span class="n">thetas</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">XY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+<span class="n">posterior_gibbs</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">XY</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">lik</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">posterior_gibbs</span><span class="p">)</span>
+<span class="n">make_plots</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prior</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">lik</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">),</span> <span class="n">posterior_gibbs</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_49_0.png" src="_images/20A_MCMC_49_0.png" />
+<img alt="_images/20A_MCMC_49_1.png" src="_images/20A_MCMC_49_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="hierarchical-models">
+<h2>Hierarchical models<a class="headerlink" href="#hierarchical-models" title="Permalink to this headline">¶</a></h2>
+<p>Hierarchical models have the following structure - first we specify that
+the data come from a distribution with parameters <span class="math">\(\theta\)</span></p>
+<div class="math">
+\[X \sim f(X\ | \ \theta)\]</div>
+<p>and that the parameters themselves come from another distribution with
+hyperparameters <span class="math">\(\lambda\)</span></p>
+<div class="math">
+\[\theta \sim g(\theta \ | \ \lambda)\]</div>
+<p>and finally that <span class="math">\(\lambda\)</span> comes from a prior distribution</p>
+<div class="math">
+\[\lambda \sim h(\lambda)\]</div>
+<p>More levels of hierarchy are possible - i.e you can specify
+hyper-hyperparameters for the distribution of <span class="math">\(\lambda\)</span> and so on.</p>
+<p>The essential idea of the hierarchical model is because the
+<span class="math">\(\theta\)</span>s are not independent but rather are drawn from a common
+distribution with parameter <span class="math">\(\lambda\)</span>, we can share information
+across the <span class="math">\(\theta\)</span>s by also estimating <span class="math">\(\lambda\)</span> at the
+same time.</p>
+<p>As an example, suppose have data about the proportion of heads after
+some number of tosses from several coins, and we want to estimate the
+bias of each coin. We also know that the coins come from the same mint
+and so might share some common manufacturing defect. There are two
+extreme approaches - we could estimate the bias of each coin from its
+coin toss data independently of all the others, or we could pool the
+results together and estimate the same bias for all coins. Hierarchical
+models provide a compromise where we shrink individual estimates towards
+a common estimate.</p>
+<p>Note that because of the conditionally independent structure of
+hierarchical models, Gibbs sampling is often a natural choice for the
+MCMC sampling strategy.</p>
+<p>Suppose we have data of the number of failures (<span class="math">\(y_i\)</span>) for each of
+10 pumps in a nuclear plant. We also have the times (<span class="math">\(_i\)</span>) at
+which each pump was observed. We want to model the number of failures
+with a Poisson likelihood, where the expected number of failure
+<span class="math">\(\lambda_i\)</span> differs for each pump. Since the time which we
+observed each pump is different, we need to scale each <span class="math">\(\lambda_i\)</span>
+by its observed time <span class="math">\(t_i\)</span>.</p>
+<p>We now specify the hierarchical model - note change of notation from the
+overview above - that <span class="math">\(\theta\)</span> is <span class="math">\(\lambda\)</span> (parameter) and
+<span class="math">\(\lambda\)</span> is <span class="math">\(\beta\)</span> (hyperparameter) simply because
+<span class="math">\(\lambda\)</span> is traditional for the Poisson distribution parameter.</p>
+<p>The likelihood <span class="math">\(f\)</span> is</p>
+<div class="math">
+\[\prod_{i=1}^{10} \text{Poisson}(\lambda_i t_i)\]</div>
+<p>We let the prior <span class="math">\(g\)</span> for <span class="math">\(\lambda\)</span> be</p>
+<div class="math">
+\[\lambda \sim \text{Gamma}(\alpha, \beta)\]</div>
+<p>with <span class="math">\(\alpha = 1.8\)</span> (an improper prior whose integral does not sum
+to 1)</p>
+<p>and let the hyperprior <span class="math">\(h\)</span> for <span class="math">\(\beta\)</span> to be</p>
+<div class="math">
+\[\beta \sim \text{Gamma}(\gamma, \delta)\]</div>
+<p>with <span class="math">\(\gamma = 0.01\)</span> and <span class="math">\(\delta = 1\)</span>.</p>
+<p>There are 11 unknown parameters (10 <span class="math">\(\lambda\)</span>s and
+<span class="math">\(\beta\)</span>) in this hierarchical model.</p>
+<p>The posterior is</p>
+<div class="math">
+\[p(\lambda, \beta \ | \ y, t) = \prod_{i=1}^{10} \text{Poisson}(\lambda_i t_i) \times \text{Gamma}(\alpha, \beta) \times \text{Gamma}(\gamma, \delta)\]</div>
+<p>with the conditional distributions needed for Gibbs sampling given by</p>
+<div class="math">
+\[p(\lambda_i \ | \ \lambda_{-i}, \beta, y, t) = \text{Gamma}(y_i + \alpha, t_i + \beta)\]</div>
+<p>and</p>
+<div class="math">
+\[p(\beta \ | \ \lambda, y, t) = \text{Gamma}(10\alpha + \gamma, \delta + \sum_{i=1}^10 \lambda_i)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="k">import</span> <span class="n">gamma</span> <span class="k">as</span> <span class="n">rgamma</span> <span class="c1"># rename so we can use gamma for parameter name</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lambda_update</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">rgamma</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="n">y</span><span class="o">+</span><span class="n">alpha</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="n">beta</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">beta_update</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">lambd</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">rgamma</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="n">delta</span> <span class="o">+</span> <span class="n">lambd</span><span class="o">.</span><span class="n">sum</span><span class="p">()))</span>
+
+<span class="k">def</span> <span class="nf">gibbs</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+    <span class="n">lambdas_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">niter</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+    <span class="n">betas_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+    <span class="n">lambda_</span> <span class="o">=</span> <span class="n">y</span><span class="o">/</span><span class="n">t</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niter</span><span class="p">):</span>
+        <span class="n">beta_</span> <span class="o">=</span> <span class="n">beta_update</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">lambda_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">lambda_</span> <span class="o">=</span> <span class="n">lambda_update</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta_</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+        <span class="n">betas_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta_</span>
+        <span class="n">lambdas_</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">lambda_</span>
+
+    <span class="k">return</span> <span class="n">betas_</span><span class="p">,</span> <span class="n">lambdas_</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.8</span>
+<span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">beta0</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">94.32</span><span class="p">,</span> <span class="mf">15.72</span><span class="p">,</span> <span class="mf">62.88</span><span class="p">,</span> <span class="mf">125.76</span><span class="p">,</span> <span class="mf">5.24</span><span class="p">,</span> <span class="mf">31.44</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="mf">2.10</span><span class="p">,</span> <span class="mf">10.48</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">betas</span><span class="p">,</span> <span class="n">lambdas</span> <span class="o">=</span> <span class="n">gibbs</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">betas</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">betas</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lambdas</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lambdas</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.521</span>
+<span class="mf">0.732</span>
+<span class="p">[</span> <span class="mf">0.06810739</span>  <span class="mf">0.14959529</span>  <span class="mf">0.10334003</span>  <span class="mf">0.12301438</span>  <span class="mf">0.61840325</span>  <span class="mf">0.61071338</span>
+  <span class="mf">0.84008138</span>  <span class="mf">0.77864896</span>  <span class="mf">1.29609335</span>  <span class="mf">1.82910507</span><span class="p">]</span>
+<span class="p">[</span> <span class="mf">0.02653906</span>  <span class="mf">0.09079105</span>  <span class="mf">0.03870982</span>  <span class="mf">0.03033132</span>  <span class="mf">0.29242168</span>  <span class="mf">0.13761389</span>
+  <span class="mf">0.53464479</span>  <span class="mf">0.50391736</span>  <span class="mf">0.56398328</span>  <span class="mf">0.39237317</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lambdas</span><span class="o">.</span><span class="n">T</span><span class="p">)):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lambdas</span><span class="p">[::</span><span class="mi">10</span><span class="p">,</span> <span class="n">i</span><span class="p">]);</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Trace for $\lambda$</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_58_0.png" src="_images/20A_MCMC_58_0.png" />
+<div class="section" id="bandits">
+<h3>Bandits<a class="headerlink" href="#bandits" title="Permalink to this headline">¶</a></h3>
+<p>One-arm bandit refers to slot machines in a casino. The multi-arm bandit
+problem is that you are faced with multiple slot machines, and they each
+have potentially different payoffs - perhaps there is one machine where
+you could potentially win a lot of money and others where you would lose
+money in the long run. You need to balance exploration (trying different
+machines) against exploitation (sticking to the best machine found so
+far) in an optimal way to maximize your gains. Suppose you were looking
+for a mate among N candidates - how do you optimize your dating strategy
+as a good Bayesian?</p>
+<p>Adapted from <a class="reference external" href="https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/blob/master/Chapter6_Priorities">Bayesian Methods for
+Hackers</a></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">bandits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="n">wins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="n">trials</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+<span class="n">dist</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">dists</span> <span class="o">=</span> <span class="p">[</span><span class="n">dist</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">rvs</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="p">)</span>
+    <span class="n">payoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">bandits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">wins</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">payoff</span>
+    <span class="n">trials</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">wins</span><span class="p">,</span> <span class="n">b</span> <span class="o">+</span> <span class="n">trials</span> <span class="o">-</span> <span class="n">wins</span><span class="p">)</span>
+    <span class="n">dists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dists</span><span class="p">[::(</span><span class="n">n</span><span class="o">//</span><span class="mi">20</span><span class="p">)],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">20</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span>
+</pre></div>
+</div>
+<img alt="_images/20A_MCMC_60_1.png" src="_images/20A_MCMC_60_1.png" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metropolis and Gibbs Sampling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#island-hopping">Island hopping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bayesian-data-analysis">Bayesian Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hierarchical-models">Hierarchical models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="19B_Pystan.html"
+                          title="Previous page">&larr; PyStan</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="20B_AuxiliaryVariableMCMC.html"
+                          title="Next page">&rarr; Using Auxiliary Variables in MCMC proposals</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/20A_MCMC.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="20B_AuxiliaryVariableMCMC.html" title="Using Auxiliary Variables in MCMC proposals"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="19B_Pystan.html" title="PyStan"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/20A_MCMC.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:16:42 GMT -->
+</html>

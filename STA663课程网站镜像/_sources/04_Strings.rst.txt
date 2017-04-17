@@ -1,0 +1,1331 @@
+
+Strings
+=======
+
+The process of cleaning data for analysis often requires working with
+text, for example, to correct typos, convert to standard nomenclature
+and resolve ambiguous labels. In some statistical fields that deal with
+(say) processing electronic medical records, information science or
+recommendations based on user feedback, text must be processed before
+analysis - for example, by converting to a bag of words.
+
+We will use a whimsical example to illustrate Python tools for *munging*
+text data using string methods and regular expressions. Finally, we will
+see how to format text data for reporting.
+
+Get "Through the Looking Glass"
+-------------------------------
+
+.. code:: python
+
+    import requests
+    
+    try:
+        with open('looking_glass.txt') as f:
+            text = f.read()
+    except IOError:
+        url = 'http://www.gutenberg.org/cache/epub/12/pg12.txt'
+        res = requests.get(url)
+        text = res.text
+        with open('looking_glass.txt', 'w') as f:
+            f.write(str(text))
+
+Slice to get Jabberwocky
+------------------------
+
+.. code:: python
+
+    start = text.find('JABBERWOCKY')
+
+.. code:: python
+
+    text[start:start+2000]
+
+
+
+
+.. parsed-literal::
+
+    "JABBERWOCKY\r\n\r\n     'Twas brillig, and the slithy toves\r\n      Did gyre and gimble in the wabe;\r\n     All mimsy were the borogoves,\r\n      And the mome raths outgrabe.\r\n\r\n     'Beware the Jabberwock, my son!\r\n      The jaws that bite, the claws that catch!\r\n     Beware the Jubjub bird, and shun\r\n      The frumious Bandersnatch!'\r\n\r\n     He took his vorpal sword in hand:\r\n      Long time the manxome foe he sought--\r\n     So rested he by the Tumtum tree,\r\n      And stood awhile in thought.\r\n\r\n     And as in uffish thought he stood,\r\n      The Jabberwock, with eyes of flame,\r\n     Came whiffling through the tulgey wood,\r\n      And burbled as it came!\r\n\r\n     One, two! One, two! And through and through\r\n      The vorpal blade went snicker-snack!\r\n     He left it dead, and with its head\r\n      He went galumphing back.\r\n\r\n     'And hast thou slain the Jabberwock?\r\n      Come to my arms, my beamish boy!\r\n     O frabjous day! Callooh! Callay!'\r\n      He chortled in his joy.\r\n\r\n     'Twas brillig, and the slithy toves\r\n      Did gyre and gimble in the wabe;\r\n     All mimsy were the borogoves,\r\n      And the mome raths outgrabe.\r\n\r\n\r\n'It seems very pretty,' she said when she had finished it, 'but it's\r\nRATHER hard to understand!' (You see she didn't like to confess, even\r\nto herself, that she couldn't make it out at all.) 'Somehow it seems\r\nto fill my head with ideas--only I don't exactly know what they are!\r\nHowever, SOMEBODY killed SOMETHING: that's clear, at any rate--'\r\n\r\n'But oh!' thought Alice, suddenly jumping up, 'if I don't make haste I\r\nshall have to go back through the Looking-glass, before I've seen what\r\nthe rest of the house is like! Let's have a look at the garden first!'\r\nShe was out of the room in a moment, and ran down stairs--or, at least,\r\nit wasn't exactly running, but a new invention of hers for getting down\r\nstairs quickly and easily, as Alice said to herself. She just kept the\r\ntips of her fingers on the hand-rail, and floated gently down without\r\neven"
+
+
+
+.. code:: python
+
+    end = text.find('It seems very pretty', start)
+
+.. code:: python
+
+    poem = text[start:end]
+    poem
+
+
+
+
+.. parsed-literal::
+
+    "JABBERWOCKY\r\n\r\n     'Twas brillig, and the slithy toves\r\n      Did gyre and gimble in the wabe;\r\n     All mimsy were the borogoves,\r\n      And the mome raths outgrabe.\r\n\r\n     'Beware the Jabberwock, my son!\r\n      The jaws that bite, the claws that catch!\r\n     Beware the Jubjub bird, and shun\r\n      The frumious Bandersnatch!'\r\n\r\n     He took his vorpal sword in hand:\r\n      Long time the manxome foe he sought--\r\n     So rested he by the Tumtum tree,\r\n      And stood awhile in thought.\r\n\r\n     And as in uffish thought he stood,\r\n      The Jabberwock, with eyes of flame,\r\n     Came whiffling through the tulgey wood,\r\n      And burbled as it came!\r\n\r\n     One, two! One, two! And through and through\r\n      The vorpal blade went snicker-snack!\r\n     He left it dead, and with its head\r\n      He went galumphing back.\r\n\r\n     'And hast thou slain the Jabberwock?\r\n      Come to my arms, my beamish boy!\r\n     O frabjous day! Callooh! Callay!'\r\n      He chortled in his joy.\r\n\r\n     'Twas brillig, and the slithy toves\r\n      Did gyre and gimble in the wabe;\r\n     All mimsy were the borogoves,\r\n      And the mome raths outgrabe.\r\n\r\n\r\n'"
+
+
+
+.. code:: python
+
+    print(poem)
+
+
+.. parsed-literal::
+
+    JABBERWOCKY
+    
+         'Twas brillig, and the slithy toves
+          Did gyre and gimble in the wabe;
+         All mimsy were the borogoves,
+          And the mome raths outgrabe.
+    
+         'Beware the Jabberwock, my son!
+          The jaws that bite, the claws that catch!
+         Beware the Jubjub bird, and shun
+          The frumious Bandersnatch!'
+    
+         He took his vorpal sword in hand:
+          Long time the manxome foe he sought--
+         So rested he by the Tumtum tree,
+          And stood awhile in thought.
+    
+         And as in uffish thought he stood,
+          The Jabberwock, with eyes of flame,
+         Came whiffling through the tulgey wood,
+          And burbled as it came!
+    
+         One, two! One, two! And through and through
+          The vorpal blade went snicker-snack!
+         He left it dead, and with its head
+          He went galumphing back.
+    
+         'And hast thou slain the Jabberwock?
+          Come to my arms, my beamish boy!
+         O frabjous day! Callooh! Callay!'
+          He chortled in his joy.
+    
+         'Twas brillig, and the slithy toves
+          Did gyre and gimble in the wabe;
+         All mimsy were the borogoves,
+          And the mome raths outgrabe.
+    
+    
+    '
+
+
+.. code:: python
+
+    print(poem.title())
+
+
+.. parsed-literal::
+
+    Jabberwocky
+    
+         'Twas Brillig, And The Slithy Toves
+          Did Gyre And Gimble In The Wabe;
+         All Mimsy Were The Borogoves,
+          And The Mome Raths Outgrabe.
+    
+         'Beware The Jabberwock, My Son!
+          The Jaws That Bite, The Claws That Catch!
+         Beware The Jubjub Bird, And Shun
+          The Frumious Bandersnatch!'
+    
+         He Took His Vorpal Sword In Hand:
+          Long Time The Manxome Foe He Sought--
+         So Rested He By The Tumtum Tree,
+          And Stood Awhile In Thought.
+    
+         And As In Uffish Thought He Stood,
+          The Jabberwock, With Eyes Of Flame,
+         Came Whiffling Through The Tulgey Wood,
+          And Burbled As It Came!
+    
+         One, Two! One, Two! And Through And Through
+          The Vorpal Blade Went Snicker-Snack!
+         He Left It Dead, And With Its Head
+          He Went Galumphing Back.
+    
+         'And Hast Thou Slain The Jabberwock?
+          Come To My Arms, My Beamish Boy!
+         O Frabjous Day! Callooh! Callay!'
+          He Chortled In His Joy.
+    
+         'Twas Brillig, And The Slithy Toves
+          Did Gyre And Gimble In The Wabe;
+         All Mimsy Were The Borogoves,
+          And The Mome Raths Outgrabe.
+    
+    
+    '
+
+
+.. code:: python
+
+    poem.count('the')
+
+
+
+
+.. parsed-literal::
+
+    15
+
+
+
+.. code:: python
+
+    print(poem.replace('the', 'XXX'))
+
+
+.. parsed-literal::
+
+    JABBERWOCKY
+    
+         'Twas brillig, and XXX slithy toves
+          Did gyre and gimble in XXX wabe;
+         All mimsy were XXX borogoves,
+          And XXX mome raths outgrabe.
+    
+         'Beware XXX Jabberwock, my son!
+          The jaws that bite, XXX claws that catch!
+         Beware XXX Jubjub bird, and shun
+          The frumious Bandersnatch!'
+    
+         He took his vorpal sword in hand:
+          Long time XXX manxome foe he sought--
+         So rested he by XXX Tumtum tree,
+          And stood awhile in thought.
+    
+         And as in uffish thought he stood,
+          The Jabberwock, with eyes of flame,
+         Came whiffling through XXX tulgey wood,
+          And burbled as it came!
+    
+         One, two! One, two! And through and through
+          The vorpal blade went snicker-snack!
+         He left it dead, and with its head
+          He went galumphing back.
+    
+         'And hast thou slain XXX Jabberwock?
+          Come to my arms, my beamish boy!
+         O frabjous day! Callooh! Callay!'
+          He chortled in his joy.
+    
+         'Twas brillig, and XXX slithy toves
+          Did gyre and gimble in XXX wabe;
+         All mimsy were XXX borogoves,
+          And XXX mome raths outgrabe.
+    
+    
+    '
+
+
+Find palindromic words in poem if any
+-------------------------------------
+
+.. code:: python
+
+    poem = poem.lower()
+
+.. code:: python
+
+    import string
+    string.punctuation
+
+
+
+
+.. parsed-literal::
+
+    '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+
+
+.. code:: python
+
+    poem  = poem.translate(dict.fromkeys(map(ord, string.punctuation)))
+    poem
+
+
+
+
+.. parsed-literal::
+
+    'jabberwocky\r\n\r\n     twas brillig and the slithy toves\r\n      did gyre and gimble in the wabe\r\n     all mimsy were the borogoves\r\n      and the mome raths outgrabe\r\n\r\n     beware the jabberwock my son\r\n      the jaws that bite the claws that catch\r\n     beware the jubjub bird and shun\r\n      the frumious bandersnatch\r\n\r\n     he took his vorpal sword in hand\r\n      long time the manxome foe he sought\r\n     so rested he by the tumtum tree\r\n      and stood awhile in thought\r\n\r\n     and as in uffish thought he stood\r\n      the jabberwock with eyes of flame\r\n     came whiffling through the tulgey wood\r\n      and burbled as it came\r\n\r\n     one two one two and through and through\r\n      the vorpal blade went snickersnack\r\n     he left it dead and with its head\r\n      he went galumphing back\r\n\r\n     and hast thou slain the jabberwock\r\n      come to my arms my beamish boy\r\n     o frabjous day callooh callay\r\n      he chortled in his joy\r\n\r\n     twas brillig and the slithy toves\r\n      did gyre and gimble in the wabe\r\n     all mimsy were the borogoves\r\n      and the mome raths outgrabe\r\n\r\n\r\n'
+
+
+
+.. code:: python
+
+    words = poem.split()
+    words[:10]
+
+
+
+
+.. parsed-literal::
+
+    ['jabberwocky',
+     'twas',
+     'brillig',
+     'and',
+     'the',
+     'slithy',
+     'toves',
+     'did',
+     'gyre',
+     'and']
+
+
+
+.. code:: python
+
+    def is_palindrome(word):
+        return word == word[::-1]
+
+.. code:: python
+
+    {word for word in words if is_palindrome(word)}
+
+
+
+
+.. parsed-literal::
+
+    {'did', 'o'}
+
+
+
+Top 10 most frequent words
+--------------------------
+
+.. code:: python
+
+    import collections
+
+.. code:: python
+
+    poem_counter = collections.Counter(words)
+
+.. code:: python
+
+    poem_counter.most_common(10)
+
+
+
+
+.. parsed-literal::
+
+    [('the', 19),
+     ('and', 14),
+     ('he', 7),
+     ('in', 6),
+     ('my', 3),
+     ('through', 3),
+     ('jabberwock', 3),
+     ('gyre', 2),
+     ('mimsy', 2),
+     ('mome', 2)]
+
+
+
+Words that appear exactly twice.
+--------------------------------
+
+.. code:: python
+
+    [(k, v) for (k, v) in poem_counter.items() if v==2]
+
+
+
+
+.. parsed-literal::
+
+    [('gyre', 2),
+     ('mimsy', 2),
+     ('mome', 2),
+     ('wabe', 2),
+     ('gimble', 2),
+     ('it', 2),
+     ('outgrabe', 2),
+     ('all', 2),
+     ('came', 2),
+     ('with', 2),
+     ('thought', 2),
+     ('twas', 2),
+     ('that', 2),
+     ('vorpal', 2),
+     ('were', 2),
+     ('brillig', 2),
+     ('slithy', 2),
+     ('stood', 2),
+     ('as', 2),
+     ('did', 2),
+     ('toves', 2),
+     ('borogoves', 2),
+     ('two', 2),
+     ('beware', 2),
+     ('went', 2),
+     ('raths', 2),
+     ('his', 2),
+     ('one', 2)]
+
+
+
+Trigrams
+--------
+
+All possible sequences of 3 words in the poem.
+
+.. code:: python
+
+    list(zip(words[:], words[1:], words[2:]))[:10]
+
+
+
+
+.. parsed-literal::
+
+    [('jabberwocky', 'twas', 'brillig'),
+     ('twas', 'brillig', 'and'),
+     ('brillig', 'and', 'the'),
+     ('and', 'the', 'slithy'),
+     ('the', 'slithy', 'toves'),
+     ('slithy', 'toves', 'did'),
+     ('toves', 'did', 'gyre'),
+     ('did', 'gyre', 'and'),
+     ('gyre', 'and', 'gimble'),
+     ('and', 'gimble', 'in')]
+
+
+
+.. code:: python
+
+    import itertools as it
+
+.. code:: python
+
+    def window(x, n):
+        """Sliding widnow of size n from iterable x."""
+        s = (it.islice(x, i, None) for i in range(n))
+        return zip(*s)
+
+.. code:: python
+
+    list(window(words, 3))[:10]
+
+
+
+
+.. parsed-literal::
+
+    [('jabberwocky', 'twas', 'brillig'),
+     ('twas', 'brillig', 'and'),
+     ('brillig', 'and', 'the'),
+     ('and', 'the', 'slithy'),
+     ('the', 'slithy', 'toves'),
+     ('slithy', 'toves', 'did'),
+     ('toves', 'did', 'gyre'),
+     ('did', 'gyre', 'and'),
+     ('gyre', 'and', 'gimble'),
+     ('and', 'gimble', 'in')]
+
+
+
+Find words in poem that are over-represented
+--------------------------------------------
+
+.. code:: python
+
+    book = text
+
+.. code:: python
+
+    book = book.lower().translate(dict.fromkeys(map(ord, string.punctuation)))
+
+.. code:: python
+
+    book_counter = collections.Counter(book.split())
+
+.. code:: python
+
+    n = sum(book_counter.values())
+    book_freqs = {k: v/n for k, v in book_counter.items()}
+
+.. code:: python
+
+    n = sum(poem_counter.values())
+    stats = [(k, v, book_freqs.get(k,0)*n) for k, v in poem_counter.items()]
+
+.. code:: python
+
+    from pandas import DataFrame
+
+.. code:: python
+
+    df = DataFrame(stats, columns = ['word', 'observed', 'expected'])
+
+.. code:: python
+
+    df['score'] = (df.observed-df.expected)**2/df.expected
+
+.. code:: python
+
+    df = df.sort_values(['score'], ascending=False)
+    df.head(n=10)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>word</th>
+          <th>observed</th>
+          <th>expected</th>
+          <th>score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>55</th>
+          <td>jabberwock</td>
+          <td>3</td>
+          <td>0.01557</td>
+          <td>572.045510</td>
+        </tr>
+        <tr>
+          <th>46</th>
+          <td>vorpal</td>
+          <td>2</td>
+          <td>0.01038</td>
+          <td>381.363673</td>
+        </tr>
+        <tr>
+          <th>69</th>
+          <td>beware</td>
+          <td>2</td>
+          <td>0.01038</td>
+          <td>381.363673</td>
+        </tr>
+        <tr>
+          <th>66</th>
+          <td>borogoves</td>
+          <td>2</td>
+          <td>0.01557</td>
+          <td>252.917766</td>
+        </tr>
+        <tr>
+          <th>43</th>
+          <td>twas</td>
+          <td>2</td>
+          <td>0.01557</td>
+          <td>252.917766</td>
+        </tr>
+        <tr>
+          <th>65</th>
+          <td>whiffling</td>
+          <td>1</td>
+          <td>0.00519</td>
+          <td>190.681837</td>
+        </tr>
+        <tr>
+          <th>39</th>
+          <td>tumtum</td>
+          <td>1</td>
+          <td>0.00519</td>
+          <td>190.681837</td>
+        </tr>
+        <tr>
+          <th>42</th>
+          <td>burbled</td>
+          <td>1</td>
+          <td>0.00519</td>
+          <td>190.681837</td>
+        </tr>
+        <tr>
+          <th>52</th>
+          <td>snickersnack</td>
+          <td>1</td>
+          <td>0.00519</td>
+          <td>190.681837</td>
+        </tr>
+        <tr>
+          <th>54</th>
+          <td>callooh</td>
+          <td>1</td>
+          <td>0.00519</td>
+          <td>190.681837</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Encode and decode poem using a Caesar cipher
+--------------------------------------------
+
+.. code:: python
+
+    print(poem)
+
+
+.. parsed-literal::
+
+    jabberwocky
+    
+         twas brillig and the slithy toves
+          did gyre and gimble in the wabe
+         all mimsy were the borogoves
+          and the mome raths outgrabe
+    
+         beware the jabberwock my son
+          the jaws that bite the claws that catch
+         beware the jubjub bird and shun
+          the frumious bandersnatch
+    
+         he took his vorpal sword in hand
+          long time the manxome foe he sought
+         so rested he by the tumtum tree
+          and stood awhile in thought
+    
+         and as in uffish thought he stood
+          the jabberwock with eyes of flame
+         came whiffling through the tulgey wood
+          and burbled as it came
+    
+         one two one two and through and through
+          the vorpal blade went snickersnack
+         he left it dead and with its head
+          he went galumphing back
+    
+         and hast thou slain the jabberwock
+          come to my arms my beamish boy
+         o frabjous day callooh callay
+          he chortled in his joy
+    
+         twas brillig and the slithy toves
+          did gyre and gimble in the wabe
+         all mimsy were the borogoves
+          and the mome raths outgrabe
+    
+    
+    
+
+
+Encoding
+~~~~~~~~
+
+.. code:: python
+
+    def encode(text, k):
+        table = dict(zip(map(ord, string.ascii_lowercase), 
+                                  string.ascii_lowercase[k:] + string.ascii_lowercase[:k]))
+        return text.translate(table)
+
+.. code:: python
+
+    cipher = encode(poem, 2)
+    print(cipher)
+
+
+.. parsed-literal::
+
+    lcddgtyqema
+    
+         vycu dtknnki cpf vjg unkvja vqxgu
+          fkf iatg cpf ikodng kp vjg ycdg
+         cnn okoua ygtg vjg dqtqiqxgu
+          cpf vjg oqog tcvju qwvitcdg
+    
+         dgyctg vjg lcddgtyqem oa uqp
+          vjg lcyu vjcv dkvg vjg encyu vjcv ecvej
+         dgyctg vjg lwdlwd dktf cpf ujwp
+          vjg htwokqwu dcpfgtupcvej
+    
+         jg vqqm jku xqtrcn uyqtf kp jcpf
+          nqpi vkog vjg ocpzqog hqg jg uqwijv
+         uq tguvgf jg da vjg vwovwo vtgg
+          cpf uvqqf cyjkng kp vjqwijv
+    
+         cpf cu kp whhkuj vjqwijv jg uvqqf
+          vjg lcddgtyqem ykvj gagu qh hncog
+         ecog yjkhhnkpi vjtqwij vjg vwniga yqqf
+          cpf dwtdngf cu kv ecog
+    
+         qpg vyq qpg vyq cpf vjtqwij cpf vjtqwij
+          vjg xqtrcn dncfg ygpv upkemgtupcem
+         jg nghv kv fgcf cpf ykvj kvu jgcf
+          jg ygpv icnworjkpi dcem
+    
+         cpf jcuv vjqw unckp vjg lcddgtyqem
+          eqog vq oa ctou oa dgcokuj dqa
+         q htcdlqwu fca ecnnqqj ecnnca
+          jg ejqtvngf kp jku lqa
+    
+         vycu dtknnki cpf vjg unkvja vqxgu
+          fkf iatg cpf ikodng kp vjg ycdg
+         cnn okoua ygtg vjg dqtqiqxgu
+          cpf vjg oqog tcvju qwvitcdg
+    
+    
+    
+
+
+Decoding
+~~~~~~~~
+
+.. code:: python
+
+    recovered = encode(cipher, -2)
+    print(recovered)
+
+
+.. parsed-literal::
+
+    jabberwocky
+    
+         twas brillig and the slithy toves
+          did gyre and gimble in the wabe
+         all mimsy were the borogoves
+          and the mome raths outgrabe
+    
+         beware the jabberwock my son
+          the jaws that bite the claws that catch
+         beware the jubjub bird and shun
+          the frumious bandersnatch
+    
+         he took his vorpal sword in hand
+          long time the manxome foe he sought
+         so rested he by the tumtum tree
+          and stood awhile in thought
+    
+         and as in uffish thought he stood
+          the jabberwock with eyes of flame
+         came whiffling through the tulgey wood
+          and burbled as it came
+    
+         one two one two and through and through
+          the vorpal blade went snickersnack
+         he left it dead and with its head
+          he went galumphing back
+    
+         and hast thou slain the jabberwock
+          come to my arms my beamish boy
+         o frabjous day callooh callay
+          he chortled in his joy
+    
+         twas brillig and the slithy toves
+          did gyre and gimble in the wabe
+         all mimsy were the borogoves
+          and the mome raths outgrabe
+    
+    
+    
+
+
+Using Regular Expressions
+-------------------------
+
+-  `Regular Expression
+   HOWTO <https://docs.python.org/3/howto/regex.html>`__
+-  `Test your Python regular expressions <http://pythex.org/>`__
+
+Find all words with a sequence of two or more identical letters e.g. "look"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    import re
+
+.. code:: python
+
+    regex = re.compile(r'(\w*(\w)\2+\w*)', re.IGNORECASE | re.MULTILINE)
+
+.. code:: python
+
+    for match in regex.finditer(poem):
+        print(match.group(2), match.group(1))
+
+
+.. parsed-literal::
+
+    b jabberwocky
+    l brillig
+    l all
+    b jabberwock
+    o took
+    e tree
+    o stood
+    f uffish
+    o stood
+    b jabberwock
+    f whiffling
+    o wood
+    b jabberwock
+    o callooh
+    l callay
+    l brillig
+    l all
+
+
+Convert the identical sequences to uppercase
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    def f(match):
+        word, letter = match.groups()
+        return word.replace(letter, letter.upper())
+    
+    print(regex.sub(f, poem))
+
+
+.. parsed-literal::
+
+    jaBBerwocky
+    
+         twas briLLig and the slithy toves
+          did gyre and gimble in the wabe
+         aLL mimsy were the borogoves
+          and the mome raths outgrabe
+    
+         beware the jaBBerwock my son
+          the jaws that bite the claws that catch
+         beware the jubjub bird and shun
+          the frumious bandersnatch
+    
+         he tOOk his vorpal sword in hand
+          long time the manxome foe he sought
+         so rested he by the tumtum trEE
+          and stOOd awhile in thought
+    
+         and as in uFFish thought he stOOd
+          the jaBBerwock with eyes of flame
+         came whiFFling through the tulgey wOOd
+          and burbled as it came
+    
+         one two one two and through and through
+          the vorpal blade went snickersnack
+         he left it dead and with its head
+          he went galumphing back
+    
+         and hast thou slain the jaBBerwock
+          come to my arms my beamish boy
+         o frabjous day callOOh caLLay
+          he chortled in his joy
+    
+         twas briLLig and the slithy toves
+          did gyre and gimble in the wabe
+         aLL mimsy were the borogoves
+          and the mome raths outgrabe
+    
+    
+    
+
+
+Natural language processing
+---------------------------
+
+If you intend to perform statistical analysis on natural language, you
+should probably use NLTK to pre-process the text instead of using string
+methods and regular expressions. For example, a simple challenge is to
+first parse the paragraph below into sentences, then parse each sentence
+into words.
+
+Paragraph from random Pubmed abstract.
+
+.. code:: python
+
+    para = """When compared with the control group no significant associations were found for the NS-PEecl group after adjustment of confounding variables. For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity. Antiβ2GP1-domain I IgG were associated with aCL, antiβ2GP1 and aPS/PT IgG in the three groups. aPS/PT IgG were associated with aCL IgG, and aPS/PT IgM were associated with aCL and antiβ2GP1 IgM in the three groups CONCLUSION: S-PEecl is a distinct entity from NS-PEecl and is mainly associated with the presence of antiβ2GP1 IgG. Antiβ2GP1 domain I correlate with other aPL IgG tests, and aPS/PT may be promising in patients in which LA tests cannot be interpreted."""
+
+Naive splitting of sentences as anything separated by ., ! or ?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    sep = re.compile(r'[\?\!\.]')
+
+.. code:: python
+
+    ss = sep.split(para)
+
+.. code:: python
+
+    for i, s in enumerate(ss, 1):
+        print(i, ':', s, end='\n\n')
+
+
+.. parsed-literal::
+
+    1 : When compared with the control group no significant associations were found for the NS-PEecl group after adjustment of confounding variables
+    
+    2 :  For the S-PEecl group, antiβ2GP1 IgG (OR 16
+    
+    3 : 91, 95% CI 3
+    
+    4 : 71-77
+    
+    5 : 06) was associated, as well as age, obesity, smoking and multiparity
+    
+    6 :  Antiβ2GP1-domain I IgG were associated with aCL, antiβ2GP1 and aPS/PT IgG in the three groups
+    
+    7 :  aPS/PT IgG were associated with aCL IgG, and aPS/PT IgM were associated with aCL and antiβ2GP1 IgM in the three groups CONCLUSION: S-PEecl is a distinct entity from NS-PEecl and is mainly associated with the presence of antiβ2GP1 IgG
+    
+    8 :  Antiβ2GP1 domain I correlate with other aPL IgG tests, and aPS/PT may be promising in patients in which LA tests cannot be interpreted
+    
+    9 : 
+    
+
+
+Using NLTK
+~~~~~~~~~~
+
+.. code:: python
+
+    import nltk
+
+.. code:: python
+
+    ss_nltk = nltk.sent_tokenize(para)
+
+.. code:: python
+
+    for i, s in enumerate(ss_nltk, 1):
+        print(i, ':', s, end='\n\n')
+
+
+.. parsed-literal::
+
+    1 : When compared with the control group no significant associations were found for the NS-PEecl group after adjustment of confounding variables.
+    
+    2 : For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity.
+    
+    3 : Antiβ2GP1-domain I IgG were associated with aCL, antiβ2GP1 and aPS/PT IgG in the three groups.
+    
+    4 : aPS/PT IgG were associated with aCL IgG, and aPS/PT IgM were associated with aCL and antiβ2GP1 IgM in the three groups CONCLUSION: S-PEecl is a distinct entity from NS-PEecl and is mainly associated with the presence of antiβ2GP1 IgG.
+    
+    5 : Antiβ2GP1 domain I correlate with other aPL IgG tests, and aPS/PT may be promising in patients in which LA tests cannot be interpreted.
+    
+
+
+Naive parsing of the second sentence into words
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    s = ss_nltk[1]
+    s
+
+
+
+
+.. parsed-literal::
+
+    'For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity.'
+
+
+
+.. code:: python
+
+    # remove punctuation and split on whit space
+    table = dict.fromkeys(map(ord, string.punctuation))
+    s.translate(table).split()
+
+
+
+
+.. parsed-literal::
+
+    ['For',
+     'the',
+     'SPEecl',
+     'group',
+     'antiβ2GP1',
+     'IgG',
+     'OR',
+     '1691',
+     '95',
+     'CI',
+     '3717706',
+     'was',
+     'associated',
+     'as',
+     'well',
+     'as',
+     'age',
+     'obesity',
+     'smoking',
+     'and',
+     'multiparity']
+
+
+
+Using NLTK
+~~~~~~~~~~
+
+.. code:: python
+
+    text = nltk.word_tokenize(s)
+    text
+
+
+
+
+.. parsed-literal::
+
+    ['For',
+     'the',
+     'S-PEecl',
+     'group',
+     ',',
+     'antiβ2GP1',
+     'IgG',
+     '(',
+     'OR',
+     '16.91',
+     ',',
+     '95',
+     '%',
+     'CI',
+     '3.71-77.06',
+     ')',
+     'was',
+     'associated',
+     ',',
+     'as',
+     'well',
+     'as',
+     'age',
+     ',',
+     'obesity',
+     ',',
+     'smoking',
+     'and',
+     'multiparity',
+     '.']
+
+
+
+NLTK is a rich library for natural language processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See http://www.nltk.org for details.
+
+Tag tokens with part-of-speech labels
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    tagged_text = nltk.pos_tag(text)
+    tagged_text
+
+
+
+
+.. parsed-literal::
+
+    [('For', 'IN'),
+     ('the', 'DT'),
+     ('S-PEecl', 'NNP'),
+     ('group', 'NN'),
+     (',', ','),
+     ('antiβ2GP1', 'RB'),
+     ('IgG', 'NNP'),
+     ('(', '('),
+     ('OR', 'NNP'),
+     ('16.91', 'CD'),
+     (',', ','),
+     ('95', 'CD'),
+     ('%', 'NN'),
+     ('CI', 'NNP'),
+     ('3.71-77.06', 'CD'),
+     (')', ')'),
+     ('was', 'VBD'),
+     ('associated', 'VBN'),
+     (',', ','),
+     ('as', 'RB'),
+     ('well', 'RB'),
+     ('as', 'IN'),
+     ('age', 'NN'),
+     (',', ','),
+     ('obesity', 'NN'),
+     (',', ','),
+     ('smoking', 'NN'),
+     ('and', 'CC'),
+     ('multiparity', 'NN'),
+     ('.', '.')]
+
+
+
+.. code:: python
+
+    s
+
+
+
+
+.. parsed-literal::
+
+    'For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity.'
+
+
+
+A simplistic way to pick up nouns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    [w for w, t in tagged_text if t.startswith('N')]
+
+
+
+
+.. parsed-literal::
+
+    ['S-PEecl',
+     'group',
+     'IgG',
+     'OR',
+     '%',
+     'CI',
+     'age',
+     'obesity',
+     'smoking',
+     'multiparity']
+
+
+
+String formatting
+-----------------
+
+Selection
+~~~~~~~~~
+
+.. code:: python
+
+    import math
+
+.. code:: python
+
+    stuff = ('bun', 'shoe', ['bee', 'door'], 2, math.pi, 0.05)
+
+.. code:: python
+
+    'One: {}, Two {}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: bun, Two shoe'
+
+
+
+.. code:: python
+
+    'One: {0}, Two {1}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: bun, Two shoe'
+
+
+
+.. code:: python
+
+    'One: {1}, Two {1}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: shoe, Two shoe'
+
+
+
+.. code:: python
+
+    'One: {0}, Two {2[1]}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: bun, Two door'
+
+
+
+Formatting
+~~~~~~~~~~
+
+.. code:: python
+
+    'One: {0:^10s}, Two {1:_>15s}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One:    bun    , Two ___________shoe'
+
+
+
+.. code:: python
+
+    'One: {3}, Two {4}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: 2, Two 3.141592653589793'
+
+
+
+.. code:: python
+
+    'One: {3:+10d}, Two {4:.4f}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One:         +2, Two 3.1416'
+
+
+
+.. code:: python
+
+    'One: {3:04d}, Two {4:.4g}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: 0002, Two 3.142'
+
+
+
+.. code:: python
+
+    'One: {3:.4e}, Two {4:.4e}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: 2.0000e+00, Two 3.1416e+00'
+
+
+
+.. code:: python
+
+    'One: {5:.2%}, Two {5:f}'.format(*stuff)
+
+
+
+
+.. parsed-literal::
+
+    'One: 5.00%, Two 0.050000'
+
+
+
+Old style formatting
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    '%s, %s, %a, %d, %.4f, %.2f' % stuff
+
+
+
+
+.. parsed-literal::
+
+    "bun, shoe, ['bee', 'door'], 2, 3.1416, 0.05"
+
+
+
+Formatting numpy arrays
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    import numpy as np
+
+.. code:: python
+
+    x = np.arange(1, 13).reshape(3,4)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1,  2,  3,  4],
+           [ 5,  6,  7,  8],
+           [ 9, 10, 11, 12]])
+
+
+
+.. code:: python
+
+    np.set_printoptions(formatter={'int': lambda x: '%8.2f' % x})
+
+.. code:: python
+
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[    1.00,     2.00,     3.00,     4.00],
+           [    5.00,     6.00,     7.00,     8.00],
+           [    9.00,    10.00,    11.00,    12.00]])
+
+
+
+.. code:: python
+
+    np.set_printoptions()
+
+.. code:: python
+
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1,  2,  3,  4],
+           [ 5,  6,  7,  8],
+           [ 9, 10, 11, 12]])
+
+

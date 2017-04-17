@@ -1,0 +1,31 @@
+To do list
+----------------------------------------
+
+- [ ] 矩阵分解的方法
+    - [ ] LU
+    - [ ] QR
+    - [ ] SVD
+    - [ ] PCA
+    - [ ] Cholesky
+- [ ] 优化方法
+	- [ ] IRLS
+	- [ ] 梯度下降法 Gradient descent
+	- [ ] 随机梯度下降法 Stochastic gradient descent
+	- [ ] 共轭梯度 Conjugate gradient
+	- [ ] EM 算法
+	- [ ] 动态规划和维特比算法Dynamic programming and Viterbi algorithm
+- [ ] 模拟
+	- [ ] 简单的 MCMC算法（马尔可夫链蒙特卡罗(Markov Chain Monte Carlo)）
+	- [ ] 粒子滤波 Particle filter
+	- [ ] ABC
+	- [ ] Tempering
+	- [ ] Bootstrap
+	- [ ] Jackknife
+	- [ ] Permutation resampling
+	- [ ] GMMs in PyMC
+	- [ ] PyStan 和 Emcee 的类似实现（Similar implementations in PyStan and Emcee）
+- [ ] 高性能计算
+	- [ ] I通过 CythonRemath 来与 R 语言的链接库进行交互
+	- [ ] 通过 Ceygen 与 Egien 进行交互
+	- [ ] 改进 CythonGSL 和 CythonRmath 的样例
+	- [ ] 给 Cython 模块添加解释视图（annotate view）

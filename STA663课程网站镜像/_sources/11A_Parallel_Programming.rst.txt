@@ -1,0 +1,166 @@
+
+Parallel Programming
+====================
+
+The goal is to design parallel programs that are flexible, efficient and
+simple.
+
+**Step 0**: Start by profiling a serial program to identify bottlenecks
+
+**Step 1**: Are there for opportunities for parallelism?
+
+-  Can tasks be performed in parallel?
+
+   -  Function calls
+   -  Loops
+
+-  Can data be split and operated on in parallel?
+
+   -  Decomposition of arrays along rows, columns, blocks
+   -  Decomposition of trees into sub-trees
+
+-  Is there a pipeline with a sequence of stages?
+
+   -  Data preprocessing and analysis
+   -  Graphics rendering
+
+**Step 2**: What is the nature of the parallelism?
+
+-  Linear
+
+   -  Embarrassingly parallel programs
+
+-  Recursive
+
+   -  Adaptive partitioning methods
+
+**Step 3**: What is the granularity?
+
+-  10s of jobs
+-  1000s of jobs
+
+**Step 4**: Choose an algorithm
+
+-  Organize by tasks
+
+   -  Task parallelism
+   -  Divide and conquer
+
+-  Organize by data
+
+   -  Geometric decomposition
+   -  Recursive decomposition
+
+-  Organize by flow
+
+   -  Pipeline
+   -  Event-based processing
+
+**Step 5**: Map to program and data structures
+
+-  Program structures
+
+   -  Single program multiple data (SPMD)
+   -  Master/worker
+   -  Loop parallelism
+   -  Fork/join
+
+-  Data structures
+
+   -  Shared data
+   -  Shared queue
+   -  Distributed array
+
+**Step 6**: Map to parallel environment
+
+-  Multi-core shared memory
+
+   -  Cython with OpenMP
+   -  multiprocessing
+   -  IPython.cluster
+
+-  Multi-computer
+
+   -  IPython.cluster
+   -  MPI
+   -  Hadoop / Spark
+
+-  GPU
+
+   -  CUDA
+   -  OpenCL
+
+**Step 7**: Execute, debug, tune in parallel environment
+
+Embarrassingly parallel programs
+--------------------------------
+
+Many statistical problems are embarrassingly parallel and can be easily
+decomposed into independent tasks or data sets. Here are several
+examples:
+
+-  Monte Carlo integration
+-  Multiple chains of MCMC
+-  Bootstrap for confidence intervals
+-  Power calculations by simulation
+-  Permutation-resampling tests
+-  Fitting same model on multiple data sets
+
+Other problems are serial at small scale, but can be parallelized at
+large scales. For example, EM and MCMC iterations are inherently serial
+since there is a dependence on the previous state, but within a single
+iteration, there can be many thousands of density calculations (one for
+each data point to calculate the likelihood), and this is an
+embarrassingly parallel problem within a single iteration.
+
+These "low hanging fruits" are great because they offer a path to easy
+parallelism with minimal complexity.
+
+Executing parallel code
+-----------------------
+
+**The bigger the problem, the more scope there is for parallelism**
+
+**Amhdahls' law** says that the speedup from parallelization is bounded
+by the ratio of parallelizable to irreducibly serial code in the
+algorithm. However, for big data analysis, **Gustafson's Law** is more
+relevant. This says that we are nearly always interested in increasing
+the size of the parallelizable bits, and the ratio of parallelizable to
+irreducibly serial code is not a static quantity but depends on data
+size. For example, Gibbs sampling has an irreducibly serial nature, but
+for large samples, each iteration may be able perform PDF evaluations in
+parallel for zillions of data points.
+
+Coming highlights
+-----------------
+
+-  Parallelism in pre-built packages -``sklearn``
+
+   -  ``pymc3``
+   -  ``pystan``
+
+-  Parallelism when compiling to native code
+
+   -  Using ``target=paraallel`` in ``numba.vectorize`` and
+      ``numb.guvectorize``
+   -  Using ``openmp`` with ``cython.parallel``, ``cython.prange`` and
+      ``cython.nogil``
+
+-  Parallelism for multi-core computers
+
+   -  Using ``concurrent.futures``
+   -  Using ``multiprocessing``
+   -  Using ``ipyparallel`` within Jupyter
+
+-  Data too big for memory but not for disk
+
+   -  ``memmap``
+   -  ``HDF5`` and ``h5py``
+   -  Using ``dask``
+   -  Usign ``blaze``
+
+-  Data too big for one computer
+
+   -  Distributed storage
+   -  Data sketches
+   -  Using ``pyspark``

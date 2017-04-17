@@ -1,0 +1,1318 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/12A_C++.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:12 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using C++ &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using pybind11" href="12B_C%2b%2b_Python_pybind11.html" />
+    <link rel="prev" title="Using ipyparallel" href="11C_IPyParallel.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="12B_C%2b%2b_Python_pybind11.html" title="Using pybind11"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="11C_IPyParallel.html" title="Using ipyparallel"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-c">
+<h1>Using C++<a class="headerlink" href="#using-c" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Lecture 11 will cover the baiscs of C++ progamming.</li>
+<li>Lecture 12 will cover how to call C++ libraries from Python using
+<code class="docutils literal"><span class="pre">pybind11</span></code></li>
+</ul>
+<p>Since we are mainly learning C++ to wrap for use in Python, we will
+ignore C++ I/O.</p>
+<div class="section" id="the-compilation-process">
+<h2>The compilation process<a class="headerlink" href="#the-compilation-process" title="Permalink to this headline">¶</a></h2>
+<div class="figure" id="id3">
+<img alt="Compilation process" src="http://www.codingunit.com/images/preprocessor-compiler-linker.jpg" />
+<p class="caption"><span class="caption-text">Compilation process</span></p>
+</div>
+<div class="section" id="hello-world">
+<h3>Hello, world<a class="headerlink" href="#hello-world" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">hello</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">hello</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">hello</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">hello</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">hello</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Hello, world&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">hello</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! g++ hello.cpp -o hello
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! ./hello
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Hello</span><span class="p">,</span> <span class="n">world</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-simple-function">
+<h3>A simple function<a class="headerlink" href="#a-simple-function" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">add1</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">add1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">add1</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">add1</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="n">double</span> <span class="n">add</span><span class="p">(</span><span class="n">double</span> <span class="n">a</span><span class="p">,</span> <span class="n">double</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+
+    <span class="n">double</span> <span class="n">c</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">a</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; + &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">b</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">c</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! g++ add.cpp -o add
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! ./add
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-header-files">
+<h3>Using header files<a class="headerlink" href="#using-header-files" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">add2</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">add2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">add2</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">add2</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">add</span><span class="o">.</span><span class="n">hpp</span>
+
+<span class="c1">#pragma once</span>
+<span class="n">double</span> <span class="n">add</span><span class="p">(</span><span class="n">double</span> <span class="n">a</span><span class="p">,</span> <span class="n">double</span> <span class="n">b</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">add</span><span class="o">.</span><span class="n">hpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="n">double</span> <span class="n">add</span><span class="p">(</span><span class="n">double</span> <span class="n">a</span><span class="p">,</span> <span class="n">double</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &quot;add.hpp&quot;</span>
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+
+    <span class="n">double</span> <span class="n">c</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">a</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; + &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">b</span>  <span class="o">&lt;&lt;</span> <span class="s2">&quot; = &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">c</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">g</span><span class="o">++</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span>
+<span class="o">./</span><span class="n">add_driver</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+<div class="section" id="notes">
+<h4>Notes:<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">#pragma</span> <span class="pre">once</span></code> is non-standard but very widely supported</li>
+<li>if you want to be pedantic, use traditional guards</li>
+</ul>
+<div class="code cpp highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">src</span><span class="o">/</span><span class="n">add</span><span class="o">.</span><span class="n">hpp</span>
+
+<span class="c1">#ifndef ADD_HPP</span>
+<span class="c1">#define ADD_HPP</span>
+<span class="n">double</span> <span class="n">add</span><span class="p">(</span><span class="n">double</span> <span class="n">a</span><span class="p">,</span> <span class="n">double</span> <span class="n">b</span><span class="p">);</span>
+<span class="c1">#endif /* ADD_HPP */</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-make">
+<h3>Using <code class="docutils literal"><span class="pre">make</span></code><a class="headerlink" href="#using-make" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">add3</span>
+<span class="o">%</span><span class="n">cp</span> <span class="n">add2</span><span class="o">/</span><span class="n">add</span><span class="o">.</span><span class="n">cpp</span> <span class="n">add2</span><span class="o">/</span><span class="n">add</span><span class="o">.</span><span class="n">hpp</span> <span class="n">add2</span><span class="o">/</span><span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span> <span class="n">add3</span><span class="o">/</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">add3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">add3</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">add3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">Makefile</span>
+
+<span class="n">add_driver</span><span class="p">:</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span>
+    <span class="n">g</span><span class="o">++</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span>
+
+<span class="n">add_driver</span><span class="o">.</span><span class="n">o</span><span class="p">:</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span> <span class="n">add</span><span class="o">.</span><span class="n">hpp</span>
+    <span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="n">add</span><span class="o">.</span><span class="n">o</span><span class="p">:</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+    <span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="o">.</span><span class="n">PHONY</span><span class="p">:</span> <span class="n">clean</span>
+<span class="n">clean</span><span class="p">:</span>
+    <span class="n">rm</span> <span class="n">add_driver</span> <span class="o">*.</span><span class="n">o</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! make
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! make clean
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="n">add_driver</span> <span class="o">*.</span><span class="n">o</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! make
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-reusable-makefile">
+<h3>A reusable Makefile<a class="headerlink" href="#a-reusable-makefile" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = add_driver
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">add_driver</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">add_driver</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">add</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">add</span><span class="o">.</span><span class="n">o</span> <span class="n">add_driver</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">add_driver</span>
+<span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">=</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linking-to-a-library">
+<h3>Linking to a library<a class="headerlink" href="#linking-to-a-library" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">linker</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">linker</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">linker</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">linker</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">test_linker</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;cmath&gt;</span>
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;2^10 = &quot;</span> <span class="o">&lt;&lt;</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">test_linker</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = test_linker
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! make
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">test_linker</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">test_linker</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">test_linker</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">test_linker</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! ./test_linker
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2</span><span class="o">^</span><span class="mi">10</span> <span class="o">=</span> <span class="mi">1024</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="arrays-pointers-and-dereferencing">
+<h2>Arrays, pointers and dereferencing<a class="headerlink" href="#arrays-pointers-and-dereferencing" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">arrays</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">arrays</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">arrays</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="p">[</span><span class="n">Errno</span> <span class="mi">20</span><span class="p">]</span> <span class="n">Not</span> <span class="n">a</span> <span class="n">directory</span><span class="p">:</span> <span class="s1">&#39;arrays&#39;</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file arrays.cpp
+
+#include &lt;cmath&gt;
+#include &lt;iostream&gt;
+using std::cout;
+using std::endl;
+
+int main() {
+
+    // pointers and address-of opertor
+    int a = 1, b = 2;
+    int *p = &amp;a, *q = &amp;b;
+
+    cout &lt;&lt; a &lt;&lt; &quot;, &quot; &lt;&lt; b &lt;&lt; endl;
+    cout &lt;&lt; *p &lt;&lt; &quot;, &quot; &lt;&lt; *q &lt;&lt; endl;
+    cout &lt;&lt; p &lt;&lt; &quot;, &quot; &lt;&lt; q &lt;&lt; endl;
+
+    // An array name is just a pointer
+    int ms[] = {1,2,3,4};
+
+    // using indexing
+    cout &lt;&lt; ms[0] &lt;&lt; &quot;, &quot; &lt;&lt; ms[1] &lt;&lt; endl;
+    // using pointer arithmetic
+    cout &lt;&lt; *(ms) &lt;&lt; &quot;, &quot; &lt;&lt; *(ms + 0) &lt;&lt; &quot;, &quot; &lt;&lt; *(ms + 2) &lt;&lt; endl;
+    cout &lt;&lt; 2[ms] &lt;&lt; &quot;, &quot; &lt;&lt; 3[ms] &lt;&lt; endl; // wait, what??
+
+    // size of an array
+    cout &lt;&lt; sizeof(ms)/sizeof(*ms) &lt;&lt; endl;
+}
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">arrays</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = arrays
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span>
+<span class="o">./</span><span class="n">arrays</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">arrays</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">arrays</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">arrays</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">arrays</span>
+<span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+<span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+<span class="mh">0x7fff56a6b4fc</span><span class="p">,</span> <span class="mh">0x7fff56a6b4f8</span>
+<span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+<span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+<span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
+<span class="mi">4</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loops-in-c">
+<h2>Loops in C++<a class="headerlink" href="#loops-in-c" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">loops</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">loops</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">loops</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">loops</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">loops</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;cmath&gt;</span>
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">xs</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">};</span>
+
+    <span class="o">//</span> <span class="n">looping</span> <span class="k">with</span> <span class="n">an</span> <span class="n">index</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">sizeof</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="o">/</span><span class="n">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">xs</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="nb">pow</span><span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; &quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="o">//</span> <span class="n">looping</span> <span class="k">with</span> <span class="n">an</span> <span class="n">iterator</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">it</span><span class="o">=</span><span class="n">std</span><span class="p">::</span><span class="n">begin</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span> <span class="n">it</span><span class="o">!=</span><span class="n">std</span><span class="p">::</span><span class="n">end</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span> <span class="n">it</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="nb">pow</span><span class="p">(</span><span class="o">*</span><span class="n">it</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; &quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="o">//</span> <span class="n">ranged</span> <span class="k">for</span> <span class="n">loop</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">x</span> <span class="p">:</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; &quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">loops</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = loops
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">loops</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">loops</span> <span class="n">loops</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">loops</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">loops</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">loops</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">loops</span>
+<span class="mi">0</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">9</span> <span class="mi">16</span> <span class="mi">25</span> <span class="mi">36</span> <span class="mi">49</span> <span class="mi">64</span> <span class="mi">81</span>
+<span class="mi">0</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">9</span> <span class="mi">16</span> <span class="mi">25</span> <span class="mi">36</span> <span class="mi">49</span> <span class="mi">64</span> <span class="mi">81</span>
+<span class="mi">0</span> <span class="mi">1</span> <span class="mi">4</span> <span class="mi">9</span> <span class="mi">16</span> <span class="mi">25</span> <span class="mi">36</span> <span class="mi">49</span> <span class="mi">64</span> <span class="mi">81</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions-in-c">
+<h2>Functions in C++<a class="headerlink" href="#functions-in-c" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">funcs1</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">funcs1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">funcs1</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">funcs1</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">funcs1</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="n">double</span> <span class="nb">sum</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">xs</span><span class="p">,</span> <span class="nb">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">void</span> <span class="n">triple</span><span class="p">(</span><span class="n">double</span> <span class="o">*</span><span class="n">xs</span><span class="p">,</span> <span class="n">double</span> <span class="o">*</span> <span class="n">ys</span><span class="p">,</span> <span class="nb">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">xs</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">};</span>
+    <span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="o">/</span><span class="n">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">xs</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">double</span> <span class="n">ys</span><span class="p">[</span><span class="n">n</span><span class="p">];</span>
+
+    <span class="n">triple</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">n</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">y</span> <span class="p">:</span> <span class="n">ys</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot; &quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">funcs1</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = funcs1
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span>
+<span class="o">./</span><span class="n">funcs1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">funcs1</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">funcs1</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">funcs1</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">funcs1</span>
+<span class="mi">10</span>
+<span class="mi">3</span> <span class="mi">6</span> <span class="mi">9</span> <span class="mi">12</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="anonymous-functions">
+<h2>Anonymous functions<a class="headerlink" href="#anonymous-functions" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">funcs2</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">funcs2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">funcs2</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="p">[</span><span class="n">Errno</span> <span class="mi">20</span><span class="p">]</span> <span class="n">Not</span> <span class="n">a</span> <span class="n">directory</span><span class="p">:</span> <span class="s1">&#39;funcs2&#39;</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">double</span> <span class="n">k</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">;</span>
+    <span class="n">double</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">;</span>
+
+    <span class="n">auto</span> <span class="n">add1</span> <span class="o">=</span> <span class="p">[](</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">;</span> <span class="p">};</span>
+    <span class="n">auto</span> <span class="n">add2</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">k</span><span class="p">;</span> <span class="p">};</span>
+    <span class="n">auto</span> <span class="n">add3</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">k</span><span class="p">](</span><span class="nb">int</span> <span class="n">a</span><span class="p">,</span> <span class="nb">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">k</span><span class="p">;</span> <span class="p">};</span>
+
+    <span class="n">k</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Lambda: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">add1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Lambda with capture by value: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">add2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Lmabda with capture by reference: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">add3</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = funcs2
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">funcs2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">funcs2</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">funcs2</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">funcs2</span>
+<span class="n">Lambda</span><span class="p">:</span> <span class="mi">3</span>
+<span class="n">Lambda</span> <span class="k">with</span> <span class="n">capture</span> <span class="n">by</span> <span class="n">value</span><span class="p">:</span> <span class="mi">8</span>
+<span class="n">Lmabda</span> <span class="k">with</span> <span class="n">capture</span> <span class="n">by</span> <span class="n">reference</span><span class="p">:</span> <span class="mi">13</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="templates">
+<h2>Templates<a class="headerlink" href="#templates" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">templates</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">templates</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">templates</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">templates</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">templates</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="c1">#include &lt;vector&gt;</span>
+<span class="c1">#include &lt;list&gt;</span>
+<span class="c1">#include &lt;numeric&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="nb">list</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">vector</span><span class="p">;</span>
+
+<span class="n">template</span><span class="o">&lt;</span><span class="n">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+<span class="n">T</span> <span class="nb">sum</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">T</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">x</span> <span class="p">:</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">(){</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span> <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">};</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">xs</span> <span class="o">=</span> <span class="p">{</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">6.4</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">};</span>
+
+    <span class="o">//</span> <span class="nb">sum</span> <span class="n">works</span> <span class="k">with</span> <span class="n">integers</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Sum of ints: &quot;</span> <span class="o">&lt;&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="o">//</span> <span class="nb">sum</span> <span class="n">works</span> <span class="k">with</span> <span class="n">doubles</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Sum of doubles: &quot;</span> <span class="o">&lt;&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="o">//</span> <span class="n">iota</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">numeric</span> <span class="n">library</span> <span class="n">behaves</span> <span class="n">like</span> <span class="nb">range</span>
+    <span class="nb">list</span><span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span> <span class="n">ys</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="n">std</span><span class="p">::</span><span class="n">iota</span><span class="p">(</span><span class="n">ys</span><span class="o">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">ys</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="o">-</span><span class="mi">3</span><span class="p">);</span>
+
+    <span class="o">//</span> <span class="n">accumulate</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">numeric</span> <span class="n">library</span> <span class="n">behavses</span> <span class="n">like</span> <span class="n">reduce</span> <span class="k">with</span> <span class="n">default</span> <span class="n">operation</span> <span class="n">of</span> <span class="n">addition</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Sum from iota: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">ys</span><span class="o">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">ys</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="o">//</span> <span class="n">Note</span> <span class="n">that</span> <span class="n">the</span> <span class="n">initial</span> <span class="n">value</span> <span class="n">determines</span> <span class="n">the</span> <span class="n">template</span> <span class="nb">type</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Sum of doubles using accumulate: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">xs</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Surpise: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">xs</span><span class="o">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">xs</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+
+    <span class="o">//</span> <span class="n">The</span> <span class="n">binary</span> <span class="n">operation</span> <span class="n">can</span> <span class="n">be</span> <span class="n">user</span><span class="o">-</span><span class="n">defined</span>
+    <span class="n">auto</span> <span class="n">op</span> <span class="o">=</span> <span class="n">std</span><span class="p">::</span><span class="n">multiplies</span><span class="o">&lt;</span><span class="nb">int</span><span class="o">&gt;</span><span class="p">();</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Product of ints: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">accumulate</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">ns</span><span class="o">.</span><span class="n">end</span><span class="p">(),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">templates</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = templates
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">templates</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">templates</span> <span class="n">templates</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">templates</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">templates</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">templates</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">templates</span>
+<span class="n">Sum</span> <span class="n">of</span> <span class="n">ints</span><span class="p">:</span> <span class="mi">6</span>
+<span class="n">Sum</span> <span class="n">of</span> <span class="n">doubles</span><span class="p">:</span> <span class="mf">18.7</span>
+<span class="n">Sum</span> <span class="kn">from</span> <span class="nn">iota</span><span class="p">:</span> <span class="mi">21</span>
+<span class="n">Sum</span> <span class="n">of</span> <span class="n">doubles</span> <span class="n">using</span> <span class="n">accumulate</span><span class="p">:</span> <span class="mf">18.7</span>
+<span class="n">Surpise</span><span class="p">:</span> <span class="mi">17</span>
+<span class="n">Product</span> <span class="n">of</span> <span class="n">ints</span><span class="p">:</span> <span class="mi">6</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-pointers">
+<h2>Function pointers<a class="headerlink" href="#function-pointers" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">func_ptrs</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">func_ptrs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">func_ptrs</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">func_ptrs</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file func_ptrs.cpp
+
+#include &lt;numeric&gt;
+#include &lt;functional&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using std::cout;
+using std::endl;
+using std::vector;
+
+double sum(vector&lt;double&gt; xs) {
+    return std::accumulate(xs.begin(), xs.end(), 0.0);
+}
+
+double prod(vector&lt;double&gt; xs) {
+    return std::accumulate(xs.begin(), xs.end(), 1.0, std::multiplies&lt;double&gt;());
+}
+
+// funciton pointers in C++ are easy
+using func = std::function&lt;double(double)&gt;;
+
+// now you can pass in a funciton as an argument
+double mystery(double x, func f) {
+    return f(x);
+}
+
+double foo(double x) {
+    return 2*x + 1;
+}
+
+double bar(double x) {
+    return 42*x;
+}
+
+int main() {
+    vector&lt;double&gt; xs = {1.2, 2.3};
+    cout &lt;&lt; sum(xs) &lt;&lt; endl;
+    cout &lt;&lt; prod(xs) &lt;&lt; endl;
+
+    // auto can crate iterables of functions!
+    auto funcs = {sum, prod};
+    for (auto f: funcs) {
+        cout &lt;&lt; f(xs) &lt;&lt; endl;
+    }
+
+    int x = 2;
+    cout &lt;&lt; mystery(x, foo) &lt;&lt; endl;
+    cout &lt;&lt; mystery(x, bar) &lt;&lt; endl;
+    cout &lt;&lt; mystery(x, [](double x) {return x*x;}) &lt;&lt; endl;
+
+}
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">func_ptrs</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+
+# File names
+EXEC = func_ptrs
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">func_ptrs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">func_ptrs</span> <span class="n">func_ptrs</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">func_ptrs</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">func_ptrs</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="n">func_ptrs</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">func_ptrs</span>
+<span class="mf">3.5</span>
+<span class="mf">2.76</span>
+<span class="mf">3.5</span>
+<span class="mf">2.76</span>
+<span class="mi">5</span>
+<span class="mi">84</span>
+<span class="mi">4</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-numeric-library">
+<h2>Using a numeric library<a class="headerlink" href="#using-a-numeric-library" title="Permalink to this headline">¶</a></h2>
+<p>We show the Armadillo numeric library here; in the next lecture, we will
+show the competing Eigen libary.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">numeric</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">numeric</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mkdir</span><span class="p">:</span> <span class="n">numeric</span><span class="p">:</span> <span class="n">File</span> <span class="n">exists</span>
+<span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span><span class="o">/</span><span class="n">numeric</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">numeric</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="c1">#include &lt;iostream&gt;</span>
+<span class="c1">#include &lt;fstream&gt;</span>
+<span class="c1">#include &lt;armadillo&gt;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">cout</span><span class="p">;</span>
+<span class="n">using</span> <span class="n">std</span><span class="p">::</span><span class="n">ofstream</span><span class="p">;</span>
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">using</span> <span class="n">namespace</span> <span class="n">arma</span><span class="p">;</span>
+
+    <span class="n">vec</span> <span class="n">u</span> <span class="o">=</span> <span class="n">linspace</span><span class="o">&lt;</span><span class="n">vec</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span>
+    <span class="n">vec</span> <span class="n">v</span> <span class="o">=</span> <span class="n">ones</span><span class="o">&lt;</span><span class="n">vec</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+    <span class="n">mat</span> <span class="n">A</span> <span class="o">=</span> <span class="n">randu</span><span class="o">&lt;</span><span class="n">mat</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span> <span class="o">//</span> <span class="n">uniform</span> <span class="n">random</span> <span class="n">deviates</span>
+    <span class="n">mat</span> <span class="n">B</span> <span class="o">=</span> <span class="n">randn</span><span class="o">&lt;</span><span class="n">mat</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">);</span> <span class="o">//</span> <span class="n">normal</span> <span class="n">random</span> <span class="n">deviates</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Vecotrs in Armadillo</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">u</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">u</span><span class="o">.</span><span class="n">t</span><span class="p">()</span> <span class="o">*</span> <span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Random matrices in Armadillo</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">A</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">B</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">A</span> <span class="o">*</span> <span class="n">B</span><span class="o">.</span><span class="n">t</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">A</span> <span class="o">*</span> <span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">QR in Armadillo</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="n">mat</span> <span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">;</span>
+    <span class="n">qr</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">t</span><span class="p">()</span> <span class="o">*</span> <span class="n">A</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">Q</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">R</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">numeric</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file Makefile
+# Declaration of variables
+CC = g++
+CC_FLAGS = -Wall -std=c++11
+LD_FLAGS = -larmadillo # Add library for linking
+
+# File names
+EXEC = numeric
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Main target
+$(EXEC): $(OBJECTS)
+    $(CC) $(LD_FLAGS) $(OBJECTS) -o $(EXEC)
+
+# To obtain object files
+%.o: %.cpp
+    $(CC) -c $(CC_FLAGS) $&lt; -o $@
+
+# To remove generated files
+clean:
+    rm -f $(EXEC) $(OBJECTS)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">Makefile</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span>
+<span class="o">./</span><span class="n">numeric</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rm</span> <span class="o">-</span><span class="n">f</span> <span class="n">numeric</span> <span class="n">numeric</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">c</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span> <span class="n">numeric</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">numeric</span><span class="o">.</span><span class="n">o</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">larmadillo</span>  <span class="n">numeric</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">numeric</span>
+
+<span class="n">Vecotrs</span> <span class="ow">in</span> <span class="n">Armadillo</span>
+        <span class="mi">0</span>
+   <span class="mf">0.2500</span>
+   <span class="mf">0.5000</span>
+   <span class="mf">0.7500</span>
+   <span class="mf">1.0000</span>
+
+   <span class="mf">1.0000</span>
+   <span class="mf">1.0000</span>
+   <span class="mf">1.0000</span>
+   <span class="mf">1.0000</span>
+   <span class="mf">1.0000</span>
+
+   <span class="mf">2.5000</span>
+
+
+<span class="n">Random</span> <span class="n">matrices</span> <span class="ow">in</span> <span class="n">Armadillo</span>
+   <span class="mf">7.8264e-06</span>   <span class="mf">5.3277e-01</span>   <span class="mf">6.7930e-01</span>   <span class="mf">8.3097e-01</span>   <span class="mf">6.7115e-01</span>
+   <span class="mf">1.3154e-01</span>   <span class="mf">2.1896e-01</span>   <span class="mf">9.3469e-01</span>   <span class="mf">3.4572e-02</span>   <span class="mf">7.6982e-03</span>
+   <span class="mf">7.5561e-01</span>   <span class="mf">4.7045e-02</span>   <span class="mf">3.8350e-01</span>   <span class="mf">5.3462e-02</span>   <span class="mf">3.8342e-01</span>
+   <span class="mf">4.5865e-01</span>   <span class="mf">6.7886e-01</span>   <span class="mf">5.1942e-01</span>   <span class="mf">5.2970e-01</span>   <span class="mf">6.6842e-02</span>
+
+  <span class="o">-</span><span class="mf">0.7649</span>   <span class="mf">1.2041</span>  <span class="o">-</span><span class="mf">0.7020</span>   <span class="mf">1.1862</span>   <span class="mf">0.8284</span>
+   <span class="mf">1.7313</span>   <span class="mf">0.0937</span>   <span class="mf">1.6814</span>  <span class="o">-</span><span class="mf">0.8631</span>   <span class="mf">0.9426</span>
+   <span class="mf">0.1454</span>  <span class="o">-</span><span class="mf">0.6920</span>   <span class="mf">0.2742</span>   <span class="mf">0.6810</span>   <span class="mf">0.2091</span>
+   <span class="mf">0.7032</span>   <span class="mf">0.2610</span>   <span class="mf">0.1752</span>   <span class="mf">1.3165</span>  <span class="o">-</span><span class="mf">0.5897</span>
+
+   <span class="mf">1.7063</span>   <span class="mf">1.1075</span>   <span class="mf">0.5238</span>   <span class="mf">0.9563</span>
+  <span class="o">-</span><span class="mf">0.4457</span>   <span class="mf">1.7973</span>   <span class="mf">0.1490</span>   <span class="mf">0.3544</span>
+  <span class="o">-</span><span class="mf">0.4095</span>   <span class="mf">2.2726</span>   <span class="mf">0.2990</span>   <span class="mf">0.4551</span>
+   <span class="mf">0.7857</span>   <span class="mf">1.3368</span>   <span class="mf">0.1140</span>   <span class="mf">1.2487</span>
+
+   <span class="mf">2.7142</span>
+   <span class="mf">1.3275</span>
+   <span class="mf">1.6230</span>
+   <span class="mf">2.2535</span>
+
+
+<span class="n">QR</span> <span class="ow">in</span> <span class="n">Armadillo</span>
+  <span class="o">-</span><span class="mf">0.6776</span>   <span class="mf">0.6377</span>   <span class="mf">0.3253</span>   <span class="mf">0.0944</span>  <span class="o">-</span><span class="mf">0.1395</span>
+  <span class="o">-</span><span class="mf">0.3188</span>  <span class="o">-</span><span class="mf">0.4409</span>   <span class="mf">0.3521</span>   <span class="mf">0.4177</span>   <span class="mf">0.6368</span>
+  <span class="o">-</span><span class="mf">0.5524</span>  <span class="o">-</span><span class="mf">0.2366</span>  <span class="o">-</span><span class="mf">0.7774</span>   <span class="mf">0.1504</span>  <span class="o">-</span><span class="mf">0.1092</span>
+  <span class="o">-</span><span class="mf">0.2443</span>  <span class="o">-</span><span class="mf">0.5816</span>   <span class="mf">0.4071</span>  <span class="o">-</span><span class="mf">0.1709</span>  <span class="o">-</span><span class="mf">0.6380</span>
+  <span class="o">-</span><span class="mf">0.2727</span>  <span class="o">-</span><span class="mf">0.0688</span>  <span class="o">-</span><span class="mf">0.0099</span>  <span class="o">-</span><span class="mf">0.8745</span>   <span class="mf">0.3950</span>
+
+  <span class="o">-</span><span class="mf">1.1785e+00</span>  <span class="o">-</span><span class="mf">1.3394e+00</span>  <span class="o">-</span><span class="mf">2.1015e+00</span>  <span class="o">-</span><span class="mf">1.3527e+00</span>  <span class="o">-</span><span class="mf">1.0229e+00</span>
+        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>  <span class="o">-</span><span class="mf">8.3421e-01</span>  <span class="o">-</span><span class="mf">9.7607e-01</span>  <span class="o">-</span><span class="mf">9.9515e-01</span>  <span class="o">-</span><span class="mf">5.3245e-01</span>
+        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>  <span class="o">-</span><span class="mf">4.6336e-01</span>   <span class="mf">7.6793e-02</span>  <span class="o">-</span><span class="mf">4.0376e-03</span>
+        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>  <span class="o">-</span><span class="mf">2.0273e-01</span>  <span class="o">-</span><span class="mf">3.2745e-01</span>
+        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>        <span class="mi">0</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>   <span class="mf">1.1102e-16</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">git</span><span class="o">-</span><span class="n">teach</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using C++</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-compilation-process">The compilation process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#arrays-pointers-and-dereferencing">Arrays, pointers and dereferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#loops-in-c">Loops in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#functions-in-c">Functions in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anonymous-functions">Anonymous functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#templates">Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#function-pointers">Function pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-a-numeric-library">Using a numeric library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="11C_IPyParallel.html"
+                          title="Previous page">&larr; Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="12B_C%2b%2b_Python_pybind11.html"
+                          title="Next page">&rarr; Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/12A_C%2b%2b.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="12B_C%2b%2b_Python_pybind11.html" title="Using pybind11"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="11C_IPyParallel.html" title="Using ipyparallel"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/12A_C++.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:14 GMT -->
+</html>

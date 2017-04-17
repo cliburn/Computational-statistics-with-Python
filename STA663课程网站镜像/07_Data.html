@@ -1,0 +1,2225 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/07_Data.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:04 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Data &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SQL" href="08_SQL.html" />
+    <link rel="prev" title="Graphics in Python" href="06_Graphics.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="08_SQL.html" title="SQL"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="06_Graphics.html" title="Graphics in Python"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="data">
+<h1>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/">Pandas
+documentation</a></li>
+<li><a class="reference external" href="https://github.com/quantopian/qgrid">QGrid</a></li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">Series</span><span class="p">,</span> <span class="n">DataFrame</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-series">
+<h2>Working with Series<a class="headerlink" href="#working-with-series" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>    <span class="mi">5</span>
+<span class="mi">1</span>    <span class="mi">6</span>
+<span class="mi">2</span>    <span class="mi">7</span>
+<span class="mi">3</span>    <span class="mi">8</span>
+<span class="mi">4</span>    <span class="mi">9</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+<div class="section" id="we-cna-treat-series-objects-much-like-numpy-vectors">
+<h3>We cna treat Series objects much like numpy vectors<a class="headerlink" href="#we-cna-treat-series-objects-much-like-numpy-vectors" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="mf">7.0</span><span class="p">,</span> <span class="mf">1.5811388300841898</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>    <span class="mi">25</span>
+<span class="mi">1</span>    <span class="mi">36</span>
+<span class="mi">2</span>    <span class="mi">49</span>
+<span class="mi">3</span>    <span class="mi">64</span>
+<span class="mi">4</span>    <span class="mi">81</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span>    <span class="mi">8</span>
+<span class="mi">4</span>    <span class="mi">9</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="series-can-also-contain-more-information-than-numpy-vectors">
+<h3>Series can also contain more information than numpy vectors<a class="headerlink" href="#series-can-also-contain-more-information-than-numpy-vectors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="you-can-always-use-standard-positional-indexing">
+<h4>You can always use standard positional indexing<a class="headerlink" href="#you-can-always-use-standard-positional-indexing" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span>    <span class="mi">6</span>
+<span class="mi">2</span>    <span class="mi">7</span>
+<span class="mi">3</span>    <span class="mi">8</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="series-index">
+<h4>Series index<a class="headerlink" href="#series-index" title="Permalink to this headline">¶</a></h4>
+<p>But you can also assign labeled indexes.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s1">&#39;abcde&#39;</span><span class="p">)</span>
+<span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span>    <span class="mi">5</span>
+<span class="n">b</span>    <span class="mi">6</span>
+<span class="n">c</span>    <span class="mi">7</span>
+<span class="n">d</span>    <span class="mi">8</span>
+<span class="n">e</span>    <span class="mi">9</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-that-with-labels-the-end-index-is-included">
+<h4>Note that with labels, the end index is included<a class="headerlink" href="#note-that-with-labels-the-end-index-is-included" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">:</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span>    <span class="mi">5</span>
+<span class="n">b</span>    <span class="mi">6</span>
+<span class="n">c</span>    <span class="mi">7</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="even-when-you-have-a-labeled-index-positional-arguments-still-work">
+<h4>Even when you have a labeled index, positional arguments still work<a class="headerlink" href="#even-when-you-have-a-labeled-index-positional-arguments-still-work" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span>    <span class="mi">6</span>
+<span class="n">c</span>    <span class="mi">7</span>
+<span class="n">d</span>    <span class="mi">8</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">e</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-missing-data">
+<h4>Working with missing data<a class="headerlink" href="#working-with-missing-data" title="Permalink to this headline">¶</a></h4>
+<p>Missing data is indicated with NaN (not a number).</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">Series</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>    <span class="mf">10.0</span>
+<span class="mi">1</span>     <span class="n">NaN</span>
+<span class="mi">2</span>     <span class="n">NaN</span>
+<span class="mi">3</span>    <span class="mf">13.0</span>
+<span class="mi">4</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="concatenating-two-series">
+<h4>Concatenating two series<a class="headerlink" href="#concatenating-two-series" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">])</span>
+<span class="n">z</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span>     <span class="mf">5.0</span>
+<span class="n">b</span>     <span class="mf">6.0</span>
+<span class="n">c</span>     <span class="mf">7.0</span>
+<span class="n">d</span>     <span class="mf">8.0</span>
+<span class="n">e</span>     <span class="mf">9.0</span>
+<span class="mi">0</span>    <span class="mf">10.0</span>
+<span class="mi">1</span>     <span class="n">NaN</span>
+<span class="mi">2</span>     <span class="n">NaN</span>
+<span class="mi">3</span>    <span class="mf">13.0</span>
+<span class="mi">4</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reset-index-to-default">
+<h4>Reset index to default<a class="headerlink" href="#reset-index-to-default" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">z</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">6</span>     <span class="n">NaN</span>
+<span class="mi">7</span>     <span class="n">NaN</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pandas-aggregate-functions-ignore-missing-data">
+<h4><code class="docutils literal"><span class="pre">pandas</span></code> aggregate functions ignore missing data<a class="headerlink" href="#pandas-aggregate-functions-ignore-missing-data" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">z</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">z</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">72.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">,</span> <span class="mf">3.2071349029490928</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-missing-values">
+<h4>Selecting missing values<a class="headerlink" href="#selecting-missing-values" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="p">[</span><span class="n">z</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">6</span>   <span class="n">NaN</span>
+<span class="mi">7</span>   <span class="n">NaN</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-non-missing-values">
+<h4>Selecting non-missing values<a class="headerlink" href="#selecting-non-missing-values" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="p">[</span><span class="n">z</span><span class="o">.</span><span class="n">notnull</span><span class="p">()]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="replacement-of-missing-values">
+<h4>Replacement of missing values<a class="headerlink" href="#replacement-of-missing-values" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">6</span>     <span class="mf">0.0</span>
+<span class="mi">7</span>     <span class="mf">0.0</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">6</span>    <span class="mf">10.0</span>
+<span class="mi">7</span>    <span class="mf">10.0</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;bfill&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">6</span>    <span class="mf">13.0</span>
+<span class="mi">7</span>    <span class="mf">13.0</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>     <span class="mf">5.0</span>
+<span class="mi">1</span>     <span class="mf">6.0</span>
+<span class="mi">2</span>     <span class="mf">7.0</span>
+<span class="mi">3</span>     <span class="mf">8.0</span>
+<span class="mi">4</span>     <span class="mf">9.0</span>
+<span class="mi">5</span>    <span class="mf">10.0</span>
+<span class="mi">6</span>     <span class="mf">9.0</span>
+<span class="mi">7</span>     <span class="mf">9.0</span>
+<span class="mi">8</span>    <span class="mf">13.0</span>
+<span class="mi">9</span>    <span class="mf">14.0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="working-with-dates-times">
+<h4>Working with dates / times<a class="headerlink" href="#working-with-dates-times" title="Permalink to this headline">¶</a></h4>
+<p>We will see more date/time handling in the DataFrame section.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;01-Jan-2016&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span>     <span class="mf">5.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span>     <span class="mf">6.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">03</span>     <span class="mf">7.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">04</span>     <span class="mf">8.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">05</span>     <span class="mf">9.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">06</span>    <span class="mf">10.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">07</span>     <span class="n">NaN</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">08</span>     <span class="n">NaN</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">09</span>    <span class="mf">13.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">10</span>    <span class="mf">14.0</span>
+<span class="n">Freq</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="intelligent-aggregation-over-datetime-ranges">
+<h4>Intelligent aggregation over datetime ranges<a class="headerlink" href="#intelligent-aggregation-over-datetime-ranges" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="s1">&#39;W&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">03</span>    <span class="mf">18.0</span>
+<span class="mi">2016</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">10</span>    <span class="mf">54.0</span>
+<span class="n">Freq</span><span class="p">:</span> <span class="n">W</span><span class="o">-</span><span class="n">SUN</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="formatting-datetime-objects-see-http-strftime-org">
+<h4>Formatting datetime objects (see <a class="reference external" href="http://strftime.org/">http://strftime.org</a>)<a class="headerlink" href="#formatting-datetime-objects-see-http-strftime-org" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;Jan 01, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 02, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 03, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 04, 2016&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Jan 05, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 06, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 07, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 08, 2016&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;Jan 09, 2016&#39;</span><span class="p">,</span> <span class="s1">&#39;Jan 10, 2016&#39;</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&lt;U12&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="dataframe">
+<h2>DataFrame<a class="headerlink" href="#dataframe" title="Permalink to this headline">¶</a></h2>
+<p>Similar to R.</p>
+<div class="section" id="titanic-data">
+<h3>Titanic data<a class="headerlink" href="#titanic-data" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv&#39;</span>
+<span class="n">titanic</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">891</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Index</span><span class="p">([</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="s1">&#39;pclass&#39;</span><span class="p">,</span> <span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;sibsp&#39;</span><span class="p">,</span> <span class="s1">&#39;parch&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;embarked&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="s1">&#39;adult_male&#39;</span><span class="p">,</span> <span class="s1">&#39;deck&#39;</span><span class="p">,</span> <span class="s1">&#39;embark_town&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;alive&#39;</span><span class="p">,</span> <span class="s1">&#39;alone&#39;</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># For display purposes, we will drop some columns</span>
+<span class="n">titanic</span> <span class="o">=</span> <span class="n">titanic</span><span class="p">[[</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;embarked&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="s1">&#39;deck&#39;</span><span class="p">,</span> <span class="s1">&#39;embark_town&#39;</span><span class="p">,]]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">dtypes</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">survived</span>         <span class="n">int64</span>
+<span class="n">sex</span>             <span class="nb">object</span>
+<span class="n">age</span>            <span class="n">float64</span>
+<span class="n">fare</span>           <span class="n">float64</span>
+<span class="n">embarked</span>        <span class="nb">object</span>
+<span class="k">class</span>           <span class="nc">object</span>
+<span class="n">who</span>             <span class="nb">object</span>
+<span class="n">deck</span>            <span class="nb">object</span>
+<span class="n">embark_town</span>     <span class="nb">object</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="summarizing-a-data-frame">
+<h3>Summarizing a data frame<a class="headerlink" href="#summarizing-a-data-frame" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">survived</span>                 <span class="mi">0</span>
+<span class="n">sex</span>                   <span class="n">male</span>
+<span class="n">age</span>                     <span class="mi">22</span>
+<span class="n">fare</span>                  <span class="mf">7.25</span>
+<span class="n">embarked</span>                 <span class="n">S</span>
+<span class="k">class</span>                <span class="nc">Third</span>
+<span class="n">who</span>                    <span class="n">man</span>
+<span class="n">deck</span>                   <span class="n">NaN</span>
+<span class="n">embark_town</span>    <span class="n">Southampton</span>
+<span class="n">Name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>age</th>
+      <th>fare</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>891.000000</td>
+      <td>714.000000</td>
+      <td>891.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>0.383838</td>
+      <td>29.699118</td>
+      <td>32.204208</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>0.486592</td>
+      <td>14.526497</td>
+      <td>49.693429</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>0.000000</td>
+      <td>0.420000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>0.000000</td>
+      <td>20.125000</td>
+      <td>7.910400</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>0.000000</td>
+      <td>28.000000</td>
+      <td>14.454200</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>1.000000</td>
+      <td>38.000000</td>
+      <td>31.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>1.000000</td>
+      <td>80.000000</td>
+      <td>512.329200</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>7.9250</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>woman</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>53.1000</td>
+      <td>S</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>male</td>
+      <td>35.0</td>
+      <td>8.0500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>886</th>
+      <td>0</td>
+      <td>male</td>
+      <td>27.0</td>
+      <td>13.00</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>887</th>
+      <td>1</td>
+      <td>female</td>
+      <td>19.0</td>
+      <td>30.00</td>
+      <td>S</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>B</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>888</th>
+      <td>0</td>
+      <td>female</td>
+      <td>NaN</td>
+      <td>23.45</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>woman</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>889</th>
+      <td>1</td>
+      <td>male</td>
+      <td>26.0</td>
+      <td>30.00</td>
+      <td>C</td>
+      <td>First</td>
+      <td>man</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>890</th>
+      <td>0</td>
+      <td>male</td>
+      <td>32.0</td>
+      <td>7.75</td>
+      <td>Q</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Queenstown</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Index</span><span class="p">([</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="s1">&#39;embarked&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="s1">&#39;deck&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;embark_town&#39;</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">index</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">RangeIndex</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">891</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indexing">
+<h3>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="p">[[</span><span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sex</th>
+      <th>age</th>
+      <th>class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>male</td>
+      <td>22.0</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>female</td>
+      <td>38.0</td>
+      <td>First</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>female</td>
+      <td>26.0</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>female</td>
+      <td>35.0</td>
+      <td>First</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>male</td>
+      <td>35.0</td>
+      <td>Third</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10</th>
+      <td>1</td>
+      <td>female</td>
+      <td>4.0</td>
+      <td>16.7000</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>G</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1</td>
+      <td>female</td>
+      <td>58.0</td>
+      <td>26.5500</td>
+      <td>S</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>0</td>
+      <td>male</td>
+      <td>20.0</td>
+      <td>8.0500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>0</td>
+      <td>male</td>
+      <td>39.0</td>
+      <td>31.2750</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>0</td>
+      <td>female</td>
+      <td>14.0</td>
+      <td>7.8542</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="using-the-ix-helper-for-indexing">
+<h4>Using the <code class="docutils literal"><span class="pre">ix</span></code> helper for indexing<a class="headerlink" href="#using-the-ix-helper-for-indexing" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="s1">&#39;fare&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>fare</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10</th>
+      <td>4.0</td>
+      <td>16.7000</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>58.0</td>
+      <td>26.5500</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>20.0</td>
+      <td>8.0500</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>39.0</td>
+      <td>31.2750</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>14.0</td>
+      <td>7.8542</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>55.0</td>
+      <td>16.0000</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">15</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sex</th>
+      <th>fare</th>
+      <th>class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10</th>
+      <td>female</td>
+      <td>16.7000</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>female</td>
+      <td>26.5500</td>
+      <td>First</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>male</td>
+      <td>8.0500</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>male</td>
+      <td>31.2750</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>female</td>
+      <td>7.8542</td>
+      <td>Third</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>female</td>
+      <td>16.0000</td>
+      <td>Second</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="p">[</span><span class="n">titanic</span><span class="o">.</span><span class="n">age</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>78</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.83</td>
+      <td>29.0000</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>164</th>
+      <td>0</td>
+      <td>male</td>
+      <td>1.00</td>
+      <td>39.6875</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>172</th>
+      <td>1</td>
+      <td>female</td>
+      <td>1.00</td>
+      <td>11.1333</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>183</th>
+      <td>1</td>
+      <td>male</td>
+      <td>1.00</td>
+      <td>39.0000</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>F</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>305</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.92</td>
+      <td>151.5500</td>
+      <td>S</td>
+      <td>First</td>
+      <td>child</td>
+      <td>C</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>381</th>
+      <td>1</td>
+      <td>female</td>
+      <td>1.00</td>
+      <td>15.7417</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>386</th>
+      <td>0</td>
+      <td>male</td>
+      <td>1.00</td>
+      <td>46.9000</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>469</th>
+      <td>1</td>
+      <td>female</td>
+      <td>0.75</td>
+      <td>19.2583</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>644</th>
+      <td>1</td>
+      <td>female</td>
+      <td>0.75</td>
+      <td>19.2583</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>755</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.67</td>
+      <td>14.5000</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>788</th>
+      <td>1</td>
+      <td>male</td>
+      <td>1.00</td>
+      <td>20.5750</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>803</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.42</td>
+      <td>8.5167</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>827</th>
+      <td>1</td>
+      <td>male</td>
+      <td>1.00</td>
+      <td>37.0042</td>
+      <td>C</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>831</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.83</td>
+      <td>18.7500</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="sorting-and-ordering-data">
+<h4>Sorting and ordering data<a class="headerlink" href="#sorting-and-ordering-data" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>7.9250</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>woman</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>53.1000</td>
+      <td>S</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>male</td>
+      <td>35.0</td>
+      <td>8.0500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>803</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.42</td>
+      <td>8.5167</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>755</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.67</td>
+      <td>14.5000</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>644</th>
+      <td>1</td>
+      <td>female</td>
+      <td>0.75</td>
+      <td>19.2583</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>469</th>
+      <td>1</td>
+      <td>female</td>
+      <td>0.75</td>
+      <td>19.2583</td>
+      <td>C</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Cherbourg</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>1</td>
+      <td>male</td>
+      <td>0.83</td>
+      <td>29.0000</td>
+      <td>S</td>
+      <td>Second</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>164</th>
+      <td>0</td>
+      <td>male</td>
+      <td>1.0</td>
+      <td>39.6875</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>386</th>
+      <td>0</td>
+      <td>male</td>
+      <td>1.0</td>
+      <td>46.9000</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0</td>
+      <td>male</td>
+      <td>2.0</td>
+      <td>21.0750</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>0</td>
+      <td>male</td>
+      <td>2.0</td>
+      <td>29.1250</td>
+      <td>Q</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Queenstown</td>
+    </tr>
+    <tr>
+      <th>119</th>
+      <td>0</td>
+      <td>female</td>
+      <td>2.0</td>
+      <td>31.2750</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>child</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="grouping-data">
+<h4>Grouping data<a class="headerlink" href="#grouping-data" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sex_class</span> <span class="o">=</span> <span class="n">titanic</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sex_class</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>survived</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+    <tr>
+      <th>sex</th>
+      <th>class</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="3" valign="top">female</th>
+      <th>First</th>
+      <td>94</td>
+      <td>85</td>
+      <td>94</td>
+      <td>92</td>
+      <td>94</td>
+      <td>81</td>
+      <td>92</td>
+    </tr>
+    <tr>
+      <th>Second</th>
+      <td>76</td>
+      <td>74</td>
+      <td>76</td>
+      <td>76</td>
+      <td>76</td>
+      <td>10</td>
+      <td>76</td>
+    </tr>
+    <tr>
+      <th>Third</th>
+      <td>144</td>
+      <td>102</td>
+      <td>144</td>
+      <td>144</td>
+      <td>144</td>
+      <td>6</td>
+      <td>144</td>
+    </tr>
+    <tr>
+      <th rowspan="3" valign="top">male</th>
+      <th>First</th>
+      <td>122</td>
+      <td>101</td>
+      <td>122</td>
+      <td>122</td>
+      <td>122</td>
+      <td>94</td>
+      <td>122</td>
+    </tr>
+    <tr>
+      <th>Second</th>
+      <td>108</td>
+      <td>99</td>
+      <td>108</td>
+      <td>108</td>
+      <td>108</td>
+      <td>6</td>
+      <td>108</td>
+    </tr>
+    <tr>
+      <th>Third</th>
+      <td>347</td>
+      <td>253</td>
+      <td>347</td>
+      <td>347</td>
+      <td>347</td>
+      <td>6</td>
+      <td>347</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="why-kate-winslett-survived-and-leonardo-dicaprio-didn-t">
+<h4>Why Kate Winslett survived and Leonardo DiCaprio didn&#8217;t<a class="headerlink" href="#why-kate-winslett-survived-and-leonardo-dicaprio-didn-t" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">sex_class</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;survived&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sex</span>     <span class="k">class</span>
+<span class="nc">female</span>  <span class="n">First</span>     <span class="mf">0.968085</span>
+        <span class="n">Second</span>    <span class="mf">0.921053</span>
+        <span class="n">Third</span>     <span class="mf">0.500000</span>
+<span class="n">male</span>    <span class="n">First</span>     <span class="mf">0.368852</span>
+        <span class="n">Second</span>    <span class="mf">0.157407</span>
+        <span class="n">Third</span>     <span class="mf">0.135447</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">survived</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="of-the-females-who-were-in-first-class-count-the-number-from-each-embarking-town">
+<h4>Of the females who were in first class, count the number from each embarking town<a class="headerlink" href="#of-the-females-who-were-in-first-class-count-the-number-from-each-embarking-town" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sex_class</span><span class="o">.</span><span class="n">get_group</span><span class="p">((</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;First&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;embark_town&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+    </tr>
+    <tr>
+      <th>embark_town</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Cherbourg</th>
+      <td>43</td>
+      <td>43</td>
+      <td>38</td>
+      <td>43</td>
+      <td>43</td>
+      <td>43</td>
+      <td>43</td>
+      <td>35</td>
+    </tr>
+    <tr>
+      <th>Queenstown</th>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Southampton</th>
+      <td>48</td>
+      <td>48</td>
+      <td>44</td>
+      <td>48</td>
+      <td>48</td>
+      <td>48</td>
+      <td>48</td>
+      <td>43</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="cross-tabulation">
+<h4>Cross-tabulation<a class="headerlink" href="#cross-tabulation" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">titanic</span><span class="o">.</span><span class="n">survived</span><span class="p">,</span> <span class="n">titanic</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>class</th>
+      <th>First</th>
+      <th>Second</th>
+      <th>Third</th>
+    </tr>
+    <tr>
+      <th>survived</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>80</td>
+      <td>97</td>
+      <td>372</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>136</td>
+      <td>87</td>
+      <td>119</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="we-can-also-get-multiple-summaries-at-the-same-time">
+<h4>We can also get multiple summaries at the same time<a class="headerlink" href="#we-can-also-get-multiple-summaries-at-the-same-time" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mapped_funcs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;embarked&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">my_func</span><span class="p">),</span> <span class="s1">&#39;survived&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">}</span>
+<span class="n">sex_class</span><span class="o">.</span><span class="n">get_group</span><span class="p">((</span><span class="s1">&#39;female&#39;</span><span class="p">,</span> <span class="s1">&#39;First&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;embark_town&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">mapped_funcs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th>survived</th>
+      <th>embarked</th>
+      <th colspan="3" halign="left">age</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>sum</th>
+      <th>count</th>
+      <th>mean</th>
+      <th>median</th>
+      <th>my_func</th>
+    </tr>
+    <tr>
+      <th>embark_town</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Cherbourg</th>
+      <td>42</td>
+      <td>43</td>
+      <td>36.052632</td>
+      <td>37.0</td>
+      <td>60.0</td>
+    </tr>
+    <tr>
+      <th>Queenstown</th>
+      <td>1</td>
+      <td>1</td>
+      <td>33.000000</td>
+      <td>33.0</td>
+      <td>33.0</td>
+    </tr>
+    <tr>
+      <th>Southampton</th>
+      <td>46</td>
+      <td>48</td>
+      <td>32.704545</td>
+      <td>33.0</td>
+      <td>63.0</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Index</span><span class="p">([</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="s1">&#39;embarked&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="s1">&#39;deck&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;embark_town&#39;</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualizing-tables">
+<h4>Visualizing tables<a class="headerlink" href="#visualizing-tables" title="Permalink to this headline">¶</a></h4>
+<p>See more examples in the Graphics notebook.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">font_scale</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">factorplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;box&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">titanic</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/07_Data_84_0.png" src="_images/07_Data_84_0.png" />
+</div>
+</div>
+<div class="section" id="making-plots-with-pandas">
+<h3>Making plots with <code class="docutils literal"><span class="pre">pandas</span></code><a class="headerlink" href="#making-plots-with-pandas" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas_datareader</span> <span class="k">import</span> <span class="n">data</span> <span class="k">as</span> <span class="n">web</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">apple</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">DataReader</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;google&#39;</span><span class="p">,</span>
+                        <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2015</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">apple</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Open</th>
+      <th>High</th>
+      <th>Low</th>
+      <th>Close</th>
+      <th>Volume</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2015-01-02</th>
+      <td>111.39</td>
+      <td>111.44</td>
+      <td>107.35</td>
+      <td>109.33</td>
+      <td>53204626</td>
+    </tr>
+    <tr>
+      <th>2015-01-05</th>
+      <td>108.29</td>
+      <td>108.65</td>
+      <td>105.41</td>
+      <td>106.25</td>
+      <td>64285491</td>
+    </tr>
+    <tr>
+      <th>2015-01-06</th>
+      <td>106.54</td>
+      <td>107.43</td>
+      <td>104.63</td>
+      <td>106.26</td>
+      <td>65797116</td>
+    </tr>
+    <tr>
+      <th>2015-01-07</th>
+      <td>107.20</td>
+      <td>108.20</td>
+      <td>106.70</td>
+      <td>107.75</td>
+      <td>40105934</td>
+    </tr>
+    <tr>
+      <th>2015-01-08</th>
+      <td>109.23</td>
+      <td>112.15</td>
+      <td>108.70</td>
+      <td>111.89</td>
+      <td>59364547</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">apple</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;Close&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/07_Data_89_0.png" src="_images/07_Data_89_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Zoom in on large drop in August</span>
+<span class="n">aug</span> <span class="o">=</span> <span class="n">apple</span><span class="p">[</span><span class="s1">&#39;2015-08-01&#39;</span><span class="p">:</span><span class="s1">&#39;2015-08-30&#39;</span><span class="p">]</span>
+<span class="n">aug</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;High&#39;</span><span class="p">,</span> <span class="s1">&#39;Low&#39;</span><span class="p">,</span> <span class="s1">&#39;Open&#39;</span><span class="p">,</span> <span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/07_Data_90_0.png" src="_images/07_Data_90_0.png" />
+</div>
+</div>
+<div class="section" id="data-conversions">
+<h2>Data conversions<a class="headerlink" href="#data-conversions" title="Permalink to this headline">¶</a></h2>
+<p>One of the nicest features of <code class="docutils literal"><span class="pre">pandas</span></code> is the ease of converting
+tabular data across different storage formats. We will illustrate by
+converting the <code class="docutils literal"><span class="pre">titanic</span></code> dataframe into multiple formats.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;titanic.csv&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;titanic.csv&#39;</span><span class="p">)</span>
+<span class="n">t1</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span>!pip install openpyxl
+t1.to_excel(&#39;titanic.xlsx&#39;)
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Requirement</span> <span class="n">already</span> <span class="n">satisfied</span><span class="p">:</span> <span class="n">openpyxl</span> <span class="ow">in</span> <span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">anaconda2</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span>
+<span class="n">Requirement</span> <span class="n">already</span> <span class="n">satisfied</span><span class="p">:</span> <span class="n">jdcal</span> <span class="ow">in</span> <span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">anaconda2</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">openpyxl</span><span class="p">)</span>
+<span class="n">Requirement</span> <span class="n">already</span> <span class="n">satisfied</span><span class="p">:</span> <span class="n">et_xmlfile</span> <span class="ow">in</span> <span class="o">/</span><span class="n">Users</span><span class="o">/</span><span class="n">cliburn</span><span class="o">/</span><span class="n">anaconda2</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python2</span><span class="o">.</span><span class="mi">7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">openpyxl</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;titanic.xlsx&#39;</span><span class="p">)</span>
+<span class="n">t2</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlite3</span>
+
+<span class="n">con</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;titanic.db&#39;</span><span class="p">)</span>
+<span class="n">t2</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s1">&#39;titanic&#39;</span><span class="p">,</span> <span class="n">con</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql</span><span class="p">(</span><span class="s1">&#39;select * from titanic&#39;</span><span class="p">,</span> <span class="n">con</span><span class="p">)</span>
+<span class="n">t3</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>None</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t3</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s1">&#39;titanic.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t4</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s1">&#39;titanic.json&#39;</span><span class="p">)</span>
+<span class="n">t4</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>age</th>
+      <th>class</th>
+      <th>deck</th>
+      <th>embark_town</th>
+      <th>embarked</th>
+      <th>fare</th>
+      <th>sex</th>
+      <th>survived</th>
+      <th>who</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>22.0</td>
+      <td>Third</td>
+      <td>None</td>
+      <td>Southampton</td>
+      <td>S</td>
+      <td>7.2500</td>
+      <td>male</td>
+      <td>0</td>
+      <td>man</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>38.0</td>
+      <td>First</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+      <td>C</td>
+      <td>71.2833</td>
+      <td>female</td>
+      <td>1</td>
+      <td>woman</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t4</span> <span class="o">=</span> <span class="n">t4</span><span class="p">[</span><span class="n">t3</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+<span class="n">t4</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>deck</th>
+      <th>embark_town</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>male</td>
+      <td>22.0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>None</td>
+      <td>Southampton</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-series">Working with Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe">DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-conversions">Data conversions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="06_Graphics.html"
+                          title="Previous page">&larr; Graphics in Python</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="08_SQL.html"
+                          title="Next page">&rarr; SQL</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/07_Data.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="08_SQL.html" title="SQL"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="06_Graphics.html" title="Graphics in Python"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/07_Data.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:09 GMT -->
+</html>

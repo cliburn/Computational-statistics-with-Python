@@ -1,0 +1,1335 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/05_Numbers.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:28 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using numpy &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Graphics in Python" href="06_Graphics.html" />
+    <link rel="prev" title="Strings" href="04_Strings.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="06_Graphics.html" title="Graphics in Python"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="04_Strings.html" title="Strings"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-numpy">
+<h1>Using <code class="docutils literal"><span class="pre">numpy</span></code><a class="headerlink" href="#using-numpy" title="Permalink to this headline">¶</a></h1>
+<p>The foundation for numerical computation in Python is the <code class="docutils literal"><span class="pre">numpy</span></code>
+package, and essentially all scientific libraries in Python build on
+this - e.g. <code class="docutils literal"><span class="pre">scipy</span></code>, <code class="docutils literal"><span class="pre">pandas</span></code>, <code class="docutils literal"><span class="pre">statsmodels</span></code>, <code class="docutils literal"><span class="pre">scikit-learn</span></code>,
+<code class="docutils literal"><span class="pre">cv2</span></code> etc. The basic data structure in <code class="docutils literal"><span class="pre">numpy</span></code> is the NDArray, and
+it is essential to become familiar with how to slice and dice this
+object.</p>
+<p>Numpy also has the <code class="docutils literal"><span class="pre">random</span></code>, and <code class="docutils literal"><span class="pre">linalg</span></code> modules that we will
+discuss in later lectures.</p>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://mathesaurus.sourceforge.net/r-numpy.html">Numpy for R
+users</a></li>
+<li><a class="reference external" href="http://www.scipy-lectures.org/intro/numpy/index.html">NumPy: creating and manipulating numerical
+data</a></li>
+<li><a class="reference external" href="http://www.scipy-lectures.org/advanced/advanced_numpy/index.html">Advanced
+Numpy</a></li>
+<li><a class="reference external" href="http://www.labri.fr/perso/nrougier/teaching/numpy.100/">100 Numpy
+Exercises</a></li>
+</ul>
+<div class="section" id="ndarray">
+<h3>NDArray<a class="headerlink" href="#ndarray" title="Permalink to this headline">¶</a></h3>
+<p>The base structure in <code class="docutils literal"><span class="pre">numpy</span></code> is <code class="docutils literal"><span class="pre">ndarray</span></code>, used to represent
+vectors, matrices and higher-dimensional arrays. Each <code class="docutils literal"><span class="pre">ndarray</span></code> has
+the following attributes:</p>
+<ul class="simple">
+<li>dtype = corresponds to data types in C</li>
+<li>shape = dimensions of array</li>
+<li>strides = number of bytes to step in each direction when traversing
+the array</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dytpe&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;strides&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">strides</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">dytpe</span> <span class="n">int64</span>
+<span class="n">shape</span> <span class="p">(</span><span class="mi">6</span><span class="p">,)</span>
+<span class="n">strides</span> <span class="p">(</span><span class="mi">8</span><span class="p">,)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dytpe&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;strides&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">strides</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span><span class="p">]]</span>
+<span class="n">dytpe</span> <span class="n">int64</span>
+<span class="n">shape</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">strides</span> <span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dytpe&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;strides&#39;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">strides</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">2.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">3.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">5.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">6.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]]</span>
+<span class="n">dytpe</span> <span class="n">complex128</span>
+<span class="n">shape</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">strides</span> <span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="array-creation">
+<h2>Array creation<a class="headerlink" href="#array-creation" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">3.</span> <span class="p">,</span>  <span class="mf">3.5</span><span class="p">,</span>  <span class="mf">4.</span> <span class="p">,</span>  <span class="mf">4.5</span><span class="p">,</span>  <span class="mf">5.</span> <span class="p">,</span>  <span class="mf">5.5</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">fromfunction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">j</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="array-manipulation">
+<h2>Array manipulation<a class="headerlink" href="#array-manipulation" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfunction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">j</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">size</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">20</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">17</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">25</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">16.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="array-indexing">
+<h2>Array indexing<a class="headerlink" href="#array-indexing" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.0</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="section" id="boolean-indexing">
+<h3>Boolean indexing<a class="headerlink" href="#boolean-indexing" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">],</span>
+       <span class="p">[</span><span class="kc">False</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">],</span>
+       <span class="p">[</span> <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">],</span>
+       <span class="p">[</span> <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">,</span>  <span class="kc">True</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">4.</span><span class="p">,</span>   <span class="mf">9.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">17.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">,</span>
+         <span class="mf">9.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">13.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fancy-indexing">
+<h3>Fancy indexing<a class="headerlink" href="#fancy-indexing" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="calculations-and-broadcasting">
+<h2>Calculations and broadcasting<a class="headerlink" href="#calculations-and-broadcasting" title="Permalink to this headline">¶</a></h2>
+<p>Broadcasting refers to the set of rules that numpy uses to perfrom
+operations on arrays with different shapes. See official
+<a class="reference external" href="http://docs.scipy.org/doc/numpy-1.10.1/user/basics.broadcasting.html">documentation</a>
+for a clear explanation of the rules. Array shapes can be manipulated
+using the <code class="docutils literal"><span class="pre">reshape</span></code> method or by inserting a new axis with
+<code class="docutils literal"><span class="pre">np.newaxis</span></code>. Note that <code class="docutils literal"><span class="pre">np.newaxis</span></code> is an alias for <code class="docutils literal"><span class="pre">None</span></code>, which
+I sometimes use in my examples.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromfunction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">j</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">*</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">20.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">25.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">+</span> <span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">2.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">@</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">17.</span><span class="p">,</span>  <span class="mf">22.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">22.</span><span class="p">,</span>  <span class="mf">30.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>  <span class="mf">1.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">2.</span><span class="p">,</span>   <span class="mf">5.</span><span class="p">,</span>  <span class="mf">14.</span><span class="p">],</span>
+       <span class="p">[</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">14.</span><span class="p">,</span>  <span class="mf">41.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.69314718</span><span class="p">,</span>  <span class="mf">1.60943791</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.69314718</span><span class="p">,</span>  <span class="mf">1.09861229</span><span class="p">,</span>  <span class="mf">1.79175947</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>   <span class="mf">1.</span>        <span class="p">,</span>    <span class="mf">2.71828183</span><span class="p">,</span>   <span class="mf">54.59815003</span><span class="p">],</span>
+       <span class="p">[</span>   <span class="mf">2.71828183</span><span class="p">,</span>    <span class="mf">7.3890561</span> <span class="p">,</span>  <span class="mf">148.4131591</span> <span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="combining-and-splitting-arrays">
+<h2>Combining and splitting arrays<a class="headerlink" href="#combining-and-splitting-arrays" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">]</span>
+<span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hsplit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">2.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">2.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">vsplit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">]]),</span> <span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">]]),</span> <span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hsplit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reductions">
+<h2>Reductions<a class="headerlink" href="#reductions" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">26.0</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># column sum</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">2.</span><span class="p">,</span>   <span class="mf">6.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># row sum</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">5.</span><span class="p">,</span>  <span class="mf">8.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">8.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="section" id="standardize-by-column-mean-and-standard-deviation">
+<h3>Standardize by column mean and standard deviation<a class="headerlink" href="#standardize-by-column-mean-and-standard-deviation" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">z</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="standardize-by-row-mean-and-standard-deviation">
+<h3>Standardize by row mean and standard deviation<a class="headerlink" href="#standardize-by-row-mean-and-standard-deviation" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)[:,</span><span class="kc">None</span><span class="p">])</span><span class="o">/</span><span class="n">y</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">1</span><span class="p">)[:,</span><span class="kc">None</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.98058068</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.39223227</span><span class="p">,</span>  <span class="mf">1.37281295</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.98058068</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.39223227</span><span class="p">,</span>  <span class="mf">1.37281295</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.98058068</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.39223227</span><span class="p">,</span>  <span class="mf">1.37281295</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.98058068</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.39223227</span><span class="p">,</span>  <span class="mf">1.37281295</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">z</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">z</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">array</span><span class="p">([</span> <span class="o">-</span><span class="mf">7.40148683e-17</span><span class="p">,</span>   <span class="mf">7.40148683e-17</span><span class="p">,</span>  <span class="o">-</span><span class="mf">7.40148683e-17</span><span class="p">,</span>
+          <span class="mf">7.40148683e-17</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-calculating-pairwise-distance-matrix-using-broadcasting-and-vectorization">
+<h2>Example: Calculating pairwise distance matrix using broadcasting and vectorization<a class="headerlink" href="#example-calculating-pairwise-distance-matrix-using-broadcasting-and-vectorization" title="Permalink to this headline">¶</a></h2>
+<p>Calculate the pairwise distance matrix between the following points</p>
+<ul class="simple">
+<li>(0,0)</li>
+<li>(4,0)</li>
+<li>(4,3)</li>
+<li>(0,3)</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">distance_matrix_py</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns matrix of pairwise Euclidean distances. Pure Python version.&quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="k">return</span> <span class="n">m</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">distance_matrix_np</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns matrix of pairwise Euclidean distances. Vectorized numpy version.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,:]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)])</span>
+<span class="n">pts</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pts</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">dist</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">5.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="section" id="using-broadcasting">
+<h3>Using broadcasting<a class="headerlink" href="#using-broadcasting" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">m</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">3</span><span class="p">]],</span>
+
+       <span class="p">[[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">3</span><span class="p">]],</span>
+
+       <span class="p">[[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">m</span><span class="o">**</span><span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">]],</span>
+
+       <span class="p">[[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">9</span><span class="p">]],</span>
+
+       <span class="p">[[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">m</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We want to end up with a 4 by 4 matrix, so sum over the axis with
+dimension 2. This is axis=2, or axis=-1 since it is the first axis from
+the end.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">25</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basically-the-distance-matrix-can-be-calculated-in-one-line-of-numpy-code">
+<h3>Basically, the distance matrix can be calculated in one line of numpy code<a class="headerlink" href="#basically-the-distance-matrix-can-be-calculated-in-one-line-of-numpy-code" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">5.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">3.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Let&#8217;s put them in functions and compare the time.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pdist1</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">pdist2</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">pts</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="section" id="check-that-the-outputs-are-the-same">
+<h4>Check that the outputs are the same<a class="headerlink" href="#check-that-the-outputs-are-the-same" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">alltrue</span><span class="p">(</span><span class="n">pdist1</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span> <span class="o">==</span> <span class="n">pdist2</span><span class="p">(</span><span class="n">pts</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">pdist1</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">3.26</span> <span class="n">s</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">pdist2</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">77.3</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="but-don-t-give-up-on-loops-yet">
+<h3>But don&#8217;t give up on loops yet<a class="headerlink" href="#but-don-t-give-up-on-loops-yet" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba</span> <span class="k">import</span> <span class="n">njit</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@njit</span>
+<span class="k">def</span> <span class="nf">pdist3</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pts</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">dist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">pdist3</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">slowest</span> <span class="n">run</span> <span class="n">took</span> <span class="mf">27.17</span> <span class="n">times</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">fastest</span><span class="o">.</span> <span class="n">This</span> <span class="n">could</span> <span class="n">mean</span> <span class="n">that</span> <span class="n">an</span> <span class="n">intermediate</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">cached</span>
+<span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">16.1</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-is-going-on">
+<h3>What is going on?<a class="headerlink" href="#what-is-going-on" title="Permalink to this headline">¶</a></h3>
+<p>This is 3-5 times faster than the broadcasting version! We have just
+performed Just In Time (JIT) compilation of a function, which will be
+discussed in a later lecture.</p>
+</div>
+</div>
+<div class="section" id="example-consructing-leave-one-out-arrays">
+<h2>Example: Consructing leave-one-out arrays<a class="headerlink" href="#example-consructing-leave-one-out-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Another example of numpy trickery is to construct a leave-one-out matrix
+of a vector of length k. In the matrix, each row is a vector of length
+k-1, with a different vector component dropped each time. This can be
+used for LOOCV to evalaute the out-of-sample accuracy of a predictive
+model.</p>
+<p>For example, suppose you have data points [(1,4), (2,7), (3,11), (4,9),
+(5,15)] that you want to perfrom LOOCV on for a simple regression model.
+For each cross-validation, you use one point for testing, and the
+remaining 4 points for training. In other words, you want the training
+set to be:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">)]</span>
+<span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">)]</span>
+<span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span>  <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">)]</span>
+<span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">)]</span>
+<span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Here is one way to do create the training set using numpy tricks.</p>
+<p>Create a triangular matrix with N rows, N-1 columns and offset from
+diagnonal by -1</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>Use broadcasting to create a new index matrix</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">)])</span>
+<span class="n">data</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">2</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<div class="section" id="all-but-one">
+<h3>All but one<a class="headerlink" href="#all-but-one" title="Permalink to this headline">¶</a></h3>
+<p>R uses negative indexing to mean delete the component at that index.
+Because Python uses negative indexing to mean count from the end, we
+have to do a little more work to get the same effect. Here are two ways
+of deleting one item from a vector.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+    <span class="n">idx</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">a</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">a</span><span class="p">[:</span><span class="n">k</span><span class="p">],</span> <span class="n">a</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">:]]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">50</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f1</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">slowest</span> <span class="n">run</span> <span class="n">took</span> <span class="mf">6.39</span> <span class="n">times</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">fastest</span><span class="o">.</span> <span class="n">This</span> <span class="n">could</span> <span class="n">mean</span> <span class="n">that</span> <span class="n">an</span> <span class="n">intermediate</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">cached</span>
+<span class="mi">100000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">12.4</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f2</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">47.6</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="universal-functions-ufuncs">
+<h3>Universal functions (Ufuncs)<a class="headerlink" href="#universal-functions-ufuncs" title="Permalink to this headline">¶</a></h3>
+<p>Functions that work on both scalars and arrays are known as ufuncs. For
+arrays, ufuncs apply the function in an element-wise fashion. Use of
+ufuncs is an esssential aspect of vectorization and typically much more
+computationally efficient than using an explicit loop over each element.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="c1"># np.sin is a universal function</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/05_Numbers_123_0.png" src="_images/05_Numbers_123_0.png" />
+</div>
+</div>
+<div class="section" id="generalized-ufuncs">
+<h2>Generalized ufuncs<a class="headerlink" href="#generalized-ufuncs" title="Permalink to this headline">¶</a></h2>
+<p>A universal function performs vectorized looping over scalars. A
+generalized ufunc performs looping over vectors or arrays. Currently,
+numpy only ships with a single generalized ufunc. However, they play an
+important role for JIT compilation with <code class="docutils literal"><span class="pre">numba</span></code>, a topic we will cover
+in future lectures.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="k">import</span> <span class="n">matrix_multiply</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">matrix_multiply</span><span class="o">.</span><span class="n">signature</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">),(</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">us</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="c1"># 5 2x3 matrics</span>
+<span class="n">vs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="c1"># 5 3x4 matrices</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">us</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mf">0.45041464</span><span class="p">,</span>  <span class="mf">0.73156889</span><span class="p">,</span>  <span class="mf">0.20199586</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.07597661</span><span class="p">,</span>  <span class="mf">0.13069672</span><span class="p">,</span>  <span class="mf">0.57386177</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.10830059</span><span class="p">,</span>  <span class="mf">0.26695388</span><span class="p">,</span>  <span class="mf">0.44054188</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.57974703</span><span class="p">,</span>  <span class="mf">0.17978862</span><span class="p">,</span>  <span class="mf">0.52472549</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.40794462</span><span class="p">,</span>  <span class="mf">0.35751635</span><span class="p">,</span>  <span class="mf">0.36870809</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.63494551</span><span class="p">,</span>  <span class="mf">0.11960905</span><span class="p">,</span>  <span class="mf">0.51381859</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.49510212</span><span class="p">,</span>  <span class="mf">0.46783668</span><span class="p">,</span>  <span class="mf">0.07856113</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.28401281</span><span class="p">,</span>  <span class="mf">0.47199107</span><span class="p">,</span>  <span class="mf">0.54560703</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.79458848</span><span class="p">,</span>  <span class="mf">0.43756637</span><span class="p">,</span>  <span class="mf">0.06759583</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.40228528</span><span class="p">,</span>  <span class="mf">0.50838122</span><span class="p">,</span>  <span class="mf">0.56375008</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">vs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span>  <span class="mf">5.12266952e-02</span><span class="p">,</span>   <span class="mf">8.40637879e-01</span><span class="p">,</span>   <span class="mf">2.38644940e-01</span><span class="p">,</span>
+           <span class="mf">4.35712252e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">7.81217918e-01</span><span class="p">,</span>   <span class="mf">6.77203544e-01</span><span class="p">,</span>   <span class="mf">7.28623630e-01</span><span class="p">,</span>
+           <span class="mf">8.70980358e-02</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">9.53278422e-01</span><span class="p">,</span>   <span class="mf">6.57880491e-01</span><span class="p">,</span>   <span class="mf">4.45387233e-01</span><span class="p">,</span>
+           <span class="mf">5.54732924e-02</span><span class="p">]],</span>
+
+       <span class="p">[[</span>  <span class="mf">6.52946888e-01</span><span class="p">,</span>   <span class="mf">2.29030756e-01</span><span class="p">,</span>   <span class="mf">5.91273241e-01</span><span class="p">,</span>
+           <span class="mf">8.29711164e-06</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">5.25251656e-01</span><span class="p">,</span>   <span class="mf">5.06625358e-01</span><span class="p">,</span>   <span class="mf">1.87996526e-01</span><span class="p">,</span>
+           <span class="mf">3.57795468e-02</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">6.45830540e-01</span><span class="p">,</span>   <span class="mf">7.67992588e-01</span><span class="p">,</span>   <span class="mf">3.53764451e-01</span><span class="p">,</span>
+           <span class="mf">8.93663158e-01</span><span class="p">]],</span>
+
+       <span class="p">[[</span>  <span class="mf">7.05223217e-01</span><span class="p">,</span>   <span class="mf">5.68551438e-01</span><span class="p">,</span>   <span class="mf">2.21699577e-01</span><span class="p">,</span>
+           <span class="mf">3.66118249e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">3.59834031e-01</span><span class="p">,</span>   <span class="mf">8.86827366e-01</span><span class="p">,</span>   <span class="mf">8.90595276e-01</span><span class="p">,</span>
+           <span class="mf">9.32417623e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">9.20454420e-01</span><span class="p">,</span>   <span class="mf">8.21082903e-01</span><span class="p">,</span>   <span class="mf">9.46367477e-01</span><span class="p">,</span>
+           <span class="mf">6.79992096e-02</span><span class="p">]],</span>
+
+       <span class="p">[[</span>  <span class="mf">5.17735631e-01</span><span class="p">,</span>   <span class="mf">7.57666718e-01</span><span class="p">,</span>   <span class="mf">9.76354847e-01</span><span class="p">,</span>
+           <span class="mf">8.23073506e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">9.12873687e-01</span><span class="p">,</span>   <span class="mf">7.01160089e-01</span><span class="p">,</span>   <span class="mf">9.41861241e-01</span><span class="p">,</span>
+           <span class="mf">5.75122377e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">4.29768204e-01</span><span class="p">,</span>   <span class="mf">6.52651201e-01</span><span class="p">,</span>   <span class="mf">4.52733332e-01</span><span class="p">,</span>
+           <span class="mf">7.76359616e-01</span><span class="p">]],</span>
+
+       <span class="p">[[</span>  <span class="mf">3.29293395e-01</span><span class="p">,</span>   <span class="mf">6.01805518e-01</span><span class="p">,</span>   <span class="mf">8.82878227e-01</span><span class="p">,</span>
+           <span class="mf">9.58704548e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">1.57352491e-01</span><span class="p">,</span>   <span class="mf">8.34085919e-01</span><span class="p">,</span>   <span class="mf">2.60621284e-01</span><span class="p">,</span>
+           <span class="mf">1.61751295e-01</span><span class="p">],</span>
+        <span class="p">[</span>  <span class="mf">1.81993190e-01</span><span class="p">,</span>   <span class="mf">3.98928140e-01</span><span class="p">,</span>   <span class="mf">1.31517889e-01</span><span class="p">,</span>
+           <span class="mf">4.99537484e-03</span><span class="p">]]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># perform matrix multiplication for each of the 5 sets of matrices</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ws</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ws</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[[</span> <span class="mf">0.78714627</span><span class="p">,</span>  <span class="mf">1.00694579</span><span class="p">,</span>  <span class="mf">0.73049393</span><span class="p">,</span>  <span class="mf">0.27117477</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.65304469</span><span class="p">,</span>  <span class="mf">0.52990956</span><span class="p">,</span>  <span class="mf">0.36895086</span><span class="p">,</span>  <span class="mf">0.07632137</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.4954479</span> <span class="p">,</span>  <span class="mf">0.49838267</span><span class="p">,</span>  <span class="mf">0.2700697</span> <span class="p">,</span>  <span class="mf">0.40324843</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.81186204</span><span class="p">,</span>  <span class="mf">0.62685067</span><span class="p">,</span>  <span class="mf">0.56221777</span><span class="p">,</span>  <span class="mf">0.47536541</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.75571755</span><span class="p">,</span>  <span class="mf">0.85173269</span><span class="p">,</span>  <span class="mf">0.75777686</span><span class="p">,</span>  <span class="mf">0.50778237</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.96376431</span><span class="p">,</span>  <span class="mf">0.88895942</span><span class="p">,</span>  <span class="mf">0.73355161</span><span class="p">,</span>  <span class="mf">0.37892998</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.71717088</span><span class="p">,</span>  <span class="mf">0.75442382</span><span class="p">,</span>  <span class="mf">0.95959983</span><span class="p">,</span>  <span class="mf">0.73756047</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.81239634</span><span class="p">,</span>  <span class="mf">0.90221944</span><span class="p">,</span>  <span class="mf">0.96886187</span><span class="p">,</span>  <span class="mf">0.92880331</span><span class="p">]],</span>
+
+       <span class="p">[[</span> <span class="mf">0.34280688</span><span class="p">,</span>  <span class="mf">0.87012156</span><span class="p">,</span>  <span class="mf">0.82445404</span><span class="p">,</span>  <span class="mf">0.83289018</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.31506361</span><span class="p">,</span>  <span class="mf">0.89102688</span><span class="p">,</span>  <span class="mf">0.5618071</span> <span class="p">,</span>  <span class="mf">0.47072019</span><span class="p">]]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="saving-and-loading-ndarrays">
+<h2>Saving and loading NDArrays<a class="headerlink" href="#saving-and-loading-ndarrays" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="saving-to-and-loading-from-text-files">
+<h3>Saving to and loading from text files<a class="headerlink" href="#saving-to-and-loading-from-text-files" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">x1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;../data/x1.txt&#39;</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>!cat ../data/x1.txt
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.000000000000000000e+00</span> <span class="mf">2.000000000000000000e+00</span> <span class="mf">3.000000000000000000e+00</span>
+<span class="mf">4.000000000000000000e+00</span> <span class="mf">5.000000000000000000e+00</span> <span class="mf">6.000000000000000000e+00</span>
+<span class="mf">7.000000000000000000e+00</span> <span class="mf">8.000000000000000000e+00</span> <span class="mf">9.000000000000000000e+00</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;../data/x1.txt&#39;</span><span class="p">)</span>
+<span class="n">x2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">,</span>  <span class="mf">3.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">4.</span><span class="p">,</span>  <span class="mf">5.</span><span class="p">,</span>  <span class="mf">6.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">7.</span><span class="p">,</span>  <span class="mf">8.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="saving-to-and-loading-from-binary-files-much-faster-and-also-preserves-dtype">
+<h3>Saving to and loading from binary files (much faster and also preserves dtype)<a class="headerlink" href="#saving-to-and-loading-from-binary-files-much-faster-and-also-preserves-dtype" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;../data/x1.npy&#39;</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>!cat ../data/x1.npy
+</pre></div>
+</div>
+<pre class="literal-block">
+�NUMPYF{'descr': '&lt;i8', 'fortran_order': False, 'shape': (3, 3), }
+   
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;../data/x1.npy&#39;</span><span class="p">)</span>
+<span class="n">x3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="version-information">
+<h2>Version information<a class="headerlink" href="#version-information" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">version_information</span>
+<span class="o">%</span><span class="n">version_information</span> <span class="n">numpy</span><span class="p">,</span> <span class="n">numba</span><span class="p">,</span> <span class="n">matplotlib</span>
+</pre></div>
+</div>
+<table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.1</td></tr><tr><td>OS</td><td>Darwin 15.2.0 x86_64 i386 64bit</td></tr><tr><td>numpy</td><td>1.10.2</td></tr><tr><td>numba</td><td>0.22.1</td></tr><tr><td>matplotlib</td><td>1.5.1</td></tr><tr><td colspan='2'>Fri Jan 15 13:34:06 2016 EST</td></tr></table></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using <code class="docutils literal"><span class="pre">numpy</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#array-creation">Array creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#array-manipulation">Array manipulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#array-indexing">Array indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#calculations-and-broadcasting">Calculations and broadcasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combining-and-splitting-arrays">Combining and splitting arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reductions">Reductions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-calculating-pairwise-distance-matrix-using-broadcasting-and-vectorization">Example: Calculating pairwise distance matrix using broadcasting and vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-consructing-leave-one-out-arrays">Example: Consructing leave-one-out arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generalized-ufuncs">Generalized ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#saving-and-loading-ndarrays">Saving and loading NDArrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-information">Version information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="04_Strings.html"
+                          title="Previous page">&larr; Strings</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="06_Graphics.html"
+                          title="Next page">&rarr; Graphics in Python</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/05_Numbers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="06_Graphics.html" title="Graphics in Python"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="04_Strings.html" title="Strings"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/05_Numbers.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:30 GMT -->
+</html>

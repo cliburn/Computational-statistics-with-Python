@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/00_Jupyter.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:16 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Notes on using Jupyter &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction to Python" href="01_Introduction_To_Python.html" />
+    <link rel="prev" title="STA-663-2017" href="index-2.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="01_Introduction_To_Python.html" title="Introduction to Python"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="index-2.html" title="STA-663-2017"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="notes-on-using-jupyter">
+<h1>Notes on using Jupyter<a class="headerlink" href="#notes-on-using-jupyter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="keyboard-shortcuts">
+<h2>Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general">
+<h3>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>See Help menu for list of keyboard shortcuts</li>
+<li>For Windows users, the Ctrl key is the equivalent of the Cmd key</li>
+<li>Cmd-Shift-P: Brings up command palette (or use the toolbar icon)</li>
+</ul>
+<p>Most useful shortcuts.</p>
+</div>
+<div class="section" id="in-edit-mode">
+<h3>In EDIT mode<a class="headerlink" href="#in-edit-mode" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>ESC: switch to COMMAND mode</li>
+<li>Tab: auto-complete</li>
+<li>Shift-Tab: tooltip (e.g. to get function arguments)</li>
+<li>Cmd-/: toggle commenting of highlighted code</li>
+</ul>
+</div>
+<div class="section" id="in-command-mode">
+<h3>In COMMAND mode<a class="headerlink" href="#in-command-mode" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Return: switch to EDIT mode</li>
+<li>F: Brings up Find and Replace dialog (toggle option to replace within
+selected cell or whole notebook)</li>
+<li>A: Create new cell above</li>
+<li>B: Create new cell below</li>
+<li>DD: Delete selected cell(s)</li>
+<li>M: Switch to Markdown cell</li>
+<li>Y: Switch to Code cell</li>
+<li>Shift-Down: Select multiple cells</li>
+<li>Shift-Up: Select multiple cells</li>
+<li>Shift-M: Merge selected cells</li>
+<li>Shift-Return: Execute selected cell(s)</li>
+<li>Alt-Return: Execute selected cell(s) and insert new cell below</li>
+</ul>
+</div>
+</div>
+<div class="section" id="magic-commands">
+<h2>Magic commands<a class="headerlink" href="#magic-commands" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">lsmagic</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Available line magics:
+%alias  %alias_magic  %autocall  %automagic  %autosave  %bookmark  %cat  %cd  %clear  %colors  %config  %connect_info  %cp  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff  %logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %popd  %pprint  %precision  %profile  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %qtconsole  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos  %xdel  %xmode
+
+Available cell magics:
+%%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile
+
+Automagic is ON, % prefix IS NOT needed for line magics.
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">hello</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">Hello</span><span class="p">,</span> <span class="n">world</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">1</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">2</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">hello</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cat</span> <span class="n">hello</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Hello</span><span class="p">,</span> <span class="n">world</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">1</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">2</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-shell-commands">
+<h2>Using shell commands<a class="headerlink" href="#using-shell-commands" title="Permalink to this headline">¶</a></h2>
+<p>Use ! to run commands in the shell or %%bash to run multi-line commands.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! tail -n3 hello.txt | head -n2
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">1</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">thing</span> <span class="n">number</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%bash
+
+for i in $(ls); do
+    echo item: $i
+done
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">item</span><span class="p">:</span> <span class="mi">00</span><span class="n">_Jupyter</span><span class="o">.</span><span class="n">ipynb</span>
+<span class="n">item</span><span class="p">:</span> <span class="mi">01</span><span class="n">_Introduction_To_Python</span><span class="o">.</span><span class="n">ipynb</span>
+<span class="n">item</span><span class="p">:</span> <span class="mi">02</span><span class="n">_Functions</span><span class="o">.</span><span class="n">ipynb</span>
+<span class="n">item</span><span class="p">:</span> <span class="mi">03</span><span class="n">_Classes</span><span class="o">.</span><span class="n">ipynb</span>
+<span class="n">item</span><span class="p">:</span> <span class="n">hello</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="load-extension-for-r">
+<h2>Load extension for R<a class="headerlink" href="#load-extension-for-r" title="Permalink to this headline">¶</a></h2>
+<p>This allows you to execute R code in a cell and pass variables in and
+out.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">rpy2</span><span class="o">.</span><span class="n">ipython</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span> <span class="o">-</span><span class="n">i</span> <span class="n">a</span><span class="p">,</span><span class="n">b</span> <span class="o">-</span><span class="n">o</span> <span class="n">x</span>
+<span class="n">x</span> <span class="o">&lt;-</span> <span class="n">a</span><span class="p">:</span><span class="n">b</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">int32</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-help">
+<h2>Getting help<a class="headerlink" href="#getting-help" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Use the Help menu for general documentation</li>
+<li>Use ? before or after a name to get information about the name</li>
+<li>Use ?? before or after a name to also get the source if available</li>
+</ul>
+</div>
+<div class="section" id="further-exploration">
+<h2>Further exploration<a class="headerlink" href="#further-exploration" title="Permalink to this headline">¶</a></h2>
+<p>See blog post <a class="reference external" href="https://www.dataquest.io/blog/jupyter-notebook-tips-tricks-shortcuts/">28 Jupyter Notebook tips, tricks and
+shortcuts</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Notes on using Jupyter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#keyboard-shortcuts">Keyboard Shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#magic-commands">Magic commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-shell-commands">Using shell commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-extension-for-r">Load extension for R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-help">Getting help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#further-exploration">Further exploration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="index-2.html"
+                          title="Previous page">&larr; STA-663-2017</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="01_Introduction_To_Python.html"
+                          title="Next page">&rarr; Introduction to Python</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/00_Jupyter.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="01_Introduction_To_Python.html" title="Introduction to Python"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="index-2.html" title="STA-663-2017"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/00_Jupyter.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:17 GMT -->
+</html>

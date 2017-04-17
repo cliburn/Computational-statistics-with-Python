@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18H_Spark_Cloud.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:38 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Spark on Cloud &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using PyMC3" href="19A_PyMC3.html" />
+    <link rel="prev" title="Spark Streaming" href="18G_Spark_Streaming.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="19A_PyMC3.html" title="Using PyMC3"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18G_Spark_Streaming.html" title="Spark Streaming"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spark-on-cloud">
+<h1>Spark on Cloud<a class="headerlink" href="#spark-on-cloud" title="Permalink to this headline">¶</a></h1>
+<p>How to set up and run Spark on Azure or AWS EC2 clusters.</p>
+<div class="section" id="azure">
+<h2>Azure<a class="headerlink" href="#azure" title="Permalink to this headline">¶</a></h2>
+<p>Follow <a class="reference external" href="https://azure.microsoft.com/en-us/documentation/articles/hdinsight-apache-spark-jupyter-spark-sql/">instructions provided by
+Microsoft</a>.</p>
+<p>To terminate the cluster, you have to <strong>delete</strong> it.</p>
+</div>
+<div class="section" id="aws">
+<h2>AWS<a class="headerlink" href="#aws" title="Permalink to this headline">¶</a></h2>
+<p>AWS setup is more involved. We will show how to access <code class="docutils literal"><span class="pre">pyspark</span></code> via
+ssh to an <code class="docutils literal"><span class="pre">EMR</span></code> cluster, as well as how to set up the <code class="docutils literal"><span class="pre">Zeppelin</span></code>
+browser-based notebook (similar to Jupyter).</p>
+<p><strong>References</strong></p>
+<ul class="simple">
+<li><a class="reference external" href="http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-spark.html">EMR
+Spark</a></li>
+<li><a class="reference external" href="http://docs.aws.amazon.com/ElasticMapReduce/latest/ManagementGuide/emr-gs.html">AWS
+tutorial</a></li>
+</ul>
+</div>
+<div class="section" id="know-your-aws-public-and-private-access-keys">
+<h2>Know your AWS public and private <a class="reference external" href="http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html">access keys</a><a class="headerlink" href="#know-your-aws-public-and-private-access-keys" title="Permalink to this headline">¶</a></h2>
+<p>These will look something like</p>
+<ul class="simple">
+<li>public: <code class="docutils literal"><span class="pre">AKIAIOSFODNN7EXAMPLE</span></code></li>
+<li>private: <code class="docutils literal"><span class="pre">wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</span></code></li>
+</ul>
+</div>
+<div class="section" id="know-your-aws-ec2-key-pair">
+<h2>Know your AWS EC2 <a class="reference external" href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html">key-pair</a><a class="headerlink" href="#know-your-aws-ec2-key-pair" title="Permalink to this headline">¶</a></h2>
+<p>This is a name that you give - mine is <code class="docutils literal"><span class="pre">cliburn-2016</span></code> and an
+associated PEM file - I keep mine at ~/AWS/cliburn-2016.pem.</p>
+<p>Set the correct permissions on the PEM file.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">chmod</span> <span class="mi">400</span> <span class="n">xxx</span><span class="o">.</span><span class="n">pem</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="install-aws-command-line-client">
+<h2>Install AWS command line client<a class="headerlink" href="#install-aws-command-line-client" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">awscli</span>
+</pre></div>
+</div>
+<p>If you run into problems, see
+<a class="reference external" href="http://docs.aws.amazon.com/cli/latest/userguide/installing.html">docs</a></p>
+</div>
+<div class="section" id="configure-the-aws-command-line-client">
+<h2>Configure the AWS command line client<a class="headerlink" href="#configure-the-aws-command-line-client" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">configure</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">AWS</span> <span class="n">Access</span> <span class="n">Key</span> <span class="n">ID</span><span class="p">:</span> <span class="o">&lt;&lt;</span><span class="n">Your</span> <span class="n">public</span> <span class="n">access</span> <span class="n">key</span><span class="o">&gt;&gt;</span>
+<span class="n">AWS</span> <span class="n">Secret</span> <span class="n">Access</span> <span class="n">Key</span><span class="p">:</span> <span class="o">&lt;&lt;</span><span class="n">Your</span> <span class="n">private</span> <span class="n">access</span> <span class="n">key</span><span class="o">&gt;&gt;</span>
+<span class="n">Default</span> <span class="n">region</span> <span class="n">name</span><span class="p">:</span> <span class="n">us</span><span class="o">-</span><span class="n">east</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">Default</span> <span class="n">output</span> <span class="nb">format</span><span class="p">:</span> <span class="n">json</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-a-cluster">
+<h2>Create a cluster<a class="headerlink" href="#create-a-cluster" title="Permalink to this headline">¶</a></h2>
+<p><strong>Warning</strong>: You will be charged for this.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">create</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">name</span> <span class="s2">&quot;&lt;&lt;NAME-FOR-CLUSTER&gt;&gt;&quot;</span> <span class="o">--</span><span class="n">release</span><span class="o">-</span><span class="n">label</span>  <span class="n">emr</span><span class="o">-</span><span class="mf">4.5</span><span class="o">.</span><span class="mi">0</span> <span class="o">--</span><span class="n">applications</span> <span class="n">Name</span><span class="o">=</span><span class="n">Spark</span> <span class="n">Name</span><span class="o">=</span><span class="n">Zeppelin</span><span class="o">-</span><span class="n">Sandbox</span>  <span class="o">--</span><span class="n">ec2</span><span class="o">-</span><span class="n">attributes</span> <span class="n">KeyName</span><span class="o">=&lt;&lt;</span><span class="n">Your</span> <span class="n">key</span><span class="o">-</span><span class="n">pair</span><span class="o">&gt;&gt;&gt;</span> <span class="o">--</span><span class="n">instance</span><span class="o">-</span><span class="nb">type</span> <span class="n">m3</span><span class="o">.</span><span class="n">xlarge</span> <span class="o">--</span><span class="n">instance</span><span class="o">-</span><span class="n">count</span> <span class="mi">3</span> <span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">default</span><span class="o">-</span><span class="n">roles</span>
+</pre></div>
+</div>
+<p>For example, I start mine with</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">create</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">name</span> <span class="s2">&quot;spak-2016-d&quot;</span> <span class="o">--</span><span class="n">release</span><span class="o">-</span><span class="n">label</span>    <span class="n">emr</span><span class="o">-</span><span class="mf">4.5</span><span class="o">.</span><span class="mi">0</span> <span class="o">--</span><span class="n">applications</span> <span class="n">Name</span><span class="o">=</span><span class="n">Spark</span> <span class="n">Name</span><span class="o">=</span><span class="n">Zeppelin</span><span class="o">-</span><span class="n">Sandbox</span>  <span class="o">--</span><span class="n">ec2</span><span class="o">-</span><span class="n">attributes</span> <span class="n">KeyName</span><span class="o">=</span><span class="s2">&quot;cliburn-2016&quot;</span>  <span class="o">--</span><span class="n">instance</span><span class="o">-</span><span class="nb">type</span> <span class="n">m3</span><span class="o">.</span><span class="n">xlarge</span> <span class="o">--</span><span class="n">instance</span><span class="o">-</span><span class="n">count</span> <span class="mi">3</span> <span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">default</span><span class="o">-</span><span class="n">role</span>
+</pre></div>
+</div>
+<p>A cluster-id should be returned</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;ClusterId&quot;</span><span class="p">:</span> <span class="s2">&quot;j-XXXXXXXXXXXXXXX&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-information-about-the-cluster">
+<h2>Get information about the cluster<a class="headerlink" href="#get-information-about-the-cluster" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">describe</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">cluster</span><span class="o">-</span><span class="nb">id</span> <span class="o">-</span><span class="n">XXXXXXXXXXXXXXX</span>
+</pre></div>
+</div>
+<p>or just inspect the state</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">describe</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">cluster</span><span class="o">-</span><span class="nb">id</span> <span class="o">-</span><span class="n">XXXXXXXXXXXXXXX</span> <span class="o">|</span> <span class="n">grep</span> \<span class="s2">&quot;State</span><span class="se">\&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connect-to-the-cluster-via-ssh">
+<h2>Connect to the cluster via <code class="docutils literal"><span class="pre">ssh</span></code><a class="headerlink" href="#connect-to-the-cluster-via-ssh" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">ssh</span> <span class="o">--</span><span class="n">cluster</span><span class="o">-</span><span class="nb">id</span> <span class="o">-</span><span class="n">XXXXXXXXXXXXXXX</span> <span class="o">--</span><span class="n">key</span><span class="o">-</span><span class="n">pair</span><span class="o">-</span><span class="n">file</span> <span class="n">cliburn</span><span class="o">-</span><span class="mf">2016.</span><span class="n">pem</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-the-ip-address-that-is-returned">
+<h2>Note the IP address that is returned<a class="headerlink" href="#note-the-ip-address-that-is-returned" title="Permalink to this headline">¶</a></h2>
+<p>It will be something like <code class="docutils literal"><span class="pre">ec2-XX-X-XX-XXX.compute-1.amazonaws.com</span></code></p>
+</div>
+<div class="section" id="run-pyspark">
+<h2>Run <code class="docutils literal"><span class="pre">pyspark</span></code><a class="headerlink" href="#run-pyspark" title="Permalink to this headline">¶</a></h2>
+<p>Run</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pyspark</span>
+</pre></div>
+</div>
+<p>And you will be in a <code class="docutils literal"><span class="pre">pyspark</span></code> console where you can issue Spark
+commands.</p>
+<p>When you&#8217;ve had enough fun playing in <code class="docutils literal"><span class="pre">pyspark</span></code> for a while, end the
+session with <code class="docutils literal"><span class="pre">Ctrl-D</span></code> and exit to leave the <code class="docutils literal"><span class="pre">ssh</span></code> session.</p>
+</div>
+<div class="section" id="run-the-zepellin-notebook">
+<h2>Run the <code class="docutils literal"><span class="pre">Zepellin</span></code> <a class="reference external" href="https://zeppelin.incubator.apache.org/">notebook</a><a class="headerlink" href="#run-the-zepellin-notebook" title="Permalink to this headline">¶</a></h2>
+<p>Create an SSH tunnel to port 8890</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="n">xxx</span><span class="o">.</span><span class="n">pem</span> <span class="o">-</span><span class="n">L</span> <span class="mi">8192</span><span class="p">:</span><span class="n">ec2</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span><span class="o">.</span><span class="n">compute</span><span class="o">-</span><span class="mf">1.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="mi">8192</span> <span class="n">hadoop</span><span class="nd">@ec2</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span><span class="o">-</span><span class="n">xx</span><span class="o">.</span><span class="n">compute</span><span class="o">-</span><span class="mf">1.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span> <span class="o">-</span><span class="n">N</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p>Fill in the <code class="docutils literal"><span class="pre">xxx</span></code> with the locatin of your PEM file, and the
+appropriate IP address.</p>
+</div>
+<div class="section" id="connect-to-zeppelin-notebook">
+<h2>Connect to <code class="docutils literal"><span class="pre">Zeppelin</span></code> notebook<a class="headerlink" href="#connect-to-zeppelin-notebook" title="Permalink to this headline">¶</a></h2>
+<p>Open a browser to <a class="reference external" href="http://localhost:8890/">http://localhost:8890/</a> - if it worked you should see
+this</p>
+<div class="figure" id="id1">
+<img alt="Zeppelin screenshot" src="http://cloudacademy.com/blog/wp-content/uploads/2016/01/Zeppelin-Notebook-1.png" />
+<p class="caption"><span class="caption-text">Zeppelin screenshot</span></p>
+</div>
+</div>
+<div class="section" id="create-notebook-and-run-spark-within-it">
+<h2>Create notebook and run Spark within it<a class="headerlink" href="#create-notebook-and-run-spark-within-it" title="Permalink to this headline">¶</a></h2>
+<p>The default cell uses <code class="docutils literal"><span class="pre">scala</span></code>. For <code class="docutils literal"><span class="pre">pyspark</span></code> just start a cell with
+<code class="docutils literal"><span class="pre">%pyspark</span></code>.</p>
+</div>
+<div class="section" id="terminate-the-cluster">
+<h2>Terminate the cluster<a class="headerlink" href="#terminate-the-cluster" title="Permalink to this headline">¶</a></h2>
+<p>When you are done, remember to terminate the cluster!</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">terminate</span><span class="o">-</span><span class="n">clusters</span> <span class="o">--</span><span class="n">cluster</span><span class="o">-</span><span class="nb">id</span> <span class="n">j</span><span class="o">-</span><span class="n">XXXXXXXXXXXXXXX</span>
+</pre></div>
+</div>
+<p>and confirm that it is terminating</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">aws</span> <span class="n">emr</span> <span class="n">describe</span><span class="o">-</span><span class="n">cluster</span> <span class="o">--</span><span class="n">cluster</span><span class="o">-</span><span class="nb">id</span> <span class="n">j</span><span class="o">-</span><span class="n">XXXXXXXXXXXXXXX</span> <span class="o">|</span> <span class="n">grep</span> \<span class="s2">&quot;State</span><span class="se">\&quot;</span>
+</pre></div>
+</div>
+<p>You should see</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>        <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;TERMINATING&quot;</span>
+        <span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;TERMINATING&quot;</span>
+<span class="s2">&quot;State&quot;</span><span class="p">:</span> <span class="s2">&quot;TERMINATING&quot;</span>
+</pre></div>
+</div>
+<p>If you are paranoid, log into the <a class="reference external" href="https://aws.amazon.com/console/">AWS Management
+Console</a> and click on
+<code class="docutils literal"><span class="pre">Services</span> <span class="pre">|</span> <span class="pre">EMR</span></code> and check the status of your cluster.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spark on Cloud</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#azure">Azure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#aws">AWS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#know-your-aws-public-and-private-access-keys">Know your AWS public and private access keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#know-your-aws-ec2-key-pair">Know your AWS EC2 key-pair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-aws-command-line-client">Install AWS command line client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configure-the-aws-command-line-client">Configure the AWS command line client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-a-cluster">Create a cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-information-about-the-cluster">Get information about the cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connect-to-the-cluster-via-ssh">Connect to the cluster via <code class="docutils literal"><span class="pre">ssh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#note-the-ip-address-that-is-returned">Note the IP address that is returned</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-pyspark">Run <code class="docutils literal"><span class="pre">pyspark</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-the-zepellin-notebook">Run the <code class="docutils literal"><span class="pre">Zepellin</span></code> notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connect-to-zeppelin-notebook">Connect to <code class="docutils literal"><span class="pre">Zeppelin</span></code> notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#create-notebook-and-run-spark-within-it">Create notebook and run Spark within it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#terminate-the-cluster">Terminate the cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="18G_Spark_Streaming.html"
+                          title="Previous page">&larr; Spark Streaming</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="19A_PyMC3.html"
+                          title="Next page">&rarr; Using PyMC3</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/18H_Spark_Cloud.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="19A_PyMC3.html" title="Using PyMC3"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18G_Spark_Streaming.html" title="Spark Streaming"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18H_Spark_Cloud.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:39 GMT -->
+</html>

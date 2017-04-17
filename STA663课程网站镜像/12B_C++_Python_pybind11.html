@@ -1,0 +1,949 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/12B_C++_Python_pybind11.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:14 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using pybind11 &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Linear Algebra Review" href="13A_LinearAlgebra1.html" />
+    <link rel="prev" title="Using C++" href="12A_C%2b%2b.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="13A_LinearAlgebra1.html" title="Linear Algebra Review"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="12A_C%2b%2b.html" title="Using C++"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-pybind11">
+<h1>Using <code class="docutils literal"><span class="pre">pybind11</span></code><a class="headerlink" href="#using-pybind11" title="Permalink to this headline">¶</a></h1>
+<p>The package <code class="docutils literal"><span class="pre">pybind11</span></code> is provides an elegant way to wrap C++ code for
+Python, including automatic conversions for <code class="docutils literal"><span class="pre">numpy</span></code> arrays and the C++
+<code class="docutils literal"><span class="pre">Eigen</span></code> linear algebra library. Used with the <code class="docutils literal"><span class="pre">cppimport</span></code> package,
+this provides a very nice work flow for integrating C++ and Python:</p>
+<ul class="simple">
+<li>Edit C++ code</li>
+<li>Run Python code</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! pip3 install pybind11
+! pip3 install cppimport
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Requirement already satisfied (use --upgrade to upgrade): pybind11 in /opt/conda/lib/python3.5/site-packages
+[33mYou are using pip version 8.1.2, however version 9.0.1 is available.
+You should consider upgrading via the &#39;pip install --upgrade pip&#39; command.[0m
+Requirement already satisfied (use --upgrade to upgrade): cppimport in /opt/conda/lib/python3.5/site-packages
+Requirement already satisfied (use --upgrade to upgrade): pybind11 in /opt/conda/lib/python3.5/site-packages (from cppimport)
+Requirement already satisfied (use --upgrade to upgrade): mako in /opt/conda/lib/python3.5/site-packages (from cppimport)
+Requirement already satisfied (use --upgrade to upgrade): MarkupSafe&gt;=0.9.2 in /opt/conda/lib/python3.5/site-packages (from mako-&gt;cppimport)
+[33mYou are using pip version 8.1.2, however version 9.0.1 is available.
+You should consider upgrading via the &#39;pip install --upgrade pip&#39; command.[0m
+</pre></div>
+</div>
+<p>Clone the Eigen library - no installation is required as Eigen is a
+header only library.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! git clone https://github.com/RLovelett/eigen.git
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fatal</span><span class="p">:</span> <span class="n">destination</span> <span class="n">path</span> <span class="s1">&#39;eigen&#39;</span> <span class="n">already</span> <span class="n">exists</span> <span class="ow">and</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">an</span> <span class="n">empty</span> <span class="n">directory</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">`pybind11</span></code> &lt;<a class="reference external" href="http://pybind11.readthedocs.io/en/latest/">http://pybind11.readthedocs.io/en/latest/</a>&gt;`__</li>
+<li><code class="docutils literal"><span class="pre">`cppimport</span></code> &lt;<a class="reference external" href="https://github.com/tbenthompson/cppimport">https://github.com/tbenthompson/cppimport</a>&gt;`__</li>
+<li><code class="docutils literal"><span class="pre">`Eigen</span></code> &lt;<a class="reference external" href="http://eigen.tuxfamily.org/">http://eigen.tuxfamily.org</a>&gt;`__</li>
+</ul>
+</div>
+<div class="section" id="a-first-example-of-using-pybind11">
+<h2>A first example of using <code class="docutils literal"><span class="pre">pybind11</span></code><a class="headerlink" href="#a-first-example-of-using-pybind11" title="Permalink to this headline">¶</a></h2>
+<p>Create a new subdirectory - e.g. <code class="docutils literal"><span class="pre">example1</span></code> and create the following 5
+files in it:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">funcs.hpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">funcs.cpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">wrap.cpp</span></code></li>
+<li><code class="docutils literal"><span class="pre">setup.py</span></code></li>
+<li><code class="docutils literal"><span class="pre">test_funcs.py</span></code></li>
+</ul>
+<p>First write the C++ header and implementation files</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example1</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example1</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">funcs</span><span class="o">.</span><span class="n">hpp</span>
+
+<span class="nb">int</span> <span class="n">add</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="p">,</span> <span class="nb">int</span> <span class="n">j</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">funcs</span><span class="o">.</span><span class="n">hpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">funcs</span><span class="o">.</span><span class="n">cpp</span>
+
+<span class="nb">int</span> <span class="n">add</span><span class="p">(</span><span class="nb">int</span> <span class="n">i</span><span class="p">,</span> <span class="nb">int</span> <span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">funcs</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<p>Next write the C++ wrapper code using <code class="docutils literal"><span class="pre">pybind11</span></code> in <code class="docutils literal"><span class="pre">wrap.cpp</span></code>. The
+arguments <code class="docutils literal"><span class="pre">&quot;i&quot;_a=1,</span> <span class="pre">&quot;j&quot;_a=2</span></code> in the exported function definition tells
+<code class="docutils literal"><span class="pre">pybind11</span></code> to generate variables named <code class="docutils literal"><span class="pre">i</span></code> with default value 1 and
+<code class="docutils literal"><span class="pre">j</span></code> with default value 2 for the <code class="docutils literal"><span class="pre">add</span></code> function.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap1</span><span class="o">.</span><span class="n">cpp</span>
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+<span class="c1">#include &quot;funcs.hpp&quot;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+
+<span class="n">using</span> <span class="n">namespace</span> <span class="n">pybind11</span><span class="p">::</span><span class="n">literals</span><span class="p">;</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap1&quot;</span><span class="p">,</span> <span class="s2">&quot;pybind11 example plugin&quot;</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">add</span><span class="p">,</span> <span class="s2">&quot;A function which adds two numbers&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;i&quot;</span><span class="n">_a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span><span class="n">_a</span><span class="o">=</span><span class="mi">2</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap1</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<p>Finally, write the <code class="docutils literal"><span class="pre">setup.py</span></code> file to compile the extension module.
+This is mostly boilerplate.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">distutils.core</span> <span class="k">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="kn">from</span> <span class="nn">distutils</span> <span class="k">import</span> <span class="n">sysconfig</span>
+
+<span class="n">cpp_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+
+<span class="n">ext_modules</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Extension</span><span class="p">(</span>
+    <span class="s1">&#39;wrap1&#39;</span><span class="p">,</span>
+        <span class="p">[</span><span class="s1">&#39;funcs.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;wrap1.cpp&#39;</span><span class="p">],</span>
+        <span class="n">include_dirs</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pybind11/include&#39;</span><span class="p">],</span>
+    <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c++&#39;</span><span class="p">,</span>
+    <span class="n">extra_compile_args</span> <span class="o">=</span> <span class="n">cpp_args</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;wrap1&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;0.0.1&#39;</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Cliburn Chan&#39;</span><span class="p">,</span>
+    <span class="n">author_email</span><span class="o">=</span><span class="s1">&#39;cliburn.chan@duke.edu&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Example&#39;</span><span class="p">,</span>
+    <span class="n">ext_modules</span><span class="o">=</span><span class="n">ext_modules</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Now build the extension module in the subdirectory with these files</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">-</span><span class="n">i</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">running</span> <span class="n">build_ext</span>
+<span class="n">building</span> <span class="s1">&#39;wrap1&#39;</span> <span class="n">extension</span>
+<span class="n">creating</span> <span class="n">build</span>
+<span class="n">creating</span> <span class="n">build</span><span class="o">/</span><span class="n">temp</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="mf">3.5</span>
+<span class="n">gcc</span> <span class="o">-</span><span class="n">pthread</span> <span class="o">-</span><span class="n">Wsign</span><span class="o">-</span><span class="n">compare</span> <span class="o">-</span><span class="n">DNDEBUG</span> <span class="o">-</span><span class="n">g</span> <span class="o">-</span><span class="n">fwrapv</span> <span class="o">-</span><span class="n">O3</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">Wstrict</span><span class="o">-</span><span class="n">prototypes</span> <span class="o">-</span><span class="n">fPIC</span> <span class="o">-</span><span class="n">Ipybind11</span><span class="o">/</span><span class="n">include</span> <span class="o">-</span><span class="n">I</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span><span class="n">m</span> <span class="o">-</span><span class="n">c</span> <span class="n">funcs</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">build</span><span class="o">/</span><span class="n">temp</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="mf">3.5</span><span class="o">/</span><span class="n">funcs</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span>
+<span class="n">gcc</span> <span class="o">-</span><span class="n">pthread</span> <span class="o">-</span><span class="n">Wsign</span><span class="o">-</span><span class="n">compare</span> <span class="o">-</span><span class="n">DNDEBUG</span> <span class="o">-</span><span class="n">g</span> <span class="o">-</span><span class="n">fwrapv</span> <span class="o">-</span><span class="n">O3</span> <span class="o">-</span><span class="n">Wall</span> <span class="o">-</span><span class="n">Wstrict</span><span class="o">-</span><span class="n">prototypes</span> <span class="o">-</span><span class="n">fPIC</span> <span class="o">-</span><span class="n">Ipybind11</span><span class="o">/</span><span class="n">include</span> <span class="o">-</span><span class="n">I</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">include</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span><span class="n">m</span> <span class="o">-</span><span class="n">c</span> <span class="n">wrap1</span><span class="o">.</span><span class="n">cpp</span> <span class="o">-</span><span class="n">o</span> <span class="n">build</span><span class="o">/</span><span class="n">temp</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="mf">3.5</span><span class="o">/</span><span class="n">wrap1</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">std</span><span class="o">=</span><span class="n">c</span><span class="o">++</span><span class="mi">11</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">pthread</span> <span class="o">-</span><span class="n">shared</span> <span class="o">-</span><span class="n">L</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span> <span class="o">-</span><span class="n">Wl</span><span class="p">,</span><span class="o">-</span><span class="n">rpath</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span><span class="p">,</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="k">as</span><span class="o">-</span><span class="n">needed</span> <span class="n">build</span><span class="o">/</span><span class="n">temp</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="mf">3.5</span><span class="o">/</span><span class="n">funcs</span><span class="o">.</span><span class="n">o</span> <span class="n">build</span><span class="o">/</span><span class="n">temp</span><span class="o">.</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="mf">3.5</span><span class="o">/</span><span class="n">wrap1</span><span class="o">.</span><span class="n">o</span> <span class="o">-</span><span class="n">L</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span> <span class="o">-</span><span class="n">lpython3</span><span class="o">.</span><span class="mi">5</span><span class="n">m</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example1</span><span class="o">/</span><span class="n">wrap1</span><span class="o">.</span><span class="n">cpython</span><span class="o">-</span><span class="mi">35</span><span class="n">m</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span><span class="o">.</span><span class="n">so</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+</pre></div>
+</div>
+<p>And if you are successful, you should now see a new <code class="docutils literal"><span class="pre">funcs.so</span></code>
+extension module. We can write a <code class="docutils literal"><span class="pre">test_funcs.py</span></code> file test the
+extension module:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+
+<span class="kn">import</span> <span class="nn">wrap1</span>
+
+<span class="k">def</span> <span class="nf">test_add</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">wrap1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">wrap1</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test_add</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>And finally, running the test should not generate any error messages:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">python</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">7</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-cppimport">
+<h2>Using <code class="docutils literal"><span class="pre">cppimport</span></code><a class="headerlink" href="#using-cppimport" title="Permalink to this headline">¶</a></h2>
+<p>In the development stage, it can be distracting to have to repeatedly
+rebuild the extension module by running</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">clean</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_ext</span> <span class="o">-</span><span class="n">i</span>
+</pre></div>
+</div>
+<p>every single time you modify the C++ code. The <code class="docutils literal"><span class="pre">cppimport</span></code> package
+does this for you.</p>
+<p>Create a new sub-directory <code class="docutils literal"><span class="pre">exaample2</span></code> and copy the files
+<code class="docutils literal"><span class="pre">func.hpp</span></code>, <code class="docutils literal"><span class="pre">funcs.cpp</span></code> and <code class="docutils literal"><span class="pre">wrap.cpp</span></code> from <code class="docutils literal"><span class="pre">example1</span></code> over. For
+the previous example, we just need to add some annotation (between
+<code class="docutils literal"><span class="pre">&lt;%</span> <span class="pre">and</span> <span class="pre">%&gt;</span></code> delimiters) to the top of the <code class="docutils literal"><span class="pre">wrap.cpp</span></code> file</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example2</span>
+<span class="o">%</span><span class="n">cp</span> <span class="n">example1</span><span class="o">/</span><span class="n">funcs</span><span class="o">.*</span> <span class="n">example2</span><span class="o">/</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example2</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap2</span><span class="o">.</span><span class="n">cpp</span>
+<span class="o">&lt;%</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;compiler_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;sources&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;funcs.cpp&#39;</span><span class="p">]</span>
+<span class="n">setup_pybind11</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="o">%&gt;</span>
+
+<span class="c1">#include &quot;funcs.hpp&quot;</span>
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap2&quot;</span><span class="p">,</span> <span class="s2">&quot;pybind11 example plugin&quot;</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">add</span><span class="p">,</span> <span class="s2">&quot;A function which adds two numbers&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap2</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+
+<span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="n">funcs</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap2&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_add</span><span class="p">():</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">funcs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">funcs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+    <span class="n">test_add</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">python</span> <span class="n">test_funcs</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">7</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+</pre></div>
+</div>
+<p>Or just call from notebook</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="n">funcs</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap2&quot;</span><span class="p">)</span>
+
+<span class="n">funcs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">7</span>
+</pre></div>
+</div>
+<p>without any need to manually build the extension module. Any updates
+will be detected by <code class="docutils literal"><span class="pre">cppimport</span></code> and it will automatically trigger a
+re-build.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="vectorizing-functions-for-use-with-numpy-arrays">
+<h2>Vectorizing functions for use with <code class="docutils literal"><span class="pre">numpy</span></code> arrays<a class="headerlink" href="#vectorizing-functions-for-use-with-numpy-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Example showing how to vectorize a <code class="docutils literal"><span class="pre">square</span></code> function. Note that from
+here on, we don&#8217;t bother to use separate header and implementation files
+for these code snippets, and just write them together with the wrapping
+code in a <code class="docutils literal"><span class="pre">code.cpp</span></code> file. This means that with <code class="docutils literal"><span class="pre">cppimport</span></code>, there
+are only two files that we actually code for, a C++ <code class="docutils literal"><span class="pre">code.cpp</span></code> file
+and a python test file.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example3</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap3</span><span class="o">.</span><span class="n">cpp</span>
+<span class="o">&lt;%</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;compiler_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+<span class="n">setup_pybind11</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="o">%&gt;</span>
+
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+<span class="c1">#include &lt;pybind11/numpy.h&gt;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+<span class="n">double</span> <span class="n">square</span><span class="p">(</span><span class="n">double</span> <span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap3</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap3&quot;</span><span class="p">,</span> <span class="s2">&quot;pybind11 example plugin&quot;</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="n">py</span><span class="p">::</span><span class="n">vectorize</span><span class="p">(</span><span class="n">square</span><span class="p">),</span> <span class="s2">&quot;A vectroized square function.&quot;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap3</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cppimport</span>
+
+<span class="n">wrap3</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap3&quot;</span><span class="p">)</span>
+<span class="n">wrap3</span><span class="o">.</span><span class="n">square</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">9.</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Once the shared libary is built, you can use it as a regular Python
+module.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! ls
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">wrap3</span><span class="o">.</span><span class="n">cpp</span>  <span class="n">wrap3</span><span class="o">.</span><span class="n">cpython</span><span class="o">-</span><span class="mi">35</span><span class="n">m</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">gnu</span><span class="o">.</span><span class="n">so</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">wrap3</span>
+
+<span class="n">wrap3</span><span class="o">.</span><span class="n">square</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">4.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">,</span>  <span class="mf">36.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-numpy-arrays-as-function-arguments-and-return-values">
+<h2>Using <code class="docutils literal"><span class="pre">numpy</span></code> arrays as function arguments and return values<a class="headerlink" href="#using-numpy-arrays-as-function-arguments-and-return-values" title="Permalink to this headline">¶</a></h2>
+<p>Example showing how to pass <code class="docutils literal"><span class="pre">numpy</span></code> arrays in and out of functions.
+These <code class="docutils literal"><span class="pre">numpy</span></code> array arguments can either be generic <code class="docutils literal"><span class="pre">py:array</span></code> or
+typed <code class="docutils literal"><span class="pre">py:array_t&lt;double&gt;</span></code>. The properties of the <code class="docutils literal"><span class="pre">numpy</span></code> array can
+be obtained by calling its <code class="docutils literal"><span class="pre">request</span></code> method. This returns a <code class="docutils literal"><span class="pre">struct</span></code>
+of the following form:</p>
+<div class="code cpp highlight-default"><div class="highlight"><pre><span></span><span class="n">struct</span> <span class="n">buffer_info</span> <span class="p">{</span>
+    <span class="n">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">;</span>
+    <span class="n">size_t</span> <span class="n">itemsize</span><span class="p">;</span>
+    <span class="n">std</span><span class="p">::</span><span class="n">string</span> <span class="nb">format</span><span class="p">;</span>
+    <span class="nb">int</span> <span class="n">ndim</span><span class="p">;</span>
+    <span class="n">std</span><span class="p">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">size_t</span><span class="o">&gt;</span> <span class="n">shape</span><span class="p">;</span>
+    <span class="n">std</span><span class="p">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">size_t</span><span class="o">&gt;</span> <span class="n">strides</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Here is C++ code for two functions - the function <code class="docutils literal"><span class="pre">twice</span></code> shows how to
+change a passed in <code class="docutils literal"><span class="pre">numpy</span></code> array in-place using pointers; the function
+<code class="docutils literal"><span class="pre">sum</span></code> shows how to sum the elements of a <code class="docutils literal"><span class="pre">numpy</span></code> array. By taking
+advantage of the information in <code class="docutils literal"><span class="pre">buffer_info</span></code>, the code will work for
+arbitrary <code class="docutils literal"><span class="pre">n-d</span></code> arrays.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example4</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example4</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example4</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap4</span><span class="o">.</span><span class="n">cpp</span>
+<span class="o">&lt;%</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;compiler_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+<span class="n">setup_pybind11</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="o">%&gt;</span>
+
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+<span class="c1">#include &lt;pybind11/numpy.h&gt;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">Passing</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">array</span> <span class="n">of</span> <span class="n">doubles</span>
+<span class="n">void</span> <span class="n">twice</span><span class="p">(</span><span class="n">py</span><span class="p">::</span><span class="n">array_t</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">buffer_info</span> <span class="n">info</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">request</span><span class="p">();</span>
+    <span class="n">auto</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">double</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">ptr</span><span class="p">);</span>
+
+    <span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">r</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">n</span> <span class="o">*=</span> <span class="n">r</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">*</span><span class="n">ptr</span><span class="o">++</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Passing</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">generic</span> <span class="n">array</span>
+<span class="n">double</span> <span class="nb">sum</span><span class="p">(</span><span class="n">py</span><span class="p">::</span><span class="n">array</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">buffer_info</span> <span class="n">info</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">request</span><span class="p">();</span>
+    <span class="n">auto</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">double</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">ptr</span><span class="p">);</span>
+
+    <span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">r</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">n</span> <span class="o">*=</span> <span class="n">r</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">double</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="o">*</span><span class="n">ptr</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">s</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pybind11</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap4&quot;</span><span class="p">,</span> <span class="s2">&quot;auto-compiled c++ extension&quot;</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nb">sum</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;twice&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">twice</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap4</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">test_code</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap4&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;np :&quot;</span><span class="p">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;cpp:&quot;</span><span class="p">,</span> <span class="n">code</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="n">code</span><span class="o">.</span><span class="n">twice</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">test_code</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">python</span> <span class="n">test_code</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span>  <span class="mf">0.</span>   <span class="mf">1.</span>   <span class="mf">2.</span>   <span class="mf">3.</span><span class="p">]</span>
+ <span class="p">[</span>  <span class="mf">4.</span>   <span class="mf">5.</span>   <span class="mf">6.</span>   <span class="mf">7.</span><span class="p">]</span>
+ <span class="p">[</span>  <span class="mf">8.</span>   <span class="mf">9.</span>  <span class="mf">10.</span>  <span class="mf">11.</span><span class="p">]]</span>
+<span class="n">np</span> <span class="p">:</span> <span class="mf">66.0</span>
+<span class="n">cpp</span><span class="p">:</span> <span class="mf">66.0</span>
+
+<span class="p">[[</span>  <span class="mf">0.</span>   <span class="mf">2.</span>   <span class="mf">4.</span>   <span class="mf">6.</span><span class="p">]</span>
+ <span class="p">[</span>  <span class="mf">8.</span>  <span class="mf">10.</span>  <span class="mf">12.</span>  <span class="mf">14.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">16.</span>  <span class="mf">18.</span>  <span class="mf">20.</span>  <span class="mf">22.</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="more-on-working-with-numpy-arrays">
+<h2>More on working with <code class="docutils literal"><span class="pre">numpy</span></code> arrays<a class="headerlink" href="#more-on-working-with-numpy-arrays" title="Permalink to this headline">¶</a></h2>
+<p>This example shows how to use array access for <code class="docutils literal"><span class="pre">numpy</span></code> arrays within
+the C++ function. It is taken from the <code class="docutils literal"><span class="pre">pybind11</span></code> documentation, but
+fixes a small bug in the official version. As noted in the
+documentation, the function would be more easily coded using
+<code class="docutils literal"><span class="pre">py::vectorize</span></code>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example5</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example5</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example5</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file wrap5.cpp
+&lt;%
+cfg[&#39;compiler_args&#39;] = [&#39;-std=c++11&#39;]
+setup_pybind11(cfg)
+%&gt;
+
+#include &lt;pybind11/pybind11.h&gt;
+#include &lt;pybind11/numpy.h&gt;
+
+namespace py = pybind11;
+
+py::array_t&lt;double&gt; add_arrays(py::array_t&lt;double&gt; input1, py::array_t&lt;double&gt; input2) {
+    auto buf1 = input1.request(), buf2 = input2.request();
+
+    if (buf1.ndim != 1 || buf2.ndim != 1)
+        throw std::runtime_error(&quot;Number of dimensions must be one&quot;);
+
+    if (buf1.shape[0] != buf2.shape[0])
+        throw std::runtime_error(&quot;Input shapes must match&quot;);
+
+    auto result = py::array(py::buffer_info(
+        nullptr,            /* Pointer to data (nullptr -&gt; ask NumPy to allocate!) */
+        sizeof(double),     /* Size of one item */
+        py::format_descriptor&lt;double&gt;::value, /* Buffer format */
+        buf1.ndim,          /* How many dimensions? */
+        { buf1.shape[0] },  /* Number of elements for each dimension */
+        { sizeof(double) }  /* Strides for each dimension */
+    ));
+
+    auto buf3 = result.request();
+
+    double *ptr1 = (double *) buf1.ptr,
+           *ptr2 = (double *) buf2.ptr,
+           *ptr3 = (double *) buf3.ptr;
+
+    for (size_t idx = 0; idx &lt; buf1.shape[0]; idx++)
+        ptr3[idx] = ptr1[idx] + ptr2[idx];
+
+    return result;
+}
+
+PYBIND11_PLUGIN(wrap5) {
+    py::module m(&quot;wrap5&quot;);
+    m.def(&quot;add_arrays&quot;, &amp;add_arrays, &quot;Add two NumPy arrays&quot;);
+    return m.ptr();
+}
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap5</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap5&quot;</span><span class="p">)</span>
+
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">add_arrays</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">xs</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">9</span> <span class="mi">10</span> <span class="mi">11</span><span class="p">]</span>
+<span class="p">[</span>  <span class="mf">0.</span>   <span class="mf">2.</span>   <span class="mf">4.</span>   <span class="mf">6.</span>   <span class="mf">8.</span>  <span class="mf">10.</span>  <span class="mf">12.</span>  <span class="mf">14.</span>  <span class="mf">16.</span>  <span class="mf">18.</span>  <span class="mf">20.</span>  <span class="mf">22.</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-the-c-eigen-library-to-calculate-matrix-inverse-and-determinant">
+<h2>Using the C++ <code class="docutils literal"><span class="pre">eigen</span></code> library to calculate matrix inverse and determinant<a class="headerlink" href="#using-the-c-eigen-library-to-calculate-matrix-inverse-and-determinant" title="Permalink to this headline">¶</a></h2>
+<p>Example showing how <code class="docutils literal"><span class="pre">Eigen</span></code> vectors and matrices can be passed in and
+out of C++ functions. Note that <code class="docutils literal"><span class="pre">Eigen</span></code> arrays are automatically
+converted to/from <code class="docutils literal"><span class="pre">numpy</span></code> arrays simply by including the
+<code class="docutils literal"><span class="pre">pybind/eigen.h</span></code> header. Because of this, it is probably simplest in
+most cases to work with <code class="docutils literal"><span class="pre">Eigen</span></code> vectors and matrices rather than
+<code class="docutils literal"><span class="pre">py::buffer</span></code> or <code class="docutils literal"><span class="pre">py::array</span></code> where <code class="docutils literal"><span class="pre">py::vectorize</span></code> is insufficient.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example6</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example6</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span><span class="o">/</span><span class="n">example6</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap6</span><span class="o">.</span><span class="n">cpp</span>
+<span class="o">&lt;%</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;compiler_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;include_dirs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;../eigen&#39;</span><span class="p">]</span>
+<span class="n">setup_pybind11</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="o">%&gt;</span>
+
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+<span class="c1">#include &lt;pybind11/eigen.h&gt;</span>
+
+<span class="c1">#include &lt;Eigen/LU&gt;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">convenient</span> <span class="n">matrix</span> <span class="n">indexing</span> <span class="n">comes</span> <span class="k">for</span> <span class="n">free</span>
+<span class="n">double</span> <span class="n">get</span><span class="p">(</span><span class="n">Eigen</span><span class="p">::</span><span class="n">MatrixXd</span> <span class="n">xs</span><span class="p">,</span> <span class="nb">int</span> <span class="n">i</span><span class="p">,</span> <span class="nb">int</span> <span class="n">j</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">xs</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">takes</span> <span class="n">numpy</span> <span class="n">array</span> <span class="k">as</span> <span class="nb">input</span> <span class="ow">and</span> <span class="n">returns</span> <span class="n">double</span>
+<span class="n">double</span> <span class="n">det</span><span class="p">(</span><span class="n">Eigen</span><span class="p">::</span><span class="n">MatrixXd</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">xs</span><span class="o">.</span><span class="n">determinant</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">takes</span> <span class="n">numpy</span> <span class="n">array</span> <span class="k">as</span> <span class="nb">input</span> <span class="ow">and</span> <span class="n">returns</span> <span class="n">another</span> <span class="n">numpy</span> <span class="n">array</span>
+<span class="n">Eigen</span><span class="p">::</span><span class="n">MatrixXd</span> <span class="n">inv</span><span class="p">(</span><span class="n">Eigen</span><span class="p">::</span><span class="n">MatrixXd</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">xs</span><span class="o">.</span><span class="n">inverse</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap6</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pybind11</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap6&quot;</span><span class="p">,</span> <span class="s2">&quot;auto-compiled c++ extension&quot;</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;inv&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">inv</span><span class="p">);</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;det&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">det</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Writing</span> <span class="n">wrap6</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap6&quot;</span><span class="p">)</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+              <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+              <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">code</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">1</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">2</span>  <span class="mi">1</span>  <span class="mi">0</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">2</span><span class="p">]]</span>
+<span class="o">-</span><span class="mf">3.0</span>
+<span class="p">[[</span><span class="o">-</span><span class="mf">0.66666667</span>  <span class="mf">1.</span>          <span class="mf">0.33333333</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.33333333</span> <span class="o">-</span><span class="mf">1.</span>         <span class="o">-</span><span class="mf">0.66666667</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.</span>          <span class="mf">1.</span>          <span class="mf">1.</span>        <span class="p">]]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-pybind11-with-openmp">
+<h2>Using <code class="docutils literal"><span class="pre">pybind11</span></code> with <code class="docutils literal"><span class="pre">openmp</span></code><a class="headerlink" href="#using-pybind11-with-openmp" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">mkdir</span> <span class="n">example7</span>
+<span class="o">%</span><span class="n">cd</span> <span class="n">example7</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>mkdir: cannot create directory ‘example7’: File exists
+/home/jovyan/work/sta-663-2017-public/scratch/example7
+</pre></div>
+</div>
+<p>Here is an example of using OpenMP to integrate the value of <span class="math">\(\pi\)</span>
+written using <code class="docutils literal"><span class="pre">pybind11</span></code>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">wrap7</span><span class="o">.</span><span class="n">cpp</span>
+<span class="o">/*</span>
+<span class="o">&lt;%</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;compiler_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">,</span> <span class="s1">&#39;-fopenmp&#39;</span><span class="p">]</span>
+<span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;linker_args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-lgomp&#39;</span><span class="p">]</span>
+<span class="n">setup_pybind11</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="o">%&gt;</span>
+<span class="o">*/</span>
+<span class="c1">#include &lt;cmath&gt;</span>
+<span class="c1">#include &lt;omp.h&gt;</span>
+<span class="c1">#include &lt;pybind11/pybind11.h&gt;</span>
+<span class="c1">#include &lt;pybind11/numpy.h&gt;</span>
+
+<span class="n">namespace</span> <span class="n">py</span> <span class="o">=</span> <span class="n">pybind11</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="n">Passing</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">array</span> <span class="n">of</span> <span class="n">doubles</span>
+<span class="n">void</span> <span class="n">twice</span><span class="p">(</span><span class="n">py</span><span class="p">::</span><span class="n">array_t</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">py</span><span class="p">::</span><span class="n">gil_scoped_acquire</span> <span class="n">acquire</span><span class="p">;</span>
+
+    <span class="n">py</span><span class="p">::</span><span class="n">buffer_info</span> <span class="n">info</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">request</span><span class="p">();</span>
+    <span class="n">auto</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">double</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">ptr</span><span class="p">);</span>
+
+    <span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">auto</span> <span class="n">r</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">n</span> <span class="o">*=</span> <span class="n">r</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">#pragma omp parallel for</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span><span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">*</span><span class="n">ptr</span><span class="o">++</span> <span class="o">*=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">PYBIND11_PLUGIN</span><span class="p">(</span><span class="n">wrap7</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">pybind11</span><span class="p">::</span><span class="n">module</span> <span class="n">m</span><span class="p">(</span><span class="s2">&quot;wrap7&quot;</span><span class="p">,</span> <span class="s2">&quot;auto-compiled c++ extension&quot;</span><span class="p">);</span>
+  <span class="n">m</span><span class="o">.</span><span class="n">def</span><span class="p">(</span><span class="s2">&quot;twice&quot;</span><span class="p">,</span> <span class="p">[](</span><span class="n">py</span><span class="p">::</span><span class="n">array_t</span><span class="o">&lt;</span><span class="n">double</span><span class="o">&gt;</span> <span class="n">xs</span><span class="p">)</span> <span class="p">{</span>
+      <span class="o">/*</span> <span class="n">Release</span> <span class="n">GIL</span> <span class="n">before</span> <span class="n">calling</span> <span class="n">into</span> <span class="n">C</span><span class="o">++</span> <span class="n">code</span> <span class="o">*/</span>
+      <span class="n">py</span><span class="p">::</span><span class="n">gil_scoped_release</span> <span class="n">release</span><span class="p">;</span>
+      <span class="k">return</span> <span class="n">twice</span><span class="p">(</span><span class="n">xs</span><span class="p">);</span>
+    <span class="p">});</span>
+
+  <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">ptr</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">wrap7</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cppimport</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">code</span> <span class="o">=</span> <span class="n">cppimport</span><span class="o">.</span><span class="n">imp</span><span class="p">(</span><span class="s2">&quot;wrap7&quot;</span><span class="p">)</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;double&#39;</span><span class="p">)</span>
+<span class="n">code</span><span class="o">.</span><span class="n">twice</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="n">xs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">0.</span><span class="p">,</span>   <span class="mf">2.</span><span class="p">,</span>   <span class="mf">4.</span><span class="p">,</span>   <span class="mf">6.</span><span class="p">,</span>   <span class="mf">8.</span><span class="p">,</span>  <span class="mf">10.</span><span class="p">,</span>  <span class="mf">12.</span><span class="p">,</span>  <span class="mf">14.</span><span class="p">,</span>  <span class="mf">16.</span><span class="p">,</span>  <span class="mf">18.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">..</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">jovyan</span><span class="o">/</span><span class="n">work</span><span class="o">/</span><span class="n">sta</span><span class="o">-</span><span class="mi">663</span><span class="o">-</span><span class="mi">2017</span><span class="o">-</span><span class="n">public</span><span class="o">/</span><span class="n">scratch</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#a-first-example-of-using-pybind11">A first example of using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-cppimport">Using <code class="docutils literal"><span class="pre">cppimport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vectorizing-functions-for-use-with-numpy-arrays">Vectorizing functions for use with <code class="docutils literal"><span class="pre">numpy</span></code> arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-numpy-arrays-as-function-arguments-and-return-values">Using <code class="docutils literal"><span class="pre">numpy</span></code> arrays as function arguments and return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#more-on-working-with-numpy-arrays">More on working with <code class="docutils literal"><span class="pre">numpy</span></code> arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-c-eigen-library-to-calculate-matrix-inverse-and-determinant">Using the C++ <code class="docutils literal"><span class="pre">eigen</span></code> library to calculate matrix inverse and determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pybind11-with-openmp">Using <code class="docutils literal"><span class="pre">pybind11</span></code> with <code class="docutils literal"><span class="pre">openmp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="12A_C%2b%2b.html"
+                          title="Previous page">&larr; Using C++</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="13A_LinearAlgebra1.html"
+                          title="Next page">&rarr; Linear Algebra Review</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/12B_C%2b%2b_Python_pybind11.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="13A_LinearAlgebra1.html" title="Linear Algebra Review"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="12A_C%2b%2b.html" title="Using C++"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/12B_C++_Python_pybind11.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:15 GMT -->
+</html>

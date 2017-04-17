@@ -1,0 +1,901 @@
+
+Code Optimization
+=================
+
+Here we will look briefly at how to time and profile your code, and then
+at an approach to making your code run faster. There is a sequence of
+mini-goals that is applicable to nearly every programming problem:
+
+1. Make it run
+2. Make it right
+3. Make it fast
+
+Note that the list does not start with ``Make it fast``. Testing,
+debugging and optimization are a set of strategies and practices to
+achieve those goals. Only optimization will be covered in these notes -
+pointers to resources for testing and debugging are provided but not
+covered.
+
+Testing code
+------------
+
+-  For an introduction to standard testing in Python, see `Testing Your
+   Code <http://docs.python-guide.org/en/latest/writing/tests/>`__
+-  For automated generation of tests, see the `Hypothesis
+   package <https://github.com/DRMacIver/hypothesis>`__
+
+.. code:: python
+
+    %%file distance.py
+    
+    import numpy as np
+    
+    def euclidean_dist(u, v):
+        """Returns Euclidean distance betwen numpy vectors u and v."""
+        w = u - v
+        return np.sqrt(np.sum(w**2))
+
+
+.. parsed-literal::
+
+    Overwriting distance.py
+
+
+.. code:: python
+
+    %%file test_distance.py
+    import numpy as np
+    from numpy.testing import assert_almost_equal
+    from distance import euclidean_dist
+    
+    def test_non_negativity():
+        for i in range(10):
+            u = np.random.normal(3)
+            v = np.random.normal(3)
+            assert euclidean_dist(u, v) >= 0
+    
+    def test_coincidence_when_zero():
+        u = np.zeros(3)
+        v = np.zeros(3)
+        assert euclidean_dist(u, v) == 0
+    
+    def test_coincidence_when_not_zero():
+         for i in range(10):
+            u = np.random.random(3)
+            v = np.zeros(3)
+            assert euclidean_dist(u, v) != 0
+    
+    def test_symmetry():
+        for i in range(10):
+            u = np.random.random(3)
+            v = np.random.random(3)
+            assert euclidean_dist(u, v) == euclidean_dist(v, u)
+    
+    def test_triangle():
+        u = np.random.random(3)
+        v = np.random.random(3)
+        w = np.random.random(3)
+        assert euclidean_dist(u, w) <= euclidean_dist(u, v) + euclidean_dist(v, w)
+    
+    def test_known1():
+        u = np.array([0])
+        v = np.array([3])
+        assert_almost_equal(euclidean_dist(u, v), 3)
+    
+    def test_known2():
+        u = np.array([0,0])
+        v = np.array([3, 4])
+        assert_almost_equal(euclidean_dist(u, v), 5)
+    
+    def test_known3():
+        u = np.array([0,0])
+        v = np.array([-3, -4])
+        assert_almost_equal(euclidean_dist(u, v), 5)
+
+
+.. parsed-literal::
+
+    Overwriting test_distance.py
+
+
+.. code:: python
+
+    ! py.test
+
+
+.. parsed-literal::
+
+    /bin/sh: 1: py.test: not found
+
+
+Debugging
+~~~~~~~~~
+
+Tools within Jupyter from the `official
+tutorial <https://ipython.org/ipython-doc/1/interactive/tutorial.html#debugging>`__
+
+::
+
+    After an exception occurs, you can call %debug to jump into the Python debugger (pdb) and examine the problem. Alternatively, if you call %pdb, IPython will automatically start the debugger on any uncaught exception. You can print variables, see code, execute statements and even walk up and down the call stack to track down the true source of the problem. This can be an efficient way to develop and debug code, in many cases eliminating the need for print statements or external debugging tools.
+
+    You can also step through a program from the beginning by calling %run -d theprogram.py.
+
+-  See the `Scipy
+   tutorial <http://www.scipy-lectures.org/advanced/debugging/>`__
+
+Timing and profiling code
+-------------------------
+
+Install profiling tools:
+
+.. code:: bash
+
+    pip install --pre line-profiler
+    pip install psutil
+    pip install memory_profiler
+
+References:
+
+1. http://scipy-lectures.github.com/advanced/optimizing/index.html
+2. http://pynash.org/2013/03/06/timing-and-profiling.html
+
+Timing code
+~~~~~~~~~~~
+
+-  1s = 1000 ms
+-  1 ms = 1000 :math:`\mu`\ s
+-  1 :math:`\mu`\ s = 1000 ns
+
+Simple approach
+^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import time
+    import timeit
+    
+    def f(nsec=1.0):
+        """Function sleeps for nsec seconds."""
+        time.sleep(nsec) 
+        
+    start = timeit.default_timer()
+    f()
+    elapsed = timeit.default_timer() - start
+    elapsed
+
+
+
+
+.. parsed-literal::
+
+    1.001308990176767
+
+
+
+We can make a decorator for convenience
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def process_time(f, *args, **kwargs):
+        def func(*args, **kwargs):
+            import timeit
+            start = timeit.default_timer()
+            f(*args, **kwargs)
+            print(timeit.default_timer() - start)
+        return func
+
+.. code:: python
+
+    @process_time
+    def f1(nsec=1.0):
+        """Function sleeps for nsec seconds."""
+        time.sleep(nsec)
+
+.. code:: python
+
+    f1()
+
+
+.. parsed-literal::
+
+    1.0010730819776654
+
+
+Within the Jupyter notebook, use the timeit magic function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %timeit f(0.01)
+
+
+.. parsed-literal::
+
+    100 loops, best of 3: 10.1 ms per loop
+
+
+.. code:: python
+
+    %timeit -n10 f(0.01)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 10.1 ms per loop
+
+
+.. code:: python
+
+    %timeit -r10 f(0.01)
+
+
+.. parsed-literal::
+
+    100 loops, best of 10: 10.1 ms per loop
+
+
+.. code:: python
+
+    %timeit -n10 -r3 f(0.01)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 10.1 ms per loop
+
+
+Profiling code
+~~~~~~~~~~~~~~
+
+This can be done in a notebook with %prun, with the following readouts
+as column headers:
+
+-  ncalls
+
+   -  for the number of calls,
+
+-  tottime
+
+   -  for the total time spent in the given function (and excluding time
+      made in calls to sub-functions),
+
+-  percall
+
+   -  is the quotient of tottime divided by ncalls
+
+-  cumtime
+
+   -  is the total time spent in this and all subfunctions (from
+      invocation till exit). This figure is accurate even for recursive
+      functions.
+
+-  percall
+
+   -  is the quotient of cumtime divided by primitive calls
+
+-  filename:lineno(function)
+
+   -  provides the respective data of each function
+
+.. code:: python
+
+    def foo1(n):
+        return sum(i**2 for i in range(n))
+    
+    def foo2(n):
+        return sum(i*i for i in range(n))
+    
+    def foo3(n):
+        [foo1(n) for i in range(10)]
+        foo2(n)
+    
+    def bar(n):
+        return sum(i**3 for i in range(n))
+    
+    def work(n):
+        foo1(n)
+        foo2(n)
+        foo3(n)
+        bar(n)
+
+.. code:: python
+
+    %prun -q -D work.prof work(int(1e6))
+
+
+.. parsed-literal::
+
+     
+    *** Profile stats marshalled to file 'work.prof'. 
+
+
+.. code:: python
+
+    import pstats
+    p = pstats.Stats('work.prof')
+    p.print_stats()
+    pass
+
+
+.. parsed-literal::
+
+    Sat Feb  4 21:48:25 2017    work.prof
+    
+             14000048 function calls in 9.068 seconds
+    
+       Random listing order was used
+    
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+           14    2.495    0.178    9.067    0.648 {built-in method builtins.sum}
+      1000001    0.515    0.000    0.515    0.000 <ipython-input-12-48ed291f45d5>:12(<genexpr>)
+            1    0.000    0.000    9.068    9.068 <string>:1(<module>)
+      2000002    0.432    0.000    0.432    0.000 <ipython-input-12-48ed291f45d5>:5(<genexpr>)
+           11    0.000    0.000    7.572    0.688 <ipython-input-12-48ed291f45d5>:1(foo1)
+     11000011    5.626    0.000    5.626    0.000 <ipython-input-12-48ed291f45d5>:2(<genexpr>)
+            1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+            1    0.000    0.000    6.915    6.915 <ipython-input-12-48ed291f45d5>:8(<listcomp>)
+            1    0.000    0.000    9.068    9.068 <ipython-input-12-48ed291f45d5>:14(work)
+            1    0.000    0.000    0.709    0.709 <ipython-input-12-48ed291f45d5>:11(bar)
+            1    0.000    0.000    9.068    9.068 {built-in method builtins.exec}
+            1    0.000    0.000    7.285    7.285 <ipython-input-12-48ed291f45d5>:7(foo3)
+            2    0.000    0.000    0.786    0.393 <ipython-input-12-48ed291f45d5>:4(foo2)
+    
+    
+
+
+.. code:: python
+
+    p.sort_stats('time', 'cumulative').print_stats('foo')
+    pass
+
+
+.. parsed-literal::
+
+    Sat Feb  4 21:48:25 2017    work.prof
+    
+             14000048 function calls in 9.068 seconds
+    
+       Ordered by: internal time, cumulative time
+       List reduced from 13 to 3 due to restriction <'foo'>
+    
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+           11    0.000    0.000    7.572    0.688 <ipython-input-12-48ed291f45d5>:1(foo1)
+            2    0.000    0.000    0.786    0.393 <ipython-input-12-48ed291f45d5>:4(foo2)
+            1    0.000    0.000    7.285    7.285 <ipython-input-12-48ed291f45d5>:7(foo3)
+    
+    
+
+
+.. code:: python
+
+    p.sort_stats('ncalls').print_stats(5)
+    pass
+
+
+.. parsed-literal::
+
+    Sat Feb  4 21:48:25 2017    work.prof
+    
+             14000048 function calls in 9.068 seconds
+    
+       Ordered by: call count
+       List reduced from 13 to 5 due to restriction <5>
+    
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     11000011    5.626    0.000    5.626    0.000 <ipython-input-12-48ed291f45d5>:2(<genexpr>)
+      2000002    0.432    0.000    0.432    0.000 <ipython-input-12-48ed291f45d5>:5(<genexpr>)
+      1000001    0.515    0.000    0.515    0.000 <ipython-input-12-48ed291f45d5>:12(<genexpr>)
+           14    2.495    0.178    9.067    0.648 {built-in method builtins.sum}
+           11    0.000    0.000    7.572    0.688 <ipython-input-12-48ed291f45d5>:1(foo1)
+    
+    
+
+
+Checking memory usage
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %load_ext memory_profiler
+
+.. code:: python
+
+    %%file foo.py
+    
+    def foo(n):
+        phrase = 'repeat me'
+        pmul = phrase * n
+        pjoi = ''.join([phrase for x in range(n)])
+        pinc = ''
+        for x in range(n):
+            pinc += phrase
+        del pmul, pjoi, pinc
+
+
+.. parsed-literal::
+
+    Overwriting foo.py
+
+
+.. code:: python
+
+    import sys
+    sys.path.append('.')
+
+.. code:: python
+
+    # mprun requires the code be in a file 
+    # functions declared interactively in python will not work
+    
+    from foo import foo
+    
+    %mprun -f foo foo(100000)
+
+
+.. parsed-literal::
+
+    
+
+
+.. code:: python
+
+    # However, memit does work with interactive functions
+    # Unlike mprun which gives a line by line analysis
+    # memit gives the total amount of memory used
+    
+    def gobble(n):
+        x = [i*i for i in range(n)]
+        
+    %memit -r 3 gobble(1000000)
+
+
+.. parsed-literal::
+
+    peak memory: 85.16 MiB, increment: 39.19 MiB
+
+
+Data structures and algorithms
+------------------------------
+
+There are many ways to speed up slow code. However, the first thing that
+should come to mind (after profiling to identify the bottlenecks) is
+whether there is a more appropriate data structure or algorithm that can
+be used. The reason is that this is the only approach that makes a
+difference to the big O complexity, and this makes all the difference
+for scalability. A few examples are shown here; a large collection of
+classic data structures and algorithms in Python with detailed
+explanations is available at `Problem Solving wiht Algorithms and Data
+Structures <http://interactivepython.org/runestone/static/pythonds/index.html#>`__
+
+You are highly encouraged to take an algorithms class, where you will
+discover strategies such as:
+
+-  adaptive methods (e.g. adaptive quadrature, adaptive Runge-Kutta)
+-  divide and conquer (e.g. Barnes-Hut, Fast Fourier Transform)
+-  tabling and dynamic programming (e.g. Viterbi algorithm for Hidden
+   Markov Models)
+-  graphs and network algorithms (e.g. shortest path, max flow min cut)
+-  hashing (e.g. locality senstive hashing, Bloom filters)
+-  probabilistic algorithms (e.g. randomized projections, Monte Carlo
+   integration)
+
+Example 1 - finding common elements in two data collections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import numpy as np
+    xs = np.random.randint(0, 1000, 100)
+    ys = np.random.randint(0, 1000, 100)
+
+**Using lists**
+
+.. code:: python
+
+    def common1(xs, ys):
+        """Using lists."""
+        zs = set([])
+        for x in xs:
+            for y in ys:
+                if x==y:
+                    zs.add(x)
+        return zs
+
+.. code:: python
+
+    %timeit -n3 -r3 common1(xs, ys)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 872 µs per loop
+
+
+**Using sets**
+
+.. code:: python
+
+    %timeit -n3 -r3 set(xs) & set(ys)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 27.2 µs per loop
+
+
+Example 2 - Find minimum item in a list each time a new item is inserted
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Using lists**
+
+.. code:: python
+
+    alist = list(np.random.randint(1000, 100000, 1000))
+    blist = alist[:]
+    entries = np.random.randint(1, 10000, 10000)
+
+.. code:: python
+
+    def f1(alist, entries):
+        """Using repeated sorts."""
+        zs = []
+        for entry in entries:
+            alist.append(entry)
+            alist.sort(reverse=True)
+            zs.append(alist.pop())
+        return zs
+
+.. code:: python
+
+    %timeit f1(alist, entries)
+
+
+.. parsed-literal::
+
+    1 loop, best of 3: 270 ms per loop
+
+
+**Using a heap (priority queue)**
+
+.. code:: python
+
+    from heapq import heappushpop, heapify
+
+.. code:: python
+
+    def f2(alist, entries):
+        """Using a priority queue."""
+        heapify(alist)
+        zs = []
+        for entry in entries:
+            zs.append(heappushpop(alist, entry))
+        return zs
+
+.. code:: python
+
+    %timeit f2(blist, entries) 
+
+
+.. parsed-literal::
+
+    100 loops, best of 3: 2.57 ms per loop
+
+
+Python idioms for speed
+~~~~~~~~~~~~~~~~~~~~~~~
+
+String concatenation
+^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def concat1(alist):
+        """Using string concatenation."""
+        s = alist[0]
+        for item in alist[1:]:
+            s += " " + item
+        return s
+        
+    def concat2(alist):
+        """Using join."""
+        return " ".join(alist)
+    
+    alist = ['abcde'] * 1000000
+    %timeit -r3 -n3 concat1(alist)
+    %timeit -r3 -n3 concat2(alist)    
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 170 ms per loop
+    3 loops, best of 3: 11.9 ms per loop
+
+
+Avoiding loops
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    """Avoiding loops."""
+    
+    import math
+    
+    def loop1(n):
+        """Using for loop with function call."""
+        z = []
+        for i in range(n):
+            z.append(math.sin(i))
+        return z
+    
+    def loop2(n):
+        """Using local version of function."""
+        z = []
+        sin = math.sin
+        for i in range(n):
+            z.append(sin(i))
+        return z
+    
+    def loop3(n):
+        """Using list comprehension."""
+        sin = math.sin
+        return [sin(i) for i in range(n)]
+    
+    def loop4(n):
+        """Using map."""
+        sin = math.sin
+        return list(map(sin, range(n)))
+    
+    def loop5(n):
+        """Using numpy."""
+        return np.sin(np.arange(n)).tolist()
+    
+    n = 1000000
+    %timeit -r1 -n1 loop1(n)
+    %timeit -r1 -n1 loop2(n)
+    %timeit -r1 -n1 loop3(n)
+    %timeit -r1 -n1 loop4(n)
+    %timeit -r1 -n1 loop5(n)
+    
+    assert(np.all(loop1(n) == loop2(n)))
+    assert(np.all(loop1(n) == loop3(n)))
+    assert(np.all(loop1(n) == loop4(n)))
+    assert(np.all(loop1(n) == loop5(n)))
+
+
+.. parsed-literal::
+
+    1 loop, best of 1: 323 ms per loop
+    1 loop, best of 1: 276 ms per loop
+    1 loop, best of 1: 234 ms per loop
+    1 loop, best of 1: 234 ms per loop
+    1 loop, best of 1: 77.6 ms per loop
+
+
+Using in-place operations
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    a = np.arange(1e6)
+        
+    %timeit global a; a = a * 0
+    %timeit global a; a *= 0
+
+
+.. parsed-literal::
+
+    1000 loops, best of 3: 677 µs per loop
+    1000 loops, best of 3: 484 µs per loop
+
+
+Using appropriate indexing
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def idx1(xs):
+        """Using loops."""
+        s = 0
+        for x in xs:
+            if (x > 10) and (x < 20):
+                s += x
+        return s
+    
+    def idx2(xs):
+        """Using logical indexing."""
+        return np.sum(xs[(xs > 10) & (xs < 20)])
+    
+    n = 1000000
+    xs = np.random.randint(0, 100, n)
+    %timeit -r3 -n3 idx1(xs)
+    %timeit -r3 -n3 idx2(xs)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 253 ms per loop
+    3 loops, best of 3: 3.64 ms per loop
+
+
+Using views to implement stencils
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def average1(xs):
+        """Using loops."""
+        ys = xs.copy()
+        rows, cols = xs.shape
+        for i in range(rows):
+            for j in range(cols):
+                s = 0
+                for u in range(i-1, i+2):
+                    if u < 0 or u >= rows:
+                        continue
+                    for v in range(j-1, j+2):
+                        if v < 0 or v >= cols:
+                            continue
+                        s += xs[u, v]
+                ys[i, j] = s/9.0
+        return ys
+    
+    def average2(xs):
+        """Using shifted array views and border to avoid out of bounds checks."""
+        rows, cols = xs.shape
+        xs1 = np.zeros((rows+2, cols+2))
+        xs1[1:-1, 1:-1] = xs[:]
+        ys = (xs1[:-2, :-2]  + xs1[1:-1, :-2]  + xs1[2:, :-2] +
+              xs1[:-2, 1:-1] + xs1[1:-1, 1:-1] + xs1[2:, 1:-1] +
+              xs1[:-2, 2:]   + xs1[1:-1, 2:]   + xs1[2:, 2:])/9.0
+        return ys
+    
+    n = 25
+    xs = np.random.uniform(0,10,(n, n))
+    %timeit -r3 -n3 average1(xs)
+    %timeit -r3 -n3 average2(xs)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 2.94 ms per loop
+    The slowest run took 5.25 times longer than the fastest. This could mean that an intermediate result is being cached.
+    3 loops, best of 3: 31.8 µs per loop
+
+
+Using generalized universal functions (gufuncs)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    xs = np.random.random((1000, 10))
+    xs
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.39553964,  0.43949635,  0.77481941, ...,  0.84000755,
+             0.94299563,  0.43152857],
+           [ 0.87968629,  0.11504792,  0.03695428, ...,  0.71660984,
+             0.94491872,  0.48812466],
+           [ 0.0503604 ,  0.22943346,  0.49411253, ...,  0.58721728,
+             0.6981426 ,  0.3121911 ],
+           ..., 
+           [ 0.26690533,  0.17851867,  0.09191283, ...,  0.51155374,
+             0.36687633,  0.89075235],
+           [ 0.31549862,  0.65091691,  0.78542996, ...,  0.50022381,
+             0.61367792,  0.14031692],
+           [ 0.282188  ,  0.31751235,  0.8940388 , ...,  0.26812523,
+             0.34901333,  0.92292332]])
+
+
+
+.. code:: python
+
+    ys = np.random.random((1000, 10))
+    ys
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.93286296,  0.94418211,  0.0953946 , ...,  0.26749038,
+             0.0531014 ,  0.16493622],
+           [ 0.32503159,  0.4449412 ,  0.18590556, ...,  0.76733633,
+             0.26397945,  0.34141141],
+           [ 0.84743659,  0.82717738,  0.13587691, ...,  0.30086508,
+             0.96820162,  0.9575234 ],
+           ..., 
+           [ 0.19222391,  0.92741194,  0.6319984 , ...,  0.16065195,
+             0.24150295,  0.99804306],
+           [ 0.5787627 ,  0.93275705,  0.09585525, ...,  0.0570904 ,
+             0.61784739,  0.8015175 ],
+           [ 0.37052475,  0.58469862,  0.80742525, ...,  0.88899757,
+             0.93674252,  0.79794595]])
+
+
+
+.. code:: python
+
+    from numpy.core.umath_tests import inner1d
+    
+    %timeit -n3 -r3 np.array([x @ y for x, y in zip(xs, ys)])
+    %timeit -n3 -r3 inner1d(xs, ys)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 945 µs per loop
+    3 loops, best of 3: 14 µs per loop
+
+
+.. code:: python
+
+    from numpy.core.umath_tests import matrix_multiply
+
+.. code:: python
+
+    xs = np.random.randint(0, 10, (500, 2, 2))
+    ys = np.random.randint(0, 10, (500, 2, 2))
+
+.. code:: python
+
+    %timeit -n3 -r3 np.array([x @ y for x, y in zip(xs, ys)])
+    %timeit -r3 -n3 matrix_multiply(xs, ys)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 1.28 ms per loop
+    3 loops, best of 3: 12 µs per loop
+
+
+Memoization
+^^^^^^^^^^^
+
+.. code:: python
+
+    from functools import lru_cache
+
+.. code:: python
+
+    def fib(n):
+        if n <= 2:
+            return 1
+        else:
+            return fib(n-1) + fib(n-2)
+    
+    # A simple example of memoization - in practice, use `lru_cache` from functools
+    def memoize(f):
+        store = {}
+        def func(n):
+            if n not in store:
+                store[n] = f(n)
+            return store[n]
+        return func
+    
+    @memoize
+    def mfib(n):
+        return fib(n)
+    
+    @lru_cache()
+    def lfib(n):
+        return fib(n)
+    
+    assert(fib(10) == mfib(10))
+    assert(fib(10) == lfib(10))
+    
+    %timeit -r1 -n10 fib(30)
+    %timeit -r1 -n10 mfib(30)
+    %timeit -r1 -n10 lfib(30)
+
+
+.. parsed-literal::
+
+    10 loops, best of 1: 263 ms per loop
+    10 loops, best of 1: 25.9 ms per loop
+    10 loops, best of 1: 26.3 ms per loop
+

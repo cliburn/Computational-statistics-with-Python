@@ -1,0 +1,1235 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/04_Strings.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:27 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Strings &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using numpy" href="05_Numbers.html" />
+    <link rel="prev" title="Classes" href="03_Classes.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="05_Numbers.html" title="Using numpy"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="03_Classes.html" title="Classes"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="strings">
+<h1>Strings<a class="headerlink" href="#strings" title="Permalink to this headline">¶</a></h1>
+<p>The process of cleaning data for analysis often requires working with
+text, for example, to correct typos, convert to standard nomenclature
+and resolve ambiguous labels. In some statistical fields that deal with
+(say) processing electronic medical records, information science or
+recommendations based on user feedback, text must be processed before
+analysis - for example, by converting to a bag of words.</p>
+<p>We will use a whimsical example to illustrate Python tools for <em>munging</em>
+text data using string methods and regular expressions. Finally, we will
+see how to format text data for reporting.</p>
+<div class="section" id="get-through-the-looking-glass">
+<h2>Get &#8220;Through the Looking Glass&#8221;<a class="headerlink" href="#get-through-the-looking-glass" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;looking_glass.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://www.gutenberg.org/cache/epub/12/pg12.txt&#39;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;looking_glass.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="slice-to-get-jabberwocky">
+<h2>Slice to get Jabberwocky<a class="headerlink" href="#slice-to-get-jabberwocky" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">start</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;JABBERWOCKY&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span><span class="o">+</span><span class="mi">2000</span><span class="p">]</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+&quot;JABBERWOCKYrnrn     'Twas brillig, and the slithy tovesrn      Did gyre and gimble in the wabe;rn     All mimsy were the borogoves,rn      And the mome raths outgrabe.rnrn     'Beware the Jabberwock, my son!rn      The jaws that bite, the claws that catch!rn     Beware the Jubjub bird, and shunrn      The frumious Bandersnatch!'rnrn     He took his vorpal sword in hand:rn      Long time the manxome foe he sought--rn     So rested he by the Tumtum tree,rn      And stood awhile in thought.rnrn     And as in uffish thought he stood,rn      The Jabberwock, with eyes of flame,rn     Came whiffling through the tulgey wood,rn      And burbled as it came!rnrn     One, two! One, two! And through and throughrn      The vorpal blade went snicker-snack!rn     He left it dead, and with its headrn      He went galumphing back.rnrn     'And hast thou slain the Jabberwock?rn      Come to my arms, my beamish boy!rn     O frabjous day! Callooh! Callay!'rn      He chortled in his joy.rnrn     'Twas brillig, and the slithy tovesrn      Did gyre and gimble in the wabe;rn     All mimsy were the borogoves,rn      And the mome raths outgrabe.rnrnrn'It seems very pretty,' she said when she had finished it, 'but it'srnRATHER hard to understand!' (You see she didn't like to confess, evenrnto herself, that she couldn't make it out at all.) 'Somehow it seemsrnto fill my head with ideas--only I don't exactly know what they are!rnHowever, SOMEBODY killed SOMETHING: that's clear, at any rate--'rnrn'But oh!' thought Alice, suddenly jumping up, 'if I don't make haste Irnshall have to go back through the Looking-glass, before I've seen whatrnthe rest of the house is like! Let's have a look at the garden first!'rnShe was out of the room in a moment, and ran down stairs--or, at least,rnit wasn't exactly running, but a new invention of hers for getting downrnstairs quickly and easily, as Alice said to herself. She just kept therntips of her fingers on the hand-rail, and floated gently down withoutrneven&quot;
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">end</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;It seems very pretty&#39;</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+<span class="n">poem</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+&quot;JABBERWOCKYrnrn     'Twas brillig, and the slithy tovesrn      Did gyre and gimble in the wabe;rn     All mimsy were the borogoves,rn      And the mome raths outgrabe.rnrn     'Beware the Jabberwock, my son!rn      The jaws that bite, the claws that catch!rn     Beware the Jubjub bird, and shunrn      The frumious Bandersnatch!'rnrn     He took his vorpal sword in hand:rn      Long time the manxome foe he sought--rn     So rested he by the Tumtum tree,rn      And stood awhile in thought.rnrn     And as in uffish thought he stood,rn      The Jabberwock, with eyes of flame,rn     Came whiffling through the tulgey wood,rn      And burbled as it came!rnrn     One, two! One, two! And through and throughrn      The vorpal blade went snicker-snack!rn     He left it dead, and with its headrn      He went galumphing back.rnrn     'And hast thou slain the Jabberwock?rn      Come to my arms, my beamish boy!rn     O frabjous day! Callooh! Callay!'rn      He chortled in his joy.rnrn     'Twas brillig, and the slithy tovesrn      Did gyre and gimble in the wabe;rn     All mimsy were the borogoves,rn      And the mome raths outgrabe.rnrnrn'&quot;
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">poem</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>JABBERWOCKY
+
+     &#39;Twas brillig, and the slithy toves
+      Did gyre and gimble in the wabe;
+     All mimsy were the borogoves,
+      And the mome raths outgrabe.
+
+     &#39;Beware the Jabberwock, my son!
+      The jaws that bite, the claws that catch!
+     Beware the Jubjub bird, and shun
+      The frumious Bandersnatch!&#39;
+
+     He took his vorpal sword in hand:
+      Long time the manxome foe he sought--
+     So rested he by the Tumtum tree,
+      And stood awhile in thought.
+
+     And as in uffish thought he stood,
+      The Jabberwock, with eyes of flame,
+     Came whiffling through the tulgey wood,
+      And burbled as it came!
+
+     One, two! One, two! And through and through
+      The vorpal blade went snicker-snack!
+     He left it dead, and with its head
+      He went galumphing back.
+
+     &#39;And hast thou slain the Jabberwock?
+      Come to my arms, my beamish boy!
+     O frabjous day! Callooh! Callay!&#39;
+      He chortled in his joy.
+
+     &#39;Twas brillig, and the slithy toves
+      Did gyre and gimble in the wabe;
+     All mimsy were the borogoves,
+      And the mome raths outgrabe.
+
+
+&#39;
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">poem</span><span class="o">.</span><span class="n">title</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Jabberwocky
+
+     &#39;Twas Brillig, And The Slithy Toves
+      Did Gyre And Gimble In The Wabe;
+     All Mimsy Were The Borogoves,
+      And The Mome Raths Outgrabe.
+
+     &#39;Beware The Jabberwock, My Son!
+      The Jaws That Bite, The Claws That Catch!
+     Beware The Jubjub Bird, And Shun
+      The Frumious Bandersnatch!&#39;
+
+     He Took His Vorpal Sword In Hand:
+      Long Time The Manxome Foe He Sought--
+     So Rested He By The Tumtum Tree,
+      And Stood Awhile In Thought.
+
+     And As In Uffish Thought He Stood,
+      The Jabberwock, With Eyes Of Flame,
+     Came Whiffling Through The Tulgey Wood,
+      And Burbled As It Came!
+
+     One, Two! One, Two! And Through And Through
+      The Vorpal Blade Went Snicker-Snack!
+     He Left It Dead, And With Its Head
+      He Went Galumphing Back.
+
+     &#39;And Hast Thou Slain The Jabberwock?
+      Come To My Arms, My Beamish Boy!
+     O Frabjous Day! Callooh! Callay!&#39;
+      He Chortled In His Joy.
+
+     &#39;Twas Brillig, And The Slithy Toves
+      Did Gyre And Gimble In The Wabe;
+     All Mimsy Were The Borogoves,
+      And The Mome Raths Outgrabe.
+
+
+&#39;
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;the&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">15</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">poem</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;XXX&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>JABBERWOCKY
+
+     &#39;Twas brillig, and XXX slithy toves
+      Did gyre and gimble in XXX wabe;
+     All mimsy were XXX borogoves,
+      And XXX mome raths outgrabe.
+
+     &#39;Beware XXX Jabberwock, my son!
+      The jaws that bite, XXX claws that catch!
+     Beware XXX Jubjub bird, and shun
+      The frumious Bandersnatch!&#39;
+
+     He took his vorpal sword in hand:
+      Long time XXX manxome foe he sought--
+     So rested he by XXX Tumtum tree,
+      And stood awhile in thought.
+
+     And as in uffish thought he stood,
+      The Jabberwock, with eyes of flame,
+     Came whiffling through XXX tulgey wood,
+      And burbled as it came!
+
+     One, two! One, two! And through and through
+      The vorpal blade went snicker-snack!
+     He left it dead, and with its head
+      He went galumphing back.
+
+     &#39;And hast thou slain XXX Jabberwock?
+      Come to my arms, my beamish boy!
+     O frabjous day! Callooh! Callay!&#39;
+      He chortled in his joy.
+
+     &#39;Twas brillig, and XXX slithy toves
+      Did gyre and gimble in XXX wabe;
+     All mimsy were XXX borogoves,
+      And XXX mome raths outgrabe.
+
+
+&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="find-palindromic-words-in-poem-if-any">
+<h2>Find palindromic words in poem if any<a class="headerlink" href="#find-palindromic-words-in-poem-if-any" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem</span> <span class="o">=</span> <span class="n">poem</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">string</span>
+<span class="n">string</span><span class="o">.</span><span class="n">punctuation</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+'!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?&#64;[\]^_`{|}~'
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem</span>  <span class="o">=</span> <span class="n">poem</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)))</span>
+<span class="n">poem</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+'jabberwockyrnrn     twas brillig and the slithy tovesrn      did gyre and gimble in the wabern     all mimsy were the borogovesrn      and the mome raths outgrabernrn     beware the jabberwock my sonrn      the jaws that bite the claws that catchrn     beware the jubjub bird and shunrn      the frumious bandersnatchrnrn     he took his vorpal sword in handrn      long time the manxome foe he soughtrn     so rested he by the tumtum treern      and stood awhile in thoughtrnrn     and as in uffish thought he stoodrn      the jabberwock with eyes of flamern     came whiffling through the tulgey woodrn      and burbled as it camernrn     one two one two and through and throughrn      the vorpal blade went snickersnackrn     he left it dead and with its headrn      he went galumphing backrnrn     and hast thou slain the jabberwockrn      come to my arms my beamish boyrn     o frabjous day callooh callayrn      he chortled in his joyrnrn     twas brillig and the slithy tovesrn      did gyre and gimble in the wabern     all mimsy were the borogovesrn      and the mome raths outgrabernrnrn'
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">words</span> <span class="o">=</span> <span class="n">poem</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="n">words</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;jabberwocky&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;twas&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;brillig&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;and&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;the&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;slithy&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;toves&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;did&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;gyre&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;and&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">is_palindrome</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">word</span> <span class="o">==</span> <span class="n">word</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">is_palindrome</span><span class="p">(</span><span class="n">word</span><span class="p">)}</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="top-10-most-frequent-words">
+<h2>Top 10 most frequent words<a class="headerlink" href="#top-10-most-frequent-words" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">collections</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">poem_counter</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">19</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;he&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;my&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;through&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;jabberwock&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mimsy&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mome&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="words-that-appear-exactly-twice">
+<h2>Words that appear exactly twice.<a class="headerlink" href="#words-that-appear-exactly-twice" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">poem_counter</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">==</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mimsy&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mome&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;wabe&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gimble&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;it&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;outgrabe&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;came&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;with&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;thought&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;twas&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;vorpal&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;brillig&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;slithy&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;stood&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;toves&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;borogoves&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;beware&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;went&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;raths&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;his&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="trigrams">
+<h2>Trigrams<a class="headerlink" href="#trigrams" title="Permalink to this headline">¶</a></h2>
+<p>All possible sequences of 3 words in the poem.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">words</span><span class="p">[:],</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;jabberwocky&#39;</span><span class="p">,</span> <span class="s1">&#39;twas&#39;</span><span class="p">,</span> <span class="s1">&#39;brillig&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;twas&#39;</span><span class="p">,</span> <span class="s1">&#39;brillig&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;brillig&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;slithy&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;slithy&#39;</span><span class="p">,</span> <span class="s1">&#39;toves&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;slithy&#39;</span><span class="p">,</span> <span class="s1">&#39;toves&#39;</span><span class="p">,</span> <span class="s1">&#39;did&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;toves&#39;</span><span class="p">,</span> <span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;gyre&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;gimble&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;gimble&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">window</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sliding widnow of size n from iterable x.&quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">window</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="mi">3</span><span class="p">))[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;jabberwocky&#39;</span><span class="p">,</span> <span class="s1">&#39;twas&#39;</span><span class="p">,</span> <span class="s1">&#39;brillig&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;twas&#39;</span><span class="p">,</span> <span class="s1">&#39;brillig&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;brillig&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;slithy&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;slithy&#39;</span><span class="p">,</span> <span class="s1">&#39;toves&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;slithy&#39;</span><span class="p">,</span> <span class="s1">&#39;toves&#39;</span><span class="p">,</span> <span class="s1">&#39;did&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;toves&#39;</span><span class="p">,</span> <span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;gyre&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;did&#39;</span><span class="p">,</span> <span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gyre&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;gimble&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;gimble&#39;</span><span class="p">,</span> <span class="s1">&#39;in&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="find-words-in-poem-that-are-over-represented">
+<h2>Find words in poem that are over-represented<a class="headerlink" href="#find-words-in-poem-that-are-over-represented" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">book</span> <span class="o">=</span> <span class="n">text</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">book</span> <span class="o">=</span> <span class="n">book</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">book_counter</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">book</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">book_counter</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">book_freqs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">/</span><span class="n">n</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">book_counter</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">poem_counter</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">stats</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">book_freqs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">poem_counter</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;word&#39;</span><span class="p">,</span> <span class="s1">&#39;observed&#39;</span><span class="p">,</span> <span class="s1">&#39;expected&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">observed</span><span class="o">-</span><span class="n">df</span><span class="o">.</span><span class="n">expected</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">df</span><span class="o">.</span><span class="n">expected</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;score&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>word</th>
+      <th>observed</th>
+      <th>expected</th>
+      <th>score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>55</th>
+      <td>jabberwock</td>
+      <td>3</td>
+      <td>0.01557</td>
+      <td>572.045510</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>vorpal</td>
+      <td>2</td>
+      <td>0.01038</td>
+      <td>381.363673</td>
+    </tr>
+    <tr>
+      <th>69</th>
+      <td>beware</td>
+      <td>2</td>
+      <td>0.01038</td>
+      <td>381.363673</td>
+    </tr>
+    <tr>
+      <th>66</th>
+      <td>borogoves</td>
+      <td>2</td>
+      <td>0.01557</td>
+      <td>252.917766</td>
+    </tr>
+    <tr>
+      <th>43</th>
+      <td>twas</td>
+      <td>2</td>
+      <td>0.01557</td>
+      <td>252.917766</td>
+    </tr>
+    <tr>
+      <th>65</th>
+      <td>whiffling</td>
+      <td>1</td>
+      <td>0.00519</td>
+      <td>190.681837</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>tumtum</td>
+      <td>1</td>
+      <td>0.00519</td>
+      <td>190.681837</td>
+    </tr>
+    <tr>
+      <th>42</th>
+      <td>burbled</td>
+      <td>1</td>
+      <td>0.00519</td>
+      <td>190.681837</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>snickersnack</td>
+      <td>1</td>
+      <td>0.00519</td>
+      <td>190.681837</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>callooh</td>
+      <td>1</td>
+      <td>0.00519</td>
+      <td>190.681837</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="encode-and-decode-poem-using-a-caesar-cipher">
+<h2>Encode and decode poem using a Caesar cipher<a class="headerlink" href="#encode-and-decode-poem-using-a-caesar-cipher" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">poem</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">jabberwocky</span>
+
+     <span class="n">twas</span> <span class="n">brillig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="nb">all</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jabberwock</span> <span class="n">my</span> <span class="n">son</span>
+      <span class="n">the</span> <span class="n">jaws</span> <span class="n">that</span> <span class="n">bite</span> <span class="n">the</span> <span class="n">claws</span> <span class="n">that</span> <span class="n">catch</span>
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jubjub</span> <span class="n">bird</span> <span class="ow">and</span> <span class="n">shun</span>
+      <span class="n">the</span> <span class="n">frumious</span> <span class="n">bandersnatch</span>
+
+     <span class="n">he</span> <span class="n">took</span> <span class="n">his</span> <span class="n">vorpal</span> <span class="n">sword</span> <span class="ow">in</span> <span class="n">hand</span>
+      <span class="n">long</span> <span class="n">time</span> <span class="n">the</span> <span class="n">manxome</span> <span class="n">foe</span> <span class="n">he</span> <span class="n">sought</span>
+     <span class="n">so</span> <span class="n">rested</span> <span class="n">he</span> <span class="n">by</span> <span class="n">the</span> <span class="n">tumtum</span> <span class="n">tree</span>
+      <span class="ow">and</span> <span class="n">stood</span> <span class="n">awhile</span> <span class="ow">in</span> <span class="n">thought</span>
+
+     <span class="ow">and</span> <span class="k">as</span> <span class="ow">in</span> <span class="n">uffish</span> <span class="n">thought</span> <span class="n">he</span> <span class="n">stood</span>
+      <span class="n">the</span> <span class="n">jabberwock</span> <span class="k">with</span> <span class="n">eyes</span> <span class="n">of</span> <span class="n">flame</span>
+     <span class="n">came</span> <span class="n">whiffling</span> <span class="n">through</span> <span class="n">the</span> <span class="n">tulgey</span> <span class="n">wood</span>
+      <span class="ow">and</span> <span class="n">burbled</span> <span class="k">as</span> <span class="n">it</span> <span class="n">came</span>
+
+     <span class="n">one</span> <span class="n">two</span> <span class="n">one</span> <span class="n">two</span> <span class="ow">and</span> <span class="n">through</span> <span class="ow">and</span> <span class="n">through</span>
+      <span class="n">the</span> <span class="n">vorpal</span> <span class="n">blade</span> <span class="n">went</span> <span class="n">snickersnack</span>
+     <span class="n">he</span> <span class="n">left</span> <span class="n">it</span> <span class="n">dead</span> <span class="ow">and</span> <span class="k">with</span> <span class="n">its</span> <span class="n">head</span>
+      <span class="n">he</span> <span class="n">went</span> <span class="n">galumphing</span> <span class="n">back</span>
+
+     <span class="ow">and</span> <span class="n">hast</span> <span class="n">thou</span> <span class="n">slain</span> <span class="n">the</span> <span class="n">jabberwock</span>
+      <span class="n">come</span> <span class="n">to</span> <span class="n">my</span> <span class="n">arms</span> <span class="n">my</span> <span class="n">beamish</span> <span class="n">boy</span>
+     <span class="n">o</span> <span class="n">frabjous</span> <span class="n">day</span> <span class="n">callooh</span> <span class="n">callay</span>
+      <span class="n">he</span> <span class="n">chortled</span> <span class="ow">in</span> <span class="n">his</span> <span class="n">joy</span>
+
+     <span class="n">twas</span> <span class="n">brillig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="nb">all</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+</pre></div>
+</div>
+<div class="section" id="encoding">
+<h3>Encoding<a class="headerlink" href="#encoding" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">),</span>
+                              <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">[</span><span class="n">k</span><span class="p">:]</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">[:</span><span class="n">k</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cipher</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="n">poem</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cipher</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">lcddgtyqema</span>
+
+     <span class="n">vycu</span> <span class="n">dtknnki</span> <span class="n">cpf</span> <span class="n">vjg</span> <span class="n">unkvja</span> <span class="n">vqxgu</span>
+      <span class="n">fkf</span> <span class="n">iatg</span> <span class="n">cpf</span> <span class="n">ikodng</span> <span class="n">kp</span> <span class="n">vjg</span> <span class="n">ycdg</span>
+     <span class="n">cnn</span> <span class="n">okoua</span> <span class="n">ygtg</span> <span class="n">vjg</span> <span class="n">dqtqiqxgu</span>
+      <span class="n">cpf</span> <span class="n">vjg</span> <span class="n">oqog</span> <span class="n">tcvju</span> <span class="n">qwvitcdg</span>
+
+     <span class="n">dgyctg</span> <span class="n">vjg</span> <span class="n">lcddgtyqem</span> <span class="n">oa</span> <span class="n">uqp</span>
+      <span class="n">vjg</span> <span class="n">lcyu</span> <span class="n">vjcv</span> <span class="n">dkvg</span> <span class="n">vjg</span> <span class="n">encyu</span> <span class="n">vjcv</span> <span class="n">ecvej</span>
+     <span class="n">dgyctg</span> <span class="n">vjg</span> <span class="n">lwdlwd</span> <span class="n">dktf</span> <span class="n">cpf</span> <span class="n">ujwp</span>
+      <span class="n">vjg</span> <span class="n">htwokqwu</span> <span class="n">dcpfgtupcvej</span>
+
+     <span class="n">jg</span> <span class="n">vqqm</span> <span class="n">jku</span> <span class="n">xqtrcn</span> <span class="n">uyqtf</span> <span class="n">kp</span> <span class="n">jcpf</span>
+      <span class="n">nqpi</span> <span class="n">vkog</span> <span class="n">vjg</span> <span class="n">ocpzqog</span> <span class="n">hqg</span> <span class="n">jg</span> <span class="n">uqwijv</span>
+     <span class="n">uq</span> <span class="n">tguvgf</span> <span class="n">jg</span> <span class="n">da</span> <span class="n">vjg</span> <span class="n">vwovwo</span> <span class="n">vtgg</span>
+      <span class="n">cpf</span> <span class="n">uvqqf</span> <span class="n">cyjkng</span> <span class="n">kp</span> <span class="n">vjqwijv</span>
+
+     <span class="n">cpf</span> <span class="n">cu</span> <span class="n">kp</span> <span class="n">whhkuj</span> <span class="n">vjqwijv</span> <span class="n">jg</span> <span class="n">uvqqf</span>
+      <span class="n">vjg</span> <span class="n">lcddgtyqem</span> <span class="n">ykvj</span> <span class="n">gagu</span> <span class="n">qh</span> <span class="n">hncog</span>
+     <span class="n">ecog</span> <span class="n">yjkhhnkpi</span> <span class="n">vjtqwij</span> <span class="n">vjg</span> <span class="n">vwniga</span> <span class="n">yqqf</span>
+      <span class="n">cpf</span> <span class="n">dwtdngf</span> <span class="n">cu</span> <span class="n">kv</span> <span class="n">ecog</span>
+
+     <span class="n">qpg</span> <span class="n">vyq</span> <span class="n">qpg</span> <span class="n">vyq</span> <span class="n">cpf</span> <span class="n">vjtqwij</span> <span class="n">cpf</span> <span class="n">vjtqwij</span>
+      <span class="n">vjg</span> <span class="n">xqtrcn</span> <span class="n">dncfg</span> <span class="n">ygpv</span> <span class="n">upkemgtupcem</span>
+     <span class="n">jg</span> <span class="n">nghv</span> <span class="n">kv</span> <span class="n">fgcf</span> <span class="n">cpf</span> <span class="n">ykvj</span> <span class="n">kvu</span> <span class="n">jgcf</span>
+      <span class="n">jg</span> <span class="n">ygpv</span> <span class="n">icnworjkpi</span> <span class="n">dcem</span>
+
+     <span class="n">cpf</span> <span class="n">jcuv</span> <span class="n">vjqw</span> <span class="n">unckp</span> <span class="n">vjg</span> <span class="n">lcddgtyqem</span>
+      <span class="n">eqog</span> <span class="n">vq</span> <span class="n">oa</span> <span class="n">ctou</span> <span class="n">oa</span> <span class="n">dgcokuj</span> <span class="n">dqa</span>
+     <span class="n">q</span> <span class="n">htcdlqwu</span> <span class="n">fca</span> <span class="n">ecnnqqj</span> <span class="n">ecnnca</span>
+      <span class="n">jg</span> <span class="n">ejqtvngf</span> <span class="n">kp</span> <span class="n">jku</span> <span class="n">lqa</span>
+
+     <span class="n">vycu</span> <span class="n">dtknnki</span> <span class="n">cpf</span> <span class="n">vjg</span> <span class="n">unkvja</span> <span class="n">vqxgu</span>
+      <span class="n">fkf</span> <span class="n">iatg</span> <span class="n">cpf</span> <span class="n">ikodng</span> <span class="n">kp</span> <span class="n">vjg</span> <span class="n">ycdg</span>
+     <span class="n">cnn</span> <span class="n">okoua</span> <span class="n">ygtg</span> <span class="n">vjg</span> <span class="n">dqtqiqxgu</span>
+      <span class="n">cpf</span> <span class="n">vjg</span> <span class="n">oqog</span> <span class="n">tcvju</span> <span class="n">qwvitcdg</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="decoding">
+<h3>Decoding<a class="headerlink" href="#decoding" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">recovered</span> <span class="o">=</span> <span class="n">encode</span><span class="p">(</span><span class="n">cipher</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">recovered</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">jabberwocky</span>
+
+     <span class="n">twas</span> <span class="n">brillig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="nb">all</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jabberwock</span> <span class="n">my</span> <span class="n">son</span>
+      <span class="n">the</span> <span class="n">jaws</span> <span class="n">that</span> <span class="n">bite</span> <span class="n">the</span> <span class="n">claws</span> <span class="n">that</span> <span class="n">catch</span>
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jubjub</span> <span class="n">bird</span> <span class="ow">and</span> <span class="n">shun</span>
+      <span class="n">the</span> <span class="n">frumious</span> <span class="n">bandersnatch</span>
+
+     <span class="n">he</span> <span class="n">took</span> <span class="n">his</span> <span class="n">vorpal</span> <span class="n">sword</span> <span class="ow">in</span> <span class="n">hand</span>
+      <span class="n">long</span> <span class="n">time</span> <span class="n">the</span> <span class="n">manxome</span> <span class="n">foe</span> <span class="n">he</span> <span class="n">sought</span>
+     <span class="n">so</span> <span class="n">rested</span> <span class="n">he</span> <span class="n">by</span> <span class="n">the</span> <span class="n">tumtum</span> <span class="n">tree</span>
+      <span class="ow">and</span> <span class="n">stood</span> <span class="n">awhile</span> <span class="ow">in</span> <span class="n">thought</span>
+
+     <span class="ow">and</span> <span class="k">as</span> <span class="ow">in</span> <span class="n">uffish</span> <span class="n">thought</span> <span class="n">he</span> <span class="n">stood</span>
+      <span class="n">the</span> <span class="n">jabberwock</span> <span class="k">with</span> <span class="n">eyes</span> <span class="n">of</span> <span class="n">flame</span>
+     <span class="n">came</span> <span class="n">whiffling</span> <span class="n">through</span> <span class="n">the</span> <span class="n">tulgey</span> <span class="n">wood</span>
+      <span class="ow">and</span> <span class="n">burbled</span> <span class="k">as</span> <span class="n">it</span> <span class="n">came</span>
+
+     <span class="n">one</span> <span class="n">two</span> <span class="n">one</span> <span class="n">two</span> <span class="ow">and</span> <span class="n">through</span> <span class="ow">and</span> <span class="n">through</span>
+      <span class="n">the</span> <span class="n">vorpal</span> <span class="n">blade</span> <span class="n">went</span> <span class="n">snickersnack</span>
+     <span class="n">he</span> <span class="n">left</span> <span class="n">it</span> <span class="n">dead</span> <span class="ow">and</span> <span class="k">with</span> <span class="n">its</span> <span class="n">head</span>
+      <span class="n">he</span> <span class="n">went</span> <span class="n">galumphing</span> <span class="n">back</span>
+
+     <span class="ow">and</span> <span class="n">hast</span> <span class="n">thou</span> <span class="n">slain</span> <span class="n">the</span> <span class="n">jabberwock</span>
+      <span class="n">come</span> <span class="n">to</span> <span class="n">my</span> <span class="n">arms</span> <span class="n">my</span> <span class="n">beamish</span> <span class="n">boy</span>
+     <span class="n">o</span> <span class="n">frabjous</span> <span class="n">day</span> <span class="n">callooh</span> <span class="n">callay</span>
+      <span class="n">he</span> <span class="n">chortled</span> <span class="ow">in</span> <span class="n">his</span> <span class="n">joy</span>
+
+     <span class="n">twas</span> <span class="n">brillig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="nb">all</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-regular-expressions">
+<h2>Using Regular Expressions<a class="headerlink" href="#using-regular-expressions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://docs.python.org/3/howto/regex.html">Regular Expression
+HOWTO</a></li>
+<li><a class="reference external" href="http://pythex.org/">Test your Python regular expressions</a></li>
+</ul>
+<div class="section" id="find-all-words-with-a-sequence-of-two-or-more-identical-letters-e-g-look">
+<h3>Find all words with a sequence of two or more identical letters e.g. &#8220;look&#8221;<a class="headerlink" href="#find-all-words-with-a-sequence-of-two-or-more-identical-letters-e-g-look" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;(\w*(\w)\2+\w*)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">regex</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">poem</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="n">jabberwocky</span>
+<span class="n">l</span> <span class="n">brillig</span>
+<span class="n">l</span> <span class="nb">all</span>
+<span class="n">b</span> <span class="n">jabberwock</span>
+<span class="n">o</span> <span class="n">took</span>
+<span class="n">e</span> <span class="n">tree</span>
+<span class="n">o</span> <span class="n">stood</span>
+<span class="n">f</span> <span class="n">uffish</span>
+<span class="n">o</span> <span class="n">stood</span>
+<span class="n">b</span> <span class="n">jabberwock</span>
+<span class="n">f</span> <span class="n">whiffling</span>
+<span class="n">o</span> <span class="n">wood</span>
+<span class="n">b</span> <span class="n">jabberwock</span>
+<span class="n">o</span> <span class="n">callooh</span>
+<span class="n">l</span> <span class="n">callay</span>
+<span class="n">l</span> <span class="n">brillig</span>
+<span class="n">l</span> <span class="nb">all</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="convert-the-identical-sequences-to-uppercase">
+<h3>Convert the identical sequences to uppercase<a class="headerlink" href="#convert-the-identical-sequences-to-uppercase" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+    <span class="n">word</span><span class="p">,</span> <span class="n">letter</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">letter</span><span class="p">,</span> <span class="n">letter</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">regex</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">poem</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">jaBBerwocky</span>
+
+     <span class="n">twas</span> <span class="n">briLLig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="n">aLL</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jaBBerwock</span> <span class="n">my</span> <span class="n">son</span>
+      <span class="n">the</span> <span class="n">jaws</span> <span class="n">that</span> <span class="n">bite</span> <span class="n">the</span> <span class="n">claws</span> <span class="n">that</span> <span class="n">catch</span>
+     <span class="n">beware</span> <span class="n">the</span> <span class="n">jubjub</span> <span class="n">bird</span> <span class="ow">and</span> <span class="n">shun</span>
+      <span class="n">the</span> <span class="n">frumious</span> <span class="n">bandersnatch</span>
+
+     <span class="n">he</span> <span class="n">tOOk</span> <span class="n">his</span> <span class="n">vorpal</span> <span class="n">sword</span> <span class="ow">in</span> <span class="n">hand</span>
+      <span class="n">long</span> <span class="n">time</span> <span class="n">the</span> <span class="n">manxome</span> <span class="n">foe</span> <span class="n">he</span> <span class="n">sought</span>
+     <span class="n">so</span> <span class="n">rested</span> <span class="n">he</span> <span class="n">by</span> <span class="n">the</span> <span class="n">tumtum</span> <span class="n">trEE</span>
+      <span class="ow">and</span> <span class="n">stOOd</span> <span class="n">awhile</span> <span class="ow">in</span> <span class="n">thought</span>
+
+     <span class="ow">and</span> <span class="k">as</span> <span class="ow">in</span> <span class="n">uFFish</span> <span class="n">thought</span> <span class="n">he</span> <span class="n">stOOd</span>
+      <span class="n">the</span> <span class="n">jaBBerwock</span> <span class="k">with</span> <span class="n">eyes</span> <span class="n">of</span> <span class="n">flame</span>
+     <span class="n">came</span> <span class="n">whiFFling</span> <span class="n">through</span> <span class="n">the</span> <span class="n">tulgey</span> <span class="n">wOOd</span>
+      <span class="ow">and</span> <span class="n">burbled</span> <span class="k">as</span> <span class="n">it</span> <span class="n">came</span>
+
+     <span class="n">one</span> <span class="n">two</span> <span class="n">one</span> <span class="n">two</span> <span class="ow">and</span> <span class="n">through</span> <span class="ow">and</span> <span class="n">through</span>
+      <span class="n">the</span> <span class="n">vorpal</span> <span class="n">blade</span> <span class="n">went</span> <span class="n">snickersnack</span>
+     <span class="n">he</span> <span class="n">left</span> <span class="n">it</span> <span class="n">dead</span> <span class="ow">and</span> <span class="k">with</span> <span class="n">its</span> <span class="n">head</span>
+      <span class="n">he</span> <span class="n">went</span> <span class="n">galumphing</span> <span class="n">back</span>
+
+     <span class="ow">and</span> <span class="n">hast</span> <span class="n">thou</span> <span class="n">slain</span> <span class="n">the</span> <span class="n">jaBBerwock</span>
+      <span class="n">come</span> <span class="n">to</span> <span class="n">my</span> <span class="n">arms</span> <span class="n">my</span> <span class="n">beamish</span> <span class="n">boy</span>
+     <span class="n">o</span> <span class="n">frabjous</span> <span class="n">day</span> <span class="n">callOOh</span> <span class="n">caLLay</span>
+      <span class="n">he</span> <span class="n">chortled</span> <span class="ow">in</span> <span class="n">his</span> <span class="n">joy</span>
+
+     <span class="n">twas</span> <span class="n">briLLig</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">slithy</span> <span class="n">toves</span>
+      <span class="n">did</span> <span class="n">gyre</span> <span class="ow">and</span> <span class="n">gimble</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">wabe</span>
+     <span class="n">aLL</span> <span class="n">mimsy</span> <span class="n">were</span> <span class="n">the</span> <span class="n">borogoves</span>
+      <span class="ow">and</span> <span class="n">the</span> <span class="n">mome</span> <span class="n">raths</span> <span class="n">outgrabe</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="natural-language-processing">
+<h2>Natural language processing<a class="headerlink" href="#natural-language-processing" title="Permalink to this headline">¶</a></h2>
+<p>If you intend to perform statistical analysis on natural language, you
+should probably use NLTK to pre-process the text instead of using string
+methods and regular expressions. For example, a simple challenge is to
+first parse the paragraph below into sentences, then parse each sentence
+into words.</p>
+<p>Paragraph from random Pubmed abstract.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">para</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;When compared with the control group no significant associations were found for the NS-PEecl group after adjustment of confounding variables. For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity. Antiβ2GP1-domain I IgG were associated with aCL, antiβ2GP1 and aPS/PT IgG in the three groups. aPS/PT IgG were associated with aCL IgG, and aPS/PT IgM were associated with aCL and antiβ2GP1 IgM in the three groups CONCLUSION: S-PEecl is a distinct entity from NS-PEecl and is mainly associated with the presence of antiβ2GP1 IgG. Antiβ2GP1 domain I correlate with other aPL IgG tests, and aPS/PT may be promising in patients in which LA tests cannot be interpreted.&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="section" id="naive-splitting-of-sentences-as-anything-separated-by-or">
+<h3>Naive splitting of sentences as anything separated by ., ! or ?<a class="headerlink" href="#naive-splitting-of-sentences-as-anything-separated-by-or" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sep</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;[\?\!\.]&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ss</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">para</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="p">:</span> <span class="n">When</span> <span class="n">compared</span> <span class="k">with</span> <span class="n">the</span> <span class="n">control</span> <span class="n">group</span> <span class="n">no</span> <span class="n">significant</span> <span class="n">associations</span> <span class="n">were</span> <span class="n">found</span> <span class="k">for</span> <span class="n">the</span> <span class="n">NS</span><span class="o">-</span><span class="n">PEecl</span> <span class="n">group</span> <span class="n">after</span> <span class="n">adjustment</span> <span class="n">of</span> <span class="n">confounding</span> <span class="n">variables</span>
+
+<span class="mi">2</span> <span class="p">:</span>  <span class="n">For</span> <span class="n">the</span> <span class="n">S</span><span class="o">-</span><span class="n">PEecl</span> <span class="n">group</span><span class="p">,</span> <span class="n">antiβ2GP1</span> <span class="n">IgG</span> <span class="p">(</span><span class="n">OR</span> <span class="mi">16</span>
+
+<span class="mi">3</span> <span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="mi">95</span><span class="o">%</span> <span class="n">CI</span> <span class="mi">3</span>
+
+<span class="mi">4</span> <span class="p">:</span> <span class="mi">71</span><span class="o">-</span><span class="mi">77</span>
+
+<span class="mi">5</span> <span class="p">:</span> <span class="mi">06</span><span class="p">)</span> <span class="n">was</span> <span class="n">associated</span><span class="p">,</span> <span class="k">as</span> <span class="n">well</span> <span class="k">as</span> <span class="n">age</span><span class="p">,</span> <span class="n">obesity</span><span class="p">,</span> <span class="n">smoking</span> <span class="ow">and</span> <span class="n">multiparity</span>
+
+<span class="mi">6</span> <span class="p">:</span>  <span class="n">Antiβ2GP1</span><span class="o">-</span><span class="n">domain</span> <span class="n">I</span> <span class="n">IgG</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span><span class="p">,</span> <span class="n">antiβ2GP1</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgG</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">three</span> <span class="n">groups</span>
+
+<span class="mi">7</span> <span class="p">:</span>  <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgG</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span> <span class="n">IgG</span><span class="p">,</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgM</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span> <span class="ow">and</span> <span class="n">antiβ2GP1</span> <span class="n">IgM</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">three</span> <span class="n">groups</span> <span class="n">CONCLUSION</span><span class="p">:</span> <span class="n">S</span><span class="o">-</span><span class="n">PEecl</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">distinct</span> <span class="n">entity</span> <span class="kn">from</span> <span class="nn">NS</span><span class="o">-</span><span class="n">PEecl</span> <span class="ow">and</span> <span class="ow">is</span> <span class="n">mainly</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">the</span> <span class="n">presence</span> <span class="n">of</span> <span class="n">antiβ2GP1</span> <span class="n">IgG</span>
+
+<span class="mi">8</span> <span class="p">:</span>  <span class="n">Antiβ2GP1</span> <span class="n">domain</span> <span class="n">I</span> <span class="n">correlate</span> <span class="k">with</span> <span class="n">other</span> <span class="n">aPL</span> <span class="n">IgG</span> <span class="n">tests</span><span class="p">,</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">may</span> <span class="n">be</span> <span class="n">promising</span> <span class="ow">in</span> <span class="n">patients</span> <span class="ow">in</span> <span class="n">which</span> <span class="n">LA</span> <span class="n">tests</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">interpreted</span>
+
+<span class="mi">9</span> <span class="p">:</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-nltk">
+<h3>Using NLTK<a class="headerlink" href="#using-nltk" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nltk</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ss_nltk</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">sent_tokenize</span><span class="p">(</span><span class="n">para</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ss_nltk</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="p">:</span> <span class="n">When</span> <span class="n">compared</span> <span class="k">with</span> <span class="n">the</span> <span class="n">control</span> <span class="n">group</span> <span class="n">no</span> <span class="n">significant</span> <span class="n">associations</span> <span class="n">were</span> <span class="n">found</span> <span class="k">for</span> <span class="n">the</span> <span class="n">NS</span><span class="o">-</span><span class="n">PEecl</span> <span class="n">group</span> <span class="n">after</span> <span class="n">adjustment</span> <span class="n">of</span> <span class="n">confounding</span> <span class="n">variables</span><span class="o">.</span>
+
+<span class="mi">2</span> <span class="p">:</span> <span class="n">For</span> <span class="n">the</span> <span class="n">S</span><span class="o">-</span><span class="n">PEecl</span> <span class="n">group</span><span class="p">,</span> <span class="n">antiβ2GP1</span> <span class="n">IgG</span> <span class="p">(</span><span class="n">OR</span> <span class="mf">16.91</span><span class="p">,</span> <span class="mi">95</span><span class="o">%</span> <span class="n">CI</span> <span class="mf">3.71</span><span class="o">-</span><span class="mf">77.06</span><span class="p">)</span> <span class="n">was</span> <span class="n">associated</span><span class="p">,</span> <span class="k">as</span> <span class="n">well</span> <span class="k">as</span> <span class="n">age</span><span class="p">,</span> <span class="n">obesity</span><span class="p">,</span> <span class="n">smoking</span> <span class="ow">and</span> <span class="n">multiparity</span><span class="o">.</span>
+
+<span class="mi">3</span> <span class="p">:</span> <span class="n">Antiβ2GP1</span><span class="o">-</span><span class="n">domain</span> <span class="n">I</span> <span class="n">IgG</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span><span class="p">,</span> <span class="n">antiβ2GP1</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgG</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">three</span> <span class="n">groups</span><span class="o">.</span>
+
+<span class="mi">4</span> <span class="p">:</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgG</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span> <span class="n">IgG</span><span class="p">,</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">IgM</span> <span class="n">were</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">aCL</span> <span class="ow">and</span> <span class="n">antiβ2GP1</span> <span class="n">IgM</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">three</span> <span class="n">groups</span> <span class="n">CONCLUSION</span><span class="p">:</span> <span class="n">S</span><span class="o">-</span><span class="n">PEecl</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">distinct</span> <span class="n">entity</span> <span class="kn">from</span> <span class="nn">NS</span><span class="o">-</span><span class="n">PEecl</span> <span class="ow">and</span> <span class="ow">is</span> <span class="n">mainly</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">the</span> <span class="n">presence</span> <span class="n">of</span> <span class="n">antiβ2GP1</span> <span class="n">IgG</span><span class="o">.</span>
+
+<span class="mi">5</span> <span class="p">:</span> <span class="n">Antiβ2GP1</span> <span class="n">domain</span> <span class="n">I</span> <span class="n">correlate</span> <span class="k">with</span> <span class="n">other</span> <span class="n">aPL</span> <span class="n">IgG</span> <span class="n">tests</span><span class="p">,</span> <span class="ow">and</span> <span class="n">aPS</span><span class="o">/</span><span class="n">PT</span> <span class="n">may</span> <span class="n">be</span> <span class="n">promising</span> <span class="ow">in</span> <span class="n">patients</span> <span class="ow">in</span> <span class="n">which</span> <span class="n">LA</span> <span class="n">tests</span> <span class="n">cannot</span> <span class="n">be</span> <span class="n">interpreted</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="naive-parsing-of-the-second-sentence-into-words">
+<h3>Naive parsing of the second sentence into words<a class="headerlink" href="#naive-parsing-of-the-second-sentence-into-words" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">ss_nltk</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">s</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity.&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># remove punctuation and split on whit space</span>
+<span class="n">table</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">))</span>
+<span class="n">s</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;For&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;the&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;SPEecl&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;group&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;antiβ2GP1&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;IgG&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;1691&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;95&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;CI&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;3717706&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;was&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;associated&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;as&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;well&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;as&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;age&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;obesity&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;smoking&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;and&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;multiparity&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Using NLTK<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">text</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;For&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;the&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;S-PEecl&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;group&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;antiβ2GP1&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;IgG&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;(&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;16.91&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;95&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;%&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;CI&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;3.71-77.06&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;)&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;was&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;associated&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;as&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;well&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;as&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;age&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;obesity&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;smoking&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;and&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;multiparity&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;.&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="nltk-is-a-rich-library-for-natural-language-processing">
+<h3>NLTK is a rich library for natural language processing<a class="headerlink" href="#nltk-is-a-rich-library-for-natural-language-processing" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference external" href="http://www.nltk.org/">http://www.nltk.org</a> for details.</p>
+<div class="section" id="tag-tokens-with-part-of-speech-labels">
+<h4>Tag tokens with part-of-speech labels<a class="headerlink" href="#tag-tokens-with-part-of-speech-labels" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">tagged_text</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="n">tagged_text</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;For&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;DT&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;S-PEecl&#39;</span><span class="p">,</span> <span class="s1">&#39;NNP&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;antiβ2GP1&#39;</span><span class="p">,</span> <span class="s1">&#39;RB&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;IgG&#39;</span><span class="p">,</span> <span class="s1">&#39;NNP&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;(&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;OR&#39;</span><span class="p">,</span> <span class="s1">&#39;NNP&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;16.91&#39;</span><span class="p">,</span> <span class="s1">&#39;CD&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;95&#39;</span><span class="p">,</span> <span class="s1">&#39;CD&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;CI&#39;</span><span class="p">,</span> <span class="s1">&#39;NNP&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;3.71-77.06&#39;</span><span class="p">,</span> <span class="s1">&#39;CD&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;was&#39;</span><span class="p">,</span> <span class="s1">&#39;VBD&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;associated&#39;</span><span class="p">,</span> <span class="s1">&#39;VBN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="s1">&#39;RB&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;well&#39;</span><span class="p">,</span> <span class="s1">&#39;RB&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;as&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;obesity&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;smoking&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;CC&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;multiparity&#39;</span><span class="p">,</span> <span class="s1">&#39;NN&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">s</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;For the S-PEecl group, antiβ2GP1 IgG (OR 16.91, 95% CI 3.71-77.06) was associated, as well as age, obesity, smoking and multiparity.&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="a-simplistic-way-to-pick-up-nouns">
+<h3>A simplistic way to pick up nouns<a class="headerlink" href="#a-simplistic-way-to-pick-up-nouns" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tagged_text</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;S-PEecl&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;group&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;IgG&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;%&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;CI&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;age&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;obesity&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;smoking&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;multiparity&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="string-formatting">
+<h2>String formatting<a class="headerlink" href="#string-formatting" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="selection">
+<h3>Selection<a class="headerlink" href="#selection" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">stuff</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;bun&#39;</span><span class="p">,</span> <span class="s1">&#39;shoe&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;bee&#39;</span><span class="p">,</span> <span class="s1">&#39;door&#39;</span><span class="p">],</span> <span class="mi">2</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{}</span><span class="s1">, Two </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: bun, Two shoe&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{0}</span><span class="s1">, Two </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: bun, Two shoe&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{1}</span><span class="s1">, Two </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: shoe, Two shoe&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{0}</span><span class="s1">, Two </span><span class="si">{2[1]}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: bun, Two door&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="formatting">
+<h3>Formatting<a class="headerlink" href="#formatting" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{0:^10s}</span><span class="s1">, Two </span><span class="si">{1:_&gt;15s}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One:    bun    , Two ___________shoe&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{3}</span><span class="s1">, Two </span><span class="si">{4}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: 2, Two 3.141592653589793&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{3:+10d}</span><span class="s1">, Two </span><span class="si">{4:.4f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One:         +2, Two 3.1416&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{3:04d}</span><span class="s1">, Two </span><span class="si">{4:.4g}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: 0002, Two 3.142&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{3:.4e}</span><span class="s1">, Two </span><span class="si">{4:.4e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: 2.0000e+00, Two 3.1416e+00&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: </span><span class="si">{5:.2%}</span><span class="s1">, Two </span><span class="si">{5:f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">stuff</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;One: 5.00%, Two 0.050000&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="old-style-formatting">
+<h3>Old style formatting<a class="headerlink" href="#old-style-formatting" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">, %a, </span><span class="si">%d</span><span class="s1">, </span><span class="si">%.4f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">stuff</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s2">&quot;bun, shoe, [&#39;bee&#39;, &#39;door&#39;], 2, 3.1416, 0.05&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="formatting-numpy-arrays">
+<h3>Formatting numpy arrays<a class="headerlink" href="#formatting-numpy-arrays" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">formatter</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%8.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span>    <span class="mf">1.00</span><span class="p">,</span>     <span class="mf">2.00</span><span class="p">,</span>     <span class="mf">3.00</span><span class="p">,</span>     <span class="mf">4.00</span><span class="p">],</span>
+       <span class="p">[</span>    <span class="mf">5.00</span><span class="p">,</span>     <span class="mf">6.00</span><span class="p">,</span>     <span class="mf">7.00</span><span class="p">,</span>     <span class="mf">8.00</span><span class="p">],</span>
+       <span class="p">[</span>    <span class="mf">9.00</span><span class="p">,</span>    <span class="mf">10.00</span><span class="p">,</span>    <span class="mf">11.00</span><span class="p">,</span>    <span class="mf">12.00</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Strings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#get-through-the-looking-glass">Get &#8220;Through the Looking Glass&#8221;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#slice-to-get-jabberwocky">Slice to get Jabberwocky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-palindromic-words-in-poem-if-any">Find palindromic words in poem if any</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#top-10-most-frequent-words">Top 10 most frequent words</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#words-that-appear-exactly-twice">Words that appear exactly twice.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trigrams">Trigrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#find-words-in-poem-that-are-over-represented">Find words in poem that are over-represented</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#encode-and-decode-poem-using-a-caesar-cipher">Encode and decode poem using a Caesar cipher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-regular-expressions">Using Regular Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#natural-language-processing">Natural language processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#string-formatting">String formatting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="03_Classes.html"
+                          title="Previous page">&larr; Classes</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="05_Numbers.html"
+                          title="Next page">&rarr; Using <code class="docutils literal"><span class="pre">numpy</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/04_Strings.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="05_Numbers.html" title="Using numpy"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="03_Classes.html" title="Classes"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/04_Strings.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:28 GMT -->
+</html>

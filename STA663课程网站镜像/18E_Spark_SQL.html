@@ -1,0 +1,763 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18E_Spark_SQL.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:32 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Spark SQL &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="18F_Spark_GraphX.html" />
+    <link rel="prev" title="Spark MLLib" href="18D_Spark_MLib.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="18F_Spark_GraphX.html" title="&lt;no title&gt;"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18D_Spark_MLib.html" title="Spark MLLib"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spark-sql">
+<h1>Spark SQL<a class="headerlink" href="#spark-sql" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="http://spark.apache.org/docs/latest/sql-programming-guide.html">Official
+Documentation</a></li>
+</ul>
+<p>A tour of the Spark SQL library, the <code class="docutils literal"><span class="pre">spark-csv</span></code> package and Spark
+DataFrames.</p>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.sparktutorials.net/tutorials">Spark tutorials</a>: A
+growing bunch of accessible tutorials on Spark, mostly in Scala but a
+few in Python.</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="k">import</span> <span class="n">SparkContext</span><span class="p">,</span> <span class="n">SparkConf</span>
+
+<span class="n">conf</span> <span class="o">=</span> <span class="p">(</span><span class="n">SparkConf</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">setAppName</span><span class="p">(</span><span class="s1">&#39;SparkSQL&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">setMaster</span><span class="p">(</span><span class="s1">&#39;local[*]&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">conf</span><span class="o">=</span><span class="n">conf</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="k">import</span> <span class="n">SQLContext</span>
+<span class="n">sqlc</span> <span class="o">=</span> <span class="n">SQLContext</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataframe-from-pandas">
+<h2>DataFrame from <code class="docutils literal"><span class="pre">pandas</span></code><a class="headerlink" href="#dataframe-from-pandas" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pandas_df</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">spark_df</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pandas_df</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">spark_df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+------------+-----------+------------+-----------+-------+</span>
+<span class="o">|</span><span class="n">sepal_length</span><span class="o">|</span><span class="n">sepal_width</span><span class="o">|</span><span class="n">petal_length</span><span class="o">|</span><span class="n">petal_width</span><span class="o">|</span><span class="n">species</span><span class="o">|</span>
+<span class="o">+------------+-----------+------------+-----------+-------+</span>
+<span class="o">|</span>         <span class="mf">5.1</span><span class="o">|</span>        <span class="mf">3.5</span><span class="o">|</span>         <span class="mf">1.4</span><span class="o">|</span>        <span class="mf">0.2</span><span class="o">|</span> <span class="n">setosa</span><span class="o">|</span>
+<span class="o">|</span>         <span class="mf">4.9</span><span class="o">|</span>        <span class="mf">3.0</span><span class="o">|</span>         <span class="mf">1.4</span><span class="o">|</span>        <span class="mf">0.2</span><span class="o">|</span> <span class="n">setosa</span><span class="o">|</span>
+<span class="o">|</span>         <span class="mf">4.7</span><span class="o">|</span>        <span class="mf">3.2</span><span class="o">|</span>         <span class="mf">1.3</span><span class="o">|</span>        <span class="mf">0.2</span><span class="o">|</span> <span class="n">setosa</span><span class="o">|</span>
+<span class="o">+------------+-----------+------------+-----------+-------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">3</span> <span class="n">rows</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataframe-from-csv-files">
+<h2>DataFrame from CSV files<a class="headerlink" href="#dataframe-from-csv-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-manual-parsing-and-a-schema">
+<h3>Using manual parsing and a schema<a class="headerlink" href="#using-manual-parsing-and-a-schema" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">cat</span> <span class="n">data</span><span class="o">/</span><span class="n">cars</span><span class="o">.</span><span class="n">csv</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">year</span><span class="p">,</span><span class="n">make</span><span class="p">,</span><span class="n">model</span><span class="p">,</span><span class="n">comment</span><span class="p">,</span><span class="n">blank</span>
+<span class="s2">&quot;2012&quot;</span><span class="p">,</span><span class="s2">&quot;Tesla&quot;</span><span class="p">,</span><span class="s2">&quot;S&quot;</span><span class="p">,</span><span class="s2">&quot;No comment&quot;</span><span class="p">,</span>
+
+<span class="mi">1997</span><span class="p">,</span><span class="n">Ford</span><span class="p">,</span><span class="n">E350</span><span class="p">,</span><span class="s2">&quot;Go get one now they are going fast&quot;</span><span class="p">,</span>
+<span class="mi">2015</span><span class="p">,</span><span class="n">Chevy</span><span class="p">,</span><span class="n">Volt</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="k">import</span> <span class="o">*</span>
+
+<span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[:]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tmp</span>
+
+<span class="c1"># Load a text file and convert each line to a tuple.</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;data/cars.csv&#39;</span><span class="p">)</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">first</span><span class="p">()</span> <span class="c1">#extract header</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">line</span> <span class="o">!=</span> <span class="n">header</span><span class="p">)</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">line</span><span class="p">)</span>
+<span class="n">parts</span> <span class="o">=</span> <span class="n">lines</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+<span class="n">parts</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">part</span><span class="p">:</span> <span class="n">pad</span><span class="p">(</span><span class="n">part</span><span class="p">))</span>
+
+<span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">StructField</span><span class="p">(</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="n">IntegerType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="n">StructField</span><span class="p">(</span><span class="s1">&#39;make&#39;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="n">StructField</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="n">StructField</span><span class="p">(</span><span class="s1">&#39;comment&#39;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="n">StructField</span><span class="p">(</span><span class="s1">&#39;blank&#39;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+
+<span class="c1"># Apply the schema to the RDD.</span>
+<span class="n">df0</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+
+<span class="n">df0</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----+-------+-----+--------------------+-----+</span>
+<span class="o">|</span><span class="n">year</span><span class="o">|</span>   <span class="n">make</span><span class="o">|</span><span class="n">model</span><span class="o">|</span>             <span class="n">comment</span><span class="o">|</span><span class="n">blank</span><span class="o">|</span>
+<span class="o">+----+-------+-----+--------------------+-----+</span>
+<span class="o">|</span><span class="n">null</span><span class="o">|</span><span class="s2">&quot;Tesla&quot;</span><span class="o">|</span>  <span class="s2">&quot;S&quot;</span><span class="o">|</span>        <span class="s2">&quot;No comment&quot;</span><span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span><span class="n">null</span><span class="o">|</span>   <span class="n">Ford</span><span class="o">|</span> <span class="n">E350</span><span class="o">|</span><span class="s2">&quot;Go get one now t...|     |</span>
+<span class="o">|</span><span class="n">null</span><span class="o">|</span>  <span class="n">Chevy</span><span class="o">|</span> <span class="n">Volt</span><span class="o">|</span>                    <span class="o">|</span>     <span class="o">|</span>
+<span class="o">+----+-------+-----+--------------------+-----+</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-the-spark-csv-package">
+<h3>Using the <code class="docutils literal"><span class="pre">spark-csv</span></code> package<a class="headerlink" href="#using-the-spark-csv-package" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="p">(</span><span class="n">sqlc</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;com.databricks.spark.csv&#39;</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="n">inferschema</span><span class="o">=</span><span class="s1">&#39;true&#39;</span><span class="p">)</span>
+      <span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;data/cars.csv&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-the-dataframe">
+<h3>Using the dataframe<a class="headerlink" href="#using-the-dataframe" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">root</span>
+ <span class="o">|--</span> <span class="n">year</span><span class="p">:</span> <span class="n">integer</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">make</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">model</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">comment</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">blank</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----+-----+-----+--------------------+-----+</span>
+<span class="o">|</span><span class="n">year</span><span class="o">|</span> <span class="n">make</span><span class="o">|</span><span class="n">model</span><span class="o">|</span>             <span class="n">comment</span><span class="o">|</span><span class="n">blank</span><span class="o">|</span>
+<span class="o">+----+-----+-----+--------------------+-----+</span>
+<span class="o">|</span><span class="mi">2012</span><span class="o">|</span><span class="n">Tesla</span><span class="o">|</span>    <span class="n">S</span><span class="o">|</span>          <span class="n">No</span> <span class="n">comment</span><span class="o">|</span>     <span class="o">|</span>
+<span class="o">|</span><span class="mi">1997</span><span class="o">|</span> <span class="n">Ford</span><span class="o">|</span> <span class="n">E350</span><span class="o">|</span><span class="n">Go</span> <span class="n">get</span> <span class="n">one</span> <span class="n">now</span> <span class="n">th</span><span class="o">...|</span>     <span class="o">|</span>
+<span class="o">|</span><span class="mi">2015</span><span class="o">|</span><span class="n">Chevy</span><span class="o">|</span> <span class="n">Volt</span><span class="o">|</span>                <span class="n">null</span><span class="o">|</span> <span class="n">null</span><span class="o">|</span>
+<span class="o">+----+-----+-----+--------------------+-----+</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----+-----+</span>
+<span class="o">|</span><span class="n">year</span><span class="o">|</span> <span class="n">make</span><span class="o">|</span>
+<span class="o">+----+-----+</span>
+<span class="o">|</span><span class="mi">2012</span><span class="o">|</span><span class="n">Tesla</span><span class="o">|</span>
+<span class="o">|</span><span class="mi">1997</span><span class="o">|</span> <span class="n">Ford</span><span class="o">|</span>
+<span class="o">|</span><span class="mi">2015</span><span class="o">|</span><span class="n">Chevy</span><span class="o">|</span>
+<span class="o">+----+-----+</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="to-run-sql-queries-we-need-to-register-the-dataframe-as-a-table">
+<h3>To run SQL queries, we need to register the dataframe as a table<a class="headerlink" href="#to-run-sql-queries-we-need-to-register-the-dataframe-as-a-table" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">registerTempTable</span><span class="p">(</span><span class="s1">&#39;cars&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s1">&#39;select year, make from cars where year &gt; 2000&#39;</span><span class="p">)</span>
+<span class="n">q</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+----+-----+</span>
+<span class="o">|</span><span class="n">year</span><span class="o">|</span> <span class="n">make</span><span class="o">|</span>
+<span class="o">+----+-----+</span>
+<span class="o">|</span><span class="mi">2012</span><span class="o">|</span><span class="n">Tesla</span><span class="o">|</span>
+<span class="o">|</span><span class="mi">2015</span><span class="o">|</span><span class="n">Chevy</span><span class="o">|</span>
+<span class="o">+----+-----+</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="spark-dataframes-can-be-converted-to-pandas-ones">
+<h3>Spark dataframes can be converted to Pandas ones<a class="headerlink" href="#spark-dataframes-can-be-converted-to-pandas-ones" title="Permalink to this headline">¶</a></h3>
+<p>Typically, we would only convert small dataframes such as the results of
+SQL queries. If we could load the original dataset in memory as a
+<code class="docutils literal"><span class="pre">pandaa</span></code> dataframe, why would we be using Spark?</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">q_df</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
+<span class="n">q_df</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>year</th>
+      <th>make</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2012</td>
+      <td>Tesla</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2015</td>
+      <td>Chevy</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="dataframe-from-json-files">
+<h2>DataFrame from JSON files<a class="headerlink" href="#dataframe-from-json-files" title="Permalink to this headline">¶</a></h2>
+<p>It is easier to read in JSON than CSV files because JSON is
+self-describing, allowing Spark SQL to infer the appropriate schema
+without additional hints.</p>
+<p>As an example, we will look at Durham police crime reports from the
+<a class="reference external" href="https://opendurham.nc.gov/page/home/">Durham Open Data</a> website.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s1">&#39;data/durham-police-crime-reports.json&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>How many records are there?</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">101375</span>
+</pre></div>
+</div>
+<p>Since this is JSON, it is possible to have a nested schema.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">root</span>
+ <span class="o">|--</span> <span class="n">datasetid</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">fields</span><span class="p">:</span> <span class="n">struct</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">addtime</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">big_zone</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">chrgdesc</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">csstatus</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">csstatusdt</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">date_fnd</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">date_occu</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">date_rept</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">dist</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">dow1</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">dow2</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">geo_point_2d</span><span class="p">:</span> <span class="n">array</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">element</span><span class="p">:</span> <span class="n">double</span> <span class="p">(</span><span class="n">containsNull</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">geo_shape</span><span class="p">:</span> <span class="n">struct</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">coordinates</span><span class="p">:</span> <span class="n">array</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">element</span><span class="p">:</span> <span class="n">double</span> <span class="p">(</span><span class="n">containsNull</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="nb">type</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">hour_fnd</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">hour_occu</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">hour_rept</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">inci_id</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">monthstamp</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">reportedas</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">reviewdate</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">strdate</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">ucr_code</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">ucr_type_o</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">yearstamp</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">geometry</span><span class="p">:</span> <span class="n">struct</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="n">coordinates</span><span class="p">:</span> <span class="n">array</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|</span>    <span class="o">|--</span> <span class="n">element</span><span class="p">:</span> <span class="n">double</span> <span class="p">(</span><span class="n">containsNull</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|</span>    <span class="o">|--</span> <span class="nb">type</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">record_timestamp</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+ <span class="o">|--</span> <span class="n">recordid</span><span class="p">:</span> <span class="n">string</span> <span class="p">(</span><span class="n">nullable</span> <span class="o">=</span> <span class="n">true</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Show the top few rows.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------------------+--------------------+--------------------+--------------------+--------------------+</span>
+<span class="o">|</span>           <span class="n">datasetid</span><span class="o">|</span>              <span class="n">fields</span><span class="o">|</span>            <span class="n">geometry</span><span class="o">|</span>    <span class="n">record_timestamp</span><span class="o">|</span>            <span class="n">recordid</span><span class="o">|</span>
+<span class="o">+--------------------+--------------------+--------------------+--------------------+--------------------+</span>
+<span class="o">|</span><span class="n">durham</span><span class="o">-</span><span class="n">police</span><span class="o">-</span><span class="n">cri</span><span class="o">...|</span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span><span class="n">T19</span><span class="p">:</span><span class="mf">00.</span><span class="o">..|</span><span class="p">[</span><span class="n">WrappedArray</span><span class="p">(</span><span class="o">-</span><span class="mf">78.</span><span class="o">..|</span><span class="mi">2016</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">12</span><span class="n">T02</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="o">...|</span><span class="mi">2</span><span class="n">c0251654c4b7a006</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">durham</span><span class="o">-</span><span class="n">police</span><span class="o">-</span><span class="n">cri</span><span class="o">...|</span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span><span class="n">T19</span><span class="p">:</span><span class="mf">00.</span><span class="o">..|</span><span class="p">[</span><span class="n">WrappedArray</span><span class="p">(</span><span class="o">-</span><span class="mf">78.</span><span class="o">..|</span><span class="mi">2016</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">12</span><span class="n">T02</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="o">...|</span><span class="n">e5fe0e483fdb17fb7</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">durham</span><span class="o">-</span><span class="n">police</span><span class="o">-</span><span class="n">cri</span><span class="o">...|</span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span><span class="n">T19</span><span class="p">:</span><span class="mf">00.</span><span class="o">..|</span><span class="p">[</span><span class="n">WrappedArray</span><span class="p">(</span><span class="o">-</span><span class="mf">78.</span><span class="o">..|</span><span class="mi">2016</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">12</span><span class="n">T02</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="o">...|</span><span class="n">d16c330ea4b3e2a90</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">durham</span><span class="o">-</span><span class="n">police</span><span class="o">-</span><span class="n">cri</span><span class="o">...|</span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span><span class="n">T19</span><span class="p">:</span><span class="mf">00.</span><span class="o">..|</span><span class="p">[</span><span class="n">WrappedArray</span><span class="p">(</span><span class="o">-</span><span class="mf">78.</span><span class="o">..|</span><span class="mi">2016</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">12</span><span class="n">T02</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="o">...|</span><span class="mi">1128</span><span class="n">e12a912b16cfe</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">durham</span><span class="o">-</span><span class="n">police</span><span class="o">-</span><span class="n">cri</span><span class="o">...|</span><span class="p">[</span><span class="mi">2013</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">01</span><span class="n">T19</span><span class="p">:</span><span class="mf">00.</span><span class="o">..|</span><span class="p">[</span><span class="n">WrappedArray</span><span class="p">(</span><span class="o">-</span><span class="mf">78.</span><span class="o">..|</span><span class="mi">2016</span><span class="o">-</span><span class="mi">03</span><span class="o">-</span><span class="mi">12</span><span class="n">T02</span><span class="p">:</span><span class="mi">32</span><span class="p">:</span><span class="o">...|</span><span class="n">ac79bc9c709d5dfa4</span><span class="o">...|</span>
+<span class="o">+--------------------+--------------------+--------------------+--------------------+--------------------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">5</span> <span class="n">rows</span>
+</pre></div>
+</div>
+<p>Make a dataframe only containing date and charges.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;fields.strdate&#39;</span><span class="p">,</span> <span class="s1">&#39;fields.chrgdesc&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+-----------+--------------------+</span>
+<span class="o">|</span>    <span class="n">strdate</span><span class="o">|</span>            <span class="n">chrgdesc</span><span class="o">|</span>
+<span class="o">+-----------+--------------------+</span>
+<span class="o">|</span><span class="n">Dec</span>  <span class="mi">2</span> <span class="mi">2013</span><span class="o">|</span><span class="n">CALLS</span> <span class="n">FOR</span> <span class="n">SERVICE</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">Dec</span>  <span class="mi">2</span> <span class="mi">2013</span><span class="o">|</span><span class="n">VANDALISM</span> <span class="n">TO</span> <span class="n">PROP</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">Dec</span>  <span class="mi">2</span> <span class="mi">2013</span><span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">FORCIB</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">Dec</span>  <span class="mi">2</span> <span class="mi">2013</span><span class="o">|</span><span class="n">LARCENY</span> <span class="o">-</span> <span class="n">SHOPLIF</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">Dec</span>  <span class="mi">2</span> <span class="mi">2013</span><span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">FORCIB</span><span class="o">...|</span>
+<span class="o">+-----------+--------------------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">5</span> <span class="n">rows</span>
+</pre></div>
+</div>
+<p>Show distinct charges - note that for an actual analysis, you would
+probably want to consolidate these into a smaller number of groups to
+account for typos, etc.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;fields.chrgdesc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------------------+</span>
+<span class="o">|</span>            <span class="n">chrgdesc</span><span class="o">|</span>
+<span class="o">+--------------------+</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">DRUG</span> <span class="n">EQUIPMENT</span><span class="o">/</span><span class="n">PA</span><span class="o">...|</span>
+<span class="o">|</span> <span class="n">ASSIST</span> <span class="n">OTHER</span> <span class="n">AGENCY</span><span class="o">|</span>
+<span class="o">|</span><span class="n">TOWED</span><span class="o">/</span><span class="n">ABANDONED</span> <span class="n">V</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">DRUG</span> <span class="n">EQUIPMENT</span><span class="o">/</span><span class="n">PA</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">FORCIB</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">SEX</span> <span class="n">OFFENSE</span> <span class="o">-</span> <span class="n">STA</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">ROBBERY</span> <span class="o">-</span> <span class="n">INDIVIDUAL</span><span class="o">|</span>
+<span class="o">|</span><span class="n">WEAPON</span> <span class="n">VIOLATIONS</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">SEX</span> <span class="n">OFFENSE</span> <span class="o">-</span> <span class="n">PEE</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">AGGRAVATED</span> <span class="n">ASSAUL</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">LIQUOR</span> <span class="n">LAW</span> <span class="o">-</span> <span class="n">POSS</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">EMBEZZLEMENT</span> <span class="o">-</span> <span class="n">WI</span><span class="o">...|</span>
+<span class="o">|</span><span class="n">WEAPON</span> <span class="n">VIOLATIONS</span><span class="o">...|</span>
+<span class="o">|</span>             <span class="n">RUNAWAY</span><span class="o">|</span>
+<span class="o">+--------------------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">20</span> <span class="n">rows</span>
+</pre></div>
+</div>
+<p>What charges are the most common?</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;fields.chrgdesc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------------------+-----+</span>
+<span class="o">|</span>            <span class="n">chrgdesc</span><span class="o">|</span><span class="n">count</span><span class="o">|</span>
+<span class="o">+--------------------+-----+</span>
+<span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">FORCIB</span><span class="o">...|</span><span class="mi">11630</span><span class="o">|</span>
+<span class="o">|</span><span class="n">LARCENY</span> <span class="o">-</span> <span class="n">SHOPLIF</span><span class="o">...|</span> <span class="mi">7633</span><span class="o">|</span>
+<span class="o">|</span><span class="n">LARCENY</span> <span class="o">-</span> <span class="n">FROM</span> <span class="n">MO</span><span class="o">...|</span> <span class="mi">7405</span><span class="o">|</span>
+<span class="o">|</span><span class="n">SIMPLE</span> <span class="n">ASSAULT</span> <span class="p">(</span><span class="n">P</span><span class="o">...|</span> <span class="mi">5085</span><span class="o">|</span>
+<span class="o">|</span> <span class="n">LARCENY</span> <span class="o">-</span> <span class="n">ALL</span> <span class="n">OTHER</span><span class="o">|</span> <span class="mi">4666</span><span class="o">|</span>
+<span class="o">|</span><span class="n">LARCENY</span> <span class="o">-</span> <span class="n">FROM</span> <span class="n">BU</span><span class="o">...|</span> <span class="mi">4514</span><span class="o">|</span>
+<span class="o">|</span><span class="n">VANDALISM</span> <span class="n">TO</span> <span class="n">AUTO</span><span class="o">...|</span> <span class="mi">4112</span><span class="o">|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span> <span class="mi">3790</span><span class="o">|</span>
+<span class="o">|</span><span class="n">LARCENY</span> <span class="o">-</span> <span class="n">AUTOMOB</span><span class="o">...|</span> <span class="mi">3441</span><span class="o">|</span>
+<span class="o">|</span><span class="n">VANDALISM</span> <span class="n">TO</span> <span class="n">PROP</span><span class="o">...|</span> <span class="mi">3422</span><span class="o">|</span>
+<span class="o">|</span><span class="n">CALLS</span> <span class="n">FOR</span> <span class="n">SERVICE</span><span class="o">...|</span> <span class="mi">3207</span><span class="o">|</span>
+<span class="o">|</span>  <span class="n">AGGRAVATED</span> <span class="n">ASSAULT</span><span class="o">|</span> <span class="mi">3183</span><span class="o">|</span>
+<span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">NON</span><span class="o">-</span><span class="n">FO</span><span class="o">...|</span> <span class="mi">2339</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ROBBERY</span> <span class="o">-</span> <span class="n">INDIVIDUAL</span><span class="o">|</span> <span class="mi">2330</span><span class="o">|</span>
+<span class="o">|</span><span class="n">TOWED</span><span class="o">/</span><span class="n">ABANDONED</span> <span class="n">V</span><span class="o">...|</span> <span class="mi">2244</span><span class="o">|</span>
+<span class="o">|</span><span class="n">MOTOR</span> <span class="n">VEHICLE</span> <span class="n">THE</span><span class="o">...|</span> <span class="mi">1970</span><span class="o">|</span>
+<span class="o">|</span><span class="n">DRIVING</span> <span class="n">WHILE</span> <span class="n">IMP</span><span class="o">...|</span> <span class="mi">1912</span><span class="o">|</span>
+<span class="o">|</span><span class="n">FRAUD</span> <span class="o">-</span> <span class="n">FALSE</span> <span class="n">PRE</span><span class="o">...|</span> <span class="mi">1660</span><span class="o">|</span>
+<span class="o">|</span>      <span class="n">FOUND</span> <span class="n">PROPERTY</span><span class="o">|</span> <span class="mi">1643</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">TRAFFIC</span> <span class="p">(</span><span class="n">EXCE</span><span class="o">...|</span> <span class="mi">1436</span><span class="o">|</span>
+<span class="o">+--------------------+-----+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">20</span> <span class="n">rows</span>
+</pre></div>
+</div>
+<div class="section" id="register-as-table-to-run-full-sql-queries">
+<h3>Register as table to run full SQL queries<a class="headerlink" href="#register-as-table-to-run-full-sql-queries" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">registerTempTable</span><span class="p">(</span><span class="s1">&#39;crimes&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">select fields.chrgdesc, count(fields.chrgdesc) as count</span>
+<span class="s1">from crimes</span>
+<span class="s1">where fields.monthstamp=3</span>
+<span class="s1">group by fields.chrgdesc</span>
+<span class="s1">&#39;&#39;&#39;</span><span class="p">)</span>
+<span class="n">q</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------------------+-----+</span>
+<span class="o">|</span>            <span class="n">chrgdesc</span><span class="o">|</span><span class="n">count</span><span class="o">|</span>
+<span class="o">+--------------------+-----+</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>    <span class="mi">1</span><span class="o">|</span>
+<span class="o">|</span><span class="n">TOWED</span><span class="o">/</span><span class="n">ABANDONED</span> <span class="n">V</span><span class="o">...|</span>  <span class="mi">258</span><span class="o">|</span>
+<span class="o">|</span> <span class="n">ASSIST</span> <span class="n">OTHER</span> <span class="n">AGENCY</span><span class="o">|</span>   <span class="mi">19</span><span class="o">|</span>
+<span class="o">|</span><span class="n">BURGLARY</span> <span class="o">-</span> <span class="n">FORCIB</span><span class="o">...|</span>  <span class="mi">929</span><span class="o">|</span>
+<span class="o">|</span><span class="n">SEX</span> <span class="n">OFFENSE</span> <span class="o">-</span> <span class="n">STA</span><span class="o">...|</span>    <span class="mi">3</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ROBBERY</span> <span class="o">-</span> <span class="n">INDIVIDUAL</span><span class="o">|</span>  <span class="mi">157</span><span class="o">|</span>
+<span class="o">|</span><span class="n">WEAPON</span> <span class="n">VIOLATIONS</span><span class="o">...|</span>    <span class="mi">6</span><span class="o">|</span>
+<span class="o">|</span><span class="n">SEX</span> <span class="n">OFFENSE</span> <span class="o">-</span> <span class="n">PEE</span><span class="o">...|</span>    <span class="mi">5</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>    <span class="mi">8</span><span class="o">|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span>   <span class="mi">14</span><span class="o">|</span>
+<span class="o">|</span><span class="n">DRUG</span><span class="o">/</span><span class="n">NARCOTIC</span> <span class="n">VIO</span><span class="o">...|</span>   <span class="mi">28</span><span class="o">|</span>
+<span class="o">|</span><span class="n">AGGRAVATED</span> <span class="n">ASSAUL</span><span class="o">...|</span>    <span class="mi">1</span><span class="o">|</span>
+<span class="o">|</span><span class="n">LIQUOR</span> <span class="n">LAW</span> <span class="o">-</span> <span class="n">POSS</span><span class="o">...|</span>    <span class="mi">2</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>    <span class="mi">3</span><span class="o">|</span>
+<span class="o">|</span><span class="n">EMBEZZLEMENT</span> <span class="o">-</span> <span class="n">WI</span><span class="o">...|</span>    <span class="mi">7</span><span class="o">|</span>
+<span class="o">|</span><span class="n">WEAPON</span> <span class="n">VIOLATIONS</span><span class="o">...|</span>    <span class="mi">1</span><span class="o">|</span>
+<span class="o">|</span>             <span class="n">RUNAWAY</span><span class="o">|</span>   <span class="mi">87</span><span class="o">|</span>
+<span class="o">|</span>      <span class="n">MISSING</span> <span class="n">PERSON</span><span class="o">|</span>   <span class="mi">16</span><span class="o">|</span>
+<span class="o">|</span><span class="n">SIMPLE</span> <span class="n">ASSAULT</span><span class="o">-</span><span class="n">PH</span><span class="o">...|</span>    <span class="mi">3</span><span class="o">|</span>
+<span class="o">|</span><span class="n">ALL</span> <span class="n">OTHER</span> <span class="n">OFFENSE</span><span class="o">...|</span>   <span class="mi">22</span><span class="o">|</span>
+<span class="o">+--------------------+-----+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">20</span> <span class="n">rows</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="convert-to-pandas">
+<h3>Convert to <code class="docutils literal"><span class="pre">pandas</span></code><a class="headerlink" href="#convert-to-pandas" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">crimes_df</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
+<span class="n">crimes_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>chrgdesc</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>ALL OTHER OFFENSES-BIGAMY/MARRIAGE LAWS</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>TOWED/ABANDONED VEHICLE</td>
+      <td>258</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>ASSIST OTHER AGENCY</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>BURGLARY - FORCIBLE ENTRY</td>
+      <td>929</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>SEX OFFENSE - STATUTORY RAPE</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="dataframe-from-sqlite3">
+<h2>DataFrame from SQLite3<a class="headerlink" href="#dataframe-from-sqlite3" title="Permalink to this headline">¶</a></h2>
+<p>The official docs suggest that this can be done directly via JDBC but I
+cannot get it to work. As a workaround, you can convert to JSON before
+importing as a dataframe. If anyone finds out how to load an SQLite3
+database table directly into a Spark dataframe, please let me know.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">odo</span> <span class="k">import</span> <span class="n">odo</span>
+
+<span class="n">odo</span><span class="p">(</span><span class="s1">&#39;sqlite:///../data/Chinook_Sqlite.sqlite::Album&#39;</span><span class="p">,</span> <span class="s1">&#39;Album.json&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s1">&#39;Album.json&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+-------+--------+--------------------+</span>
+<span class="o">|</span><span class="n">AlbumId</span><span class="o">|</span><span class="n">ArtistId</span><span class="o">|</span>               <span class="n">Title</span><span class="o">|</span>
+<span class="o">+-------+--------+--------------------+</span>
+<span class="o">|</span>      <span class="mi">1</span><span class="o">|</span>       <span class="mi">1</span><span class="o">|</span><span class="n">For</span> <span class="n">Those</span> <span class="n">About</span> <span class="n">T</span><span class="o">...|</span>
+<span class="o">|</span>      <span class="mi">2</span><span class="o">|</span>       <span class="mi">2</span><span class="o">|</span>   <span class="n">Balls</span> <span class="n">to</span> <span class="n">the</span> <span class="n">Wall</span><span class="o">|</span>
+<span class="o">|</span>      <span class="mi">3</span><span class="o">|</span>       <span class="mi">2</span><span class="o">|</span>   <span class="n">Restless</span> <span class="ow">and</span> <span class="n">Wild</span><span class="o">|</span>
+<span class="o">+-------+--------+--------------------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">3</span> <span class="n">rows</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="datasets">
+<h2>DataSets<a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>In Scala and Java, Spark 1.6 introduced a new type called <code class="docutils literal"><span class="pre">DataSet</span></code>
+that combines the relational properties of a <code class="docutils literal"><span class="pre">DataFrame</span></code> with the
+functional methods of an <code class="docutils literal"><span class="pre">RDD</span></code>. This will be available in Python in a
+later version. However, because of the dynamic nature of Python, you can
+already call functional methods on a Spark <code class="docutils literal"><span class="pre">Dataframe</span></code>, giving most of
+the ease of use of the <code class="docutils literal"><span class="pre">DataSet</span></code> type.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">sqlc</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="s1">&#39;../data/Ulysses.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ds</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">DataFrame</span><span class="p">[</span><span class="n">value</span><span class="p">:</span> <span class="n">string</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ds</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">+--------------------+</span>
+<span class="o">|</span>               <span class="n">value</span><span class="o">|</span>
+<span class="o">+--------------------+</span>
+<span class="o">|</span><span class="n">The</span> <span class="n">Project</span> <span class="n">Guten</span><span class="o">...|</span>
+<span class="o">|</span>                    <span class="o">|</span>
+<span class="o">|</span><span class="n">This</span> <span class="n">eBook</span> <span class="ow">is</span> <span class="k">for</span><span class="o">...|</span>
+<span class="o">+--------------------+</span>
+<span class="n">only</span> <span class="n">showing</span> <span class="n">top</span> <span class="mi">3</span> <span class="n">rows</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">remove_punctuation</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">string</span>
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">remove_punctuation</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>  <span class="n">x</span><span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">countByKey</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">sorted</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">15107</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">8257</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">7282</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">6553</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="mi">5042</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="mi">4981</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;he&#39;</span><span class="p">,</span> <span class="mi">4033</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;his&#39;</span><span class="p">,</span> <span class="mi">3333</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">2698</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="mi">2621</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p><strong>Optional Exercise</strong></p>
+<p>The crime data set includes both date and geospatial information.
+Consider creating an interactive map visualization of crimes in Durham
+by date using the <code class="docutils literal"><span class="pre">bokeh</span></code> package. See this
+<a class="reference external" href="http://bokeh.pydata.org/en/0.11.1/docs/user_guide/geo.html">example</a>
+to get started. GeoJSON version of the Durham Police Crime Reports can
+be
+<a class="reference external" href="https://opendurham.nc.gov/explore/dataset/durham-police-crime-reports/download/?format=geojson&amp;timezone=America/New_York">downloaded</a>.</p>
+<div class="section" id="version-information">
+<h3>Version information<a class="headerlink" href="#version-information" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">version_information</span>
+<span class="o">%</span><span class="n">version_information</span> <span class="n">pyspark</span>
+</pre></div>
+</div>
+<table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.3</td></tr><tr><td>OS</td><td>Darwin 15.4.0 x86_64 i386 64bit</td></tr><tr><td>pyspark</td><td>The 'pyspark' distribution was not found and is required by the application</td></tr><tr><td colspan='2'>Wed Apr 20 11:54:43 2016 EDT</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spark SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe-from-pandas">DataFrame from <code class="docutils literal"><span class="pre">pandas</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe-from-csv-files">DataFrame from CSV files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe-from-json-files">DataFrame from JSON files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe-from-sqlite3">DataFrame from SQLite3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">DataSets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="18D_Spark_MLib.html"
+                          title="Previous page">&larr; Spark MLLib</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="18F_Spark_GraphX.html"
+                          title="Next page">&rarr; &lt;no title&gt;</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/18E_Spark_SQL.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="18F_Spark_GraphX.html" title="&lt;no title&gt;"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18D_Spark_MLib.html" title="Spark MLLib"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18E_Spark_SQL.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:37 GMT -->
+</html>

@@ -1,0 +1,769 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/16_PGM.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:12 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Probabilistic Graphical Models with pgmpy &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Working with large data sets" href="17_Functional_Programming.html" />
+    <link rel="prev" title="Numerical Evaluation of Integrals" href="15C_MonteCarloIntegration.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="17_Functional_Programming.html" title="Working with large data sets"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="15C_MonteCarloIntegration.html" title="Numerical Evaluation of Integrals"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="probabilistic-graphical-models-with-pgmpy">
+<h1>Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code><a class="headerlink" href="#probabilistic-graphical-models-with-pgmpy" title="Permalink to this headline">¶</a></h1>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>!pip install pgmpy
+</pre></div>
+</div>
+<pre class="literal-block">
+Collecting pgmpy
+  Downloading pgmpy-0.1.2.tar.gz (147kB)
+[K    100% <a href="#id1"><span class="problematic" id="id2">|████████████████████████████████|</span></a> 153kB 5.9MB/s
+[?25hRequirement already satisfied (use --upgrade to upgrade): networkx&gt;=1.8.1 in /opt/conda/lib/python3.5/site-packages (from pgmpy)
+Requirement already satisfied (use --upgrade to upgrade): scipy&gt;=0.12.1 in /opt/conda/lib/python3.5/site-packages (from pgmpy)
+Requirement already satisfied (use --upgrade to upgrade): numpy&gt;=1.7.0 in /opt/conda/lib/python3.5/site-packages (from pgmpy)
+Requirement already satisfied (use --upgrade to upgrade): nose&gt;=1.3.0 in /opt/conda/lib/python3.5/site-packages (from pgmpy)
+Collecting coveralls&gt;=0.4 (from pgmpy)
+  Downloading coveralls-1.1-py2.py3-none-any.whl
+Requirement already satisfied (use --upgrade to upgrade): decorator&gt;=3.4.0 in /opt/conda/lib/python3.5/site-packages (from networkx&gt;=1.8.1-&gt;pgmpy)
+Collecting docopt&gt;=0.6.1 (from coveralls&gt;=0.4-&gt;pgmpy)
+  Downloading docopt-0.6.2.tar.gz
+Collecting coverage&gt;=3.6 (from coveralls&gt;=0.4-&gt;pgmpy)
+  Downloading coverage-4.3.4-cp35-cp35m-manylinux1_x86_64.whl (191kB)
+[K    100% <a href="#id3"><span class="problematic" id="id4">|████████████████████████████████|</span></a> 194kB 4.7MB/s
+[?25hRequirement already satisfied (use --upgrade to upgrade): requests&gt;=1.0.0 in /opt/conda/lib/python3.5/site-packages (from coveralls&gt;=0.4-&gt;pgmpy)
+Building wheels for collected packages: pgmpy, docopt
+  Running setup.py bdist_wheel for pgmpy ... [?25l-  | done
+[?25h  Stored in directory: /home/jovyan/.cache/pip/wheels/d3/21/0f/5b1fc282ee2ab16b693c1a0ed9cb8fde44dbaa28d907c90ff4
+  Running setup.py bdist_wheel for docopt ... [?25l-  done
+[?25h  Stored in directory: /home/jovyan/.cache/pip/wheels/b2/16/5f/c33a2bb5f2dce71205f8e65cbfd05647d79d441282be31fd82
+Successfully built pgmpy docopt
+Installing collected packages: docopt, coverage, coveralls, pgmpy
+Successfully installed coverage-4.3.4 coveralls-1.1 docopt-0.6.2 pgmpy-0.1.2
+[33mYou are using pip version 8.1.2, however version 9.0.1 is available.
+You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pgmpy.factors</span> <span class="k">import</span> <span class="n">TabularCPD</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Declare a CPD</span>
+<span class="n">grade_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="s2">&quot;G&quot;</span><span class="p">,</span>
+    <span class="n">variable_card</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]],</span>
+    <span class="n">evidence</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">],</span>
+    <span class="n">evidence_card</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">grade_cpd</span>
+</pre></div>
+</div>
+<table><caption>TabularCPD for <b>G</b></caption><tr><td><b>D</b></td><td colspan=2>D_0</td><td colspan=2>D_1</td></tr><tr><td><b>I</b></td><td colspan=1>I_0</td><td colspan=1>I_1</td><td colspan=1>I_0</td><td colspan=1>I_1</td></tr><tr><td><b>G_0</b></td><td>0.3000</td><td>0.0500</td><td>0.9000</td><td>0.5000</td></tr><tr><td><b>G_1</b></td><td>0.4000</td><td>0.2500</td><td>0.0800</td><td>0.3000</td></tr><tr><td><b>G_2</b></td><td>0.3000</td><td>0.7000</td><td>0.0200</td><td>0.2000</td></tr></table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Declare the sudent model in pgmpy</span>
+
+<span class="kn">from</span> <span class="nn">pgmpy.models</span> <span class="k">import</span> <span class="n">BayesianModel</span>
+<span class="kn">from</span> <span class="nn">pgmpy.factors</span> <span class="k">import</span> <span class="n">TabularCPD</span>
+
+<span class="c1"># Define nodes and edges</span>
+<span class="n">student_model</span> <span class="o">=</span> <span class="n">BayesianModel</span><span class="p">([(</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">),</span>
+<span class="p">(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">)])</span>
+
+<span class="c1">#Define CPDs</span>
+
+<span class="n">grade_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span>
+<span class="n">variable</span><span class="o">=</span><span class="s2">&quot;G&quot;</span><span class="p">,</span>
+<span class="n">variable_card</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+<span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span>
+<span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]],</span>
+<span class="n">evidence</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">],</span>
+<span class="n">evidence_card</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+
+<span class="n">difficulty_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span>
+<span class="n">variable</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span>
+<span class="n">variable_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]])</span>
+
+<span class="n">intel_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span>
+<span class="n">variable</span><span class="o">=</span><span class="s2">&quot;I&quot;</span><span class="p">,</span>
+<span class="n">variable_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]])</span>
+
+<span class="n">letter_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span>
+<span class="n">variable</span><span class="o">=</span><span class="s2">&quot;L&quot;</span><span class="p">,</span>
+<span class="n">variable_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">],</span>
+<span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]],</span>
+<span class="n">evidence</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;G&quot;</span><span class="p">],</span>
+<span class="n">evidence_card</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="n">sat_cpd</span> <span class="o">=</span> <span class="n">TabularCPD</span><span class="p">(</span>
+<span class="n">variable</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">,</span>
+<span class="n">variable_card</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+<span class="p">[</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]],</span>
+<span class="n">evidence</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;I&quot;</span><span class="p">],</span>
+<span class="n">evidence_card</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+
+<span class="c1">#Add CPDs to nodes and edges</span>
+<span class="n">student_model</span><span class="o">.</span><span class="n">add_cpds</span><span class="p">(</span><span class="n">grade_cpd</span><span class="p">,</span> <span class="n">difficulty_cpd</span><span class="p">,</span>
+<span class="n">intel_cpd</span><span class="p">,</span> <span class="n">letter_cpd</span><span class="p">,</span>
+<span class="n">sat_cpd</span><span class="p">)</span>
+
+<span class="n">grade_cpd</span>
+</pre></div>
+</div>
+<table><caption>TabularCPD for <b>G</b></caption><tr><td><b>D</b></td><td colspan=2>D_0</td><td colspan=2>D_1</td></tr><tr><td><b>I</b></td><td colspan=1>I_0</td><td colspan=1>I_1</td><td colspan=1>I_0</td><td colspan=1>I_1</td></tr><tr><td><b>G_0</b></td><td>0.3000</td><td>0.0500</td><td>0.9000</td><td>0.5000</td></tr><tr><td><b>G_1</b></td><td>0.4000</td><td>0.2500</td><td>0.0800</td><td>0.3000</td></tr><tr><td><b>G_2</b></td><td>0.3000</td><td>0.7000</td><td>0.0200</td><td>0.2000</td></tr></table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">get_cpds</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table><caption>TabularCPD for <b>G</b></caption><tr><td><b>D</b></td><td colspan=2>D_0</td><td colspan=2>D_1</td></tr><tr><td><b>I</b></td><td colspan=1>I_0</td><td colspan=1>I_1</td><td colspan=1>I_0</td><td colspan=1>I_1</td></tr><tr><td><b>G_0</b></td><td>0.3000</td><td>0.0500</td><td>0.9000</td><td>0.5000</td></tr><tr><td><b>G_1</b></td><td>0.4000</td><td>0.2500</td><td>0.0800</td><td>0.3000</td></tr><tr><td><b>G_2</b></td><td>0.3000</td><td>0.7000</td><td>0.0200</td><td>0.2000</td></tr></table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">get_parents</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pgmpy.inference</span> <span class="k">import</span> <span class="n">VariableElimination</span>
+
+<span class="n">student_infer</span> <span class="o">=</span> <span class="n">VariableElimination</span><span class="p">(</span><span class="n">student_model</span><span class="p">)</span>
+
+<span class="n">prob_G</span> <span class="o">=</span> <span class="n">student_infer</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">prob_G</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>╒═════╤══════════╕
+│ G   │   phi(G) │
+╞═════╪══════════╡
+│ G_0 │   0.4470 │
+├─────┼──────────┤
+│ G_1 │   0.2714 │
+├─────┼──────────┤
+│ G_2 │   0.2816 │
+╘═════╧══════════╛
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">prob_G</span> <span class="o">=</span> <span class="n">student_infer</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">evidence</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">prob_G</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>╒═════╤══════════╕
+│ G   │   phi(G) │
+╞═════╪══════════╡
+│ G_0 │   0.0500 │
+├─────┼──────────┤
+│ G_1 │   0.2500 │
+├─────┼──────────┤
+│ G_2 │   0.7000 │
+╘═════╧══════════╛
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">prob_G</span> <span class="o">=</span> <span class="n">student_infer</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">evidence</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;I&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">prob_G</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>╒═════╤══════════╕
+│ G   │   phi(G) │
+╞═════╪══════════╡
+│ G_0 │   0.9000 │
+├─────┼──────────┤
+│ G_1 │   0.0800 │
+├─────┼──────────┤
+│ G_2 │   0.0200 │
+╘═════╧══════════╛
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#Train Model from Data</span>
+
+<span class="kn">from</span> <span class="nn">pgmpy.models</span> <span class="k">import</span> <span class="n">BayesianModel</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># Considering that each variable have only 2 states,</span>
+<span class="c1"># we can generate some random data.</span>
+
+<span class="n">raw_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">high</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">0.75</span><span class="p">)])</span>
+
+<span class="n">data_train</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.75</span><span class="p">)]</span>
+
+<span class="n">student_model</span> <span class="o">=</span> <span class="n">BayesianModel</span><span class="p">([(</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">),(</span><span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">),(</span><span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;L&quot;</span><span class="p">)])</span>
+<span class="n">student_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data_train</span><span class="p">)</span>
+<span class="n">student_model</span><span class="o">.</span><span class="n">get_cpds</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>     <span class="n">D</span>  <span class="n">I</span>  <span class="n">G</span>  <span class="n">L</span>  <span class="n">S</span>
+<span class="mi">0</span>    <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">1</span>    <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">2</span>    <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">3</span>    <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">4</span>    <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">5</span>    <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">6</span>    <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">7</span>    <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">8</span>    <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">9</span>    <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">10</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">11</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">12</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">13</span>   <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">14</span>   <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">15</span>   <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">16</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">17</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">18</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">19</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">20</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">21</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">22</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">23</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">24</span>   <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">25</span>   <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">26</span>   <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">27</span>   <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">28</span>   <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">29</span>   <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="o">..</span>  <span class="o">..</span> <span class="o">..</span> <span class="o">..</span> <span class="o">..</span> <span class="o">..</span>
+<span class="mi">720</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">721</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">722</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">723</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">724</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">725</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">726</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">727</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">728</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">729</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">730</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">731</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">732</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">733</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">734</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">735</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">736</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">737</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">738</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">739</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>
+<span class="mi">740</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">741</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">742</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">743</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">744</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">745</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">746</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">0</span>
+<span class="mi">747</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">748</span>  <span class="mi">1</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>
+<span class="mi">749</span>  <span class="mi">0</span>  <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">1</span>  <span class="mi">1</span>
+
+<span class="p">[</span><span class="mi">750</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">5</span> <span class="n">columns</span><span class="p">]</span>
+</pre></div>
+</div>
+<table><caption>TabularCPD for <b>D</b></caption><tr><td><b>D_0</b></td><td>0.4400</td></tr><tr><td><b>D_1</b></td><td>0.5600</td></tr></table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">get_cpds</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table><caption>TabularCPD for <b>L</b></caption><tr><td><b>G</b></td><td colspan=1>G_0</td><td colspan=1>G_1</td></tr><tr><td><b>L_0</b></td><td>0.4545</td><td>0.5000</td></tr><tr><td><b>L_1</b></td><td>0.5455</td><td>0.5000</td></tr></table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">active_trail_nodes</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">local_independencies</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">G</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">S</span> <span class="o">|</span> <span class="n">D</span><span class="p">,</span> <span class="n">I</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_model</span><span class="o">.</span><span class="n">get_independencies</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">G</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">L</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">D</span><span class="p">)</span>
+<span class="p">(</span><span class="n">G</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">L</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">S</span><span class="p">)</span>
+<span class="p">(</span><span class="n">G</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">L</span><span class="p">)</span>
+<span class="p">(</span><span class="n">G</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">L</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">I</span><span class="p">)</span>
+<span class="p">(</span><span class="n">D</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">G</span><span class="p">)</span>
+<span class="p">(</span><span class="n">D</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">L</span> <span class="o">|</span> <span class="n">S</span><span class="p">)</span>
+<span class="p">(</span><span class="n">D</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">L</span><span class="p">)</span>
+<span class="p">(</span><span class="n">D</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">L</span> <span class="o">|</span> <span class="n">I</span><span class="p">)</span>
+<span class="p">(</span><span class="n">S</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">G</span><span class="p">)</span>
+<span class="p">(</span><span class="n">S</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">L</span> <span class="o">|</span> <span class="n">D</span><span class="p">)</span>
+<span class="p">(</span><span class="n">S</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">L</span><span class="p">)</span>
+<span class="p">(</span><span class="n">L</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">D</span><span class="p">)</span>
+<span class="p">(</span><span class="n">L</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">S</span><span class="p">)</span>
+<span class="p">(</span><span class="n">L</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">D</span> <span class="o">|</span> <span class="n">I</span><span class="p">)</span>
+<span class="p">(</span><span class="n">I</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">D</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">G</span><span class="p">)</span>
+<span class="p">(</span><span class="n">I</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">L</span> <span class="o">|</span> <span class="n">D</span><span class="p">)</span>
+<span class="p">(</span><span class="n">I</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">L</span> <span class="o">|</span> <span class="n">S</span><span class="p">)</span>
+<span class="p">(</span><span class="n">I</span> <span class="n">_</span><span class="o">|</span><span class="n">_</span> <span class="n">G</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">S</span> <span class="o">|</span> <span class="n">L</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_test</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.75</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+<span class="n">data_test</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">student_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">ipykernel</span><span class="o">/</span><span class="n">__main__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">3</span><span class="p">:</span> <span class="n">SettingWithCopyWarning</span><span class="p">:</span>
+<span class="n">A</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">trying</span> <span class="n">to</span> <span class="n">be</span> <span class="nb">set</span> <span class="n">on</span> <span class="n">a</span> <span class="n">copy</span> <span class="n">of</span> <span class="n">a</span> <span class="nb">slice</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">DataFrame</span>
+
+<span class="n">See</span> <span class="n">the</span> <span class="n">caveats</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">documentation</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">pandas</span><span class="o">.</span><span class="n">pydata</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pandas</span><span class="o">-</span><span class="n">docs</span><span class="o">/</span><span class="n">stable</span><span class="o">/</span><span class="n">indexing</span><span class="o">.</span><span class="n">html</span><span class="c1">#indexing-view-versus-copy</span>
+  <span class="n">app</span><span class="o">.</span><span class="n">launch_new_instance</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>G</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>750</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>751</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>752</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>753</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>754</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>755</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>756</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>757</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>758</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>759</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>760</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>761</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>762</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>763</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>764</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>765</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>766</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>767</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>768</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>769</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>770</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>771</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>772</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>773</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>774</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>775</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>776</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>777</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>778</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>779</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>970</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>971</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>972</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>973</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>974</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>975</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>976</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>977</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>978</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>979</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>980</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>981</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>982</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>983</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>984</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>985</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>986</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>987</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>988</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>989</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>990</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>991</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>992</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>993</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>994</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>995</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>996</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>997</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>998</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>999</th>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>250 rows × 1 columns</p>
+</div></div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="15C_MonteCarloIntegration.html"
+                          title="Previous page">&larr; Numerical Evaluation of Integrals</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="17_Functional_Programming.html"
+                          title="Next page">&rarr; Working with large data sets</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/16_PGM.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="17_Functional_Programming.html" title="Working with large data sets"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="15C_MonteCarloIntegration.html" title="Numerical Evaluation of Integrals"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/16_PGM.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:13 GMT -->
+</html>

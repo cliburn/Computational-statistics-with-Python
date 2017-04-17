@@ -1,0 +1,2104 @@
+
+Symbolic Algebra with ``sympy``
+===============================
+
+.. code:: python
+
+    from sympy import *
+
+.. code:: python
+
+    from sympy import init_session
+    init_session()
+
+
+.. parsed-literal::
+
+    IPython console for SymPy 0.7.6.1 (Python 3.5.1-64-bit) (ground types: python)
+    
+    These commands were executed:
+    >>> from __future__ import division
+    >>> from sympy import *
+    >>> x, y, z, t = symbols('x y z t')
+    >>> k, m, n = symbols('k m n', integer=True)
+    >>> f, g, h = symbols('f g h', cls=Function)
+    >>> init_printing()
+    
+    Documentation can be found at http://www.sympy.org
+
+
+Basics
+------
+
+.. code:: python
+
+    from sympy.stats import *
+    E(Die('X', 6))
+
+
+
+
+.. math::
+
+    \frac{7}{2}
+
+
+
+.. code:: python
+
+    sqrt(8)
+
+
+
+
+.. math::
+
+    2 \sqrt{2}
+
+
+
+.. code:: python
+
+    expr = x + 2*y
+
+.. code:: python
+
+    expr2 = x*expr
+
+.. code:: python
+
+    expr2
+
+
+
+
+.. math::
+
+    x \left(x + 2 y\right)
+
+
+
+.. code:: python
+
+    expand(expr2)
+
+
+
+
+.. math::
+
+    x^{2} + 2 x y
+
+
+
+.. code:: python
+
+    factor(expand(expr2))
+
+
+
+
+.. math::
+
+    x \left(x + 2 y\right)
+
+
+
+.. code:: python
+
+    diff(sin(x) * exp(x), x)
+
+
+
+
+.. math::
+
+    e^{x} \sin{\left (x \right )} + e^{x} \cos{\left (x \right )}
+
+
+
+.. code:: python
+
+    integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
+
+
+
+
+.. math::
+
+    e^{x} \sin{\left (x \right )}
+
+
+
+.. code:: python
+
+    integrate(sin(x**2), (x, -oo, oo))
+
+
+
+
+.. math::
+
+    \frac{\sqrt{2} \sqrt{\pi}}{2}
+
+
+
+.. code:: python
+
+    dsolve(Eq(f(t).diff(t, t) - f(t), exp(t)), f(t))
+
+
+
+
+.. math::
+
+    f{\left (t \right )} = C_{2} e^{- t} + \left(C_{1} + \frac{t}{2}\right) e^{t}
+
+
+
+.. code:: python
+
+    Matrix([[1,2],[2,2]]).eigenvals()
+
+
+
+
+.. math::
+
+    \left \{ \frac{3}{2} + \frac{\sqrt{17}}{2} : 1, \quad - \frac{\sqrt{17}}{2} + \frac{3}{2} : 1\right \}
+
+
+
+.. code:: python
+
+    nu = symbols('nu')
+    besselj(nu, z).rewrite(jn)
+
+
+
+
+.. math::
+
+    \frac{\sqrt{2} \sqrt{z}}{\sqrt{\pi}} j_{\nu - \frac{1}{2}}\left(z\right)
+
+
+
+.. code:: python
+
+    latex(Integral(cos(x)**2, (x, 0, pi)))
+
+
+
+
+.. parsed-literal::
+
+    '\\int_{0}^{\\pi} \\cos^{2}{\\left (x \\right )}\\, dx'
+
+
+
+.. code:: python
+
+    expr = cos(x) + 1
+
+.. code:: python
+
+    expr.subs(x, y)
+
+
+
+
+.. math::
+
+    \cos{\left (y \right )} + 1
+
+
+
+.. code:: python
+
+    expr = x**y
+    expr = expr.subs(y, x**y)
+    expr = expr.subs(y, x**y)
+    expr = expr.subs(x, x**x)
+
+.. code:: python
+
+    expr
+
+
+
+
+.. math::
+
+    \left(x^{x}\right)^{\left(x^{x}\right)^{\left(x^{x}\right)^{y}}}
+
+
+
+.. code:: python
+
+    expr = sin(2*x) + cos(2*x)
+    expand_trig(expr)
+
+
+
+
+.. math::
+
+    2 \sin{\left (x \right )} \cos{\left (x \right )} + 2 \cos^{2}{\left (x \right )} - 1
+
+
+
+.. code:: python
+
+    expr.subs(sin(2*x), 2*sin(x)*cos(x))
+
+
+
+
+.. math::
+
+    2 \sin{\left (x \right )} \cos{\left (x \right )} + \cos{\left (2 x \right )}
+
+
+
+.. code:: python
+
+    expr = x**4 - 4*x**3 + 4*x**2 - 2*x +3
+
+.. code:: python
+
+    replacements = [(x**i, y**i) for i in range(5) if i%2 == 0]
+    expr.subs(replacements)
+
+
+
+
+.. math::
+
+    - 4 x^{3} - 2 x + y^{4} + 4 y^{2} + 3
+
+
+
+.. code:: python
+
+    sexpr = "x**4 - 4*x**3 + 4*x**2 - 2*x +3"
+    sympify(sexpr)
+
+
+
+
+.. math::
+
+    x^{4} - 4 x^{3} + 4 x^{2} - 2 x + 3
+
+
+
+.. code:: python
+
+    sqrt(8).evalf()
+
+
+
+
+.. math::
+
+    2.82842712474619
+
+
+
+.. code:: python
+
+    pi.evalf(100)
+
+
+
+
+.. math::
+
+    3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
+
+
+
+.. code:: python
+
+    expr = cos(2*x)
+    expr.evalf(subs = {x: 2.4})
+
+
+
+
+.. math::
+
+    0.0874989834394464
+
+
+
+.. code:: python
+
+    expr = cos(x)**2 + sin(x)**2
+    expr.evalf(subs = {x: 1}, chop=True)
+
+
+
+
+.. math::
+
+    1.0
+
+
+
+.. code:: python
+
+    a = range(10)
+    expr = sin(x)
+    f = lambdify(x, expr, "numpy")
+    f(a)
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.        ,  0.84147098,  0.90929743,  0.14112001, -0.7568025 ,
+           -0.95892427, -0.2794155 ,  0.6569866 ,  0.98935825,  0.41211849])
+
+
+
+Simplify
+--------
+
+.. code:: python
+
+    simplify(sin(x)**2 + cos(x)**2)
+
+
+
+
+.. math::
+
+    1
+
+
+
+.. code:: python
+
+    simplify(gamma(x) / gamma(x-2))
+
+
+
+
+.. math::
+
+    \left(x - 2\right) \left(x - 1\right)
+
+
+
+.. code:: python
+
+    expand((x + y)**3)
+
+
+
+
+.. math::
+
+    x^{3} + 3 x^{2} y + 3 x y^{2} + y^{3}
+
+
+
+.. code:: python
+
+    factor(x**3 - x**2 + x - 1)
+
+
+
+
+.. math::
+
+    \left(x - 1\right) \left(x^{2} + 1\right)
+
+
+
+.. code:: python
+
+    factor_list(x**3 - x**2 + x - 1)
+
+
+
+
+.. math::
+
+    \left ( 1, \quad \left [ \left ( x - 1, \quad 1\right ), \quad \left ( x^{2} + 1, \quad 1\right )\right ]\right )
+
+
+
+.. code:: python
+
+    expand((cos(x) + sin(x))**2)
+
+
+
+
+.. math::
+
+    \sin^{2}{\left (x \right )} + 2 \sin{\left (x \right )} \cos{\left (x \right )} + \cos^{2}{\left (x \right )}
+
+
+
+.. code:: python
+
+    expr = x*y + x - 3 + 2*x**2 - z*x**2 + x**3
+    cexpr = collect(expr, x)
+    cexpr
+
+
+
+
+.. math::
+
+    x^{3} + x^{2} \left(- z + 2\right) + x \left(y + 1\right) - 3
+
+
+
+.. code:: python
+
+    cexpr.coeff(x**2)
+
+
+
+
+.. math::
+
+    - z + 2
+
+
+
+.. code:: python
+
+    cancel((x**2 + 2*x + 1) / (x**2 + x))
+
+
+
+
+.. math::
+
+    \frac{1}{x} \left(x + 1\right)
+
+
+
+.. code:: python
+
+    expr = (x*y**2 - 2*x*y*z + x*z**2 + y**2 - 2*y*z + z**2)/(x**2 - 1)
+
+.. code:: python
+
+    cancel(expr)
+
+
+
+
+.. math::
+
+    \frac{1}{x - 1} \left(y^{2} - 2 y z + z^{2}\right)
+
+
+
+.. code:: python
+
+    factor(expr)
+
+
+
+
+.. math::
+
+    \frac{\left(y - z\right)^{2}}{x - 1}
+
+
+
+.. code:: python
+
+    expr = (4*x**3 + 21*x**2 + 10*x + 12)/(x**4 + 5*x**3 + 5*x**2 + 4*x)
+
+.. code:: python
+
+    apart(expr)
+
+
+
+
+.. math::
+
+    \frac{2 x - 1}{x^{2} + x + 1} - \frac{1}{x + 4} + \frac{3}{x}
+
+
+
+.. code:: python
+
+    trigsimp(sin(x)*tan(x)/sec(x))
+
+
+
+
+.. math::
+
+    \sin^{2}{\left (x \right )}
+
+
+
+.. code:: python
+
+    trigsimp(cosh(x)**2 + sinh(x)**2)
+
+
+
+
+.. math::
+
+    \cosh{\left (2 x \right )}
+
+
+
+.. code:: python
+
+    expand_trig(sin(x + y))
+
+
+
+
+.. math::
+
+    \sin{\left (x \right )} \cos{\left (y \right )} + \sin{\left (y \right )} \cos{\left (x \right )}
+
+
+
+.. code:: python
+
+    x, y = symbols('x y', positive=True)
+    a, b = symbols('a b', real=True)
+    z, t, c = symbols('z t c')
+
+.. code:: python
+
+    powsimp(x**a*x**b)
+
+
+
+
+.. math::
+
+    x^{a + b}
+
+
+
+.. code:: python
+
+    powsimp(x**a*y**a)
+
+
+
+
+.. math::
+
+    \left(x y\right)^{a}
+
+
+
+.. code:: python
+
+    powsimp(t**c*z**c)
+
+
+
+
+.. math::
+
+    t^{c} z^{c}
+
+
+
+.. code:: python
+
+    powsimp(t**c*z**c, force=True)
+
+
+
+
+.. math::
+
+    \left(t z\right)^{c}
+
+
+
+.. code:: python
+
+    expand_power_exp(x**(a + b))
+
+
+
+
+.. math::
+
+    x^{a} x^{b}
+
+
+
+.. code:: python
+
+    expand_power_base((x*y)**a)
+
+
+
+
+.. math::
+
+    x^{a} y^{a}
+
+
+
+.. code:: python
+
+    powdenest((x**a)**b)
+
+
+
+
+.. math::
+
+    x^{a b}
+
+
+
+.. code:: python
+
+    n = symbols('n', real=True)
+
+.. code:: python
+
+    expand_log(log(x*y))
+
+
+
+
+.. math::
+
+    \log{\left (x \right )} + \log{\left (y \right )}
+
+
+
+.. code:: python
+
+    expand_log(log(x**n))
+
+
+
+
+.. math::
+
+    n \log{\left (x \right )}
+
+
+
+.. code:: python
+
+    logcombine(n*log(x))
+
+
+
+
+.. math::
+
+    \log{\left (x^{n} \right )}
+
+
+
+.. code:: python
+
+    x, y, z = symbols('x y z')
+    k, m, n = symbols('k m n')
+
+.. code:: python
+
+    factorial(n)
+
+
+
+
+.. math::
+
+    n!
+
+
+
+.. code:: python
+
+    binomial(n, k)
+
+
+
+
+.. math::
+
+    {\binom{n}{k}}
+
+
+
+.. code:: python
+
+    hyper([1,2], [3], z)
+
+
+
+
+.. math::
+
+    {{}_{2}F_{1}\left(\begin{matrix} 1, 2 \\ 3 \end{matrix}\middle| {z} \right)}
+
+
+
+.. code:: python
+
+    factorial(x).rewrite(gamma)
+
+
+
+
+.. math::
+
+    \Gamma{\left(x + 1 \right)}
+
+
+
+.. code:: python
+
+    tan(x).rewrite(sin)
+
+
+
+
+.. math::
+
+    \frac{2 \sin^{2}{\left (x \right )}}{\sin{\left (2 x \right )}}
+
+
+
+.. code:: python
+
+    expand_func(gamma(x + 3))
+
+
+
+
+.. math::
+
+    x \left(x + 1\right) \left(x + 2\right) \Gamma{\left(x \right)}
+
+
+
+.. code:: python
+
+    hyperexpand(hyper([1, 1], [2], z))
+
+
+
+
+.. math::
+
+    - \frac{1}{z} \log{\left (- z + 1 \right )}
+
+
+
+.. code:: python
+
+    expr =  meijerg([[1],[1]], [[1],[]], -z)
+
+.. code:: python
+
+    expr
+
+
+
+
+.. math::
+
+    {G_{2, 1}^{1, 1}\left(\begin{matrix} 1 & 1 \\1 &  \end{matrix} \middle| {- z} \right)}
+
+
+
+.. code:: python
+
+    hyperexpand(expr)
+
+
+
+
+.. math::
+
+    e^{\frac{1}{z}}
+
+
+
+.. code:: python
+
+    combsimp(binomial(n+1, k+1)/binomial(n, k))
+
+
+
+
+.. math::
+
+    \frac{n + 1}{k + 1}
+
+
+
+.. code:: python
+
+    def list_to_frac(l):
+        expr = Integer(0)
+        for i in reversed(l[1:]):
+            expr += i
+            expr = 1/expr
+        return l[0] + expr
+
+.. code:: python
+
+    list_to_frac([1,2,3,4])
+
+
+
+
+.. math::
+
+    \frac{43}{30}
+
+
+
+.. code:: python
+
+    syms = symbols('a0:5')
+
+.. code:: python
+
+    syms
+
+
+
+
+.. math::
+
+    \left ( a_{0}, \quad a_{1}, \quad a_{2}, \quad a_{3}, \quad a_{4}\right )
+
+
+
+.. code:: python
+
+    frac = list_to_frac(syms)
+
+.. code:: python
+
+    frac
+
+
+
+
+.. math::
+
+    a_{0} + \frac{1}{a_{1} + \frac{1}{a_{2} + \frac{1}{a_{3} + \frac{1}{a_{4}}}}}
+
+
+
+.. code:: python
+
+    frac = cancel(frac)
+
+.. code:: python
+
+    frac
+
+
+
+
+.. math::
+
+    \frac{a_{0} a_{1} a_{2} a_{3} a_{4} + a_{0} a_{1} a_{2} + a_{0} a_{1} a_{4} + a_{0} a_{3} a_{4} + a_{0} + a_{2} a_{3} a_{4} + a_{2} + a_{4}}{a_{1} a_{2} a_{3} a_{4} + a_{1} a_{2} + a_{1} a_{4} + a_{3} a_{4} + 1}
+
+
+
+.. code:: python
+
+    from sympy.printing import print_ccode
+    print_ccode(frac)
+
+
+.. parsed-literal::
+
+    (a0*a1*a2*a3*a4 + a0*a1*a2 + a0*a1*a4 + a0*a3*a4 + a0 + a2*a3*a4 + a2 + a4)/(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)
+
+
+Calculus
+--------
+
+.. code:: python
+
+    diff(cos(x), x)
+
+
+
+
+.. math::
+
+    - \sin{\left (x \right )}
+
+
+
+.. code:: python
+
+    diff(x**4, x, 3)
+
+
+
+
+.. math::
+
+    24 x
+
+
+
+.. code:: python
+
+    expr = exp(x*y*z)
+    diff(expr, x, y, 2, z, 4)
+
+
+
+
+.. math::
+
+    x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}
+
+
+
+.. code:: python
+
+    deriv = Derivative(expr, x, y, 2, z, 4)
+    deriv
+
+
+
+
+.. math::
+
+    \frac{\partial^{7}}{\partial x\partial y^{2}\partial z^{4}}  e^{x y z}
+
+
+
+.. code:: python
+
+    deriv.doit()
+
+
+
+
+.. math::
+
+    x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}
+
+
+
+.. code:: python
+
+    integrate(cos(x), x)
+
+
+
+
+.. math::
+
+    \sin{\left (x \right )}
+
+
+
+.. code:: python
+
+    integrate(exp(-x), (x, 0, oo))
+
+
+
+
+.. math::
+
+    1
+
+
+
+.. code:: python
+
+    integrate(exp(-x**2 - y**2), (x, -oo, oo), (y, -oo, oo))
+
+
+
+
+.. math::
+
+    \pi
+
+
+
+.. code:: python
+
+    integrate(x**x, x)
+
+
+
+
+.. math::
+
+    \int x^{x}\, dx
+
+
+
+.. code:: python
+
+    expr = Integral(log(x)**2, x)
+    expr
+
+
+
+
+.. math::
+
+    \int \log^{2}{\left (x \right )}\, dx
+
+
+
+.. code:: python
+
+    expr.doit()
+
+
+
+
+.. math::
+
+    x \log^{2}{\left (x \right )} - 2 x \log{\left (x \right )} + 2 x
+
+
+
+.. code:: python
+
+    integrate(sin(x**2), x)
+
+
+
+
+.. math::
+
+    \frac{3 \sqrt{2} \sqrt{\pi} S\left(\frac{\sqrt{2} x}{\sqrt{\pi}}\right)}{8 \Gamma{\left(\frac{7}{4} \right)}} \Gamma{\left(\frac{3}{4} \right)}
+
+
+
+.. code:: python
+
+    integrate(x**y*exp(-x), (x, 0, oo))
+
+
+
+
+.. math::
+
+    \begin{cases} \Gamma{\left(y + 1 \right)} & \text{for}\: - \Re{y} < 1 \\\int_{0}^{\infty} x^{y} e^{- x}\, dx & \text{otherwise} \end{cases}
+
+
+
+.. code:: python
+
+    limit(sin(x)/x, x, 0)
+
+
+
+
+.. math::
+
+    1
+
+
+
+.. code:: python
+
+    expr = Limit((cos(x) - 1)/x, x, 0)
+    expr
+
+
+
+
+.. math::
+
+    \lim_{x \to 0^+}\left(\frac{1}{x} \left(\cos{\left (x \right )} - 1\right)\right)
+
+
+
+.. code:: python
+
+    expr.doit()
+
+
+
+
+.. math::
+
+    0
+
+
+
+.. code:: python
+
+    limit(1/x, x, 0, '-')
+
+
+
+
+.. math::
+
+    -\infty
+
+
+
+.. code:: python
+
+    expr = exp(sin(x))
+    expr.series(x, 0, 4)
+
+
+
+
+.. math::
+
+    1 + x + \frac{x^{2}}{2} + \mathcal{O}\left(x^{4}\right)
+
+
+
+.. code:: python
+
+    x + x**3 + x**6 + O(x**4)
+
+
+
+
+.. math::
+
+    x + x^{3} + \mathcal{O}\left(x^{4}\right)
+
+
+
+.. code:: python
+
+    x * O(1)
+
+
+
+
+.. math::
+
+    \mathcal{O}\left(x\right)
+
+
+
+.. code:: python
+
+    expr.series(x, 0, 4).removeO()
+
+
+
+
+.. math::
+
+    \frac{x^{2}}{2} + x + 1
+
+
+
+.. code:: python
+
+    exp(x - 6).series(x, 6)
+
+
+
+
+.. math::
+
+    -5 + \frac{1}{2} \left(x - 6\right)^{2} + \frac{1}{6} \left(x - 6\right)^{3} + \frac{1}{24} \left(x - 6\right)^{4} + \frac{1}{120} \left(x - 6\right)^{5} + x + \mathcal{O}\left(\left(x - 6\right)^{6}; x\rightarrow6\right)
+
+
+
+.. code:: python
+
+    exp(x - 6).series(x, 6).removeO().subs(x, x - 6)
+
+
+
+
+.. math::
+
+    x + \frac{1}{120} \left(x - 12\right)^{5} + \frac{1}{24} \left(x - 12\right)^{4} + \frac{1}{6} \left(x - 12\right)^{3} + \frac{1}{2} \left(x - 12\right)^{2} - 11
+
+
+
+Working with matrices
+---------------------
+
+.. code:: python
+
+    M = Matrix([[1,2,3],[3,2,1]])
+    P = Matrix([0,1,1])
+    M*P
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}5\\3\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & 2 & 3\\3 & 2 & 1\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.shape
+
+
+
+
+.. math::
+
+    \left ( 2, \quad 3\right )
+
+
+
+.. code:: python
+
+    M.col(-1)
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}3\\1\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M = Matrix([[1,3], [-2,3]])
+    M**-1
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}\frac{1}{3} & - \frac{1}{3}\\\frac{2}{9} & \frac{1}{9}\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.T
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & -2\\3 & 3\end{matrix}\right]
+
+
+
+.. code:: python
+
+    eye(3)
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & 0 & 0\\0 & 1 & 0\\0 & 0 & 1\end{matrix}\right]
+
+
+
+.. code:: python
+
+    diag(1,2,3)
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & 0 & 0\\0 & 2 & 0\\0 & 0 & 3\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.det()
+
+
+
+
+.. math::
+
+    9
+
+
+
+.. code:: python
+
+    M= Matrix([[1,0,1,3],[2,3,4,7],[-1,-3,-3,-4]])
+    M
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & 0 & 1 & 3\\2 & 3 & 4 & 7\\-1 & -3 & -3 & -4\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.rref()
+
+
+
+
+.. math::
+
+    \left ( \left[\begin{matrix}1 & 0 & 1 & 3\\0 & 1 & \frac{2}{3} & \frac{1}{3}\\0 & 0 & 0 & 0\end{matrix}\right], \quad \left [ 0, \quad 1\right ]\right )
+
+
+
+.. code:: python
+
+    M = Matrix([[1,2,3,0,0],[4,10,0,0,1]])
+    M
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}1 & 2 & 3 & 0 & 0\\4 & 10 & 0 & 0 & 1\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.nullspace()
+
+
+
+
+.. math::
+
+    \left [ \left[\begin{matrix}-15\\6\\1\\0\\0\end{matrix}\right], \quad \left[\begin{matrix}0\\0\\0\\1\\0\end{matrix}\right], \quad \left[\begin{matrix}1\\- \frac{1}{2}\\0\\0\\1\end{matrix}\right]\right ]
+
+
+
+.. code:: python
+
+    M = Matrix([[3, -2, 4, -2], [5,3,-3,-2], [5,-2,2,-2], [5,-2,-3,3]])
+    M
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}3 & -2 & 4 & -2\\5 & 3 & -3 & -2\\5 & -2 & 2 & -2\\5 & -2 & -3 & 3\end{matrix}\right]
+
+
+
+.. code:: python
+
+    M.eigenvals()
+
+
+
+
+.. math::
+
+    \left \{ -2 : 1, \quad 3 : 1, \quad 5 : 2\right \}
+
+
+
+.. code:: python
+
+    M.eigenvects()
+
+
+
+
+.. math::
+
+    \left [ \left ( -2, \quad 1, \quad \left [ \left[\begin{matrix}0\\1\\1\\1\end{matrix}\right]\right ]\right ), \quad \left ( 3, \quad 1, \quad \left [ \left[\begin{matrix}1\\1\\1\\1\end{matrix}\right]\right ]\right ), \quad \left ( 5, \quad 2, \quad \left [ \left[\begin{matrix}1\\1\\1\\0\end{matrix}\right], \quad \left[\begin{matrix}0\\-1\\0\\1\end{matrix}\right]\right ]\right )\right ]
+
+
+
+.. code:: python
+
+    P, D = M.diagonalize()
+
+.. code:: python
+
+    P
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}0 & 1 & 1 & 0\\1 & 1 & 1 & -1\\1 & 1 & 1 & 0\\1 & 1 & 0 & 1\end{matrix}\right]
+
+
+
+.. code:: python
+
+    D
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}-2 & 0 & 0 & 0\\0 & 3 & 0 & 0\\0 & 0 & 5 & 0\\0 & 0 & 0 & 5\end{matrix}\right]
+
+
+
+.. code:: python
+
+    P*D*P**-1
+
+
+
+
+.. math::
+
+    \left[\begin{matrix}3 & -2 & 4 & -2\\5 & 3 & -3 & -2\\5 & -2 & 2 & -2\\5 & -2 & -3 & 3\end{matrix}\right]
+
+
+
+.. code:: python
+
+    lamda = symbols('lamda')
+    p = M.charpoly(lamda)
+    p
+
+
+
+
+.. math::
+
+    \operatorname{PurePoly}{\left( \lambda^{4} - 11 \lambda^{3} + 29 \lambda^{2} + 35 \lambda - 150, \lambda, domain=\mathbb{Z} \right)}
+
+
+
+.. code:: python
+
+    factor(p)
+
+
+
+
+.. math::
+
+    \left(\lambda - 5\right)^{2} \left(\lambda - 3\right) \left(\lambda + 2\right)
+
+
+
+Solving Algebraic and Differential Equations
+--------------------------------------------
+
+.. code:: python
+
+    solve(x**2 - 1, x)
+
+
+
+
+.. math::
+
+    \left [ -1, \quad 1\right ]
+
+
+
+.. code:: python
+
+    solve((x - y + 2, x + y -3), (x, y))
+
+
+
+
+.. math::
+
+    \left \{ x : \frac{1}{2}, \quad y : \frac{5}{2}\right \}
+
+
+
+.. code:: python
+
+    solve(x**3 - 6*x**2 + 9*x, x)
+
+
+
+
+.. math::
+
+    \left [ 0, \quad 3\right ]
+
+
+
+.. code:: python
+
+    roots(x**3 - 6*x**2 + 9*x, x)
+
+
+
+
+.. math::
+
+    \left \{ 0 : 1, \quad 3 : 2\right \}
+
+
+
+.. code:: python
+
+    f, g = symbols('f g', cls=Function)
+
+.. code:: python
+
+    f(x).diff(x)
+
+
+
+
+.. math::
+
+    \frac{d}{d x} f{\left (x \right )}
+
+
+
+.. code:: python
+
+    diffeq = Eq(f(x).diff(x, 2) - 2*f(x).diff(x) + f(x), sin(x))
+
+.. code:: python
+
+    diffeq
+
+
+
+
+.. math::
+
+    f{\left (x \right )} - 2 \frac{d}{d x} f{\left (x \right )} + \frac{d^{2}}{d x^{2}}  f{\left (x \right )} = \sin{\left (x \right )}
+
+
+
+.. code:: python
+
+    dsolve(diffeq, f(x))
+
+
+
+
+.. math::
+
+    f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{1}{2} \cos{\left (x \right )}
+
+
+
+.. code:: python
+
+    dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))
+
+
+
+
+.. math::
+
+    f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}
+
+
+
+.. code:: python
+
+    a, t = symbols('a t')
+    f(t).diff(t)
+    diffeq = Eq(f(t).diff(t), a*t)
+
+.. code:: python
+
+    diffeq
+
+
+
+
+.. math::
+
+    \frac{d}{d t} f{\left (t \right )} = a t
+
+
+
+.. code:: python
+
+    dsolve(diffeq, f(t))
+
+
+
+
+.. math::
+
+    f{\left (t \right )} = C_{1} + \frac{a t^{2}}{2}
+
+
+
+.. code:: python
+
+    x = symbols('x', cls=Function)
+    diffeq = Eq(x(t).diff(t), a*x(t))
+    diffeq
+
+
+
+
+.. math::
+
+    \frac{d}{d t} x{\left (t \right )} = a x{\left (t \right )}
+
+
+
+.. code:: python
+
+    dsolve(diffeq, x(t))
+
+
+
+
+.. math::
+
+    x{\left (t \right )} = C_{1} e^{a t}
+
+
+
+Numerics
+--------
+
+.. code:: python
+
+    N(pi, 10)
+
+
+
+
+.. math::
+
+    3.141592654
+
+
+
+.. code:: python
+
+    x = symbols('x')
+
+.. code:: python
+
+    expr = Integral(sin(x)/(x**2), (x, 1, oo))
+
+.. code:: python
+
+    expr.evalf()
+
+
+
+
+.. math::
+
+    0.5
+
+
+
+.. code:: python
+
+    expr.evalf(maxn=20)
+
+
+
+
+.. math::
+
+    0.5
+
+
+
+.. code:: python
+
+    expr.evalf(quad='osc')
+
+
+
+
+.. math::
+
+    0.504067061906928
+
+
+
+.. code:: python
+
+    expr.evalf(20, quad='osc')
+
+
+
+
+.. math::
+
+    0.50406706190692837199
+
+
+
+.. code:: python
+
+    expr = Integral(sin(1/x), (x, 0, 1))
+    expr
+
+
+
+
+.. math::
+
+    \int_{0}^{1} \sin{\left (\frac{1}{x} \right )}\, dx
+
+
+
+.. code:: python
+
+    expr.evalf()
+
+
+
+
+.. math::
+
+    0.5
+
+
+
+.. code:: python
+
+    expr = expr.transform(x, 1/x)
+    expr
+
+
+
+
+.. math::
+
+    \int_{1}^{\infty} \frac{1}{x^{2}} \sin{\left (x \right )}\, dx
+
+
+
+.. code:: python
+
+    expr.evalf(quad='osc')
+
+
+
+
+.. math::
+
+    0.504067061906928
+
+
+
+.. code:: python
+
+    nsimplify(pi, tolerance=0.001)
+
+
+
+
+.. math::
+
+    \frac{355}{113}
+
+
+
+.. code:: python
+
+    expr = sin(x)/x
+
+.. code:: python
+
+    %timeit expr.evalf(subs={x: 3.14})
+
+
+.. parsed-literal::
+
+    1000 loops, best of 3: 397 µs per loop
+
+
+.. code:: python
+
+    f1 = lambdify(x, expr)
+    %timeit f1(3.14)
+
+
+.. parsed-literal::
+
+    The slowest run took 13.44 times longer than the fastest. This could mean that an intermediate result is being cached 
+    1000000 loops, best of 3: 308 ns per loop
+
+
+.. code:: python
+
+    f2 = lambdify(x, expr, 'numpy')
+    %timeit f2(3.14)
+
+
+.. parsed-literal::
+
+    The slowest run took 16.41 times longer than the fastest. This could mean that an intermediate result is being cached 
+    100000 loops, best of 3: 2.2 µs per loop
+
+
+.. code:: python
+
+    %timeit f2(np.linspace(1, 10, 10000))
+
+
+.. parsed-literal::
+
+    1000 loops, best of 3: 306 µs per loop
+
+
+.. code:: python
+
+    %timeit [f1(x) for x in np.linspace(1, 10, 10000)]
+
+
+.. parsed-literal::
+
+    100 loops, best of 3: 5.19 ms per loop
+
+
+.. code:: python
+
+    from mpmath import *
+
+.. code:: python
+
+    f = odefun(lambda x, y: [-y[1], y[0]], 0, [1, 0])
+    for x in [0, 1, 2.5, 10]:
+        nprint(f(x), 15)
+        nprint([cos(x), sin(x)], 15)
+
+
+.. parsed-literal::
+
+    [1.0, 0.0]
+    [1.0, 0.0]
+    [0.54030230586814, 0.841470984807897]
+    [0.54030230586814, 0.841470984807897]
+    [-0.801143615546934, 0.598472144103957]
+    [-0.801143615546934, 0.598472144103957]
+    [-0.839071529076452, -0.54402111088937]
+    [-0.839071529076452, -0.54402111088937]
+
+
+.. code:: python
+
+    from sympy.plotting import plot
+    %matplotlib inline
+    
+    plot(x*y**3 - y*x**3)
+    pass
+
+
+
+.. image:: Extras_03_Symbolic_Algebra_files/Extras_03_Symbolic_Algebra_167_0.png
+
+
+.. code:: python
+
+    from sympy.plotting import plot3d_parametric_surface
+    from sympy import sin, cos
+    u, v = symbols('u v')
+    plot3d_parametric_surface(cos(u + v), sin(u - v), u-v, (u, -5, 5), (v, -5, 5))
+    pass
+
+
+
+.. image:: Extras_03_Symbolic_Algebra_files/Extras_03_Symbolic_Algebra_168_0.png
+
+
+Statistics
+----------
+
+.. code:: python
+
+    from sympy.stats import *
+
+.. code:: python
+
+    k = Symbol("k", positive=True)
+    theta = Symbol("theta", positive=True)
+    z = Symbol("z")
+    X = Gamma("x", k, theta)
+
+.. code:: python
+
+    D = density(X)(z)
+    D
+
+
+
+
+.. math::
+
+    \frac{z^{k - 1} e^{- \frac{z}{\theta}}}{\theta^{k} \Gamma{\left(k \right)}}
+
+
+
+.. code:: python
+
+    C = cdf(X, meijerg=True)(z)
+    C
+
+
+
+
+.. math::
+
+    \begin{cases} - \frac{k \gamma\left(k, 0\right)}{\Gamma{\left(k + 1 \right)}} + \frac{k \gamma\left(k, \frac{z}{\theta}\right)}{\Gamma{\left(k + 1 \right)}} & \text{for}\: z \geq 0 \\0 & \text{otherwise} \end{cases}
+
+
+
+.. code:: python
+
+    E(X)
+
+
+
+
+.. math::
+
+    \frac{\theta}{\Gamma{\left(k \right)}} \Gamma{\left(k + 1 \right)}
+
+
+
+.. code:: python
+
+    V = variance(X)
+    V
+
+
+
+
+.. math::
+
+    \frac{\theta^{3} \theta^{k - 1}}{\theta^{k} \Gamma^{2}{\left(k \right)}} \Gamma^{2}{\left(k + 1 \right)} - \frac{2 \theta^{2}}{\Gamma^{2}{\left(k \right)}} \Gamma^{2}{\left(k + 1 \right)} + \frac{\theta \theta^{k + 1}}{\theta^{k} \Gamma{\left(k \right)}} \Gamma{\left(k + 2 \right)}
+
+
+
+.. code:: python
+
+    simplify(V)
+
+
+
+
+.. math::
+
+    k \theta^{2}
+
+
+
+.. code:: python
+
+    N = Normal('Gaussian', 10, 5)
+    density(N)(z)
+
+
+
+
+.. math::
+
+    \frac{\sqrt{2}}{10 \sqrt{\pi}} e^{- \frac{1}{50} \left(z - 10\right)^{2}}
+
+
+
+.. code:: python
+
+    density(N)(3).evalf()
+
+
+
+
+.. math::
+
+    0.029945493127149
+
+
+
+.. code:: python
+
+    simplify(cdf(N)(z))
+
+
+
+
+.. math::
+
+    \frac{1}{2} \operatorname{erf}{\left (\frac{\sqrt{2}}{10} \left(z - 10\right) \right )} + \frac{1}{2}
+
+
+
+.. code:: python
+
+    P(N > 10)
+
+
+
+
+.. math::
+
+    \frac{1}{2}
+
+
+
+.. code:: python
+
+    sample(N)
+
+
+
+
+.. math::
+
+    6.30254802079348
+
+

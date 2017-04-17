@@ -1,0 +1,712 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/17B_Big_Data_Structures.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:23 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Efficient storage of data in memory &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Working with large data sets" href="18A_Dask.html" />
+    <link rel="prev" title="Biggish Data" href="17A_Intermediate_Sized_Data.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="18A_Dask.html" title="Working with large data sets"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="17A_Intermediate_Sized_Data.html" title="Biggish Data"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="efficient-storage-of-data-in-memory">
+<h1>Efficient storage of data in memory<a class="headerlink" href="#efficient-storage-of-data-in-memory" title="Permalink to this headline">¶</a></h1>
+<p>When dealing with big data, minimizing the amount of memory used is
+critical to avoid having to use disk-based access, which can be 100,000
+times slower than random access. This notebook deals with ways to
+minimizee data storage for several common use cases:</p>
+<ul class="simple">
+<li>Large arrays of homogenous data (often numbers)</li>
+<li>Large string collections</li>
+<li>Counting distinct values</li>
+<li>Yes/No responses to queries</li>
+</ul>
+<p>Methods covered range from the mundane (use <code class="docutils literal"><span class="pre">numpy</span></code> arrays rather than
+lists), to classic but less well-known data structures (e.g. prefix
+trees or tries) to algorithmically ingenious probabilistic data
+structures (e.g. bloom filter and hyperloglog).</p>
+<div class="section" id="selective-retrieval-from-disk-based-storage">
+<h2>Selective retrieval from disk-based storage<a class="headerlink" href="#selective-retrieval-from-disk-based-storage" title="Permalink to this headline">¶</a></h2>
+<p>We have alrady seen that there are many ways to retrieve only the parts
+of the data we need now into memory at this particular moment. Options
+include</p>
+<ul class="simple">
+<li>generators (e.g. to read a file a line at a time)</li>
+<li><code class="docutils literal"><span class="pre">numpy.memmap</span></code></li>
+<li>HDF5 via <code class="docutils literal"><span class="pre">h5py</span></code></li>
+<li>Key-value stores (e.g. <code class="docutils literal"><span class="pre">redis</span></code>)</li>
+<li>SQL and NoSQL databases (e.g. <code class="docutils literal"><span class="pre">sqlite3</span></code>)</li>
+</ul>
+</div>
+<div class="section" id="storing-numbers">
+<h2>Storing numbers<a class="headerlink" href="#storing-numbers" title="Permalink to this headline">¶</a></h2>
+<p>Less memory is used when storing numbers in numpy arrays rather than
+lists.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="n">e8</span><span class="p">))))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">900000112</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="n">e8</span><span class="p">))</span><span class="o">.</span><span class="n">nbytes</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">800000000</span>
+</pre></div>
+</div>
+<div class="section" id="using-only-the-precision-needed-can-also-save-memory">
+<h3>Using only the precision needed can also save memory<a class="headerlink" href="#using-only-the-precision-needed-can-also-save-memory" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="n">e8</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">400000000</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="n">e8</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">nbytes</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">800000000</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="storing-strings">
+<h2>Storing strings<a class="headerlink" href="#storing-strings" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">flatmap</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">it</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">items</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">xss</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">xss</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;data/Ulysses.txt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">word_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flatten</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2258048</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;WARRANTIES&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">word_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">7.97</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">word_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">bisect</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">bisect</span><span class="o">.</span><span class="n">bisect</span><span class="p">(</span><span class="n">word_list</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">31.8</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">word_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">word_set</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2097376</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">word_set</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">2.25</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span>! pip install hat_trie
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">memory_profiler</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hat_trie</span> <span class="k">import</span> <span class="n">Trie</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">memit</span> <span class="n">word_trie</span> <span class="o">=</span> <span class="n">Trie</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peak</span> <span class="n">memory</span><span class="p">:</span> <span class="mf">116.97</span> <span class="n">MiB</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="mf">0.39</span> <span class="n">MiB</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">word_trie</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">5.86</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="data-sketches">
+<h2>Data Sketches<a class="headerlink" href="#data-sketches" title="Permalink to this headline">¶</a></h2>
+<p>A <code class="docutils literal"><span class="pre">sketch</span></code> is a probabilistic algorithm or data structure that
+approximates some statistic of interest, typically using very little
+memory and processing time. Often they are applied to streaming data,
+and so must be able to incrementally process data. Many data sketches
+make use of hash functions to distribute data into buckets uniformly.
+Typically, data sketches have the following desirable properties</p>
+<ul class="simple">
+<li>sub-linear in space</li>
+<li>single scan</li>
+<li>can be parallelized</li>
+<li>can be combined (merge)</li>
+</ul>
+<p>Some statistics that sketches have been used to estimate include</p>
+<ul class="simple">
+<li>indicator variables (event detection)</li>
+<li>counts</li>
+<li>quantiles</li>
+<li>moments</li>
+<li>entropy</li>
+</ul>
+<p>Packages for data sketches in Python are relatively immmature, and if
+you are interested, you could make a large contribution by creating a
+comprehensive open source library of data sketches in Python.</p>
+<p>The Morris counter is used as a simple illustration of a probabilistic
+data structure, with the standard trade-off of using less memory in
+return for less accuracy. The algorithm is extremely simple - keep a
+counter <span class="math">\(c\)</span> that represents the <strong>exponent</strong> - that is, when the
+Morris counter is <span class="math">\(c\)</span>, the estimated count is <span class="math">\(2^c\)</span>. The
+probabilistic part comes from the way that the counter is incremented by
+comparing a uniform random variate to <span class="math">\(1/2^c\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">random</span>
+
+<span class="k">class</span> <span class="nc">MorrisCounter</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">+=</span> <span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mc</span> <span class="o">=</span> <span class="n">MorrisCounter</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;True</span><span class="se">\t\t</span><span class="s1">Morris</span><span class="se">\t\t</span><span class="s1">Rel Error&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">2</span><span class="n">e5</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="se">\t</span><span class="si">%8d</span><span class="se">\t</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mc</span><span class="p">),</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">mc</span><span class="p">))</span><span class="o">/</span><span class="n">i</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>                <span class="n">Morris</span>          <span class="n">Rel</span> <span class="n">Error</span>
+       <span class="mi">0</span>           <span class="mi">2</span>        <span class="mf">0.00</span>
+   <span class="mi">20000</span>        <span class="mi">8192</span>        <span class="mf">0.59</span>
+   <span class="mi">40000</span>       <span class="mi">32768</span>        <span class="mf">0.18</span>
+   <span class="mi">60000</span>       <span class="mi">65536</span>        <span class="mf">0.09</span>
+   <span class="mi">80000</span>       <span class="mi">65536</span>        <span class="mf">0.18</span>
+  <span class="mi">100000</span>      <span class="mi">131072</span>        <span class="mf">0.31</span>
+  <span class="mi">120000</span>      <span class="mi">131072</span>        <span class="mf">0.09</span>
+  <span class="mi">140000</span>      <span class="mi">131072</span>        <span class="mf">0.06</span>
+  <span class="mi">160000</span>      <span class="mi">131072</span>        <span class="mf">0.18</span>
+  <span class="mi">180000</span>      <span class="mi">131072</span>        <span class="mf">0.27</span>
+  <span class="mi">200000</span>      <span class="mi">131072</span>        <span class="mf">0.34</span>
+  <span class="mi">220000</span>      <span class="mi">262144</span>        <span class="mf">0.19</span>
+  <span class="mi">240000</span>      <span class="mi">262144</span>        <span class="mf">0.09</span>
+  <span class="mi">260000</span>      <span class="mi">524288</span>        <span class="mf">1.02</span>
+</pre></div>
+</div>
+<p>A simple way to increase the accuracy is to have multiple Morris
+counters and take the average. These two ideas of using a probabilistic
+calculation and multiple samples to improve precision are the basis for
+the more useful probabilisitc data structures described below.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">MorrisCounter</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;True</span><span class="se">\t\t</span><span class="s1">Morris</span><span class="se">\t\t</span><span class="s1">Rel Error&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">mcs</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="n">estimate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mcs</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">2</span><span class="n">e5</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="se">\t</span><span class="si">%8d</span><span class="se">\t</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">estimate</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">estimate</span><span class="p">)</span><span class="o">/</span><span class="n">i</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>                <span class="n">Morris</span>          <span class="n">Rel</span> <span class="n">Error</span>
+       <span class="mi">0</span>           <span class="mi">2</span>        <span class="mf">0.00</span>
+   <span class="mi">20000</span>       <span class="mi">20889</span>        <span class="mf">0.04</span>
+   <span class="mi">40000</span>       <span class="mi">26214</span>        <span class="mf">0.34</span>
+   <span class="mi">60000</span>       <span class="mi">36044</span>        <span class="mf">0.40</span>
+   <span class="mi">80000</span>       <span class="mi">49152</span>        <span class="mf">0.39</span>
+  <span class="mi">100000</span>       <span class="mi">72089</span>        <span class="mf">0.28</span>
+  <span class="mi">120000</span>       <span class="mi">75366</span>        <span class="mf">0.37</span>
+  <span class="mi">140000</span>       <span class="mi">95027</span>        <span class="mf">0.32</span>
+  <span class="mi">160000</span>      <span class="mi">111411</span>        <span class="mf">0.30</span>
+  <span class="mi">180000</span>      <span class="mi">131072</span>        <span class="mf">0.27</span>
+  <span class="mi">200000</span>      <span class="mi">137625</span>        <span class="mf">0.31</span>
+  <span class="mi">220000</span>      <span class="mi">137625</span>        <span class="mf">0.37</span>
+  <span class="mi">240000</span>      <span class="mi">144179</span>        <span class="mf">0.40</span>
+  <span class="mi">260000</span>      <span class="mi">170393</span>        <span class="mf">0.34</span>
+</pre></div>
+</div>
+<p>The Morris counter is less useful because the degree of memory saved as
+compared to counting the number of elements exactly is not much unless
+the numbers are staggeringly huge. In contrast, counting the number of
+<strong>distinct</strong> elements exactly requires storage of all distinct elements
+(e.g. in a set) and hence grows with the cardinality <span class="math">\(n\)</span>.
+Probabilistic data structures known as Distinct Value Sketches can do
+this with a tiny and fixed memory size.</p>
+<p>Examples where counting distinct values is useful:</p>
+<ul class="simple">
+<li>number of unique users in a Twitter stream</li>
+<li>number of distinct records to be fetched by a databse query</li>
+<li>number of unique IP addresses accessing a website</li>
+<li>number of distinct queries submitted to a search engine</li>
+<li>number of distinct DNA motifs in genomics data sets (e.g. microbiome)</li>
+</ul>
+<p>A hash function takes data of arbitrary size and converts it into a
+number in a fixed range. Ideally, given an arbitrary set of data items,
+the hash function generates numbers that follow a uniform distribution
+within the fixed range. Hash functions are immensely useful throughout
+computer science (for example - they power Python sets and
+dictionaries), and especially for the generation of probabilistic data
+structures.</p>
+<div class="section" id="a-simple-hash-function-mapping">
+<h3>A simple hash function mapping<a class="headerlink" href="#a-simple-hash-function-mapping" title="Permalink to this headline">¶</a></h3>
+<p>Note the <strong>collisions</strong>. If not handled, there is a loss of information.
+Commonly, practical hash functions return a 32 or 64 bit integer. Also
+note that there are an arbitrary number of hash functions that can
+return numbers within a given range.</p>
+<p>Note also that because the hash function is deterministic, the same item
+will always map to the same bin.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">string_hash</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">word</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sentence</span> <span class="o">=</span> <span class="s2">&quot;The quick brown fox jumps over the lazy dog.&quot;</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">string_hash</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="mi">9</span>
+<span class="n">quick</span> <span class="mi">1</span>
+<span class="n">brown</span> <span class="mi">2</span>
+<span class="n">fox</span> <span class="mi">3</span>
+<span class="n">jumps</span> <span class="mi">9</span>
+<span class="n">over</span> <span class="mi">4</span>
+<span class="n">the</span> <span class="mi">1</span>
+<span class="n">lazy</span> <span class="mi">8</span>
+<span class="n">dog</span><span class="o">.</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="built-in-python-hash-function">
+<h3>Built-in Python hash function<a class="headerlink" href="#built-in-python-hash-function" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">help</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Help</span> <span class="n">on</span> <span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">function</span> <span class="nb">hash</span> <span class="ow">in</span> <span class="n">module</span> <span class="n">builtins</span><span class="p">:</span>
+
+<span class="nb">hash</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span>
+    <span class="n">Return</span> <span class="n">the</span> <span class="nb">hash</span> <span class="n">value</span> <span class="k">for</span> <span class="n">the</span> <span class="n">given</span> <span class="nb">object</span><span class="o">.</span>
+
+    <span class="n">Two</span> <span class="n">objects</span> <span class="n">that</span> <span class="n">compare</span> <span class="n">equal</span> <span class="n">must</span> <span class="n">also</span> <span class="n">have</span> <span class="n">the</span> <span class="n">same</span> <span class="nb">hash</span> <span class="n">value</span><span class="p">,</span> <span class="n">but</span> <span class="n">the</span>
+    <span class="n">reverse</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">necessarily</span> <span class="n">true</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;10s}</span><span class="s1"> </span><span class="si">{:24}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="nb">hash</span><span class="p">(</span><span class="n">word</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span>             <span class="o">-</span><span class="mi">184990475008303844</span>
+<span class="n">quick</span>           <span class="mi">3616884800889772302</span>
+<span class="n">brown</span>           <span class="mi">6377133929055916905</span>
+<span class="n">fox</span>             <span class="o">-</span><span class="mi">611579958660588990</span>
+<span class="n">jumps</span>          <span class="o">-</span><span class="mi">5271806623556898369</span>
+<span class="n">over</span>            <span class="mi">7546130948312823661</span>
+<span class="n">the</span>             <span class="mi">6678103606492090842</span>
+<span class="n">lazy</span>           <span class="o">-</span><span class="mi">1515512778017190090</span>
+<span class="n">dog</span><span class="o">.</span>            <span class="mi">3069897472948403276</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-hash-function-from-the-murmurhash3-library">
+<h3>Using a hash function from the MurmurHash3 library<a class="headerlink" href="#using-a-hash-function-from-the-murmurhash3-library" title="Permalink to this headline">¶</a></h3>
+<p>Note that the hash function accepts a seed, allowing the creation of
+multiple hash functions. We also display the hash result as a 32-bit
+binary string.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mmh3</span>
+
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:&lt;10}</span><span class="s1"> </span><span class="si">{:+032b}</span><span class="s1"> </span><span class="si">{:+032b}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">mmh3</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">),</span>
+          <span class="n">mmh3</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">4321</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span>        <span class="o">+</span><span class="mi">0001000011111110001001110101100</span> <span class="o">+</span><span class="mi">1110110100100101010111100011010</span>
+<span class="n">quick</span>      <span class="o">-</span><span class="mi">0101111111011110110101100101000</span> <span class="o">+</span><span class="mi">1000100001101010110000101101100</span>
+<span class="n">brown</span>      <span class="o">+</span><span class="mi">1000101010000110110010001110101</span> <span class="o">-</span><span class="mi">1101101110000000010001100010100</span>
+<span class="n">fox</span>        <span class="o">-</span><span class="mi">1000000010010010000111001111011</span> <span class="o">+</span><span class="mi">0111011111000011001001001110111</span>
+<span class="n">jumps</span>      <span class="o">+</span><span class="mi">0000010111000011010000100101010</span> <span class="o">+</span><span class="mi">0010010001111110100010010110011</span>
+<span class="n">over</span>       <span class="o">-</span><span class="mi">0110101101111001001101011111011</span> <span class="o">-</span><span class="mi">1101110111110010000101101000100</span>
+<span class="n">the</span>        <span class="o">-</span><span class="mi">1000000101110000000110011111001</span> <span class="o">+</span><span class="mi">0001000111100111011000011100101</span>
+<span class="n">lazy</span>       <span class="o">-</span><span class="mi">1101011000111111110011111001100</span> <span class="o">+</span><span class="mi">0010101110101100001000101110000</span>
+<span class="n">dog</span><span class="o">.</span>       <span class="o">+</span><span class="mi">0100110101101111101011110111111</span> <span class="o">-</span><span class="mi">0101111000110000001011110001011</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loglog-family">
+<h3>LogLog family<a class="headerlink" href="#loglog-family" title="Permalink to this headline">¶</a></h3>
+<p>The binary digits in a (say) 32-bit hash are effectively random, and
+equivalent to a sequence of fair coin tosses. Hence the probability that
+we see a run of 5 zeros in the smallest hash so far suggests that we
+have added <span class="math">\(2^5\)</span> unique items so far. This is the intuition behind
+the loglog family of Distinct Value Sketches. Note that the biggest
+count we can track with 32 bits is <span class="math">\(2^{32} = 4294967296\)</span>.</p>
+<p>The accuracy of the sketch can be improved by averaging results with
+multiple coin flippers. In practice, this is done by using the first
+<span class="math">\(k\)</span> bit registers to identify <span class="math">\(2^k\)</span> different coin flippers.
+Hence, the max count is now <span class="math">\(2 ** (32 - k)\)</span>. The hyperloglog
+algorithm uses the harmonic mean of the <span class="math">\(2^k\)</span> flippers which
+reduces the effect of outliers and hence the variance of the estimate.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">):</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span>
+    <span class="n">hashes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">32</span><span class="p">)))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%6d</span><span class="se">\t</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">hashes</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>    <span class="mi">2</span>      <span class="mi">00010001101110111100011011110100</span>
+    <span class="mi">4</span>      <span class="mi">00001111000110101110111110111011</span>
+    <span class="mi">8</span>      <span class="mi">00011100101100110010101100011110</span>
+   <span class="mi">16</span>      <span class="mi">01000001100111101011001100101001</span>
+   <span class="mi">32</span>      <span class="mi">00001011000101110101000110101010</span>
+   <span class="mi">64</span>      <span class="mi">00000000110100000010001101011101</span>
+  <span class="mi">128</span>      <span class="mi">00000000100101100011100101100111</span>
+  <span class="mi">256</span>      <span class="mi">00000000001101010111001001101010</span>
+  <span class="mi">512</span>      <span class="mi">00000000001001011011001100001100</span>
+ <span class="mi">1024</span>      <span class="mi">00000000001010000100011000011011</span>
+ <span class="mi">2048</span>      <span class="mi">00000000010100111100001101001100</span>
+ <span class="mi">4096</span>      <span class="mi">00000000000000110001101010011100</span>
+ <span class="mi">8192</span>      <span class="mi">00000000000000001100110110000101</span>
+<span class="mi">16384</span>      <span class="mi">00000000000000001101011110101001</span>
+</pre></div>
+</div>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hyperloglog</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hyperloglog</span> <span class="k">import</span> <span class="n">HyperLogLog</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">hll</span> <span class="o">=</span> <span class="n">HyperLogLog</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span> <span class="c1"># accept 1% counting error</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;True</span><span class="se">\t\t</span><span class="s1">HLL</span><span class="se">\t\t</span><span class="s1">Rel Error&#39;</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="n">hll</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="nb">int</span><span class="p">(</span><span class="o">.</span><span class="mi">2</span><span class="n">e5</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%8d</span><span class="se">\t</span><span class="si">%8d</span><span class="se">\t\t</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">h1</span><span class="p">),</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">h1</span><span class="p">))</span><span class="o">/</span><span class="n">i</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>                <span class="n">HLL</span>             <span class="n">Rel</span> <span class="n">Error</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">---------------------------------------------------------------------------</span>
+
+<span class="ne">NameError</span>                                 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mi">22150</span><span class="n">e0b1002</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span><span class="p">()</span>
+      <span class="mi">1</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;True</span><span class="se">\t\t</span><span class="s1">HLL</span><span class="se">\t\t</span><span class="s1">Rel Error&#39;</span><span class="p">)</span>
+      <span class="mi">2</span> <span class="n">s</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+<span class="o">----&gt;</span> <span class="mi">3</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">word_list</span><span class="p">):</span>
+      <span class="mi">4</span>     <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+      <span class="mi">5</span>     <span class="n">hll</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+
+<span class="ne">NameError</span><span class="p">:</span> <span class="n">name</span> <span class="s1">&#39;word_list&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">defined</span>
+</pre></div>
+</div>
+<div class="section" id="bloom-filters">
+<h4>Bloom filters<a class="headerlink" href="#bloom-filters" title="Permalink to this headline">¶</a></h4>
+<p>Bloom filters are designed to answer queries about whether a specific
+item is in a collection. If the answer is NO, then it is definitive.
+However, if the answer is yes, it might be a false positive. The
+possibility of a false positive makes the Bloom filter a probabilistic
+data structure.</p>
+<p>A bloom filter consists of a bit vector of length <span class="math">\(k\)</span> initially
+set to zero, and <span class="math">\(n\)</span> different hash functions that return a hash
+value that will fall into one of the <span class="math">\(k\)</span> bins. In the construction
+phase, for every item in the collection, <span class="math">\(n\)</span> hash values are
+generated by the <span class="math">\(n\)</span> hash functions, and every position indicated
+by a hash value is flipped to one. In the query phase, given an item,
+<span class="math">\(n\)</span> hash values are calculated as before - if any of these
+<span class="math">\(n\)</span> positions is a zero, then the item is definitely not in the
+collection. However, because of the possibility of hash collisions, even
+if all the positions are one, this could be a false positive. Clearly,
+the rate of false positives depends on the ratio of zero and one bits,
+and there are Bloom filter implementations that will dynamically bound
+the ratio and hence the false positive rate.</p>
+<p>Possible uses of a Bloom filter include:</p>
+<ul class="simple">
+<li>Does a particular sequence motif appear in a DNA string?</li>
+<li>Has this book been recommended to this customer before?</li>
+<li>Check if an element exists on disk before performing I/O</li>
+<li>Check if URL is a potential malware site using in-browser Bloom
+filter to minimize network communication</li>
+<li>As an alternative way to generate distinct value counts cheaply (only
+increment count if Bloom filter says NO)</li>
+</ul>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jaybaird</span><span class="o">/</span><span class="n">python</span><span class="o">-</span><span class="n">bloomfilter</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pybloom</span> <span class="k">import</span> <span class="n">ScalableBloomFilter</span>
+
+<span class="c1"># The Scalable Bloom Filter grows as needed to keep the error rate small</span>
+<span class="c1"># The default error_rate=0.001</span>
+<span class="n">sbf</span> <span class="o">=</span> <span class="n">ScalableBloomFilter</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">word_set</span><span class="p">:</span>
+    <span class="n">sbf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">test_words</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;banana&#39;</span><span class="p">,</span> <span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="s1">&#39;Dublin&#39;</span><span class="p">,</span> <span class="s1">&#39;masochist&#39;</span><span class="p">,</span> <span class="s1">&#39;Obama&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">test_words</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sbf</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">banana</span> <span class="kc">True</span>
+<span class="n">artist</span> <span class="kc">True</span>
+<span class="n">Dublin</span> <span class="kc">True</span>
+<span class="n">masochist</span> <span class="kc">False</span>
+<span class="n">Obama</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">### Chedck</span>
+<span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">test_words</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">word_set</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">banana</span> <span class="kc">True</span>
+<span class="n">artist</span> <span class="kc">True</span>
+<span class="n">Dublin</span> <span class="kc">True</span>
+<span class="n">masochist</span> <span class="kc">False</span>
+<span class="n">Obama</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">version_information</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">version_information</span> <span class="n">pybloom</span><span class="p">,</span> <span class="n">hyperloglog</span><span class="p">,</span> <span class="n">hat_trie</span>
+</pre></div>
+</div>
+<table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.3</td></tr><tr><td>OS</td><td>Darwin 15.4.0 x86_64 i386 64bit</td></tr><tr><td>pybloom</td><td>2.0.0</td></tr><tr><td>hyperloglog</td><td>0.0.10</td></tr><tr><td>hat_trie</td><td>0.3</td></tr><tr><td colspan='2'>Thu Apr 14 16:01:59 2016 EDT</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Efficient storage of data in memory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#selective-retrieval-from-disk-based-storage">Selective retrieval from disk-based storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#storing-numbers">Storing numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#storing-strings">Storing strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-sketches">Data Sketches</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="17A_Intermediate_Sized_Data.html"
+                          title="Previous page">&larr; Biggish Data</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="18A_Dask.html"
+                          title="Next page">&rarr; Working with large data sets</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/17B_Big_Data_Structures.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="18A_Dask.html" title="Working with large data sets"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="17A_Intermediate_Sized_Data.html" title="Biggish Data"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/17B_Big_Data_Structures.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:24 GMT -->
+</html>

@@ -1,0 +1,736 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13B_LinearAlgebra2.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:23 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Matrix Decompositions &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Linear Algebra Examples" href="13C_LinearAlgebraExamples.html" />
+    <link rel="prev" title="Linear Algebra Review" href="13A_LinearAlgebra1.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="13C_LinearAlgebraExamples.html" title="Linear Algebra Examples"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13A_LinearAlgebra1.html" title="Linear Algebra Review"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="o">%</span><span class="n">precision</span> <span class="mi">4</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Reference</strong></p>
+<p><a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/tutorial/linalg.html">SciPy&#8217;s official tutorial on Linear
+algebra</a></p>
+<div class="section" id="matrix-decompositions">
+<h1>Matrix Decompositions<a class="headerlink" href="#matrix-decompositions" title="Permalink to this headline">¶</a></h1>
+<p>Matrix decompositions are an important step in solving linear systems in
+a computationally efficient manner.</p>
+<div class="section" id="lu-decomposition-and-gaussian-elimination">
+<h2>LU Decomposition and Gaussian Elimination<a class="headerlink" href="#lu-decomposition-and-gaussian-elimination" title="Permalink to this headline">¶</a></h2>
+<p>LU stands for &#8216;Lower Upper&#8217;, and so an LU decomposition of a matrix
+<span class="math">\(A\)</span> is a decomposition so that</p>
+<div class="math">
+\[A= LU\]</div>
+<p>where <span class="math">\(L\)</span> is lower triangular and <span class="math">\(U\)</span> is upper triangular.</p>
+<p>Now, LU decomposition is essentially gaussian elimination, but we work
+only with the matrix <span class="math">\(A\)</span> (as opposed to the augmented matrix).</p>
+<p>Let&#8217;s review how gaussian elimination (ge) works. We will deal with a
+<span class="math">\(3\times 3\)</span> system of equations for conciseness, but everything
+here generalizes to the <span class="math">\(n\times n\)</span> case. Consider the following
+equation:</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix}a_{11}&amp;a_{12} &amp; a_{13}\\a_{21}&amp;a_{22}&amp;a_{23}\\a_{31}&amp;a_{32}&amp;a_{33}\end{matrix}\right)\left(\begin{matrix}x_1\\x_2\\x_3\end{matrix}\right) = \left(\begin{matrix}b_1\\b_2\\b_3\end{matrix}\right)\end{split}\]</div>
+<p>For simplicity, let us assume that the leftmost matrix <span class="math">\(A\)</span> is
+non-singular. To solve the system using ge, we start with the &#8216;augmented
+matrix&#8217;:</p>
+<div class="math">
+\[\begin{split}\left(\begin{array}{ccc|c}a_{11}&amp;a_{12} &amp; a_{13}&amp; b_1 \\a_{21}&amp;a_{22}&amp;a_{23}&amp;b_2\\a_{31}&amp;a_{32}&amp;a_{33}&amp;b_3\end{array}\right)\end{split}\]</div>
+<p>We begin at the first entry, <span class="math">\(a_{11}\)</span>. If <span class="math">\(a_{11} \neq 0\)</span>,
+then we divide the first row by <span class="math">\(a_{11}\)</span> and then subtract the
+appropriate multiple of the first row from each of the other rows,
+zeroing out the first entry of all rows. (If <span class="math">\(a_{11}\)</span> is zero, we
+need to permute rows. We will not go into detail of that here.) The
+result is as follows:</p>
+<div class="math">
+\[\begin{split}\left(\begin{array}{ccc|c}
+1 &amp; \frac{a_{12}}{a_{11}} &amp; \frac{a_{13}}{a_{11}} &amp; \frac{b_1}{a_{11}} \\
+0 &amp; a_{22} - a_{21}\frac{a_{12}}{a_{11}} &amp; a_{23} - a_{21}\frac{a_{13}}{a_{11}}  &amp; b_2 - a_{21}\frac{b_1}{a_{11}}\\
+0&amp;a_{32}-a_{31}\frac{a_{12}}{a_{11}} &amp; a_{33} - a_{31}\frac{a_{13}}{a_{11}}  &amp;b_3- a_{31}\frac{b_1}{a_{11}}\end{array}\right)\end{split}\]</div>
+<p>We repeat the procedure for the second row, first dividing by the
+leading entry, then subtracting the appropriate multiple of the
+resulting row from each of the third and first rows, so that the second
+entry in row 1 and in row 3 are zero. We <em>could</em> continue until the
+matrix on the left is the identity. In that case, we can then just &#8216;read
+off&#8217; the solution: i.e., the vector <span class="math">\(x\)</span> is the resulting column
+vector on the right. Usually, it is more efficient to stop at <em>reduced
+row eschelon</em> form (upper triangular, with ones on the diagonal), and
+then use <em>back substitution</em> to obtain the final answer.</p>
+<p>Note that in some cases, it is necessary to permute rows to obtain
+reduced row eschelon form. This is called <em>partial pivoting</em>. If we also
+manipulate columns, that is called <em>full pivoting</em>.</p>
+<p>It should be mentioned that we may obtain the inverse of a matrix using
+ge, by reducing the matrix <span class="math">\(A\)</span> to the identity, with the identity
+matrix as the augmented portion.</p>
+<p>Now, this is all fine when we are solving a system one time, for one
+outcome <span class="math">\(b\)</span>. Many applications involve solutions to multiple
+problems, where the left-hand-side of our matrix equation does not
+change, but there are many outcome vectors <span class="math">\(b\)</span>. In this case, it
+is more efficient to <em>decompose</em> <span class="math">\(A\)</span>.</p>
+<p>First, we start just as in ge, but we &#8216;keep track&#8217; of the various
+multiples required to eliminate entries. For example, consider the
+matrix</p>
+<div class="math">
+\[\begin{split}A = \left(\begin{matrix} 1 &amp; 3 &amp; 4 \\
+                           2&amp; 1&amp; 3\\
+                           4&amp;1&amp;2
+                           \end{matrix}\right)\end{split}\]</div>
+<p>We need to multiply row <span class="math">\(1\)</span> by <span class="math">\(2\)</span> and subtract from row
+<span class="math">\(2\)</span> to eliminate the first entry in row <span class="math">\(2\)</span>, and then
+multiply row <span class="math">\(1\)</span> by <span class="math">\(4\)</span> and subtract from row <span class="math">\(3\)</span>.
+Instead of entering zeroes into the first entries of rows <span class="math">\(2\)</span> and
+<span class="math">\(3\)</span>, we record the multiples required for their elimination, as
+so:</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix} 1 &amp; 3 &amp; 4 \\
+                           (2)&amp; -5 &amp; -5\\
+                           (4)&amp;-11&amp;-14
+                           \end{matrix}\right)\end{split}\]</div>
+<p>And then we eliminate the second entry in the third row:</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix} 1 &amp; 3 &amp; 4 \\
+                           (2)&amp; -5 &amp; -5\\
+                           (4)&amp;(\frac{11}{5})&amp;-3
+                           \end{matrix}\right)\end{split}\]</div>
+<p>And now we have the decomposition:</p>
+<div class="math">
+\[\begin{split}L= \left(\begin{matrix} 1 &amp; 0 &amp; 0 \\
+                           2&amp; 1 &amp; 0\\
+                           4&amp;\frac{11}5&amp;1
+                           \end{matrix}\right)
+                          U = \left(\begin{matrix} 1 &amp; 3 &amp; 4 \\
+                           0&amp; -5 &amp; -5\\
+                           0&amp;0&amp;-3
+                           \end{matrix}\right)\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">11</span><span class="o">/</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">5</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="mf">1.</span>  <span class="mf">3.</span>  <span class="mf">4.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.</span>  <span class="mf">1.</span>  <span class="mf">3.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.</span>  <span class="mf">1.</span>  <span class="mf">2.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">1.</span>   <span class="mf">0.</span>   <span class="mf">0.</span> <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.</span>   <span class="mf">1.</span>   <span class="mf">0.</span> <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">4.</span>   <span class="mf">2.2</span>  <span class="mf">1.</span> <span class="p">]]</span>
+<span class="p">[[</span> <span class="mi">1</span>  <span class="mi">3</span>  <span class="mi">4</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">0</span> <span class="o">-</span><span class="mi">5</span> <span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">0</span>  <span class="mi">0</span> <span class="o">-</span><span class="mi">3</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>We can solve the system by solving two back-substitution problems:</p>
+<div class="math">
+\[Ly = b\]</div>
+<p>and</p>
+<div class="math">
+\[Ux=y\]</div>
+<p>These are both <span class="math">\(O(n^2)\)</span>, so it is more efficient to decompose when
+there are multiple outcomes to solve for.</p>
+<p>Let do this with numpy:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">la</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">lu</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+<span class="nb">print</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">U</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">1</span> <span class="mi">3</span> <span class="mi">4</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">2</span> <span class="mi">1</span> <span class="mi">3</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">4</span> <span class="mi">1</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">4.</span>  <span class="mf">1.</span>  <span class="mf">2.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.</span>  <span class="mf">3.</span>  <span class="mf">4.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.</span>  <span class="mf">1.</span>  <span class="mf">3.</span><span class="p">]]</span>
+
+<span class="p">[[</span> <span class="mf">4.</span>  <span class="mf">1.</span>  <span class="mf">2.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.</span>  <span class="mf">3.</span>  <span class="mf">4.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.</span>  <span class="mf">1.</span>  <span class="mf">3.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">0.</span>  <span class="mf">1.</span>  <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>  <span class="mf">0.</span>  <span class="mf">1.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">1.</span>  <span class="mf">0.</span>  <span class="mf">0.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">1.</span>      <span class="mf">0.</span>      <span class="mf">0.</span>    <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.25</span>    <span class="mf">1.</span>      <span class="mf">0.</span>    <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.5</span>     <span class="mf">0.1818</span>  <span class="mf">1.</span>    <span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">4.</span>      <span class="mf">1.</span>      <span class="mf">2.</span>    <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>      <span class="mf">2.75</span>    <span class="mf">3.5</span>   <span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>      <span class="mf">0.</span>      <span class="mf">1.3636</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Note that the numpy decomposition uses <em>partial pivoting</em> (matrix rows
+are permuted to use the largest pivot). This is because small pivots can
+lead to numerical instability. Another reason why one should use library
+functions whenever possible!</p>
+</div>
+<div class="section" id="cholesky-decomposition">
+<h2>Cholesky Decomposition<a class="headerlink" href="#cholesky-decomposition" title="Permalink to this headline">¶</a></h2>
+<p>Recall that a square matrix <span class="math">\(A\)</span> is positive definite if</p>
+<div class="math">
+\[u^TA u &gt; 0\]</div>
+<p>for any non-zero n-dimensional vector <span class="math">\(u\)</span>,</p>
+<p>and a symmetric, positive-definite matrix <span class="math">\(A\)</span> is a
+positive-definite matrix such that</p>
+<div class="math">
+\[A = A^T\]</div>
+<p>Let <span class="math">\(A\)</span> be a symmetric, positive-definite matrix. There is a
+unique decomposition such that</p>
+<div class="math">
+\[A = L L^T\]</div>
+<p>where <span class="math">\(L\)</span> is lower-triangular with positive diagonal elements and
+<span class="math">\(L^T\)</span> is its transpose. This decomposition is known as the
+Cholesky decompostion, and <span class="math">\(L\)</span> may be interpreted as the &#8216;square
+root&#8217; of the matrix <span class="math">\(A\)</span>.</p>
+<div class="section" id="algorithm">
+<h3>Algorithm:<a class="headerlink" href="#algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Let <span class="math">\(A\)</span> be an <span class="math">\(n\times n\)</span> matrix. We find the matri
+<span class="math">\(L\)</span> using the following iterative procedure:</p>
+<div class="math">
+\[\begin{split}A = \left(\begin{matrix}a_{11}&amp;A_{12}\\A_{12}&amp;A_{22}\end{matrix}\right) =
+\left(\begin{matrix}\ell_{11}&amp;0\\
+L_{12}&amp;L_{22}\end{matrix}\right)
+\left(\begin{matrix}\ell_{11}&amp;L_{12}\\0&amp;L_{22}\end{matrix}\right)\end{split}\]</div>
+<p>1.) Let <span class="math">\(\ell_{11} = \sqrt{a_{11}}\)</span></p>
+<p>2.) <span class="math">\(L_{12} = \frac{1}{\ell_{11}}A_{12}\)</span></p>
+<p>3.) Solve <span class="math">\(A_{22} - L_{12}L_{12}^T = L_{22}L_{22}^T\)</span> for
+<span class="math">\(L_{22}\)</span></p>
+</div>
+<div class="section" id="example">
+<h3>Example:<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<div class="math">
+\[\begin{split}A = \left(\begin{matrix}1&amp;3&amp;5\\3&amp;13&amp;23\\5&amp;23&amp;42\end{matrix}\right)\end{split}\]</div>
+<div class="math">
+\[\ell_{11} = \sqrt{a_{11}} = 1\]</div>
+<div class="math">
+\[L_{12} = \frac{1}{\ell_{11}} A_{12} = A_{12}\]</div>
+<p><span class="math">\(\begin{eqnarray*} A_{22} - L_{12}L_{12}^T &amp;=&amp; \left(\begin{matrix}13&amp;23\\23&amp;42\end{matrix}\right) - \left(\begin{matrix}9&amp;15\\15&amp;25\end{matrix}\right)\\ &amp;=&amp; \left(\begin{matrix}4&amp;8\\8&amp;17\end{matrix}\right)\\ &amp;=&amp; \left(\begin{matrix}2&amp;0\\4&amp;\ell_{33}\end{matrix}\right) \left(\begin{matrix}2&amp;4\\0&amp;\ell_{33}\end{matrix}\right)\\ &amp;=&amp; \left(\begin{matrix}4&amp;8\\8&amp;16+\ell_{33}^2\end{matrix}\right) \end{eqnarray*}\)</span></p>
+<p>And so we conclude that <span class="math">\(\ell_{33}=1\)</span>.</p>
+<p>This yields the decomposition:</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix}1&amp;3&amp;5\\3&amp;13&amp;23\\5&amp;23&amp;42\end{matrix}\right) =
+\left(\begin{matrix}1&amp;0&amp;0\\3&amp;2&amp;0\\5&amp;4&amp;1\end{matrix}\right)\left(\begin{matrix}1&amp;3&amp;5\\0&amp;2&amp;4\\0&amp;0&amp;1\end{matrix}\right)\end{split}\]</div>
+<p>Now, with numpy:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">23</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">42</span><span class="p">]])</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span>  <span class="mf">1.</span>   <span class="mf">3.</span>   <span class="mf">5.</span><span class="p">]</span>
+ <span class="p">[</span>  <span class="mf">3.</span>  <span class="mf">13.</span>  <span class="mf">23.</span><span class="p">]</span>
+ <span class="p">[</span>  <span class="mf">5.</span>  <span class="mf">23.</span>  <span class="mf">42.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">1.</span>  <span class="mf">3.</span>  <span class="mf">5.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>  <span class="mf">2.</span>  <span class="mf">4.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>  <span class="mf">0.</span>  <span class="mf">1.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mi">1</span>  <span class="mi">3</span>  <span class="mi">5</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">3</span> <span class="mi">13</span> <span class="mi">23</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mi">5</span> <span class="mi">23</span> <span class="mi">42</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Cholesky decomposition is about twice as fast as LU decomposition
+(though both scale as <span class="math">\(n^3\)</span>).</p>
+</div>
+</div>
+<div class="section" id="matrix-decompositions-for-pca-and-least-squares">
+<h2>Matrix Decompositions for PCA and Least Squares<a class="headerlink" href="#matrix-decompositions-for-pca-and-least-squares" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="eigendecomposition">
+<h2>Eigendecomposition<a class="headerlink" href="#eigendecomposition" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="eigenvectors-and-eigenvalues">
+<h3>Eigenvectors and Eigenvalues<a class="headerlink" href="#eigenvectors-and-eigenvalues" title="Permalink to this headline">¶</a></h3>
+<p>First recall that an <em>eigenvector</em> of a matrix <span class="math">\(A\)</span> is a non-zero
+vector <span class="math">\(v\)</span> such that</p>
+<div class="math">
+\[Av = \lambda v\]</div>
+<p>for some scalar <span class="math">\(\lambda\)</span></p>
+<p>The value <span class="math">\(\lambda\)</span> is called an <em>eigenvalue</em> of <span class="math">\(A\)</span>.</p>
+<p>If an <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> has <span class="math">\(n\)</span> linearly
+independent eigenvectors, then <span class="math">\(A\)</span> may be decomposed in the
+following manner:</p>
+<div class="math">
+\[A = B\Lambda B^{-1}\]</div>
+<p>where <span class="math">\(\Lambda\)</span> is a diagonal matrix whose diagonal entries are
+the eigenvalues of <span class="math">\(A\)</span> and the columns of <span class="math">\(B\)</span> are the
+corresponding eigenvectors of <span class="math">\(A\)</span>.</p>
+<p>Facts:</p>
+<ul>
+<li><p class="first">An <span class="math">\(n\times n\)</span> matrix is diagonizable <span class="math">\(\iff\)</span> it has
+<span class="math">\(n\)</span> linearly independent eigenvectors.</p>
+</li>
+<li><p class="first">A symmetric, positive definite matrix has only positive eigenvalues
+and its eigendecomposition</p>
+<div class="math">
+\[A=B\Lambda B^{-1}\]</div>
+</li>
+</ul>
+<p>is via an orthogonal transformation <span class="math">\(B\)</span>. (I.e. its eigenvectors
+are an orthonormal set)</p>
+<div class="section" id="calculating-eigenvalues">
+<h4>Calculating Eigenvalues<a class="headerlink" href="#calculating-eigenvalues" title="Permalink to this headline">¶</a></h4>
+<p>It is easy to see from the definition that if <span class="math">\(v\)</span> is an
+eigenvector of an <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> with eigenvalue
+<span class="math">\(\lambda\)</span>, then</p>
+<div class="math">
+\[Av - \lambda I = \bf{0}\]</div>
+<p>where <span class="math">\(I\)</span> is the identity matrix of dimension <span class="math">\(n\)</span> and
+<span class="math">\(\bf{0}\)</span> is an n-dimensional zero vector. Therefore, the
+eigenvalues of <span class="math">\(A\)</span> satisfy:</p>
+<div class="math">
+\[\det\left(A-\lambda I\right)=0\]</div>
+<p>The left-hand side above is a polynomial in <span class="math">\(\lambda\)</span>, and is
+called the <em>characteristic polynomial</em> of <span class="math">\(A\)</span>. Thus, to find the
+eigenvalues of <span class="math">\(A\)</span>, we find the roots of the characteristic
+polynomial.</p>
+<p>Computationally, however, computing the characteristic polynomial and
+then solving for the roots is prohibitively expensive. Therefore, in
+practice, numerical methods are used - both to find eigenvalues and
+their corresponding eigenvectors. We won&#8217;t go into the specifics of the
+algorithms used to calculate eigenvalues, but here is a numpy example:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]])</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">V</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="o">-</span><span class="mf">0.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">2.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">0.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">3.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">4.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">5.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]]</span>
+<span class="p">[</span> <span class="mf">5.8541</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span> <span class="o">-</span><span class="mf">0.8541</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.0000</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>NB:</strong> Many matrices are <em>not</em> diagonizable, and many have <em>complex</em>
+eigenvalues (even if all entries are real).</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">V</span><span class="p">))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span> <span class="mi">0</span>  <span class="mi">1</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mi">1</span>  <span class="mi">0</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">0.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">0.</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]]</span>
+<span class="p">[</span> <span class="mf">0.</span><span class="o">+</span><span class="mf">1.</span><span class="n">j</span>  <span class="mf">0.</span><span class="o">-</span><span class="mf">1.</span><span class="n">j</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># If you know the eigenvalues must be real</span>
+<span class="c1"># because A is a positive definite (e.g. covariance) matrix</span>
+<span class="c1"># use real_if_close</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]])</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="nb">print</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="mf">5.8541</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span> <span class="o">-</span><span class="mf">0.8541</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span>  <span class="mf">1.0000</span><span class="o">+</span><span class="mf">0.</span><span class="n">j</span><span class="p">]</span>
+<span class="p">[</span> <span class="mf">5.8541</span> <span class="o">-</span><span class="mf">0.8541</span>  <span class="mf">1.</span>    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="singular-values">
+<h4>Singular Values<a class="headerlink" href="#singular-values" title="Permalink to this headline">¶</a></h4>
+<p>For any <span class="math">\(m\times n\)</span> matrix <span class="math">\(A\)</span>, we define its <em>singular
+values</em> to be the square root of the eigenvalues of <span class="math">\(A^TA\)</span>. These
+are well-defined as <span class="math">\(A^TA\)</span> is always symmetric, positive-definite,
+so its eigenvalues are real and positive. Singular values are important
+properties of a matrix. Geometrically, a matrix <span class="math">\(A\)</span> maps the unit
+sphere in <span class="math">\(\mathbb{R}^n\)</span> to an ellipse. The singular values are
+the lengths of the semi-axes.</p>
+<p>Singular values also provide a measure of the <em>stabilty</em> of a matrix.
+We&#8217;ll revisit this in the end of the lecture.</p>
+</div>
+</div>
+</div>
+<div class="section" id="qr-decompositon">
+<h2>QR decompositon<a class="headerlink" href="#qr-decompositon" title="Permalink to this headline">¶</a></h2>
+<p>As with the previous decompositions, <span class="math">\(QR\)</span> decomposition is a
+method to write a matrix <span class="math">\(A\)</span> as the product of two matrices of
+simpler form. In this case, we want:</p>
+<div class="math">
+\[A= QR\]</div>
+<p>where <span class="math">\(Q\)</span> is an <span class="math">\(m\times n\)</span> matrix with <span class="math">\(Q Q^T = I\)</span>
+(i.e. <span class="math">\(Q\)</span> is <em>orthogonal</em>) and <span class="math">\(R\)</span> is an <span class="math">\(n\times n\)</span>
+upper-triangular matrix.</p>
+<p>This is really just the matrix form of the Gram-Schmidt
+orthogonalization of the columns of <span class="math">\(A\)</span>. The G-S algorithm itself
+is unstable, so various other methods have been developed to compute the
+QR decomposition. We won&#8217;t cover those in detail as they are a bit
+beyond our scope.</p>
+<p>The first <span class="math">\(k\)</span> columns of <span class="math">\(Q\)</span> are an orthonormal basis for
+the column space of the first <span class="math">\(k\)</span> columns of <span class="math">\(A\)</span>.</p>
+<p>Iterative QR decomposition is often used in the computation of
+eigenvalues.</p>
+</div>
+<div class="section" id="singular-value-decomposition">
+<h2>Singular Value Decomposition<a class="headerlink" href="#singular-value-decomposition" title="Permalink to this headline">¶</a></h2>
+<p>Another important matrix decomposition is singular value decomposition
+or SVD. For any <span class="math">\(m\times n\)</span> matrix <span class="math">\(A\)</span>, we may write:</p>
+<div class="math">
+\[A= UDV\]</div>
+<p>where <span class="math">\(U\)</span> is a unitary (orthogonal in the real case)
+<span class="math">\(m\times m\)</span> matrix, <span class="math">\(D\)</span> is a rectangular, diagonal
+<span class="math">\(m\times n\)</span> matrix with diagonal entries <span class="math">\(d_1,...,d_m\)</span> all
+non-negative. <span class="math">\(V\)</span> is a unitary (orthogonal) <span class="math">\(n\times n\)</span>
+matrix. SVD is used in principle component analysis and in the
+computation of the Moore-Penrose pseudo-inverse.</p>
+</div>
+<div class="section" id="stabilty-and-condition-number">
+<h2>Stabilty and Condition Number<a class="headerlink" href="#stabilty-and-condition-number" title="Permalink to this headline">¶</a></h2>
+<p>It is important that numerical algorithms be <em>stable</em> and <em>efficient</em>.
+Efficiency is a property of an algorithm, but stability can be a
+property of the system itself.</p>
+<div class="section" id="id1">
+<h3>Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="math">
+\[\begin{split}\left(\begin{matrix}8&amp;6&amp;4&amp;1\\1&amp;4&amp;5&amp;1\\8&amp;4&amp;1&amp;1\\1&amp;4&amp;3&amp;6\end{matrix}\right)x = \left(\begin{matrix}19\\11\\14\\14\end{matrix}\right)\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">19</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">14</span><span class="p">])</span>
+<span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">19.01</span><span class="p">,</span><span class="mf">11.05</span><span class="p">,</span><span class="mf">14.07</span><span class="p">,</span><span class="mf">14.05</span><span class="p">])</span>
+<span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">2.34</span> <span class="p">,</span>  <span class="mf">9.745</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.85</span> <span class="p">,</span> <span class="o">-</span><span class="mf">1.34</span> <span class="p">])</span>
+</pre></div>
+</div>
+<p>Note that the <em>tiny</em> perturbations in the outcome vector <span class="math">\(b\)</span> cause
+<em>large</em> differences in the solution! When this happens, we say that the
+matrix <span class="math">\(A\)</span> <em>ill-conditioned</em>. This happens when a matrix is
+&#8216;close&#8217; to being singular (i.e. non-invertible).</p>
+</div>
+<div class="section" id="condition-number">
+<h3>Condition Number<a class="headerlink" href="#condition-number" title="Permalink to this headline">¶</a></h3>
+<p>A measure of this type of behavior is called the <em>condition number</em>. It
+is defined as:</p>
+<div class="math">
+\[cond(A) = ||A||\cdot ||A^{-1}||\]</div>
+<p>In general, it is difficult to compute.</p>
+<p>Fact:</p>
+<div class="math">
+\[cond(A) = \frac{\lambda_1}{\lambda_n}\]</div>
+<p>where <span class="math">\(\lambda_1\)</span> is the maximum singular value of <span class="math">\(A\)</span> and
+<span class="math">\(\lambda_n\)</span> is the smallest. The higher the condition number, the
+more unstable the system. In general if there is a large discrepancy
+between minimal and maximal singular values, the condition number is
+large.</p>
+<div class="section" id="id2">
+<h4>Example<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">/</span><span class="nb">min</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="mf">15.5457</span>   <span class="mf">6.9002</span>   <span class="mf">3.8363</span>   <span class="mf">0.0049</span><span class="p">]</span>
+<span class="mf">3198.6725812</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="preconditioning">
+<h4>Preconditioning<a class="headerlink" href="#preconditioning" title="Permalink to this headline">¶</a></h4>
+<p>We can sometimes improve on this behavior by &#8216;pre-conditioning&#8217;. Instead
+of solving</p>
+<div class="math">
+\[Ax=b\]</div>
+<p>we solve</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}D^{-1}Ax=D^{-1}b\\where :math:`D^{-1}A` has a lower condition number than :math:`A`\end{aligned}\end{align} \]</div>
+<p>itself.</p>
+<p>Preconditioning is a <em>very</em> involved topic, quite out of the range of
+this course. It is mentioned here only to make you aware that such a
+thing exists, should you ever run into an ill-conditioned problem!</p>
+</div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><strong>1</strong>. Compute the LU decomposition of the following matrix by hand and
+using numpy</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix}1&amp;2&amp;3\\2&amp;-4&amp;6\\3&amp;-9&amp;-3\end{matrix}\right)\end{split}\]</div>
+<p>Solution:</p>
+<p>First by hand:</p>
+<p><strong>2</strong>. Compute the Cholesky decomposition of the following matrix by
+hand and using numpy</p>
+<div class="math">
+\[\begin{split}\left(\begin{matrix}1&amp;2&amp;3\\2&amp;-4&amp;6\\3&amp;6&amp;-3\end{matrix}\right)\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Your code here</span>
+</pre></div>
+</div>
+<p><strong>3</strong>. Write a function in Python to solve a system</p>
+<div class="math">
+\[Ax = b\]</div>
+<p>using SVD decomposition. Your function should take <span class="math">\(A\)</span> and
+<span class="math">\(b\)</span> as input and return <span class="math">\(x\)</span>.</p>
+<p>Your function should include the following:</p>
+<ul class="simple">
+<li>First, check that <span class="math">\(A\)</span> is invertible - return error message if
+it is not</li>
+<li>Invert <span class="math">\(A\)</span> using SVD and solve</li>
+<li>return <span class="math">\(x\)</span></li>
+</ul>
+<p>Test your function for correctness.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Your code here</span>
+
+<span class="k">def</span> <span class="nf">svdsolver</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matrix is singular&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">((</span><span class="n">V</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))),</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">svdsolver</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="mf">5.</span> <span class="o">-</span><span class="mf">2.</span><span class="p">]</span>
+<span class="p">[</span> <span class="mf">5.</span> <span class="o">-</span><span class="mf">2.</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Matrix Decompositions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#lu-decomposition-and-gaussian-elimination">LU Decomposition and Gaussian Elimination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cholesky-decomposition">Cholesky Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#matrix-decompositions-for-pca-and-least-squares">Matrix Decompositions for PCA and Least Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#eigendecomposition">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qr-decompositon">QR decompositon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#singular-value-decomposition">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stabilty-and-condition-number">Stabilty and Condition Number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="13A_LinearAlgebra1.html"
+                          title="Previous page">&larr; Linear Algebra Review</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="13C_LinearAlgebraExamples.html"
+                          title="Next page">&rarr; Linear Algebra Examples</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/13B_LinearAlgebra2.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="13C_LinearAlgebraExamples.html" title="Linear Algebra Examples"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13A_LinearAlgebra1.html" title="Linear Algebra Review"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13B_LinearAlgebra2.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:24 GMT -->
+</html>

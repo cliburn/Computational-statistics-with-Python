@@ -1,0 +1,626 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18C_Efficiency_In_Spark.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:28 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Spark Efficiently &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Spark MLLib" href="18D_Spark_MLib.html" />
+    <link rel="prev" title="Using Spark" href="18B_Spark.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="18D_Spark_MLib.html" title="Spark MLLib"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18B_Spark.html" title="Using Spark"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-spark-efficiently">
+<h1>Using Spark Efficiently<a class="headerlink" href="#using-spark-efficiently" title="Permalink to this headline">¶</a></h1>
+<p>Focus in this lecture is on Spark constructs that can make your programs
+more efficient. In general, this means minimizing the amount of data
+transfer across nodes, since this is usually the bottleneck for big data
+analysis problems.</p>
+<ul class="simple">
+<li>Shared variables<ul>
+<li>Accumulators</li>
+<li>Broadcast variables</li>
+</ul>
+</li>
+<li>DataFrames</li>
+<li>Partitioning and the Spark shuffle</li>
+<li>Piping to external programs</li>
+</ul>
+<p>Spark tuning and optimization is complicated - this tutorial only
+touches on some of the basic concepts.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="k">import</span> <span class="n">SparkContext</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="p">(</span><span class="s1">&#39;local[*]&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://spark.apache.org/docs/latest/programming-guide.html">The Spark Programming
+Guide</a></p>
+</div>
+<div class="section" id="accumulators">
+<h2>Accumulators<a class="headerlink" href="#accumulators" title="Permalink to this headline">¶</a></h2>
+<p>Spark functions such as <code class="docutils literal"><span class="pre">map</span></code> can use variables defined in the driver
+program, but they make local copies of the variable that are not passed
+back to the driver program. Accumulators are <em>shared variables</em> that
+allow the aggregation of results from workers back to the driver
+program, for example, as an event counter. Suppose we want to count the
+number of rows of data with missing information. The most efficient way
+is to use an <strong>accumulator</strong>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;data/Ulysses.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;The Project Gutenberg EBook of Ulysses, by James Joyce&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;This eBook is for the use of anyone anywhere at no cost and with&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;almost no restrictions whatsoever.  You may copy it, give it away or&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;re-use it under the terms of the Project Gutenberg License included&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;with this eBook or online at www.gutenberg.org&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Title: Ulysses&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="event-counting">
+<h3>Event counting<a class="headerlink" href="#event-counting" title="Permalink to this headline">¶</a></h3>
+<p>Notice that we have some empty lines. We want to count the number of
+non-empty lines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">num_lines</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">accumulator</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">tokenize_count</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">num_lines</span>
+
+    <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+        <span class="n">num_lines</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counter</span> <span class="o">=</span> <span class="n">ulysses</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">tokenize_count</span><span class="p">(</span><span class="n">line</span><span class="p">))</span><span class="o">.</span><span class="n">countByValue</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counter</span><span class="p">[</span><span class="s1">&#39;circle&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">20</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">num_lines</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">25396</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="broadcast-variables">
+<h2>Broadcast Variables<a class="headerlink" href="#broadcast-variables" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes we need to send a large read only variable to all workers. For
+example, we might want to share a large feature matrix to all workers as
+a part of a machine learning application. This same variable will be
+sent separately for each parallel operation unless you use a <strong>broadcast
+variable</strong>. Also, the default variable passing mechanism is optimized
+for small variables and can be slow when the variable is large.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">count</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="n">count</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">weight_first</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">weight_last</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">weight_first</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2941855</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">weight_last</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2995994</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Use SparkContext.broadcast() to create a broadcast variable</li>
+<li>Where you would use var, use var.value</li>
+<li>The broadcast variable is sent once to each node and can be re-used</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">table_bc</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">weight_first_bc</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">weight_last_bc</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table</span><span class="p">):</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Although it looks like table_bc is being passed to each function, all
+that is passed is a path to the table. The worker checks if the path has
+been cached and uses the cache instead of loading from the path.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">weight_first_bc</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table_bc</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2941855</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">weight_last_bc</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">table_bc</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">2995994</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-spark-shuffle-and-partitioning">
+<h2>The Spark Shuffle and Partitioning<a class="headerlink" href="#the-spark-shuffle-and-partitioning" title="Permalink to this headline">¶</a></h2>
+<p>Some events trigger the redistribution of data across partitions, and
+involves the (expensive) copying of data across executors and machines.
+This is known as the <strong>shuffle</strong>. For example, if we do a
+<code class="docutils literal"><span class="pre">reduceByKey</span></code> operation on key-value pair RDD, Spark needs to collect
+all pairs with the same key in the same partition to do the reduction.</p>
+<p>For key-value RDDs, you have some control over the partitioning of the
+RDDs. In particular, you can ask Spark to partition a set of keys so
+that they are guaranteed to appear together on some node. This can
+minimize a lot of data transfer. For example, suppose you have a large
+key-value RDD consisting of user_name: comments from a web user
+community. Every night, you want to update with new user comments with a
+join operation</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fake_data</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">),</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="mi">2</span><span class="p">))))</span>
+    <span class="n">comments</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">comments</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">fake_data</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;uw&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;iv&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;cy&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;ea&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;jc&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;th&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;pe&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;rf&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;ng&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">new_data</span> <span class="o">=</span> <span class="n">fake_data</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span>  <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">new_data</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;vf&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;es&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;er&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;kq&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gw&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;jt&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;my&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;xx&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;ui&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd_new</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span><span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd_updated</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rdd_new</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd_updated</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;sz&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bbb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;sc&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;kt&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;wg&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;vt&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;xb&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;oa&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;uy&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;gu&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;gb&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">))]</span>
+</pre></div>
+</div>
+<div class="section" id="using-partitionby">
+<h3>Using <code class="docutils literal"><span class="pre">partitionBy</span></code><a class="headerlink" href="#using-partitionby" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">join</span></code> operation will hash all the keys of both <code class="docutils literal"><span class="pre">rdd</span></code> and
+<code class="docutils literal"><span class="pre">rdd_nerw</span></code>, sending keys with the same hashes to the same node for the
+actual join operation. There is a lot of unnecessary data transfer.
+Since <code class="docutils literal"><span class="pre">rdd</span></code> is a much larger data set than <code class="docutils literal"><span class="pre">rdd_new</span></code>, we can instead
+fix the partitioning of <code class="docutils literal"><span class="pre">rdd</span></code> and just transfer the keys of
+<code class="docutils literal"><span class="pre">rdd_new</span></code>. This is done by <code class="docutils literal"><span class="pre">rdd.partitionBy(numPartitions)</span></code> where
+<code class="docutils literal"><span class="pre">numPartitions</span></code> should be at least twice the number of cores.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd2</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+<span class="n">rdd2</span> <span class="o">=</span> <span class="n">rdd2</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd2_updated</span> <span class="o">=</span> <span class="n">rdd2</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rdd_new</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd2_updated</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;sz&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bbb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;tp&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;sf&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bbb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;qo&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bbb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;nh&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;df&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;kw&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;fo&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;tl&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;bb&#39;</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;lh&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;aaaaaaaaaaaaa&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">))]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="piping-to-external-programs">
+<h2>Piping to External Programs<a class="headerlink" href="#piping-to-external-programs" title="Permalink to this headline">¶</a></h2>
+<p>Suppose it is more convenient or efficient to write a function in some
+other language to process data. We can <strong>pipe</strong> data from Spark to the
+external program (script) that performs the calculation via standard
+input and output. The example below shows using a C++ program to
+calculate the sum of squares for collections of numbers.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>%%file foo.cpp
+
+#include &lt;iostream&gt;
+#include &lt;sstream&gt;
+#include &lt;string&gt;
+#include &lt;numeric&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+double sum_squares(double x, double y) {
+  return x + y*y;
+};
+
+int main() {
+
+    string s;
+
+    while (cin) {
+
+        getline(cin, s);
+        stringstream stream(s);
+        vector&lt;double&gt; v;
+
+        while(1) {
+            double u;
+            stream &gt;&gt; u;
+            if(!stream)
+                break;
+            v.push_back(u);
+        }
+        if (v.size()) {
+            double x = accumulate(v.begin(), v.end(), 0.0, sum_squares);
+            cout &lt;&lt; x &lt;&lt; endl;
+        }
+    }
+}
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">foo</span><span class="o">.</span><span class="n">cpp</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! g++ foo.cpp -o foo
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="s1">&#39;numbers.txt&#39;</span><span class="p">,</span> <span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="o">./</span><span class="n">foo</span> <span class="o">&lt;</span> <span class="n">numbers</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.12948</span>
+<span class="mf">1.27958</span>
+<span class="mf">0.711174</span>
+<span class="mf">0.145084</span>
+<span class="mf">1.53344</span>
+<span class="mf">1.00307</span>
+<span class="mf">1.64678</span>
+<span class="mf">1.35042</span>
+<span class="mf">1.77033</span>
+<span class="mf">1.26898</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">bash</span>
+
+<span class="n">cat</span> <span class="n">numbers</span><span class="o">.</span><span class="n">txt</span> <span class="o">|</span> <span class="o">./</span><span class="n">foo</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.12948</span>
+<span class="mf">1.27958</span>
+<span class="mf">0.711174</span>
+<span class="mf">0.145084</span>
+<span class="mf">1.53344</span>
+<span class="mf">1.00307</span>
+<span class="mf">1.64678</span>
+<span class="mf">1.35042</span>
+<span class="mf">1.77033</span>
+<span class="mf">1.26898</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>!head numbers.txt
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">5.270539741683482049e-01</span> <span class="mf">9.538059079198231149e-01</span> <span class="mf">9.705379757246932471e-01</span>
+<span class="mf">8.224342507879207620e-01</span> <span class="mf">4.863559000065119653e-01</span> <span class="mf">6.055084142317349594e-01</span>
+<span class="mf">3.776646942097252602e-01</span> <span class="mf">6.458831090447878509e-01</span> <span class="mf">3.890739818068755795e-01</span>
+<span class="mf">3.894152894179003788e-02</span> <span class="mf">3.690381691456464663e-01</span> <span class="mf">8.589506712912342579e-02</span>
+<span class="mf">7.596819591747848710e-01</span> <span class="mf">5.785597615102290314e-01</span> <span class="mf">7.884100040999678649e-01</span>
+<span class="mf">8.717886662425843314e-01</span> <span class="mf">4.836717890004667009e-01</span> <span class="mf">9.547083256957378250e-02</span>
+<span class="mf">7.107374952186653605e-01</span> <span class="mf">5.218853770211685505e-01</span> <span class="mf">9.323470966394742376e-01</span>
+<span class="mf">8.793413319051871513e-01</span> <span class="mf">3.959469860304939415e-01</span> <span class="mf">6.483846319494085408e-01</span>
+<span class="mf">9.579829009525054895e-01</span> <span class="mf">2.739685046015039038e-01</span> <span class="mf">8.817835757073387848e-01</span>
+<span class="mf">5.315242953832449713e-01</span> <span class="mf">3.254503074377856908e-01</span> <span class="mf">9.383707453566396683e-01</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;numbers.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="k">import</span> <span class="n">SparkFiles</span>
+
+<span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Each line contains numbers separated by a space.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+<span class="c1"># pipe data to external function</span>
+<span class="n">func</span> <span class="o">=</span> <span class="s1">&#39;./foo&#39;</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+<span class="n">ss</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">prepare</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">SparkFiles</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">collect</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">2.12948</span> <span class="p">,</span>  <span class="mf">1.27958</span> <span class="p">,</span>  <span class="mf">0.711174</span><span class="p">,</span>  <span class="mf">0.145084</span><span class="p">,</span>  <span class="mf">1.53344</span> <span class="p">,</span>  <span class="mf">1.00307</span> <span class="p">,</span>
+        <span class="mf">1.64678</span> <span class="p">,</span>  <span class="mf">1.35042</span> <span class="p">,</span>  <span class="mf">1.77033</span> <span class="p">,</span>  <span class="mf">1.26898</span> <span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xs</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">2.12947556</span><span class="p">,</span>  <span class="mf">1.2795806</span> <span class="p">,</span>  <span class="mf">0.71117418</span><span class="p">,</span>  <span class="mf">0.14508358</span><span class="p">,</span>  <span class="mf">1.53343841</span><span class="p">,</span>
+        <span class="mf">1.00306856</span><span class="p">,</span>  <span class="mf">1.64678324</span><span class="p">,</span>  <span class="mf">1.35041782</span><span class="p">,</span>  <span class="mf">1.77033225</span><span class="p">,</span>  <span class="mf">1.26897563</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="section" id="version">
+<h3>Version<a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">version_information</span>
+<span class="o">%</span><span class="n">version_information</span> <span class="n">pyspark</span><span class="p">,</span> <span class="n">numpy</span>
+</pre></div>
+</div>
+<table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.3</td></tr><tr><td>OS</td><td>Darwin 15.4.0 x86_64 i386 64bit</td></tr><tr><td>pyspark</td><td>The 'pyspark' distribution was not found and is required by the application</td></tr><tr><td>numpy</td><td>1.10.4</td></tr><tr><td colspan='2'>Tue Apr 19 13:19:24 2016 EDT</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Spark Efficiently</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#accumulators">Accumulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#broadcast-variables">Broadcast Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-spark-shuffle-and-partitioning">The Spark Shuffle and Partitioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#piping-to-external-programs">Piping to External Programs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="18B_Spark.html"
+                          title="Previous page">&larr; Using Spark</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="18D_Spark_MLib.html"
+                          title="Next page">&rarr; Spark MLLib</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/18C_Efficiency_In_Spark.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="18D_Spark_MLib.html" title="Spark MLLib"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18B_Spark.html" title="Using Spark"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18C_Efficiency_In_Spark.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:29 GMT -->
+</html>

@@ -1,0 +1,862 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/11C_IPyParallel.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:04 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using ipyparallel &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using C++" href="12A_C%2b%2b.html" />
+    <link rel="prev" title="Multi-Core Parallelism" href="11B_Threads_Processses_Concurrency.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="12A_C%2b%2b.html" title="Using C++"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="11B_Threads_Processses_Concurrency.html" title="Multi-Core Parallelism"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-ipyparallel">
+<h1>Using <code class="docutils literal"><span class="pre">ipyparallel</span></code><a class="headerlink" href="#using-ipyparallel" title="Permalink to this headline">¶</a></h1>
+<p>Parallel execution is tightly integrated with Jupyter in the
+<code class="docutils literal"><span class="pre">ipyparallel</span></code> package. Install with</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">ipyparallel</span>
+<span class="n">ipcluster</span> <span class="n">nbextension</span> <span class="n">enable</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://ipyparallel.readthedocs.org/en/latest/">Official
+documentation</a></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="section" id="starting-engines">
+<h2>Starting engines<a class="headerlink" href="#starting-engines" title="Permalink to this headline">¶</a></h2>
+<p>We will only use engines on local cores which does not require any setup
+- see
+<a class="reference external" href="https://ipyparallel.readthedocs.org/en/latest/process.html">docs</a>
+for detailed instructions on how to set up a remote cluster, including
+setting up to use Amazon EC2 clusters.</p>
+<p>You can start a cluster on the <code class="docutils literal"><span class="pre">IPython</span> <span class="pre">Clusters</span></code> tab in the main
+Jupyter browser window or via the command line with</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ipcluster</span> <span class="n">start</span> <span class="o">-</span><span class="n">n</span> <span class="o">&lt;</span><span class="n">put</span> <span class="n">desired</span> <span class="n">number</span> <span class="n">of</span> <span class="n">engines</span> <span class="n">to</span> <span class="n">run</span> <span class="n">here</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The main advantage of developing parallel applications using
+<code class="docutils literal"><span class="pre">ipyparallel</span></code> is that it can be done interactively within Jupyter.</p>
+</div>
+<div class="section" id="basic-concepts-of-ipyparallel">
+<h2>Basic concepts of <code class="docutils literal"><span class="pre">ipyparallel</span></code><a class="headerlink" href="#basic-concepts-of-ipyparallel" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ipyparallel</span> <span class="k">import</span> <span class="n">Client</span>
+</pre></div>
+</div>
+<p>The client connects to the cluster of &#8220;remote&#8221; engines that perfrom the
+actual computation. These engines may be on the same machine or on a
+cluster.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span><span class="o">.</span><span class="n">ids</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[]</span>
+</pre></div>
+</div>
+<p>A view provides access to a subset of the engines available to the
+client. Jobs are submitted to the engines via the view. A direct view
+allows the user to explicitly send work specific engines. The load
+balanced view is like the <code class="docutils literal"><span class="pre">Pool</span></code> object in <code class="docutils literal"><span class="pre">multiprocessing</span></code>, and
+manages the scheduling and distribution of jobs for you.</p>
+<p><strong>Direct view</strong></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span> <span class="o">=</span> <span class="n">rc</span><span class="p">[:]</span>
+</pre></div>
+</div>
+<p>Add 10 sets of 3 numbers in parallel using all engines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Add 10 sets of 3 numbers in parallel using only alternate engines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Add 10 sets of 3 numbers using a specific engine.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Load balanced view</strong></p>
+<p>Use this when you have many jobs that take different amounts of time to
+complete.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lv</span> <span class="o">=</span> <span class="n">rc</span><span class="o">.</span><span class="n">load_balanced_view</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100000</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">49859.841956016848</span><span class="p">,</span>
+ <span class="mf">49870.081709239821</span><span class="p">,</span>
+ <span class="mf">49943.641182764761</span><span class="p">,</span>
+ <span class="mf">50036.652427205641</span><span class="p">,</span>
+ <span class="mf">50068.404147389781</span><span class="p">,</span>
+ <span class="mf">49992.029384113026</span><span class="p">,</span>
+ <span class="mf">49955.070276994411</span><span class="p">,</span>
+ <span class="mf">50125.980933489096</span><span class="p">,</span>
+ <span class="mf">50022.922095057918</span><span class="p">,</span>
+ <span class="mf">50034.625115371957</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="calling-functions-with-apply">
+<h3>Calling functions with apply<a class="headerlink" href="#calling-functions-with-apply" title="Permalink to this headline">¶</a></h3>
+<p>In contrast to <code class="docutils literal"><span class="pre">map</span></code>, <code class="docutils literal"><span class="pre">apply</span></code> is just a simple function call run on
+all remote engines, and has the usual function signature
+<code class="docutils literal"><span class="pre">apply(f,</span> <span class="pre">*args,</span> <span class="pre">**kwargs)</span></code>. It is a primitive on which other more
+useful functions (such as <code class="docutils literal"><span class="pre">map</span></code>) are built upon.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">apply_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rc</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">apply_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="synchronous-and-asynchronous-jobs">
+<h4>Synchronous and asynchronous jobs<a class="headerlink" href="#synchronous-and-asynchronous-jobs" title="Permalink to this headline">¶</a></h4>
+<p>We have used the <code class="docutils literal"><span class="pre">map_sync</span></code> and <code class="docutils literal"><span class="pre">apply_sync</span></code> methods. The <code class="docutils literal"><span class="pre">sync</span></code>
+suffix indicate that we want to run a synchronous job. Synchronous jobs
+<code class="docutils literal"><span class="pre">block</span></code> until all the computation is done and return the result.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>In contrast, asynchronous jobs return immediately so that you can do
+other work, but returns a <code class="docutils literal"><span class="pre">AsyncMapResult</span></code> object, similar to the
+<code class="docutils literal"><span class="pre">future</span></code> object returned by the <code class="docutils literal"><span class="pre">concurrent.futures</span></code> package. You
+can query its status, cancel running jobs and retrieve results once they
+have been computed.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">dv</span><span class="o">.</span><span class="n">map_async</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">AsyncMapResult</span><span class="p">:</span> <span class="o">&lt;</span><span class="k">lambda</span><span class="o">&gt;</span><span class="p">:</span><span class="n">finished</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">.</span><span class="n">done</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>There is also a <code class="docutils literal"><span class="pre">map</span></code> method that by default uses asynchronous mode,
+but you can change this by setting the <code class="docutils literal"><span class="pre">block</span></code> attribute or function
+argument.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Change blocking mode for just one job.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Change blocking mode for this view so that all jobs are synchronous.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">res</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="remote-function-decorators">
+<h4>Remote function decorators<a class="headerlink" href="#remote-function-decorators" title="Permalink to this headline">¶</a></h4>
+<p>The <code class="docutils literal"><span class="pre">&#64;remote</span></code> decorator results in functions that will execute
+simultaneously on all engines in a view. For example, you can use this
+decorator if you always want to run <span class="math">\(n\)</span> independent parallel MCMC
+chains.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@dv</span><span class="o">.</span><span class="n">remote</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f1</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.14291698</span><span class="p">,</span>  <span class="mf">0.43179052</span><span class="p">,</span>  <span class="mf">0.01988482</span><span class="p">,</span>  <span class="mf">0.34954953</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.17649555</span><span class="p">,</span>  <span class="mf">0.24990395</span><span class="p">,</span>  <span class="mf">0.55351823</span><span class="p">,</span>  <span class="mf">0.08560618</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.58286124</span><span class="p">,</span>  <span class="mf">0.54516206</span><span class="p">,</span>  <span class="mf">0.11319046</span><span class="p">,</span>  <span class="mf">0.58497964</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.47768026</span><span class="p">,</span>  <span class="mf">0.6619128</span> <span class="p">,</span>  <span class="mf">0.01443178</span><span class="p">,</span>  <span class="mf">0.35109978</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.2927628</span> <span class="p">,</span>  <span class="mf">0.76033203</span><span class="p">,</span>  <span class="mf">0.99378694</span><span class="p">,</span>  <span class="mf">0.40169856</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.26566942</span><span class="p">,</span>  <span class="mf">0.25636252</span><span class="p">,</span>  <span class="mf">0.08508869</span><span class="p">,</span>  <span class="mf">0.49019879</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.16307286</span><span class="p">,</span>  <span class="mf">0.08510121</span><span class="p">,</span>  <span class="mf">0.79460886</span><span class="p">,</span>  <span class="mf">0.95521201</span><span class="p">]),</span>
+ <span class="n">array</span><span class="p">([</span> <span class="mf">0.73906763</span><span class="p">,</span>  <span class="mf">0.06665074</span><span class="p">,</span>  <span class="mf">0.99133771</span><span class="p">,</span>  <span class="mf">0.61957675</span><span class="p">])]</span>
+</pre></div>
+</div>
+<p>The &#64;parallel decorator breaks up elementwise operations and distributes
+them.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@dv</span><span class="o">.</span><span class="n">parallel</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f2</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+ <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@dv</span><span class="o">.</span><span class="n">parallel</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f3</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@dv</span><span class="o">.</span><span class="n">parallel</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f4</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="example-use-the-parallel-decorator-to-speed-up-mandelbrot-calculations">
+<h3>Example: Use the <code class="docutils literal"><span class="pre">&#64;parallel</span></code> decorator to speed up Mandelbrot calculations<a class="headerlink" href="#example-use-the-parallel-decorator-to-speed-up-mandelbrot-calculations" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">mandel1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iters</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">c</span>
+        <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="n">z</span><span class="o">.</span><span class="n">imag</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">imag</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">max_iters</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@dv</span><span class="o">.</span><span class="n">parallel</span><span class="p">(</span><span class="n">block</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">mandel2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_iters</span><span class="o">=</span><span class="mi">80</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">complex</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iters</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">c</span>
+        <span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">real</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="n">z</span><span class="o">.</span><span class="n">imag</span><span class="o">*</span><span class="n">z</span><span class="o">.</span><span class="n">imag</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">max_iters</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<span class="n">im1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mandel1</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">())),</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CPU</span> <span class="n">times</span><span class="p">:</span> <span class="n">user</span> <span class="mi">883</span> <span class="n">ms</span><span class="p">,</span> <span class="n">sys</span><span class="p">:</span> <span class="mf">5.73</span> <span class="n">ms</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="mi">889</span> <span class="n">ms</span>
+<span class="n">Wall</span> <span class="n">time</span><span class="p">:</span> <span class="mi">886</span> <span class="n">ms</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<span class="n">im2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mandel2</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()),</span>  <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">CPU</span> <span class="n">times</span><span class="p">:</span> <span class="n">user</span> <span class="mf">41.7</span> <span class="n">ms</span><span class="p">,</span> <span class="n">sys</span><span class="p">:</span> <span class="mf">10.1</span> <span class="n">ms</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="mf">51.8</span> <span class="n">ms</span>
+<span class="n">Wall</span> <span class="n">time</span><span class="p">:</span> <span class="mi">238</span> <span class="n">ms</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">---------------------------------------------------------------------------</span>
+
+<span class="ne">NameError</span>                                 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">39</span><span class="o">-</span><span class="n">dd87f9e85fd0</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span><span class="p">()</span>
+<span class="o">----&gt;</span> <span class="mi">1</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+      <span class="mi">2</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+      <span class="mi">3</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
+      <span class="mi">4</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+      <span class="mi">5</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
+
+
+<span class="ne">NameError</span><span class="p">:</span> <span class="n">name</span> <span class="s1">&#39;plt&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">defined</span>
+</pre></div>
+</div>
+<div class="section" id="functions-with-dependencies">
+<h4>Functions with dependencies<a class="headerlink" href="#functions-with-dependencies" title="Permalink to this headline">¶</a></h4>
+<p>Modules imported locally are NOT available in the remote engines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g1</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">now</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This fails with an Exception because the <code class="docutils literal"><span class="pre">time</span></code> and <code class="docutils literal"><span class="pre">datetime</span></code>
+modules are not imported in the remote engines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The simplest fix is to import the module(s) <em>within</em> the function</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">datetime</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">now</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Alternatively, you can simultaneously import both locally and in the
+remote engines with the <code class="docutils literal"><span class="pre">sync_import</span></code> context manager.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">dv</span><span class="o">.</span><span class="n">sync_imports</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="kn">import</span> <span class="nn">datetime</span>
+</pre></div>
+</div>
+<p>Now the <code class="docutils literal"><span class="pre">g1</span></code> function will work.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="n">g1</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Finally, there is also a <code class="docutils literal"><span class="pre">require</span></code> decorator that can be used. This
+will force the remote engine to import all packages given.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ipyparallel</span> <span class="k">import</span> <span class="n">require</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@require</span><span class="p">(</span><span class="s1">&#39;scipy.stats&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">g3</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">g3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">0.0044318484119380075</span><span class="p">,</span>
+ <span class="mf">0.053990966513188063</span><span class="p">,</span>
+ <span class="mf">0.24197072451914337</span><span class="p">,</span>
+ <span class="mf">0.3989422804014327</span><span class="p">,</span>
+ <span class="mf">0.24197072451914337</span><span class="p">,</span>
+ <span class="mf">0.053990966513188063</span><span class="p">,</span>
+ <span class="mf">0.0044318484119380075</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="moving-data-around">
+<h4>Moving data around<a class="headerlink" href="#moving-data-around" title="Permalink to this headline">¶</a></h4>
+<p>We can send data to remote engines with <code class="docutils literal"><span class="pre">push</span></code> and retrieve them with
+<code class="docutils literal"><span class="pre">pull</span></code>, or using the dictionary interface. For example, you can use
+this to distribute a large lookup table to all engines once instead of
+repeatedly as a function argument.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map_sync</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">pull</span><span class="p">((</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="you-can-also-use-the-dictionary-interface-as-an-alternative-to-push-and-pull">
+<h3>You can also use the dictionary interface as an alternative to push and pull<a class="headerlink" href="#you-can-also-use-the-dictionary-interface-as-an-alternative-to-push-and-pull" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="working-with-compiled-code">
+<h2>Working with compiled code<a class="headerlink" href="#working-with-compiled-code" title="Permalink to this headline">¶</a></h2>
+<p>Using <code class="docutils literal"><span class="pre">numba.jit</span></code> is straightforward.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">dv</span><span class="o">.</span><span class="n">sync_imports</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">numba</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">importing</span> <span class="n">numba</span> <span class="n">on</span> <span class="n">engine</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@numba</span><span class="o">.</span><span class="n">jit</span>
+<span class="k">def</span> <span class="nf">f_numba</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">f_numba</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">2.716251188406655</span><span class="p">,</span>
+ <span class="mf">3.3501024198081355</span><span class="p">,</span>
+ <span class="mf">1.2128058239293429</span><span class="p">,</span>
+ <span class="mf">2.470809789295683</span><span class="p">,</span>
+ <span class="mf">1.5966680572355045</span><span class="p">,</span>
+ <span class="mf">1.4741036625128765</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We need to do some extra work to make sure the shared libary compiled
+with cython is available to the remote engines:</p>
+<ul class="simple">
+<li>Compile a <code class="docutils literal"><span class="pre">named</span></code> shared module with the <code class="docutils literal"><span class="pre">-n</span></code> flag</li>
+<li>Use <code class="docutils literal"><span class="pre">np.ndarray[dtype,</span> <span class="pre">ndim]</span></code> in place of memroy views<ul>
+<li>for example, double[:] becomes np.ndarray[np.float64_t, ndim=1]</li>
+</ul>
+</li>
+<li>Move the shared library to the <code class="docutils literal"><span class="pre">site-packages</span></code> directory<ul>
+<li>Cython magic moules can be found in <code class="docutils literal"><span class="pre">~/.ipython/cython</span></code></li>
+</ul>
+</li>
+<li>Import the modules remtoely in the usual ways</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">cython</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">cython</span> <span class="o">-</span><span class="n">n</span> <span class="n">cylib</span>
+
+<span class="kn">import</span> <span class="nn">cython</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">cimport</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="nd">@cython</span><span class="o">.</span><span class="n">boundscheck</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64_t</span><span class="p">,</span> <span class="n">ndim</span><span class="o">=</span><span class="mi">1</span><span class="p">]</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">setflags</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">cdef</span> <span class="nb">int</span> <span class="n">i</span>
+    <span class="n">cdef</span> <span class="nb">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">cdef</span> <span class="n">double</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">s</span>
+</pre></div>
+</div>
+<div class="section" id="copy-the-compiled-module-in-site-packages-so-that-the-remote-engines-can-import-it">
+<h3>Copy the compiled module in <code class="docutils literal"><span class="pre">site-packages</span></code> so that the remote engines can import it<a class="headerlink" href="#copy-the-compiled-module-in-site-packages-so-that-the-remote-engines-can-import-it" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">site</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="n">src</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~/&#39;</span><span class="p">),</span> <span class="s1">&#39;.ipython&#39;</span><span class="p">,</span> <span class="s1">&#39;cython&#39;</span><span class="p">,</span> <span class="s1">&#39;cylib*so&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">dst</span> <span class="o">=</span> <span class="n">site</span><span class="o">.</span><span class="n">getsitepackages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/cylib.cpython-35m-darwin.so&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">dv</span><span class="o">.</span><span class="n">sync_imports</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">cylib</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">importing</span> <span class="n">cylib</span> <span class="n">on</span> <span class="n">engine</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-parallel-magic-commands">
+<h2>Using parallel magic commands<a class="headerlink" href="#using-parallel-magic-commands" title="Permalink to this headline">¶</a></h2>
+<p>In practice, most users will simply use the <code class="docutils literal"><span class="pre">%px</span></code> magic to execute
+code in parallel from within the notebook. This is the simplest way to
+use <code class="docutils literal"><span class="pre">ipyparallel</span></code>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">cylib</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">2.168044406764153</span><span class="p">,</span>
+ <span class="mf">1.5397865482262518</span><span class="p">,</span>
+ <span class="mf">1.9485467821075622</span><span class="p">,</span>
+ <span class="mf">1.7876752529163262</span><span class="p">,</span>
+ <span class="mf">1.4543499166104137</span><span class="p">,</span>
+ <span class="mf">1.2174838209641248</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This sends the command to all targeted engines.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">px</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="o">%</span><span class="n">px</span> <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="o">%</span><span class="n">px</span> <span class="n">a</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[0:3]: [0m1.5615548360839382
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[1:3]: [0m1.0675242165661705
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[2:3]: [0m1.618559279515392
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[3:3]: [0m0.8601123648745338
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[4:3]: [0m0.94585364087709756
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[5:3]: [0m2.1944225493785345
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[6:3]: [0m1.3628167748489548
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>[0;31mOut[7:3]: [0m1.8217725882889713
+</pre></div>
+</div>
+<div class="section" id="list-comprehensions-in-parallel">
+<h3>List comprehensions in parallel<a class="headerlink" href="#list-comprehensions-in-parallel" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">scatter</span></code> method partitions and distributes data to all engines.
+The <code class="docutils literal"><span class="pre">gather</span></code> method does the reverse. Together with <code class="docutils literal"><span class="pre">%px</span></code>, we can
+simulate parallel list comprehensions.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="o">%</span><span class="n">px</span> <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">0</span><span class="p">]</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">4</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="p">[</span><span class="n">stdout</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dv</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="s1">&#39;xs&#39;</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+<span class="o">%</span><span class="n">px</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dv</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mi">0</span><span class="p">,</span>   <span class="mi">1</span><span class="p">,</span>   <span class="mi">4</span><span class="p">,</span>   <span class="mi">9</span><span class="p">,</span>  <span class="mi">16</span><span class="p">,</span>  <span class="mi">25</span><span class="p">,</span>  <span class="mi">36</span><span class="p">,</span>  <span class="mi">49</span><span class="p">,</span>  <span class="mi">64</span><span class="p">,</span>  <span class="mi">81</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">121</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span>
+       <span class="mi">169</span><span class="p">,</span> <span class="mi">196</span><span class="p">,</span> <span class="mi">225</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">324</span><span class="p">,</span> <span class="mi">361</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">441</span><span class="p">,</span> <span class="mi">484</span><span class="p">,</span> <span class="mi">529</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-magic-functions-in-parallel">
+<h3>Running magic functions in parallel<a class="headerlink" href="#running-magic-functions-in-parallel" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">px</span> <span class="o">--</span><span class="n">target</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/11C_IPyParallel_114_1.png" src="_images/11C_IPyParallel_114_1.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">output</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/11C_IPyParallel_114_3.png" src="_images/11C_IPyParallel_114_3.png" />
+<div class="section" id="running-in-non-blocking-mode">
+<h4>Running in non-blocking mode<a class="headerlink" href="#running-in-non-blocking-mode" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">px</span> <span class="o">--</span><span class="n">target</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">--</span><span class="n">noblock</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">AsyncResult</span><span class="p">:</span> <span class="n">execute</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">pxresult</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">output</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/11C_IPyParallel_117_1.png" src="_images/11C_IPyParallel_117_1.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">output</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/11C_IPyParallel_117_3.png" src="_images/11C_IPyParallel_117_3.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starting-engines">Starting engines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-concepts-of-ipyparallel">Basic concepts of <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-compiled-code">Working with compiled code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-parallel-magic-commands">Using parallel magic commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="11B_Threads_Processses_Concurrency.html"
+                          title="Previous page">&larr; Multi-Core Parallelism</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="12A_C%2b%2b.html"
+                          title="Next page">&rarr; Using C++</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/11C_IPyParallel.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="12A_C%2b%2b.html" title="Using C++"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="11B_Threads_Processses_Concurrency.html" title="Multi-Core Parallelism"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/11C_IPyParallel.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:12 GMT -->
+</html>

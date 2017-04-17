@@ -1,0 +1,1577 @@
+
+Using PyMC3
+===========
+
+PyMC3 is a Python package for doing MCMC using a variety of samplers,
+including Metropolis, Slice and Hamiltonian Monte Carlo. See
+`Probabilistic Programming in Python using
+PyMC <http://arxiv.org/abs/1507.08050>`__ for a description. The GitHub
+`site <https://github.com/pymc-devs/pymc3>`__ also has many examples and
+links for further exploration.
+
+.. code:: python
+
+    ! pip install --quiet pymc3
+    ! pip install --quiet daft
+    ! pip install --quiet seaborn
+
+.. code:: python
+
+    ! conda install --yes --quiet mkl-service
+
+
+.. parsed-literal::
+
+    Fetching package metadata .........
+    Solving package specifications: ..........
+    
+    # All requested packages already installed.
+    # packages in environment at /opt/conda:
+    #
+    mkl-service               1.1.2                    py35_3  
+
+
+**Other resources**
+
+Some examples are adapted from:
+
+-  `Probabilistic Programming & Bayesian Methods for
+   Hackers <http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/>`__
+-  `MCMC tutorial
+   series <https://theclevermachine.wordpress.com/2012/11/19/a-gentle-introduction-to-markov-chain-monte-carlo-mcmc/>`__
+
+.. code:: python
+
+    %matplotlib inline
+
+.. code:: python
+
+    import numpy as np
+    import numpy.random as rng
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import pandas as pd
+    import pymc3 as pm
+    import scipy.stats as stats
+    from sklearn.preprocessing import StandardScaler
+    import daft
+
+.. code:: python
+
+    import theano
+    theano.config.warn.round=False
+
+Part 1 - A tutorial example: Estimating coin bias
+-------------------------------------------------
+
+We start with the simplest model - that of determining the bias of a
+coin from observed outcomes.
+
+Setting up the model
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    n = 100
+    heads = 61
+
+Analytical solution
+^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    a, b = 10, 10
+    prior = stats.beta(a, b)
+    post = stats.beta(heads+a, n-heads+b)
+    ci = post.interval(0.95)
+    
+    xs = np.linspace(0, 1, 100)
+    plt.plot(prior.pdf(xs), label='Prior')
+    plt.plot(post.pdf(xs), label='Posterior')
+    plt.axvline(100*heads/n, c='red', alpha=0.4, label='MLE')
+    plt.xlim([0, 100])
+    plt.axhline(0.3, ci[0], ci[1], c='black', linewidth=2, label='95% CI');
+    plt.legend()
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_11_0.png
+
+
+Graphical model
+^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    pgm = daft.PGM(shape=[2.5, 3.0], origin=[0, -0.5])
+    
+    pgm.add_node(daft.Node("alpha", r"$\alpha$", 0.5, 2, fixed=True))
+    pgm.add_node(daft.Node("beta", r"$\beta$", 1.5, 2, fixed=True))
+    pgm.add_node(daft.Node("p", r"$p$", 1, 1))
+    pgm.add_node(daft.Node("n", r"$n$", 2, 0, fixed=True))
+    pgm.add_node(daft.Node("y", r"$y$", 1, 0, observed=True))
+    
+    pgm.add_edge("alpha", "p")
+    pgm.add_edge("beta", "p")
+    pgm.add_edge("n", "y")
+    pgm.add_edge("p", "y")
+    
+    pgm.render()
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_13_0.png
+
+
+Introduction to PyMC3
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    niter = 2000
+    with pm.Model() as coin_context:
+        p = pm.Beta('p', alpha=2, beta=2)
+        y = pm.Binomial('y', n=n, p=p, observed=heads)
+        trace = pm.sample(niter)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -4.2744: 100%|██████████| 200000/200000 [00:15<00:00, 12698.15it/s]
+    Finished [100%]: Average ELBO = -4.2693
+    100%|██████████| 2000/2000 [00:01<00:00, 1753.85it/s]
+
+
+Specifying start, sampler (step) and multiple chains
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    with coin_context:
+        start = pm.find_MAP()
+        step = pm.Metropolis()
+        trace = pm.sample(niter, step=step, start=start, njobs=4, random_seed=123)
+
+
+.. parsed-literal::
+
+    Optimization terminated successfully.
+             Current function value: 3.582379
+             Iterations: 3
+             Function evaluations: 5
+             Gradient evaluations: 5
+
+
+.. parsed-literal::
+
+    100%|██████████| 2000/2000 [00:00<00:00, 5656.17it/s]
+
+
+MAP estimate
+^^^^^^^^^^^^
+
+.. code:: python
+
+    start
+
+
+
+
+.. parsed-literal::
+
+    {'p_logodds_': array(0.42956265615645184)}
+
+
+
+Summary of results
+~~~~~~~~~~~~~~~~~~
+
+Discard 50% as burn-in
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    t = trace[niter//2:]
+    t['p'].shape
+
+
+
+
+.. parsed-literal::
+
+    (4000,)
+
+
+
+Getting values from the trace
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    p = trace.get_values('p', burn=niter//2, combine=True, chains=[0,2])
+    p.shape
+
+
+
+
+.. parsed-literal::
+
+    (2000,)
+
+
+
+Autocorrelation plot
+^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    pm.autocorrplot(t, varnames=['p'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_26_0.png
+
+
+Calculate effective sample size
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. math::
+
+
+   \hat{n}_{eff} = \frac{mn}{1 + 2 \sum_{t=1}^T \hat{\rho}_t}
+
+where :math:`m` is the number of chains, :math:`n` the number of steps
+per chain, :math:`T` the time when the autocorrelation first becomes
+negative, and :math:`\hat{\rho}_t` the autocorrelation at lag :math:`t`.
+
+.. code:: python
+
+    pm.effective_n(t)
+
+
+
+
+.. parsed-literal::
+
+    {'p': 767.0, 'p_logodds_': 765.0}
+
+
+
+Evaluate convergence
+^^^^^^^^^^^^^^^^^^^^
+
+Gelman-Rubin
+''''''''''''
+
+.. math::
+
+
+   \hat{R} = \frac{\hat{V}}{W}
+
+where :math:`W` is the within-chain variance and :math:`\hat{V}` is the
+posterior variance estimate for the pooled traces. Values greater than
+one indicate that one or more chains have not yet converged.
+
+Discrad burn-in steps for each chain. The idea is to see if the starting
+values of each chain come from the same distribution as the stationary
+state.
+
+-  :math:`W` is the number of chains :math:`m \times` the variacne of
+   each individual chain
+-  :math:`B` is the number of steps :math:`n \times` the variance of the
+   chain means
+-  :math:`\hat{V}` is the weigthed average
+   :math:`(1 - \frac{1}{n})W + \frac{1}{n}B`
+
+The idea is that :math:`\hat{V}` is an unbiased estimator of :math:`W`
+if the starting values of each chain come from the same distribution as
+the stationary state. Hence if :math:`\hat{R}` differs significantly
+from 1, there is probsbly no convergence and we need more iterations.
+This is done for each parameter :math:`\theta`.
+
+.. code:: python
+
+    pm.gelman_rubin(t)
+
+
+
+
+.. parsed-literal::
+
+    {'p': 0.99949987493746084, 'p_logodds_': 0.99949987493746095}
+
+
+
+Geweke
+''''''
+
+Compares mean of initial with later segments of a trace for a parameter.
+Should have absolute value less than 1 at convergence.
+
+.. code:: python
+
+    plt.plot(pm.geweke(t['p'])[:,1], 'o')
+    plt.axhline(1, c='red')
+    plt.axhline(-1, c='red')
+    plt.gca().margins(0.05)
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_33_0.png
+
+
+Textual summary
+^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    pm.summary(t, varnames=['p'])
+
+
+.. parsed-literal::
+
+    
+    p:
+    
+      Mean             SD               MC Error         95% HPD interval
+      -------------------------------------------------------------------
+      
+      0.615            0.050            0.002            [0.517, 0.698]
+    
+      Posterior quantiles:
+      2.5            25             50             75             97.5
+      |--------------|==============|==============|--------------|
+      
+      0.517          0.581          0.616          0.654          0.698
+    
+
+
+Visual summary
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    pm.traceplot(t, varnames=['p'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_37_0.png
+
+
+Posterior predictive samples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    with coin_context:
+        ppc = pm.sample_ppc(t, samples=100)
+    ppc['y'].ravel()
+
+
+.. parsed-literal::
+
+    100%|██████████| 100/100 [00:00<00:00, 337.12it/s]
+
+
+
+
+.. parsed-literal::
+
+    array([67, 70, 53, 66, 41, 56, 70, 60, 66, 46, 48, 63, 64, 58, 65, 55, 63,
+           66, 67, 58, 70, 73, 69, 55, 51, 70, 58, 68, 59, 50, 60, 67, 59, 58,
+           70, 56, 62, 63, 68, 65, 60, 64, 58, 44, 68, 75, 60, 55, 64, 66, 71,
+           59, 62, 53, 62, 67, 65, 59, 56, 59, 62, 67, 61, 58, 79, 68, 54, 62,
+           71, 60, 66, 57, 67, 70, 47, 58, 69, 68, 62, 67, 49, 61, 66, 40, 57,
+           65, 53, 40, 67, 65, 55, 53, 70, 61, 57, 51, 66, 68, 68, 73])
+
+
+
+Saving traces
+~~~~~~~~~~~~~
+
+CSV
+'''
+
+.. code:: python
+
+    from pymc3.backends import Text
+    
+    niter = 2000
+    with pm.Model() as text_save_demo:
+        p = pm.Beta('p', alpha=2, beta=2)
+        y = pm.Binomial('y', n=n, p=p, observed=heads)
+        db = Text('trace')
+        trace = pm.sample(niter, trace=db)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -4.2758: 100%|██████████| 200000/200000 [00:16<00:00, 12263.44it/s]
+    Finished [100%]: Average ELBO = -4.2726
+    100%|██████████| 2000/2000 [00:01<00:00, 1655.80it/s]
+
+
+.. code:: python
+
+    with text_save_demo:
+        trace = pm.backends.text.load('trace')
+        pm.traceplot(trace, varnames=['p'])
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_43_0.png
+
+
+.. code:: python
+
+    trace.varnames
+
+
+
+
+.. parsed-literal::
+
+    ['p_logodds_', 'p']
+
+
+
+SQLite
+''''''
+
+If you are fitting a large complex model that may not fit in memory, you
+can use the SQLite3 backend to save the trace incremnetally to disk.
+
+.. code:: python
+
+    from pymc3.backends import SQLite
+    
+    niter = 2000
+    with pm.Model() as sqlie3_save_demo:
+        p = pm.Beta('p', alpha=2, beta=2)
+        y = pm.Binomial('y', n=n, p=p, observed=heads)
+        db = SQLite('trace.db')
+        trace = pm.sample(niter, trace=db)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -4.2776: 100%|██████████| 200000/200000 [00:17<00:00, 11746.28it/s]
+    Finished [100%]: Average ELBO = -4.2749
+    100%|██████████| 2000/2000 [00:01<00:00, 1496.41it/s]
+
+
+.. code:: python
+
+    with sqlie3_save_demo:
+        trace = pm.backends.sqlite.load('trace.db')
+        pm.traceplot(trace, varnames=['p'])
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_47_0.png
+
+
+Sampling from prior
+~~~~~~~~~~~~~~~~~~~
+
+Just omit the ``observed=`` argument.
+
+.. code:: python
+
+    with pm.Model() as prior_context:
+        sigma = pm.Gamma('sigma', alpha=2.0, beta=1.0)
+        mu = pm.Normal('mu', mu=0, sd=sigma)
+        trace = pm.sample(niter, step=pm.Metropolis())
+
+
+.. parsed-literal::
+
+    100%|██████████| 2000/2000 [00:00<00:00, 4522.74it/s]
+
+
+.. code:: python
+
+    pm.traceplot(trace, varnames=['mu', 'sigma'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_50_0.png
+
+
+Univariate normal distribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    xs = rng.normal(loc=5, scale=2, size=100)
+
+.. code:: python
+
+    sns.distplot(xs, rug=True)
+    pass
+
+
+.. parsed-literal::
+
+    /opt/conda/lib/python3.5/site-packages/statsmodels/nonparametric/kdetools.py:20: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+      y = X[:m/2+1] + np.r_[0,X[m/2+1:],0]*1j
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_53_1.png
+
+
+Sampling from posterior
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    niter = 2000
+    with pm.Model() as normal_context:
+        mu = pm.Normal('mu', mu=0, sd=100)
+        sd = pm.HalfCauchy('sd', beta=2)
+        y = pm.Normal('y', mu=mu, sd=sd, observed=xs)
+        trace = pm.sample(niter)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -223.18: 100%|██████████| 200000/200000 [00:19<00:00, 10185.34it/s]
+    Finished [100%]: Average ELBO = -223.18
+    100%|██████████| 2000/2000 [00:02<00:00, 847.15it/s] 
+
+
+Find Highest Posterior Density (Credible intervals)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    hpd = pm.stats.hpd(trace, alpha=0.05)
+    hpd
+
+
+
+
+.. parsed-literal::
+
+    {'mu': array([ 4.87008876,  5.68313862]),
+     'sd': array([ 1.80810522,  2.38210096]),
+     'sd_log_': array([ 0.59227946,  0.86798286])}
+
+
+
+.. code:: python
+
+    ax = pm.traceplot(trace, varnames=['mu', 'sd'],)
+    
+    ymin, ymax = ax[0,0].get_ylim()
+    y = ymin + 0.05*(ymax-ymin)
+    ax[0, 0].plot(hpd['mu'], [y,y], c='red')
+    
+    ymin, ymax = ax[1,0].get_ylim()
+    y = ymin + 0.05*(ymax-ymin)
+    ax[1, 0].plot(hpd['sd'], [y,y], c='red')
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_58_0.png
+
+
+Evaluating goodness-of-fit
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+DIC, WAIC and BPIC are approximations to the out-of-sample error and can
+be used for model compariosn. Likelihood is depnedent on model
+complexity and should not be used for model comparions.
+
+.. code:: python
+
+    post_mean = pm.df_summary(trace, varnames=trace.varnames)['mean'].to_dict()
+    post_mean
+
+
+
+
+.. parsed-literal::
+
+    {'mu': 5.2774425669706622,
+     'sd': 2.083811018098618,
+     'sd_log_': 0.73163253719625909}
+
+
+
+Likelihood
+^^^^^^^^^^
+
+.. code:: python
+
+    normal_context.logp(post_mean)
+
+
+
+
+.. parsed-literal::
+
+    array(-220.7824869198777)
+
+
+
+DIC
+^^^
+
+.. code:: python
+
+    with normal_context:
+        print(pm.stats.dic(trace))
+
+
+.. parsed-literal::
+
+    445.508693887
+
+
+WAIC
+^^^^
+
+.. code:: python
+
+    with normal_context:
+        print(pm.stats.waic(trace))
+
+
+.. parsed-literal::
+
+    (432.18295932008124, 14.386599474961665)
+
+
+BPIC
+^^^^
+
+.. code:: python
+
+    with normal_context:
+        print(pm.stats.bpic(trace))
+
+
+.. parsed-literal::
+
+    447.480553911
+
+
+--------------
+
+Part 2: Gallery
+---------------
+
+Linear regression
+~~~~~~~~~~~~~~~~~
+
+We will show how to estimate regression parameters using a simple linear
+model
+
+.. math::
+
+
+   y \sim ax + b
+
+We can restate the linear model
+
+.. math:: y = ax + b + \epsilon
+
+as sampling from a probability distribution
+
+.. math::
+
+
+   y \sim \mathcal{N}(ax + b, \sigma^2)
+
+Now we can use ``pymc`` to estimate the parameters :math:`a`, :math:`b`
+and :math:`\sigma`. We will assume the following priors
+
+.. math::
+
+
+   a \sim \mathcal{N}(0, 100) \\
+   b \sim \mathcal{N}(0, 100) \\
+   \sigma \sim | \mathcal{N(0, 1)} |
+
+Plate diagram
+^^^^^^^^^^^^^
+
+.. code:: python
+
+    import daft
+    
+    # Instantiate the PGM.
+    pgm = daft.PGM(shape=[4.0, 3.0], origin=[-0.3, -0.7])
+    
+    # Hierarchical parameters.
+    pgm.add_node(daft.Node("alpha", r"$\alpha$", 0.5, 2))
+    pgm.add_node(daft.Node("beta", r"$\beta$", 1.5, 2))
+    pgm.add_node(daft.Node("sigma", r"$\sigma$", 0, 0))
+    
+    # Deterministic variable.
+    pgm.add_node(daft.Node("mu", r"$\mu_n$", 1, 1))
+    
+    # Data.
+    pgm.add_node(daft.Node("x", r"$x_n$", 2, 1, observed=True))
+    pgm.add_node(daft.Node("y", r"$y_n$", 1, 0, observed=True))
+    
+    # Add in the edges.
+    pgm.add_edge("alpha", "mu")
+    pgm.add_edge("beta", "mu")
+    pgm.add_edge("x", "mu")
+    pgm.add_edge("mu", "y")
+    pgm.add_edge("sigma", "y")
+    
+    # And a plate.
+    pgm.add_plate(daft.Plate([0.5, -0.5, 2, 2], label=r"$n = 1, \cdots, N$",
+        shift=-0.1))
+    
+    # Render and save.
+    pgm.render()
+    pgm.figure.savefig("lm.pdf")
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_73_0.png
+
+
+Setting up and fitting linear model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    # observed data
+    np.random.seed(123)
+    n = 11
+    _a = 6
+    _b = 2
+    x = np.linspace(0, 1, n)
+    y = _a*x + _b + np.random.randn(n)
+
+.. code:: python
+
+    niter = 10000
+    with pm.Model() as linreg:
+        a = pm.Normal('a', mu=0, sd=100)
+        b = pm.Normal('b', mu=0, sd=100)
+        sigma = pm.HalfNormal('sigma', sd=1)
+        
+        y_est = a*x + b     
+        likelihood = pm.Normal('y', mu=y_est, sd=sigma, observed=y)
+    
+        trace = pm.sample(niter, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -29.675: 100%|██████████| 200000/200000 [00:20<00:00, 9819.42it/s]
+    Finished [100%]: Average ELBO = -29.672
+    100%|██████████| 10000/10000 [00:16<00:00, 590.17it/s]
+
+
+.. code:: python
+
+    t = trace[niter//2:]
+    pm.traceplot(trace, varnames=['a', 'b'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_77_0.png
+
+
+.. code:: python
+
+    plt.scatter(x, y, s=30, label='data')
+    for a_, b_ in zip(t['a'][-100:], t['b'][-100:]):
+        plt.plot(x, a_*x + b_, c='gray', alpha=0.1)
+    plt.plot(x, _a*x + _b, label='true regression line', lw=3., c='red')
+    plt.legend(loc='best')
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_78_0.png
+
+
+Posterior predictive checks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    ppc = pm.sample_ppc(trace, samples=500, model=linreg, size=11)
+
+
+.. parsed-literal::
+
+    100%|██████████| 500/500 [00:05<00:00, 87.95it/s]
+
+
+.. code:: python
+
+    sns.distplot([np.mean(n) for n in ppc['y']], kde=True)
+    plt.axvline(np.mean(y), color='red')
+    pass
+
+
+.. parsed-literal::
+
+    /opt/conda/lib/python3.5/site-packages/statsmodels/nonparametric/kdetools.py:20: VisibleDeprecationWarning: using a non-integer number instead of an integer will result in an error in the future
+      y = X[:m/2+1] + np.r_[0,X[m/2+1:],0]*1j
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_81_1.png
+
+
+Using the GLM module
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    df = pd.DataFrame({'x': x, 'y': y})
+    df.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>x</th>
+          <th>y</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.0</td>
+          <td>0.914369</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.1</td>
+          <td>3.597345</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.2</td>
+          <td>3.482978</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.3</td>
+          <td>2.293705</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>0.4</td>
+          <td>3.821400</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    with pm.Model() as model:
+        pm.glm.glm('y ~ x', df)
+        trace = pm.sample(2000)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -49.658: 100%|██████████| 200000/200000 [00:25<00:00, 7767.70it/s]
+    Finished [100%]: Average ELBO = -49.655
+    100%|██████████| 2000/2000 [00:06<00:00, 321.26it/s]
+
+
+.. code:: python
+
+    pm.traceplot(trace, varnames=['Intercept', 'x'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_85_0.png
+
+
+Robust linear regression
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    # observed data
+    np.random.seed(123)
+    n = 11
+    _a = 6
+    _b = 2
+    x = np.linspace(0, 1, n)
+    y = _a*x + _b + np.random.randn(n)
+    y[5] *=10
+    df = pd.DataFrame({'x': x, 'y': y})
+    df.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>x</th>
+          <th>y</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.0</td>
+          <td>0.914369</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.1</td>
+          <td>3.597345</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.2</td>
+          <td>3.482978</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.3</td>
+          <td>2.293705</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>0.4</td>
+          <td>3.821400</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Scale the data
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    x, y = StandardScaler().fit_transform(df[['x', 'y']]).T
+
+Effect of outlier
+^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    niter = 10000
+    with pm.Model() as linreg:
+        a = pm.Normal('a', mu=0, sd=100)
+        b = pm.Normal('b', mu=0, sd=100)
+        sigma = pm.HalfNormal('sigma', sd=1)
+        
+        y_est = a*x + b     
+        y_obs = pm.Normal('y_obs', mu=y_est, sd=sigma, observed=y)
+    
+        trace = pm.sample(niter, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -28.536: 100%|██████████| 200000/200000 [00:20<00:00, 9643.07it/s] 
+    Finished [100%]: Average ELBO = -28.523
+    100%|██████████| 10000/10000 [00:11<00:00, 838.53it/s]
+
+
+.. code:: python
+
+    t = trace[niter//2:]
+    plt.scatter(x, y, s=30, label='data')
+    for a_, b_ in zip(t['a'][-100:], t['b'][-100:]):
+        plt.plot(x, a_*x + b_, c='gray', alpha=0.1)
+    plt.legend(loc='upper left')
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_92_0.png
+
+
+Use a T-distribution for the errors for a more robust fit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    niter = 10000
+    with pm.Model() as robust_linreg:
+        beta = pm.Normal('beta', 0, 10, shape=2)
+        nu = pm.Exponential('nu', 1/len(x))
+        sigma = pm.HalfCauchy('sigma', beta=1)
+    
+        y_est = beta[0] + beta[1]*x
+        y_obs = pm.StudentT('y_obs', mu=y_est, sd=sigma, nu=nu, observed=y)
+    
+        trace = pm.sample(niter, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -12.964: 100%|██████████| 200000/200000 [00:33<00:00, 5908.80it/s]
+    Finished [100%]: Average ELBO = -12.963
+    100%|██████████| 10000/10000 [00:22<00:00, 451.48it/s]
+
+
+.. code:: python
+
+    t = trace[niter//2:]
+    plt.scatter(x, y, s=30, label='data')
+    for a_, b_ in zip(t['beta'][-100:, 1], t['beta'][-100:, 0]):
+        plt.plot(x, a_*x + b_, c='gray', alpha=0.1)
+    plt.legend(loc='upper left')
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_95_0.png
+
+
+Logistic regression
+~~~~~~~~~~~~~~~~~~~
+
+We will look at the effect of strongly correlated variabels using a data
+set from Kruschke's book.
+
+.. code:: python
+
+    df = pd.read_csv('HtWt.csv')
+    df.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>male</th>
+          <th>height</th>
+          <th>weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0</td>
+          <td>63.2</td>
+          <td>168.7</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0</td>
+          <td>68.7</td>
+          <td>169.8</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0</td>
+          <td>64.8</td>
+          <td>176.6</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0</td>
+          <td>67.9</td>
+          <td>246.8</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>1</td>
+          <td>68.9</td>
+          <td>151.6</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    niter = 1000
+    with pm.Model() as model:
+        pm.glm.glm('male ~ height + weight', df, family=pm.glm.families.Binomial()) 
+        trace = pm.sample(niter, njobs=4, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -96.159: 100%|██████████| 200000/200000 [00:26<00:00, 7659.27it/s]
+    Finished [100%]: Average ELBO = -95.563
+    100%|██████████| 1000/1000 [00:49<00:00, 20.14it/s]
+
+
+Note poor convergence due to correlation between height and weight
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    df_trace = pm.trace_to_dataframe(trace[niter//2:])
+    pd.scatter_matrix(df_trace.ix[-niter//2:, ['height', 'weight', 'Intercept']], diagonal='kde')
+    plt.tight_layout()
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_100_0.png
+
+
+Hamiltonian Monte Carlo is faster and converges better
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    niter = 1000
+    with pm.Model() as model:
+        pm.glm.glm('male ~ height + weight', df, family=pm.glm.families.Binomial()) 
+        trace = pm.sample(niter, njobs=4, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -96.161: 100%|██████████| 200000/200000 [00:27<00:00, 7353.06it/s]
+    Finished [100%]: Average ELBO = -95.552
+    100%|██████████| 1000/1000 [00:53<00:00, 18.65it/s]
+
+
+.. code:: python
+
+    df_trace = pm.trace_to_dataframe(trace[niter//2:])
+    pd.scatter_matrix(df_trace.ix[-niter//2:, ['height', 'weight', 'Intercept']], diagonal='kde')
+    plt.tight_layout()
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_103_0.png
+
+
+Logistic regression for classification
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    height, weight, intercept = df_trace[['height', 'weight', 'Intercept']].mean(0)
+    
+    def predict(w, h, intercept=intercept, height=height, weight=weight):
+        """Predict gender given weight (w) and height (h) values."""
+        v = intercept + height*h + weight*w
+        return np.exp(v)/(1+np.exp(v))
+    
+    # calculate predictions on grid
+    xs = np.linspace(df.weight.min(), df.weight.max(), 100)
+    ys = np.linspace(df.height.min(), df.height.max(), 100)
+    X, Y = np.meshgrid(xs, ys)
+    Z = predict(X, Y)
+    
+    plt.figure(figsize=(6,6))
+    # plot 0.5 contour line - classify as male if above this line
+    plt.contour(X, Y, Z, levels=[0.5])
+    
+    # classify all subjects
+    colors = ['lime' if i else 'yellow' for i in df.male]
+    ps = predict(df.weight, df.height)
+    errs = ((ps < 0.5) & df.male) |((ps >= 0.5) & (1-df.male))
+    plt.scatter(df.weight[errs], df.height[errs], facecolors='red', s=150)
+    plt.scatter(df.weight, df.height, facecolors=colors, edgecolors='k', s=50, alpha=1);
+    plt.xlabel('Weight', fontsize=16)
+    plt.ylabel('Height', fontsize=16)
+    plt.title('Gender classification by weight and height', fontsize=16)
+    plt.tight_layout();
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_105_0.png
+
+
+Estimating parameters of a logistic model
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Gelman's book has an example where the dose of a drug may be affected to
+the number of rat deaths in an experiment.
+
++-------------------+----------+------------+
+| Dose (log g/ml)   | # Rats   | # Deaths   |
++===================+==========+============+
+| -0.896            | 5        | 0          |
++-------------------+----------+------------+
+| -0.296            | 5        | 1          |
++-------------------+----------+------------+
+| -0.053            | 5        | 3          |
++-------------------+----------+------------+
+| 0.727             | 5        | 5          |
++-------------------+----------+------------+
+
+We will model the number of deaths as a random sample from a binomial
+distribution, where :math:`n` is the number of rats and :math:`p` the
+probability of a rat dying. We are given :math:`n = 5`, but we believe
+that :math:`p` may be related to the drug dose :math:`x`. As :math:`x`
+increases the number of rats dying seems to increase, and since
+:math:`p` is a probability, we use the following model:
+
+.. math::
+
+
+   y \sim \text{Bin}(n, p) \\
+   \text{logit}(p) = \alpha + \beta x \\
+   \alpha \sim \mathcal{N}(0, 5) \\
+   \beta \sim \mathcal{N}(0, 10)
+
+where we set vague priors for :math:`\alpha` and :math:`\beta`, the
+parameters for the logistic model.
+
+Observed data
+^^^^^^^^^^^^^
+
+.. code:: python
+
+    n = 5 * np.ones(4)
+    x = np.array([-0.896, -0.296, -0.053, 0.727])
+    y = np.array([0, 1, 3, 5])
+
+.. code:: python
+
+    def invlogit(x):
+        return np.exp(x) / (1 + np.exp(x))
+    
+    with pm.Model() as model:
+        alpha = pm.Normal('alpha', mu=0, sd=5)
+        beta = pm.Flat('beta')
+        
+        p = invlogit(alpha + beta*x)
+        y_obs = pm.Binomial('y_obs', n=n, p=p, observed=y)
+        
+        trace = pm.sample(niter, random_seed=123)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -inf: 100%|██████████| 200000/200000 [00:15<00:00, 12530.06it/s]
+    Finished [100%]: Average ELBO = -inf
+    100%|██████████| 1000/1000 [00:05<00:00, 185.80it/s]
+
+
+.. code:: python
+
+    f = lambda a, b, xp: np.exp(a + b*xp)/(1 + np.exp(a + b*xp))
+    
+    xp = np.linspace(-1, 1, 100)
+    a = trace.get_values('alpha').mean()
+    b = trace.get_values('beta').mean()
+    plt.plot(xp, f(a, b, xp), c='red')
+    plt.scatter(x, y/5, s=50);
+    plt.xlabel('Log does of drug')
+    plt.ylabel('Risk of death')
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_110_0.png
+
+
+Hierarchical model
+~~~~~~~~~~~~~~~~~~
+
+This uses the Gelman radon data set and is based off this `IPython
+notebook <http://twiecki.github.io/blog/2014/03/17/bayesian-glms-3/>`__.
+Radon levels were measured in houses from all counties in several
+states. Here we want to know if the presence of a basement affects the
+level of radon, and if this is affected by which county the house is
+located in.
+
+.. figure:: http://www.fix-your-radon.com/images/how_radon_enters.jpg
+   :alt: Radon
+
+   Radon
+
+The data set provided is just for the state of Minnesota, which has 85
+counties with 2 to 116 measurements per county. We only need 3 columns
+for this example ``county``, ``log_radon``, ``floor``, where ``floor=0``
+indicates that there is a basement.
+
+We will perform simple linear regression on log\_radon as a function of
+county and floor.
+
+.. code:: python
+
+    radon = pd.read_csv('radon.csv')[['county', 'floor', 'log_radon']]
+    radon.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>county</th>
+          <th>floor</th>
+          <th>log_radon</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>AITKIN</td>
+          <td>1.0</td>
+          <td>0.832909</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>AITKIN</td>
+          <td>0.0</td>
+          <td>0.832909</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>AITKIN</td>
+          <td>0.0</td>
+          <td>1.098612</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>AITKIN</td>
+          <td>0.0</td>
+          <td>0.095310</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>ANOKA</td>
+          <td>0.0</td>
+          <td>1.163151</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Pooled model
+~~~~~~~~~~~~
+
+In the pooled model, we ignore the county infomraiton.
+
+.. math::
+
+
+   y \sim \mathcal{N}(a + bx, \sigma^2)
+
+where :math:`y` is the log radon level, and :math:`x` an indicator
+variable for whether there is a basement or not.
+
+We make up some choices for the fairly uniformative priors as usual
+
+.. math::
+
+
+   a \sim \mathcal{N}(\mu, \sigma_a^2) \\
+   b \sim \mathcal{N}(\mu, \sigma_b^2) \\
+   \sigma \sim \text{Gamma(10, 1)}
+
+However, since the radon level varies by geographical location, it might
+make sense to include county information in the model. One way to do
+this is to build a separate regression model for each county, but the
+sample sizes for some counties may be too small for precise estimates. A
+compromise between the pooled and separate county models is to use a
+hierarchical model for *patial pooling* - the practical efffect of this
+is to shrink per county estimates towards the group mean, especially for
+counties with few observations.
+
+Hierarchical model
+^^^^^^^^^^^^^^^^^^
+
+With a hierarchical model, there is an :math:`a_c` and a :math:`b_c` for
+each county :math:`c` just as in the individual county model, but they
+are no longer independent but assumed to come from a common group
+distribution
+
+.. math::
+
+
+   a_c \sim \mathcal{N}(\mu_a, \sigma_a^2) \\
+   b_c \sim \mathcal{N}(\mu_b, \sigma_b^2)
+
+we further assume that the hyperparameters come from the following
+distributions
+
+.. math::
+
+
+   \mu_a \sim \mathcal{N}(0, 10^2) \\
+   \sigma_a \sim \text{|Cauchy(1)|} \\ 
+   \mu_b \sim \mathcal{N}(0, 10^2) \\
+   \sigma_b \sim \text{|Cauchy(1)|} \\ 
+
+The variance for observations does not change, so the model for the
+radon level is
+
+.. math::
+
+
+   y \sim \mathcal{N}(a_c + b_c x, \sigma^2)
+
+.. code:: python
+
+    county = pd.Categorical(radon['county']).codes
+    
+    niter = 1000
+    with pm.Model() as hm:
+        # County hyperpriors
+        mu_a = pm.Normal('mu_a', mu=0, sd=10)
+        sigma_a = pm.HalfCauchy('sigma_a', beta=1)
+        mu_b = pm.Normal('mu_b', mu=0, sd=10)
+        sigma_b = pm.HalfCauchy('sigma_b', beta=1)
+        
+        # County slopes and intercepts
+        a = pm.Normal('slope', mu=mu_a, sd=sigma_a, shape=len(set(county)))
+        b = pm.Normal('intercept', mu=mu_b, sd=sigma_b, shape=len(set(county)))
+        
+        # Houseehold errors
+        sigma = pm.Gamma("sigma", alpha=10, beta=1)
+        
+        # Model prediction of radon level
+        mu = a[county] + b[county] * radon.floor.values
+        
+        # Data likelihood
+        y = pm.Normal('y', mu=mu, sd=sigma, observed=radon.log_radon)
+    
+        hm_trace = pm.sample(niter)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -1,087.9: 100%|██████████| 200000/200000 [00:55<00:00, 3635.46it/s]
+    Finished [100%]: Average ELBO = -1,088.2
+    100%|██████████| 1000/1000 [00:23<00:00, 42.18it/s]
+
+
+.. code:: python
+
+    plt.figure(figsize=(8, 60))
+    pm.forestplot(hm_trace, varnames=['slope', 'intercept'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_115_0.png
+
+
+Gaussian Mixture Model
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from theano.compile.ops import  as_op
+    import theano.tensor as T
+
+.. code:: python
+
+    np.random.seed(1)
+    y = np.r_[np.random.normal(-6, 2, 500), 
+              np.random.normal(0, 1, 200), 
+              np.random.normal(4, 1, 300)]
+    n = y.shape[0]
+
+.. code:: python
+
+    plt.hist(y, bins=20, normed=True, alpha=0.5)
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_119_0.png
+
+
+.. code:: python
+
+    k = 3
+    niter = 1000
+    with pm.Model() as gmm:
+        p = pm.Dirichlet('p', np.ones(k), shape=k)
+        mus = pm.Normal('mus', mu=[0, 0, 0], sd=15, shape=k)
+        sds = pm.HalfNormal('sds', sd=5, shape=k)
+            
+        Y_obs = pm.NormalMixture('Y_obs', p, mus, sd=sds, observed=y)
+        trace = pm.sample(niter)
+
+
+.. parsed-literal::
+
+    Auto-assigning NUTS sampler...
+    Initializing NUTS using advi...
+    Average ELBO = -8,888.4: 100%|██████████| 200000/200000 [01:43<00:00, 1927.51it/s]
+    Finished [100%]: Average ELBO = -8,888.5
+    100%|██████████| 1000/1000 [08:55<00:00,  3.19it/s]
+
+
+.. code:: python
+
+    burn = niter//2
+    trace = trace[burn:]
+    pm.traceplot(trace, varnames=['p', 'mus', 'sds'])
+    pass
+
+
+
+.. image:: 19A_PyMC3_files/19A_PyMC3_121_0.png
+

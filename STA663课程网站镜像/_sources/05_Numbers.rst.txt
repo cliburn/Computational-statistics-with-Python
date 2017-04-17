@@ -1,0 +1,1773 @@
+
+Using ``numpy``
+===============
+
+The foundation for numerical computation in Python is the ``numpy``
+package, and essentially all scientific libraries in Python build on
+this - e.g. ``scipy``, ``pandas``, ``statsmodels``, ``scikit-learn``,
+``cv2`` etc. The basic data structure in ``numpy`` is the NDArray, and
+it is essential to become familiar with how to slice and dice this
+object.
+
+Numpy also has the ``random``, and ``linalg`` modules that we will
+discuss in later lectures.
+
+Resources
+---------
+
+-  `Numpy for R
+   users <http://mathesaurus.sourceforge.net/r-numpy.html>`__
+-  `NumPy: creating and manipulating numerical
+   data <http://www.scipy-lectures.org/intro/numpy/index.html>`__
+-  `Advanced
+   Numpy <http://www.scipy-lectures.org/advanced/advanced_numpy/index.html>`__
+-  `100 Numpy
+   Exercises <http://www.labri.fr/perso/nrougier/teaching/numpy.100/>`__
+
+NDArray
+~~~~~~~
+
+The base structure in ``numpy`` is ``ndarray``, used to represent
+vectors, matrices and higher-dimensional arrays. Each ``ndarray`` has
+the following attributes:
+
+-  dtype = corresponds to data types in C
+-  shape = dimensions of array
+-  strides = number of bytes to step in each direction when traversing
+   the array
+
+.. code:: python
+
+    x = np.array([1,2,3,4,5,6])
+    print(x)
+    print('dytpe', x.dtype)
+    print('shape', x.shape)
+    print('strides', x.strides)
+
+
+.. parsed-literal::
+
+    [1 2 3 4 5 6]
+    dytpe int64
+    shape (6,)
+    strides (8,)
+
+
+.. code:: python
+
+    x.shape = (2,3)
+    print(x)
+    print('dytpe', x.dtype)
+    print('shape', x.shape)
+    print('strides', x.strides)
+
+
+.. parsed-literal::
+
+    [[1 2 3]
+     [4 5 6]]
+    dytpe int64
+    shape (2, 3)
+    strides (24, 8)
+
+
+.. code:: python
+
+    x = x.astype('complex')
+    print(x)
+    print('dytpe', x.dtype)
+    print('shape', x.shape)
+    print('strides', x.strides)
+
+
+.. parsed-literal::
+
+    [[ 1.+0.j  2.+0.j  3.+0.j]
+     [ 4.+0.j  5.+0.j  6.+0.j]]
+    dytpe complex128
+    shape (2, 3)
+    strides (48, 16)
+
+
+Array creation
+--------------
+
+.. code:: python
+
+    np.array([1,2,3])
+
+
+
+
+.. parsed-literal::
+
+    array([1, 2, 3])
+
+
+
+.. code:: python
+
+    np.array([1,2,3], np.float64)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.,  2.,  3.])
+
+
+
+.. code:: python
+
+    np.arange(3)
+
+
+
+
+.. parsed-literal::
+
+    array([0, 1, 2])
+
+
+
+.. code:: python
+
+    np.arange(3, 6, 0.5)
+
+
+
+
+.. parsed-literal::
+
+    array([ 3. ,  3.5,  4. ,  4.5,  5. ,  5.5])
+
+
+
+.. code:: python
+
+    np.array([[1,2,3],[4,5,6]])
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 2, 3],
+           [4, 5, 6]])
+
+
+
+.. code:: python
+
+    np.ones(3)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.,  1.,  1.])
+
+
+
+.. code:: python
+
+    np.zeros((3,4))
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.]])
+
+
+
+.. code:: python
+
+    np.eye(4)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.,  0.,  0.],
+           [ 0.,  1.,  0.,  0.],
+           [ 0.,  0.,  1.,  0.],
+           [ 0.,  0.,  0.,  1.]])
+
+
+
+.. code:: python
+
+    np.diag([1,2,3,4])
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 0, 0, 0],
+           [0, 2, 0, 0],
+           [0, 0, 3, 0],
+           [0, 0, 0, 4]])
+
+
+
+.. code:: python
+
+    np.fromfunction(lambda i, j: i**2+j**2, (4,5))
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   1.,   4.,   9.,  16.],
+           [  1.,   2.,   5.,  10.,  17.],
+           [  4.,   5.,   8.,  13.,  20.],
+           [  9.,  10.,  13.,  18.,  25.]])
+
+
+
+Array manipulation
+------------------
+
+.. code:: python
+
+    x = np.fromfunction(lambda i, j: i**2+j**2, (4,5))
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   1.,   4.,   9.,  16.],
+           [  1.,   2.,   5.,  10.,  17.],
+           [  4.,   5.,   8.,  13.,  20.],
+           [  9.,  10.,  13.,  18.,  25.]])
+
+
+
+.. code:: python
+
+    x.shape
+
+
+
+
+.. parsed-literal::
+
+    (4, 5)
+
+
+
+.. code:: python
+
+    x.size
+
+
+
+
+.. parsed-literal::
+
+    20
+
+
+
+.. code:: python
+
+    x.dtype
+
+
+
+
+.. parsed-literal::
+
+    dtype('float64')
+
+
+
+.. code:: python
+
+    x.astype(np.int64)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0,  1,  4,  9, 16],
+           [ 1,  2,  5, 10, 17],
+           [ 4,  5,  8, 13, 20],
+           [ 9, 10, 13, 18, 25]])
+
+
+
+.. code:: python
+
+    x.T
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   1.,   4.,   9.],
+           [  1.,   2.,   5.,  10.],
+           [  4.,   5.,   8.,  13.],
+           [  9.,  10.,  13.,  18.],
+           [ 16.,  17.,  20.,  25.]])
+
+
+
+.. code:: python
+
+    x.reshape(2,-1)
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   1.,   4.,   9.,  16.,   1.,   2.,   5.,  10.,  17.],
+           [  4.,   5.,   8.,  13.,  20.,   9.,  10.,  13.,  18.,  25.]])
+
+
+
+Array indexing
+--------------
+
+.. code:: python
+
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   1.,   4.,   9.,  16.],
+           [  1.,   2.,   5.,  10.,  17.],
+           [  4.,   5.,   8.,  13.,  20.],
+           [  9.,  10.,  13.,  18.,  25.]])
+
+
+
+.. code:: python
+
+    x[0]
+
+
+
+
+.. parsed-literal::
+
+    array([  0.,   1.,   4.,   9.,  16.])
+
+
+
+.. code:: python
+
+    x[0,:]
+
+
+
+
+.. parsed-literal::
+
+    array([  0.,   1.,   4.,   9.,  16.])
+
+
+
+.. code:: python
+
+    x[:,0]
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.,  1.,  4.,  9.])
+
+
+
+.. code:: python
+
+    x[-1]
+
+
+
+
+.. parsed-literal::
+
+    array([  9.,  10.,  13.,  18.,  25.])
+
+
+
+.. code:: python
+
+    x[1,1]
+
+
+
+
+.. parsed-literal::
+
+    2.0
+
+
+
+.. code:: python
+
+    x[:, 1:3]
+
+
+
+
+.. parsed-literal::
+
+    array([[  1.,   4.],
+           [  2.,   5.],
+           [  5.,   8.],
+           [ 10.,  13.]])
+
+
+
+Boolean indexing
+~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    x >= 2
+
+
+
+
+.. parsed-literal::
+
+    array([[False, False,  True,  True,  True],
+           [False,  True,  True,  True,  True],
+           [ True,  True,  True,  True,  True],
+           [ True,  True,  True,  True,  True]], dtype=bool)
+
+
+
+.. code:: python
+
+    x[x > 2]
+
+
+
+
+.. parsed-literal::
+
+    array([  4.,   9.,  16.,   5.,  10.,  17.,   4.,   5.,   8.,  13.,  20.,
+             9.,  10.,  13.,  18.,  25.])
+
+
+
+Fancy indexing
+~~~~~~~~~~~~~~
+
+.. code:: python
+
+    x[0, [1,2]]
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.,  4.])
+
+
+
+Calculations and broadcasting
+-----------------------------
+
+Broadcasting refers to the set of rules that numpy uses to perfrom
+operations on arrays with different shapes. See official
+`documentation <http://docs.scipy.org/doc/numpy-1.10.1/user/basics.broadcasting.html>`__
+for a clear explanation of the rules. Array shapes can be manipulated
+using the ``reshape`` method or by inserting a new axis with
+``np.newaxis``. Note that ``np.newaxis`` is an alias for ``None``, which
+I sometimes use in my examples.
+
+.. code:: python
+
+    x = np.fromfunction(lambda i, j: i**2+j**2, (2,3))
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    x * 5
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   5.,  20.],
+           [  5.,  10.,  25.]])
+
+
+
+.. code:: python
+
+    x + x
+
+
+
+
+.. parsed-literal::
+
+    array([[  0.,   2.,   8.],
+           [  2.,   4.,  10.]])
+
+
+
+.. code:: python
+
+    x @ x.T
+
+
+
+
+.. parsed-literal::
+
+    array([[ 17.,  22.],
+           [ 22.,  30.]])
+
+
+
+.. code:: python
+
+    x.T @ x
+
+
+
+
+.. parsed-literal::
+
+    array([[  1.,   2.,   5.],
+           [  2.,   5.,  14.],
+           [  5.,  14.,  41.]])
+
+
+
+.. code:: python
+
+    np.log1p(x)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.        ,  0.69314718,  1.60943791],
+           [ 0.69314718,  1.09861229,  1.79175947]])
+
+
+
+.. code:: python
+
+    np.exp(x)
+
+
+
+
+.. parsed-literal::
+
+    array([[   1.        ,    2.71828183,   54.59815003],
+           [   2.71828183,    7.3890561 ,  148.4131591 ]])
+
+
+
+Combining and splitting arrays
+------------------------------
+
+.. code:: python
+
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.r_[x, x]
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.vstack([x, x])
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.concatenate([x, x], axis=0)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.c_[x,x]
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.,  0.,  1.,  4.],
+           [ 1.,  2.,  5.,  1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.hstack([x, x])
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.,  0.,  1.,  4.],
+           [ 1.,  2.,  5.,  1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    np.concatenate([x,x], axis=1)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.,  0.,  1.,  4.],
+           [ 1.,  2.,  5.,  1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    y = np.r_[x, x]
+    y
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    a, b, c = np.hsplit(y, 3)
+
+.. code:: python
+
+    a
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.],
+           [ 1.],
+           [ 0.],
+           [ 1.]])
+
+
+
+.. code:: python
+
+    b
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.],
+           [ 2.],
+           [ 1.],
+           [ 2.]])
+
+
+
+.. code:: python
+
+    c
+
+
+
+
+.. parsed-literal::
+
+    array([[ 4.],
+           [ 5.],
+           [ 4.],
+           [ 5.]])
+
+
+
+.. code:: python
+
+    np.vsplit(y, [3])
+
+
+
+
+.. parsed-literal::
+
+    [array([[ 0.,  1.,  4.],
+            [ 1.,  2.,  5.],
+            [ 0.,  1.,  4.]]), array([[ 1.,  2.,  5.]])]
+
+
+
+.. code:: python
+
+    np.split(y, [3], axis=0)
+
+
+
+
+.. parsed-literal::
+
+    [array([[ 0.,  1.,  4.],
+            [ 1.,  2.,  5.],
+            [ 0.,  1.,  4.]]), array([[ 1.,  2.,  5.]])]
+
+
+
+.. code:: python
+
+    np.hstack(np.hsplit(y, 3))
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+Reductions
+----------
+
+.. code:: python
+
+    y
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  1.,  4.],
+           [ 1.,  2.,  5.],
+           [ 0.,  1.,  4.],
+           [ 1.,  2.,  5.]])
+
+
+
+.. code:: python
+
+    y.sum()
+
+
+
+
+.. parsed-literal::
+
+    26.0
+
+
+
+.. code:: python
+
+    y.sum(0) # column sum
+
+
+
+
+.. parsed-literal::
+
+    array([  2.,   6.,  18.])
+
+
+
+.. code:: python
+
+    y.sum(1) # row sum
+
+
+
+
+.. parsed-literal::
+
+    array([ 5.,  8.,  5.,  8.])
+
+
+
+Standardize by column mean and standard deviation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    z = (y - y.mean(0))/y.std(0)
+
+.. code:: python
+
+    z
+
+
+
+
+.. parsed-literal::
+
+    array([[-1., -1., -1.],
+           [ 1.,  1.,  1.],
+           [-1., -1., -1.],
+           [ 1.,  1.,  1.]])
+
+
+
+.. code:: python
+
+    z.mean(0), z.std(0)
+
+
+
+
+.. parsed-literal::
+
+    (array([ 0.,  0.,  0.]), array([ 1.,  1.,  1.]))
+
+
+
+Standardize by row mean and standard deviation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    z = (y - y.mean(1)[:,None])/y.std(1)[:,None]
+
+.. code:: python
+
+    z
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.98058068, -0.39223227,  1.37281295],
+           [-0.98058068, -0.39223227,  1.37281295],
+           [-0.98058068, -0.39223227,  1.37281295],
+           [-0.98058068, -0.39223227,  1.37281295]])
+
+
+
+.. code:: python
+
+    z.mean(1), z.std(1)
+
+
+
+
+.. parsed-literal::
+
+    (array([ -7.40148683e-17,   7.40148683e-17,  -7.40148683e-17,
+              7.40148683e-17]), array([ 1.,  1.,  1.,  1.]))
+
+
+
+Example: Calculating pairwise distance matrix using broadcasting and vectorization
+----------------------------------------------------------------------------------
+
+Calculate the pairwise distance matrix between the following points
+
+-  (0,0)
+-  (4,0)
+-  (4,3)
+-  (0,3)
+
+.. code:: python
+
+    def distance_matrix_py(pts):
+        """Returns matrix of pairwise Euclidean distances. Pure Python version."""
+        n = len(pts)
+        p = len(pts[0])
+        m = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                s = 0
+                for k in range(p):
+                    s += (pts[i,k] - pts[j,k])**2
+                m[i, j] = s**0.5
+        return m
+
+.. code:: python
+
+    def distance_matrix_np(pts):
+        """Returns matrix of pairwise Euclidean distances. Vectorized numpy version."""
+        return np.sum((pts[None,:] - pts[:, None])**2, -1)**0.5
+
+.. code:: python
+
+    pts = np.array([(0,0), (4,0), (4,3), (0,3)])
+    pts
+
+
+
+
+.. parsed-literal::
+
+    array([[0, 0],
+           [4, 0],
+           [4, 3],
+           [0, 3]])
+
+
+
+.. code:: python
+
+    pts.shape
+
+
+
+
+.. parsed-literal::
+
+    (4, 2)
+
+
+
+.. code:: python
+
+    n = pts.shape[0]
+    p = pts.shape[1]
+    dist = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            s = 0
+            for k in range(p):
+                s += (pts[i, k] - pts[j, k])**2
+            dist[i, j] = np.sqrt(s)
+    dist
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  4.,  5.,  3.],
+           [ 4.,  0.,  3.,  5.],
+           [ 5.,  3.,  0.,  4.],
+           [ 3.,  5.,  4.,  0.]])
+
+
+
+Using broadcasting
+~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    pts[None, :].shape
+
+
+
+
+.. parsed-literal::
+
+    (1, 4, 2)
+
+
+
+.. code:: python
+
+    pts[:, None].shape
+
+
+
+
+.. parsed-literal::
+
+    (4, 1, 2)
+
+
+
+.. code:: python
+
+    m = pts[None, :] - pts[:, None]
+    m
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 0,  0],
+            [ 4,  0],
+            [ 4,  3],
+            [ 0,  3]],
+    
+           [[-4,  0],
+            [ 0,  0],
+            [ 0,  3],
+            [-4,  3]],
+    
+           [[-4, -3],
+            [ 0, -3],
+            [ 0,  0],
+            [-4,  0]],
+    
+           [[ 0, -3],
+            [ 4, -3],
+            [ 4,  0],
+            [ 0,  0]]])
+
+
+
+.. code:: python
+
+    m**2
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 0,  0],
+            [16,  0],
+            [16,  9],
+            [ 0,  9]],
+    
+           [[16,  0],
+            [ 0,  0],
+            [ 0,  9],
+            [16,  9]],
+    
+           [[16,  9],
+            [ 0,  9],
+            [ 0,  0],
+            [16,  0]],
+    
+           [[ 0,  9],
+            [16,  9],
+            [16,  0],
+            [ 0,  0]]])
+
+
+
+.. code:: python
+
+    (m**2).shape
+
+
+
+
+.. parsed-literal::
+
+    (4, 4, 2)
+
+
+
+We want to end up with a 4 by 4 matrix, so sum over the axis with
+dimension 2. This is axis=2, or axis=-1 since it is the first axis from
+the end.
+
+.. code:: python
+
+    np.sum((pts[None, :] - pts[:, None])**2, -1)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0, 16, 25,  9],
+           [16,  0,  9, 25],
+           [25,  9,  0, 16],
+           [ 9, 25, 16,  0]])
+
+
+
+Basically, the distance matrix can be calculated in one line of numpy code
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    np.sqrt(np.sum((pts[None, :] - pts[:, None])**2, -1))
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  4.,  5.,  3.],
+           [ 4.,  0.,  3.,  5.],
+           [ 5.,  3.,  0.,  4.],
+           [ 3.,  5.,  4.,  0.]])
+
+
+
+Let's put them in functions and compare the time.
+
+.. code:: python
+
+    def pdist1(pts):
+        n = pts.shape[0]
+        p = pts.shape[1]
+        dist = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                s = 0
+                for k in range(p):
+                    s += (pts[i, k] - pts[j, k])**2
+                dist[i, j] = s
+        return np.sqrt(dist)
+
+.. code:: python
+
+    def pdist2(pts):
+        return np.sqrt(np.sum((pts[None, :] - pts[:, None])**2, -1))
+
+Check that the outputs are the same
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    np.alltrue(pdist1(pts) == pdist2(pts))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    pts = np.random.random((1000, 2))
+
+.. code:: python
+
+    %timeit pdist1(pts)
+
+
+.. parsed-literal::
+
+    1 loops, best of 3: 3.26 s per loop
+
+
+.. code:: python
+
+    %timeit pdist2(pts)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 77.3 ms per loop
+
+
+But don't give up on loops yet
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from numba import njit
+
+.. code:: python
+
+    @njit
+    def pdist3(pts):
+        n = pts.shape[0]
+        p = pts.shape[1]
+        dist = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                s = 0
+                for k in range(p):
+                    s += (pts[i, k] - pts[j, k])**2
+                dist[i, j] = s
+        return np.sqrt(dist)
+
+.. code:: python
+
+    %timeit pdist3(pts)
+
+
+.. parsed-literal::
+
+    The slowest run took 27.17 times longer than the fastest. This could mean that an intermediate result is being cached 
+    1 loops, best of 3: 16.1 ms per loop
+
+
+What is going on?
+~~~~~~~~~~~~~~~~~
+
+This is 3-5 times faster than the broadcasting version! We have just
+performed Just In Time (JIT) compilation of a function, which will be
+discussed in a later lecture.
+
+Example: Consructing leave-one-out arrays
+-----------------------------------------
+
+Another example of numpy trickery is to construct a leave-one-out matrix
+of a vector of length k. In the matrix, each row is a vector of length
+k-1, with a different vector component dropped each time. This can be
+used for LOOCV to evalaute the out-of-sample accuracy of a predictive
+model.
+
+For example, suppose you have data points [(1,4), (2,7), (3,11), (4,9),
+(5,15)] that you want to perfrom LOOCV on for a simple regression model.
+For each cross-validation, you use one point for testing, and the
+remaining 4 points for training. In other words, you want the training
+set to be:
+
+::
+
+    [(2,7), (3,11), (4,9), (5,15)]
+    [(1,4), (3,11), (4,9), (5,15)]
+    [(1,4), (2,7),  (4,9), (5,15)]
+    [(1,4), (2,7), (3,11), (5,15)]
+    [(1,4), (2,7), (3,11), (4,9)]
+
+Here is one way to do create the training set using numpy tricks.
+
+Create a triangular matrix with N rows, N-1 columns and offset from
+diagnonal by -1
+
+.. code:: python
+
+    N = 5
+
+.. code:: python
+
+    np.tri(N)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.,  0.,  0.,  0.],
+           [ 1.,  1.,  0.,  0.,  0.],
+           [ 1.,  1.,  1.,  0.,  0.],
+           [ 1.,  1.,  1.,  1.,  0.],
+           [ 1.,  1.,  1.,  1.,  1.]])
+
+
+
+.. code:: python
+
+    np.tri(N, N-1)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.,  0.,  0.],
+           [ 1.,  1.,  0.,  0.],
+           [ 1.,  1.,  1.,  0.],
+           [ 1.,  1.,  1.,  1.],
+           [ 1.,  1.,  1.,  1.]])
+
+
+
+.. code:: python
+
+    np.tri(N, N-1, -1)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.,  0.,  0.,  0.],
+           [ 1.,  0.,  0.,  0.],
+           [ 1.,  1.,  0.,  0.],
+           [ 1.,  1.,  1.,  0.],
+           [ 1.,  1.,  1.,  1.]])
+
+
+
+Use broadcasting to create a new index matrix
+
+.. code:: python
+
+    np.arange(1, N)
+
+
+
+
+.. parsed-literal::
+
+    array([1, 2, 3, 4])
+
+
+
+.. code:: python
+
+    np.arange(1, N) - np.tri(N, N-1, -1)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  2.,  3.,  4.],
+           [ 0.,  2.,  3.,  4.],
+           [ 0.,  1.,  3.,  4.],
+           [ 0.,  1.,  2.,  4.],
+           [ 0.,  1.,  2.,  3.]])
+
+
+
+.. code:: python
+
+    idx = np.arange(1, N) - np.tri(N, N-1, -1).astype('int')
+
+.. code:: python
+
+    data = np.array([(1,4), (2,7), (3,11), (4,9), (5,15)])
+    data
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1,  4],
+           [ 2,  7],
+           [ 3, 11],
+           [ 4,  9],
+           [ 5, 15]])
+
+
+
+.. code:: python
+
+    data[idx]
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 2,  7],
+            [ 3, 11],
+            [ 4,  9],
+            [ 5, 15]],
+    
+           [[ 1,  4],
+            [ 3, 11],
+            [ 4,  9],
+            [ 5, 15]],
+    
+           [[ 1,  4],
+            [ 2,  7],
+            [ 4,  9],
+            [ 5, 15]],
+    
+           [[ 1,  4],
+            [ 2,  7],
+            [ 3, 11],
+            [ 5, 15]],
+    
+           [[ 1,  4],
+            [ 2,  7],
+            [ 3, 11],
+            [ 4,  9]]])
+
+
+
+All but one
+~~~~~~~~~~~
+
+R uses negative indexing to mean delete the component at that index.
+Because Python uses negative indexing to mean count from the end, we
+have to do a little more work to get the same effect. Here are two ways
+of deleting one item from a vector.
+
+.. code:: python
+
+    def f1(a, k):
+        idx = np.ones_like(a).astype('bool')
+        idx[k] = 0
+        return a[idx]
+
+.. code:: python
+
+    def f2(a, k):
+        return np.r_[a[:k], a[k+1:]]
+
+.. code:: python
+
+    a = np.arange(100)
+    k = 50
+
+.. code:: python
+
+    %timeit f1(a, k)
+
+
+.. parsed-literal::
+
+    The slowest run took 6.39 times longer than the fastest. This could mean that an intermediate result is being cached 
+    100000 loops, best of 3: 12.4 µs per loop
+
+
+.. code:: python
+
+    %timeit f2(a, k)
+
+
+.. parsed-literal::
+
+    10000 loops, best of 3: 47.6 µs per loop
+
+
+Universal functions (Ufuncs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Functions that work on both scalars and arrays are known as ufuncs. For
+arrays, ufuncs apply the function in an element-wise fashion. Use of
+ufuncs is an esssential aspect of vectorization and typically much more
+computationally efficient than using an explicit loop over each element.
+
+.. code:: python
+
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+    
+    xs = np.linspace(0, 2*np.pi, 100)
+    ys = np.sin(xs) # np.sin is a universal function
+    plt.plot(xs, ys);
+
+
+
+.. image:: 05_Numbers_files/05_Numbers_123_0.png
+
+
+Generalized ufuncs
+------------------
+
+A universal function performs vectorized looping over scalars. A
+generalized ufunc performs looping over vectors or arrays. Currently,
+numpy only ships with a single generalized ufunc. However, they play an
+important role for JIT compilation with ``numba``, a topic we will cover
+in future lectures.
+
+.. code:: python
+
+    from numpy.core.umath_tests import matrix_multiply
+    
+    print(matrix_multiply.signature)
+
+
+.. parsed-literal::
+
+    (m,n),(n,p)->(m,p)
+
+
+.. code:: python
+
+    us = np.random.random((5, 2, 3)) # 5 2x3 matrics
+    vs = np.random.random((5, 3, 4)) # 5 3x4 matrices
+
+.. code:: python
+
+    us
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 0.45041464,  0.73156889,  0.20199586],
+            [ 0.07597661,  0.13069672,  0.57386177]],
+    
+           [[ 0.10830059,  0.26695388,  0.44054188],
+            [ 0.57974703,  0.17978862,  0.52472549]],
+    
+           [[ 0.40794462,  0.35751635,  0.36870809],
+            [ 0.63494551,  0.11960905,  0.51381859]],
+    
+           [[ 0.49510212,  0.46783668,  0.07856113],
+            [ 0.28401281,  0.47199107,  0.54560703]],
+    
+           [[ 0.79458848,  0.43756637,  0.06759583],
+            [ 0.40228528,  0.50838122,  0.56375008]]])
+
+
+
+.. code:: python
+
+    vs
+
+
+
+
+.. parsed-literal::
+
+    array([[[  5.12266952e-02,   8.40637879e-01,   2.38644940e-01,
+               4.35712252e-01],
+            [  7.81217918e-01,   6.77203544e-01,   7.28623630e-01,
+               8.70980358e-02],
+            [  9.53278422e-01,   6.57880491e-01,   4.45387233e-01,
+               5.54732924e-02]],
+    
+           [[  6.52946888e-01,   2.29030756e-01,   5.91273241e-01,
+               8.29711164e-06],
+            [  5.25251656e-01,   5.06625358e-01,   1.87996526e-01,
+               3.57795468e-02],
+            [  6.45830540e-01,   7.67992588e-01,   3.53764451e-01,
+               8.93663158e-01]],
+    
+           [[  7.05223217e-01,   5.68551438e-01,   2.21699577e-01,
+               3.66118249e-01],
+            [  3.59834031e-01,   8.86827366e-01,   8.90595276e-01,
+               9.32417623e-01],
+            [  9.20454420e-01,   8.21082903e-01,   9.46367477e-01,
+               6.79992096e-02]],
+    
+           [[  5.17735631e-01,   7.57666718e-01,   9.76354847e-01,
+               8.23073506e-01],
+            [  9.12873687e-01,   7.01160089e-01,   9.41861241e-01,
+               5.75122377e-01],
+            [  4.29768204e-01,   6.52651201e-01,   4.52733332e-01,
+               7.76359616e-01]],
+    
+           [[  3.29293395e-01,   6.01805518e-01,   8.82878227e-01,
+               9.58704548e-01],
+            [  1.57352491e-01,   8.34085919e-01,   2.60621284e-01,
+               1.61751295e-01],
+            [  1.81993190e-01,   3.98928140e-01,   1.31517889e-01,
+               4.99537484e-03]]])
+
+
+
+.. code:: python
+
+    # perform matrix multiplication for each of the 5 sets of matrices
+    ws = matrix_multiply(us, vs) 
+
+.. code:: python
+
+    ws.shape
+
+
+
+
+.. parsed-literal::
+
+    (5, 2, 4)
+
+
+
+.. code:: python
+
+    ws
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 0.78714627,  1.00694579,  0.73049393,  0.27117477],
+            [ 0.65304469,  0.52990956,  0.36895086,  0.07632137]],
+    
+           [[ 0.4954479 ,  0.49838267,  0.2700697 ,  0.40324843],
+            [ 0.81186204,  0.62685067,  0.56221777,  0.47536541]],
+    
+           [[ 0.75571755,  0.85173269,  0.75777686,  0.50778237],
+            [ 0.96376431,  0.88895942,  0.73355161,  0.37892998]],
+    
+           [[ 0.71717088,  0.75442382,  0.95959983,  0.73756047],
+            [ 0.81239634,  0.90221944,  0.96886187,  0.92880331]],
+    
+           [[ 0.34280688,  0.87012156,  0.82445404,  0.83289018],
+            [ 0.31506361,  0.89102688,  0.5618071 ,  0.47072019]]])
+
+
+
+Saving and loading NDArrays
+---------------------------
+
+Saving to and loading from text files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    x1 = np.arange(1,10).reshape(3,3)
+    x1
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9]])
+
+
+
+.. code:: python
+
+    np.savetxt('../data/x1.txt', x1)
+
+.. code:: python
+
+    !cat ../data/x1.txt
+
+
+.. parsed-literal::
+
+    1.000000000000000000e+00 2.000000000000000000e+00 3.000000000000000000e+00
+    4.000000000000000000e+00 5.000000000000000000e+00 6.000000000000000000e+00
+    7.000000000000000000e+00 8.000000000000000000e+00 9.000000000000000000e+00
+
+
+.. code:: python
+
+    x2 = np.loadtxt('../data/x1.txt')
+    x2
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  2.,  3.],
+           [ 4.,  5.,  6.],
+           [ 7.,  8.,  9.]])
+
+
+
+Saving to and loading from binary files (much faster and also preserves dtype)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    np.save('../data/x1.npy', x1)
+
+.. code:: python
+
+    !cat ../data/x1.npy
+
+
+.. parsed-literal::
+
+    �NUMPY F {'descr': '<i8', 'fortran_order': False, 'shape': (3, 3), }          
+                                                            	       
+
+.. code:: python
+
+    x3 = np.load('../data/x1.npy')
+    x3
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 2, 3],
+           [4, 5, 6],
+           [7, 8, 9]])
+
+
+
+Version information
+-------------------
+
+.. code:: python
+
+    %load_ext version_information
+    %version_information numpy, numba, matplotlib
+
+
+
+
+.. raw:: html
+
+    <table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.1</td></tr><tr><td>OS</td><td>Darwin 15.2.0 x86_64 i386 64bit</td></tr><tr><td>numpy</td><td>1.10.2</td></tr><tr><td>numba</td><td>0.22.1</td></tr><tr><td>matplotlib</td><td>1.5.1</td></tr><tr><td colspan='2'>Fri Jan 15 13:34:06 2016 EST</td></tr></table>
+
+
+

@@ -1,0 +1,191 @@
+
+Spark on Cloud
+==============
+
+How to set up and run Spark on Azure or AWS EC2 clusters.
+
+Azure
+-----
+
+Follow `instructions provided by
+Microsoft <https://azure.microsoft.com/en-us/documentation/articles/hdinsight-apache-spark-jupyter-spark-sql/>`__.
+
+To terminate the cluster, you have to **delete** it.
+
+AWS
+---
+
+AWS setup is more involved. We will show how to access ``pyspark`` via
+ssh to an ``EMR`` cluster, as well as how to set up the ``Zeppelin``
+browser-based notebook (similar to Jupyter).
+
+**References**
+
+-  `EMR
+   Spark <http://docs.aws.amazon.com/ElasticMapReduce/latest/ReleaseGuide/emr-spark.html>`__
+-  `AWS
+   tutorial <http://docs.aws.amazon.com/ElasticMapReduce/latest/ManagementGuide/emr-gs.html>`__
+
+Know your AWS public and private `access keys <http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSGettingStartedGuide/AWSCredentials.html>`__
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+These will look something like
+
+-  public: ``AKIAIOSFODNN7EXAMPLE``
+-  private: ``wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY``
+
+Know your AWS EC2 `key-pair <http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html>`__
+------------------------------------------------------------------------------------------------------
+
+This is a name that you give - mine is ``cliburn-2016`` and an
+associated PEM file - I keep mine at ~/AWS/cliburn-2016.pem.
+
+Set the correct permissions on the PEM file.
+
+::
+
+    chmod 400 xxx.pem
+
+Install AWS command line client
+-------------------------------
+
+::
+
+    pip install awscli
+
+If you run into problems, see
+`docs <http://docs.aws.amazon.com/cli/latest/userguide/installing.html>`__
+
+Configure the AWS command line client
+-------------------------------------
+
+::
+
+    aws configure
+
+::
+
+    AWS Access Key ID: <<Your public access key>>
+    AWS Secret Access Key: <<Your private access key>>
+    Default region name: us-east-1
+    Default output format: json
+
+Create a cluster
+----------------
+
+**Warning**: You will be charged for this.
+
+::
+
+    aws emr create-cluster --name "<<NAME-FOR-CLUSTER>>" --release-label  emr-4.5.0 --applications Name=Spark Name=Zeppelin-Sandbox  --ec2-attributes KeyName=<<Your key-pair>>> --instance-type m3.xlarge --instance-count 3 --use-default-roles
+
+For example, I start mine with
+
+::
+
+    aws emr create-cluster --name "spak-2016-d" --release-label    emr-4.5.0 --applications Name=Spark Name=Zeppelin-Sandbox  --ec2-attributes KeyName="cliburn-2016"  --instance-type m3.xlarge --instance-count 3 --use-default-role
+
+A cluster-id should be returned
+
+::
+
+    {
+        "ClusterId": "j-XXXXXXXXXXXXXXX"
+    }
+
+Get information about the cluster
+---------------------------------
+
+::
+
+    aws emr describe-cluster --cluster-id -XXXXXXXXXXXXXXX
+
+or just inspect the state
+
+::
+
+    aws emr describe-cluster --cluster-id -XXXXXXXXXXXXXXX | grep \"State\"
+
+Connect to the cluster via ``ssh``
+----------------------------------
+
+::
+
+    aws emr ssh --cluster-id -XXXXXXXXXXXXXXX --key-pair-file cliburn-2016.pem 
+
+Note the IP address that is returned
+------------------------------------
+
+It will be something like ``ec2-XX-X-XX-XXX.compute-1.amazonaws.com``
+
+Run ``pyspark``
+---------------
+
+Run
+
+::
+
+    pyspark
+
+And you will be in a ``pyspark`` console where you can issue Spark
+commands.
+
+When you've had enough fun playing in ``pyspark`` for a while, end the
+session with ``Ctrl-D`` and exit to leave the ``ssh`` session.
+
+Run the ``Zepellin`` `notebook <https://zeppelin.incubator.apache.org>`__
+-------------------------------------------------------------------------
+
+Create an SSH tunnel to port 8890
+
+::
+
+    ssh -i xxx.pem -L 8192:ec2-xx-xx-xx.compute-1.amazonaws.com:8192 hadoop@ec2-xx-xx-xx-xx.compute-1.amazonaws.com -N -v
+
+Fill in the ``xxx`` with the locatin of your PEM file, and the
+appropriate IP address.
+
+Connect to ``Zeppelin`` notebook
+--------------------------------
+
+Open a browser to http://localhost:8890/ - if it worked you should see
+this
+
+.. figure:: http://cloudacademy.com/blog/wp-content/uploads/2016/01/Zeppelin-Notebook-1.png
+   :alt: Zeppelin screenshot
+
+   Zeppelin screenshot
+
+Create notebook and run Spark within it
+---------------------------------------
+
+The default cell uses ``scala``. For ``pyspark`` just start a cell with
+``%pyspark``.
+
+Terminate the cluster
+---------------------
+
+When you are done, remember to terminate the cluster!
+
+::
+
+    aws emr terminate-clusters --cluster-id j-XXXXXXXXXXXXXXX
+
+and confirm that it is terminating
+
+::
+
+    aws emr describe-cluster --cluster-id j-XXXXXXXXXXXXXXX | grep \"State\"
+
+You should see
+
+::
+
+                        "State": "TERMINATING"
+                        "State": "TERMINATING"
+                "State": "TERMINATING"
+
+If you are paranoid, log into the `AWS Management
+Console <https://aws.amazon.com/console/>`__ and click on
+``Services | EMR`` and check the status of your cluster.
+

@@ -1,0 +1,666 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13D_PCA.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:25 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Applications of Linear Alebra: PCA &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sparse Matrices" href="13E_SparseMatrices.html" />
+    <link rel="prev" title="Linear Algebra Examples" href="13C_LinearAlgebraExamples.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="13E_SparseMatrices.html" title="Sparse Matrices"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13C_LinearAlgebraExamples.html" title="Linear Algebra Examples"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="applications-of-linear-alebra-pca">
+<h1>Applications of Linear Alebra: PCA<a class="headerlink" href="#applications-of-linear-alebra-pca" title="Permalink to this headline">¶</a></h1>
+<p>We will explore 3 applications of linear algebra in data analysis -
+change of basis (for dimension reduction), projections (for solving
+linear systems) and the quadratic form (for optimization). The first
+application is the change of basis to the eigenvector basis that
+underlies Principal Components Analysis s(PCA).</p>
+<p>We will review the following in class:</p>
+<ul class="simple">
+<li>The standard basis</li>
+<li>Orthonormal basis and orthgonal matrices</li>
+<li>Change of basis</li>
+<li>Similar matrices</li>
+<li>Eigendecomposition</li>
+<li>Sample covariance</li>
+<li>Covariance as a linear transform</li>
+<li>PCA and dimension reduction</li>
+<li>PCA and &#8220;explained variance&#8221;</li>
+<li>SVD</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="section" id="variance-and-covariance">
+<h2>Variance and covariance<a class="headerlink" href="#variance-and-covariance" title="Permalink to this headline">¶</a></h2>
+<p>Remember the formula for covariance</p>
+<div class="math">
+\[\text{Cov}(X, Y) = \frac{\sum_{i=1}^n(X_i - \bar{X})(Y_i - \bar{Y})}{n-1}\]</div>
+<p>where <span class="math">\(\text{Cov}(X, X)\)</span> is the sample variance of <span class="math">\(X\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">cov</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns covariance of vectors x and y).&quot;&quot;&quot;</span>
+    <span class="n">xbar</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ybar</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">ybar</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="p">),</span> <span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)],</span> <span class="p">[</span><span class="n">cov</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">),</span> <span class="n">cov</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span><span class="n">Y</span><span class="p">)]])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.08255874</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.009372</span>  <span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.009372</span>  <span class="p">,</span>  <span class="mf">0.08437116</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># This can of course be calculated using numpy&#39;s built in cov() function</span>
+<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.08255874</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.009372</span>  <span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.009372</span>  <span class="p">,</span>  <span class="mf">0.08437116</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Extension to more variables is done in a pair-wise way</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">([</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.08255874</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.009372</span>  <span class="p">,</span>  <span class="mf">0.02351863</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.009372</span>  <span class="p">,</span>  <span class="mf">0.08437116</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02369603</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.02351863</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.02369603</span><span class="p">,</span>  <span class="mf">0.12269876</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="eigendecomposition-of-the-covariance-matrix">
+<h2>Eigendecomposition of the covariance matrix<a class="headerlink" href="#eigendecomposition-of-the-covariance-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mu</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.6</span><span class="p">,</span><span class="mf">0.2</span><span class="p">],[</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="n">ms</span> <span class="o">=</span> <span class="n">m</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="n">ms</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Eigenvectors of covariance matrix scaled by eigenvalue.&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_13_0.png" src="_images/13D_PCA_13_0.png" />
+</div>
+<div class="section" id="covariance-matrix-as-a-linear-transformation">
+<h2>Covariance matrix as a linear transformation<a class="headerlink" href="#covariance-matrix-as-a-linear-transformation" title="Permalink to this headline">¶</a></h2>
+<p>The covariance matrix is a linear transformation that maps
+<span class="math">\(\mathbb{R}^n\)</span> in the direction of its eigenvectors with scaling
+factor given by the eigenvalues. Here we see it applied to a collection
+of random vectors in the box bounded by [-1, 1].</p>
+<div class="section" id="we-will-assume-we-have-a-covariance-matrix">
+<h3>We will assume we have a covariance matrix<a class="headerlink" href="#we-will-assume-we-have-a-covariance-matrix" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">covx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.6</span><span class="p">],[</span><span class="mf">0.6</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="create-random-vectors-in-a-box">
+<h3>Create random vectors in a box<a class="headerlink" href="#create-random-vectors-in-a-box" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="apply-covariance-matrix-as-linear-transformation">
+<h3>Apply covariance matrix as linear transformation<a class="headerlink" href="#apply-covariance-matrix-as-linear-transformation" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">covx</span> <span class="o">@</span> <span class="n">u</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e1</span><span class="p">,</span> <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">covx</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-linear-transform-maps-the-random-vectors-as-described">
+<h3>The linear transform maps the random vectors as described.<a class="headerlink" href="#the-linear-transform-maps-the-random-vectors-as-described" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_23_0.png" src="_images/13D_PCA_23_0.png" />
+</div>
+</div>
+<div class="section" id="pca">
+<h2>PCA<a class="headerlink" href="#pca" title="Permalink to this headline">¶</a></h2>
+<p>Principal Components Analysis (PCA) basically means to find and rank all
+the eigenvalues and eigenvectors of a covariance matrix. This is useful
+because high-dimensional data (with <span class="math">\(p\)</span> features) may have nearly
+all their variation in a small number of dimensions <span class="math">\(k\)</span>, i.e. in
+the subspace spanned by the eigenvectors of the covariance matrix that
+have the <span class="math">\(k\)</span> largest eigenvalues. If we project the original data
+into this subspace, we can have a dimension reduction (from <span class="math">\(p\)</span> to
+<span class="math">\(k\)</span>) with hopefully little loss of information.</p>
+<p>Numerically, PCA is typically done using SVD on the data matrix rather
+than eigendecomposition on the covariance matrix. The next section
+explains why this works.</p>
+<div class="section" id="data-matrices-that-have-zero-mean-for-all-feature-vectors">
+<h3>Data matrices that have zero mean for all feature vectors<a class="headerlink" href="#data-matrices-that-have-zero-mean-for-all-feature-vectors" title="Permalink to this headline">¶</a></h3>
+<p>and so the covariance matrix for a data set X that has zero mean in each
+feature vector is just <span class="math">\(XX^T/(n-1)\)</span>.</p>
+<p>In other words, we can also get the eigendecomposition of the covariance
+matrix from the positive semi-definite matrix <span class="math">\(XX^T\)</span>.</p>
+</div>
+<div class="section" id="note-that-zeroing-the-feature-vector-does-not-affect-the-covariance-matrix">
+<h3>Note that zeroing the feature vector does not affect the covariance matrix<a class="headerlink" href="#note-that-zeroing-the-feature-vector-does-not-affect-the-covariance-matrix" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">X</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.224</span><span class="p">,</span>  <span class="mf">0.136</span><span class="p">,</span>  <span class="mf">0.364</span><span class="p">,</span>  <span class="mf">0.189</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.79</span> <span class="p">,</span>  <span class="mf">0.007</span><span class="p">,</span>  <span class="mf">0.486</span><span class="p">,</span>  <span class="mf">0.682</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.349</span><span class="p">,</span>  <span class="mf">0.013</span><span class="p">,</span>  <span class="mf">0.484</span><span class="p">,</span>  <span class="mf">0.094</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.771</span><span class="p">,</span>  <span class="mf">0.924</span><span class="p">,</span>  <span class="mf">0.636</span><span class="p">,</span>  <span class="mf">0.692</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.33</span> <span class="p">,</span>  <span class="mf">0.01</span> <span class="p">,</span>  <span class="mf">0.439</span><span class="p">,</span>  <span class="mf">0.183</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">### Subtract the row mean from each row</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">Y</span> <span class="o">=</span> <span class="n">X</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">Y</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span>  <span class="mf">0.000e+00</span><span class="p">,</span>  <span class="o">-</span><span class="mf">2.776e-17</span><span class="p">,</span>   <span class="mf">0.000e+00</span><span class="p">,</span>   <span class="mf">2.776e-17</span><span class="p">,</span>   <span class="mf">0.000e+00</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">Y</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.004</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.092</span><span class="p">,</span>  <span class="mf">0.136</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.039</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.298</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.484</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.005</span><span class="p">,</span>  <span class="mf">0.191</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.114</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.222</span><span class="p">,</span>  <span class="mf">0.249</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.141</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.015</span><span class="p">,</span>  <span class="mf">0.168</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.119</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.064</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.089</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.23</span> <span class="p">,</span>  <span class="mf">0.199</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.058</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">### Calculate the covariance</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.01</span> <span class="p">,</span>  <span class="mf">0.012</span><span class="p">,</span>  <span class="mf">0.02</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span> <span class="p">,</span>  <span class="mf">0.017</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.012</span><span class="p">,</span>  <span class="mf">0.12</span> <span class="p">,</span>  <span class="mf">0.038</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.029</span><span class="p">,</span>  <span class="mf">0.042</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.02</span> <span class="p">,</span>  <span class="mf">0.038</span><span class="p">,</span>  <span class="mf">0.048</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.04</span> <span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.01</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.029</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.017</span><span class="p">,</span>  <span class="mf">0.042</span><span class="p">,</span>  <span class="mf">0.04</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.035</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.01</span> <span class="p">,</span>  <span class="mf">0.012</span><span class="p">,</span>  <span class="mf">0.02</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span> <span class="p">,</span>  <span class="mf">0.017</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.012</span><span class="p">,</span>  <span class="mf">0.12</span> <span class="p">,</span>  <span class="mf">0.038</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.029</span><span class="p">,</span>  <span class="mf">0.042</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.02</span> <span class="p">,</span>  <span class="mf">0.038</span><span class="p">,</span>  <span class="mf">0.048</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.04</span> <span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.01</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.029</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.016</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.017</span><span class="p">,</span>  <span class="mf">0.042</span><span class="p">,</span>  <span class="mf">0.04</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.019</span><span class="p">,</span>  <span class="mf">0.035</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Eigendecomposition of the covariance matrix<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e1</span><span class="p">,</span> <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]);</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_38_0.png" src="_images/13D_PCA_38_0.png" />
+</div>
+<div class="section" id="change-of-basis-via-pca">
+<h2>Change of basis via PCA<a class="headerlink" href="#change-of-basis-via-pca" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="we-can-transform-the-original-data-set-so-that-the-eigenvectors-are-the-basis-vectors-and-find-the-new-coordinates-of-the-data-points-with-respect-to-this-new-basis">
+<h3>We can transform the original data set so that the eigenvectors are the basis vectors and find the new coordinates of the data points with respect to this new basis<a class="headerlink" href="#we-can-transform-the-original-data-set-so-that-the-eigenvectors-are-the-basis-vectors-and-find-the-new-coordinates-of-the-data-points-with-respect-to-this-new-basis" title="Permalink to this headline">¶</a></h3>
+<p>This is the change of basis transformation covered in the Linear
+Alegebra module. First, note that the covariance matrix is a real
+symmetric matrix, and so the eigenvector matrix is an orthogonal matrix.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linear-algebra-review-for-change-of-basis">
+<h3>Linear algebra review for change of basis<a class="headerlink" href="#linear-algebra-review-for-change-of-basis" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="graphical-illustration-of-change-of-basis">
+<h2>Graphical illustration of change of basis<a class="headerlink" href="#graphical-illustration-of-change-of-basis" title="Permalink to this headline">¶</a></h2>
+<div class="figure" id="id2">
+<img alt="Commuative diagram" src="spectral.html" />
+<p class="caption"><span class="caption-text">Commuative diagram</span></p>
+</div>
+<p>Suppose we have a vector <span class="math">\(u\)</span> in the standard basis <span class="math">\(B\)</span> , and
+a matrix <span class="math">\(A\)</span> that maps <span class="math">\(u\)</span> to <span class="math">\(v\)</span>, also in <span class="math">\(B\)</span>.
+We can use the eigenvalues of <span class="math">\(A\)</span> to form a new basis <span class="math">\(B'\)</span>.
+As explained above, to bring a vector <span class="math">\(u\)</span> from <span class="math">\(B\)</span>-space to
+a vector <span class="math">\(u'\)</span> in <span class="math">\(B'\)</span>-space, we multiply it by
+<span class="math">\(Q^{-1}\)</span>, the inverse of the matrix having the eigenvctors as
+column vectors. Now, in the eigenvector basis, the equivalent operation
+to <span class="math">\(A\)</span> is the diagonal matrix <span class="math">\(\Lambda\)</span> - this takes
+<span class="math">\(u'\)</span> to <span class="math">\(v'\)</span>. Finally, we convert <span class="math">\(v'\)</span> back to a
+vector <span class="math">\(v\)</span> in the standard basis by multiplying with <span class="math">\(Q\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Principal components are simply the eigenvectors of the covariance
+matrix used as basis vectors. Each of the original data points is
+expressed as a linear combination of the principal components, giving
+rise to a new set of coordinates.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">ys</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]);</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_46_0.png" src="_images/13D_PCA_46_0.png" />
+<p>For example, if we only use the first column of <code class="docutils literal"><span class="pre">ys</span></code>, we will have the
+projection of the data onto the first principal component, capturing the
+majority of the variance in the data with a single feature that is a
+linear combination of the original features.</p>
+<p>We may need to transform the (reduced) data set to the original feature
+coordinates for interpretation. This is simply another linear transform
+(matrix multiplication).</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">zs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">zs</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">zs</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">v1</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]);</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_50_0.png" src="_images/13D_PCA_50_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">u</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dimension-reduction-via-pca">
+<h2>Dimension reduction via PCA<a class="headerlink" href="#dimension-reduction-via-pca" title="Permalink to this headline">¶</a></h2>
+<p>We have the sepctral decomposition of the covariance matrix</p>
+<div class="math">
+\[A = Q^{-1}\Lambda Q\]</div>
+<p>Suppose <span class="math">\(\Lambda\)</span> is a rank <span class="math">\(p\)</span> matrix. To reduce the
+dimensionality to <span class="math">\(k \le p\)</span>, we simply set all but the first
+<span class="math">\(k\)</span> values of the diagonal of <span class="math">\(\Lambda\)</span> to zero. This is
+equivalent to ignoring all except the first <span class="math">\(k\)</span> principal
+components.</p>
+<p>What does this achieve? Recall that <span class="math">\(A\)</span> is a covariance matrix,
+and the trace of the matrix is the overall variability, since it is the
+sum of the variances.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.605</span><span class="p">,</span>  <span class="mf">0.202</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.202</span><span class="p">,</span>  <span class="mf">0.209</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.81349656039067819</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="n">D</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.69</span> <span class="p">,</span>  <span class="mf">0.</span>   <span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span>   <span class="p">,</span>  <span class="mf">0.124</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">D</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.81349656039067819</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">D</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">D</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.84806267856011852</span>
+</pre></div>
+</div>
+<p>Since the trace is invariant under change of basis, the total
+variability is also unchanged by PCA. By keeping only the first
+<span class="math">\(k\)</span> principal components, we can still &#8220;explain&#8221;
+<span class="math">\(\sum_{i=1}^k e[i]/\sum{e}\)</span> of the total variability. Sometimes,
+the degree of dimension reduction is specified as keeping enough
+principal components so that (say) <span class="math">\(90\%\)</span> of the total variability
+is explained.</p>
+<div class="section" id="using-singular-value-decomposition-svd-for-pca">
+<h3>Using Singular Value Decomposition (SVD) for PCA<a class="headerlink" href="#using-singular-value-decomposition-svd-for-pca" title="Permalink to this headline">¶</a></h3>
+<p>SVD is a decomposition of the data matrix <span class="math">\(X = U S V^T\)</span> where
+<span class="math">\(U\)</span> and <span class="math">\(V\)</span> are orthogonal matrices and <span class="math">\(S\)</span> is a
+diagnonal matrix.</p>
+<p>Recall that the transpose of an orthogonal matrix is also its inverse,
+so if we multiply on the right by <span class="math">\(X^T\)</span>, we get the follwoing
+simplification</p>
+<p>Compare with the eigendecomposition of a matrix
+<span class="math">\(A = W \Lambda W^{-1}\)</span>, we see that SVD gives us the
+eigendecomposition of the matrix <span class="math">\(XX^T\)</span>, which as we have just
+seen, is basically a scaled version of the covariance for a data matrix
+with zero mean, with the eigenvectors given by <span class="math">\(U\)</span> and
+eigenvealuse by <span class="math">\(S^2\)</span> (scaled by <span class="math">\(n-1\)</span>)..</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e2</span> <span class="o">=</span> <span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">u</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e_</span><span class="p">,</span> <span class="n">v_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">e2</span><span class="p">,</span> <span class="n">v2</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">e_</span><span class="o">*</span><span class="n">v_</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]);</span>
+</pre></div>
+</div>
+<img alt="_images/13D_PCA_61_0.png" src="_images/13D_PCA_61_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">v1</span> <span class="c1"># from eigenvectors of covariance matrix</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.922</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.387</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.387</span><span class="p">,</span>  <span class="mf">0.922</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">v2</span> <span class="c1"># from SVD</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.922</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.387</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.387</span><span class="p">,</span>  <span class="mf">0.922</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="c1"># from eigenvalues of covariance matrix</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.693</span><span class="p">,</span>  <span class="mf">0.124</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e2</span> <span class="c1"># from SVD</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.693</span><span class="p">,</span>  <span class="mf">0.124</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a0</span> <span class="o">+</span> <span class="n">a1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mf">0.01</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">])</span>
+<span class="n">xs</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">36.809</span><span class="p">,</span>   <span class="mf">1.658</span><span class="p">,</span>   <span class="mf">0.125</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">U</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.099</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.675</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.731</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.113</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.723</span><span class="p">,</span>  <span class="mf">0.682</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.989</span><span class="p">,</span>  <span class="mf">0.149</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.005</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Applications of Linear Alebra: PCA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#variance-and-covariance">Variance and covariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#eigendecomposition-of-the-covariance-matrix">Eigendecomposition of the covariance matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#covariance-matrix-as-a-linear-transformation">Covariance matrix as a linear transformation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pca">PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Eigendecomposition of the covariance matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#change-of-basis-via-pca">Change of basis via PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#graphical-illustration-of-change-of-basis">Graphical illustration of change of basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dimension-reduction-via-pca">Dimension reduction via PCA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="13C_LinearAlgebraExamples.html"
+                          title="Previous page">&larr; Linear Algebra Examples</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="13E_SparseMatrices.html"
+                          title="Next page">&rarr; Sparse Matrices</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/13D_PCA.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="13E_SparseMatrices.html" title="Sparse Matrices"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13C_LinearAlgebraExamples.html" title="Linear Algebra Examples"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13D_PCA.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:38 GMT -->
+</html>

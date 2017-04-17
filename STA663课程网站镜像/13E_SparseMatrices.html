@@ -1,0 +1,906 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13E_SparseMatrices.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:38 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sparse Matrices &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Optimization and Root Finding" href="14A_Optimization_One_Dimension.html" />
+    <link rel="prev" title="Applications of Linear Alebra: PCA" href="13D_PCA.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="14A_Optimization_One_Dimension.html" title="Optimization and Root Finding"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13D_PCA.html" title="Applications of Linear Alebra: PCA"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sparse-matrices">
+<h1>Sparse Matrices<a class="headerlink" href="#sparse-matrices" title="Permalink to this headline">¶</a></h1>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">sparse</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">as</span> <span class="nn">spla</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="creating-a-sparse-matrix">
+<h2>Creating a sparse matrix<a class="headerlink" href="#creating-a-sparse-matrix" title="Permalink to this headline">¶</a></h2>
+<p>There are many applications in which we deal with matrices that are
+mostly zeros. For example, a matrix representing social networks is very
+sparse - there are 7 billion people, but most people are only connected
+to a few hundred or thousand others directly. Storing such a social
+network as a sparse rather than dense matrix will offer orders of
+magnitude reductions in memory requirements and corresponding speed-ups
+in computation.</p>
+<div class="section" id="coordinate-format">
+<h3>Coordinate format<a class="headerlink" href="#coordinate-format" title="Permalink to this headline">¶</a></h3>
+<p>The simplest sparse matrix format is built from the coordinates and
+values of the non-zero entries.</p>
+<div class="section" id="from-dense-matrix">
+<h4>From dense matrix<a class="headerlink" href="#from-dense-matrix" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="n">A</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">9</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">vals</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">5</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>
+        <span class="mi">8</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rows</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cols</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>
+       <span class="mi">12</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X1</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">X1</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">5</span><span class="n">x15</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="s1">&#39;&gt;&#39;</span>
+    <span class="k">with</span> <span class="mi">18</span> <span class="n">stored</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">COOrdinate</span> <span class="nb">format</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">X1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="mi">5</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>    <span class="mi">8</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>   <span class="mi">7</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="mi">8</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="mi">7</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>    <span class="mi">7</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>    <span class="mi">9</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>    <span class="mi">1</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>   <span class="mi">12</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>    <span class="mi">9</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="mi">8</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="from-coordinates">
+<h4>From coordinates<a class="headerlink" href="#from-coordinates" title="Permalink to this headline">¶</a></h4>
+<p>Note that the (values, (rows, cols)) argument is a single tuple.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X2</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)))</span>
+<span class="n">X2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">5</span><span class="n">x13</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="s1">&#39;&gt;&#39;</span>
+    <span class="k">with</span> <span class="mi">18</span> <span class="n">stored</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">COOrdinate</span> <span class="nb">format</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">X2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="mi">5</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>    <span class="mi">8</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>   <span class="mi">7</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="mi">8</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="mi">7</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>    <span class="mi">7</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>    <span class="mi">9</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>    <span class="mi">1</span>
+<span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>   <span class="mi">12</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>    <span class="mi">9</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>    <span class="mi">2</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>    <span class="mi">4</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>   <span class="mi">8</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="convert-back-to-dense-matrix">
+<h4>Convert back to dense matrix<a class="headerlink" href="#convert-back-to-dense-matrix" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X2</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">matrix</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">9</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="compressed-sparse-row-and-column-formats">
+<h3>Compressed Sparse Row and Column formats<a class="headerlink" href="#compressed-sparse-row-and-column-formats" title="Permalink to this headline">¶</a></h3>
+<p>When we have 2 or more repeated entries in the rows or cols, we can
+remove the redundancy by indicating the location of the first occurrence
+of a value and its increment instead of the full coordinates. These are
+known as CSR or CSC formats.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>
+         <span class="mi">4</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">6</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>
+        <span class="mi">12</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">indptr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">rows</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)]</span>
+<span class="n">indptr</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">18</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X3</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">indptr</span><span class="p">))</span>
+<span class="n">X3</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">4</span><span class="n">x13</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="s1">&#39;&gt;&#39;</span>
+    <span class="k">with</span> <span class="mi">18</span> <span class="n">stored</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">Compressed</span> <span class="n">Sparse</span> <span class="n">Row</span> <span class="nb">format</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X3</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">matrix</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">9</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="section" id="casting-from-coo-format">
+<h4>Casting from COO format<a class="headerlink" href="#casting-from-coo-format" title="Permalink to this headline">¶</a></h4>
+<p>Because the coordinate format is more intuitive, it is often more
+convenient to first create a COO matrix then cast to CSR or CSC form.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X4</span> <span class="o">=</span> <span class="n">X2</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X4</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="mi">5</span><span class="n">x13</span> <span class="n">sparse</span> <span class="n">matrix</span> <span class="n">of</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="s1">&#39;&gt;&#39;</span>
+    <span class="k">with</span> <span class="mi">18</span> <span class="n">stored</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">Compressed</span> <span class="n">Sparse</span> <span class="n">Row</span> <span class="nb">format</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="coo-summation-convention">
+<h3>COO summation convention<a class="headerlink" href="#coo-summation-convention" title="Permalink to this headline">¶</a></h3>
+<p>When entries are repeated in a COO matrix, they are <strong>summed</strong>. This
+provides a quick way to construct confusion matrices for evaluation of
+multi-class classification algorithms.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+<span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rows</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cols</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">vals</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X5</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">X5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>    <span class="mi">6</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>    <span class="mi">22</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="application-confusion-matrix">
+<h2>Application: Confusion matrix<a class="headerlink" href="#application-confusion-matrix" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-a-2-by-2-confusion-matrix">
+<h3>Creating a 2 by 2 confusion matrix<a class="headerlink" href="#creating-a-2-by-2-confusion-matrix" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pred</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+       <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+       <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">vals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">shape</span> <span class="p">,</span> <span class="n">pred</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">((</span><span class="mi">100</span><span class="p">,),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X6</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">vals</span><span class="p">,</span> <span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">obs</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X6</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">matrix</span><span class="p">([[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="mi">23</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="section" id="creating-an-by-confusion-matrix">
+<h4>Creating an <span class="math">\(n\)</span> by <span class="math">\(n\)</span> confusion matrix<a class="headerlink" href="#creating-an-by-confusion-matrix" title="Permalink to this headline">¶</a></h4>
+<p>For classifications with a large number of classes (e.g. image
+segmentation), the savings are even more dramatic.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="k">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">KNeighborsClassifier</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">iris</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_iris</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">()</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pred</span> <span class="o">=</span> <span class="n">knn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X7</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pred</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X7</span><span class="o">.</span><span class="n">todense</span><span class="p">(),</span> <span class="n">index</span><span class="o">=</span><span class="n">iris</span><span class="o">.</span><span class="n">target_names</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">iris</span><span class="o">.</span><span class="n">target_names</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>setosa</th>
+      <th>versicolor</th>
+      <th>virginica</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>setosa</th>
+      <td>29</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>versicolor</th>
+      <td>0</td>
+      <td>23</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>virginica</th>
+      <td>0</td>
+      <td>0</td>
+      <td>19</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+<div class="section" id="application-pagerank">
+<h2>Application: PageRank<a class="headerlink" href="#application-pagerank" title="Permalink to this headline">¶</a></h2>
+<p>SciPy provides efficient routines for solving large sparse systems as
+for dense matrices. We will illustrate by calculating the page rank for
+airports using data from the <a class="reference external" href="http://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=236">Bureau of Transportation
+Statisitcs</a>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/airports.csv&#39;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">445827</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ORIGIN_AIRPORT_ID</th>
+      <th>DEST_AIRPORT_ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10135</td>
+      <td>10397</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10135</td>
+      <td>10397</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>10135</td>
+      <td>10397</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10135</td>
+      <td>10397</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>10135</td>
+      <td>10397</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lookup</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/names.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lookup</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">6404</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lookup</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <th>Code</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10001</th>
+      <td>Afognak Lake, AK: Afognak Lake Airport</td>
+    </tr>
+    <tr>
+      <th>10003</th>
+      <td>Granite Mountain, AK: Bear Creek Mining Strip</td>
+    </tr>
+    <tr>
+      <th>10004</th>
+      <td>Lik, AK: Lik Mining Camp</td>
+    </tr>
+    <tr>
+      <th>10005</th>
+      <td>Little Squaw, AK: Little Squaw Airport</td>
+    </tr>
+    <tr>
+      <th>10006</th>
+      <td>Kizhuyak, AK: Kizhuyak Bay</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</pre></div>
+</div>
+<div class="section" id="construct-the-sparse-adjacency-matrix">
+<h3>Construct the sparse adjacency matrix<a class="headerlink" href="#construct-the-sparse-adjacency-matrix" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_dataframe</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s1">&#39;ORIGIN_AIRPORT_ID&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;DEST_AIRPORT_ID&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">airports</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">())</span>
+<span class="n">adj_matrix</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">to_scipy_sparse_matrix</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="construct-the-transition-matrix">
+<h3>Construct the transition matrix<a class="headerlink" href="#construct-the-transition-matrix" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">out_degrees</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">adj_matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">diag_matrix</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">out_degrees</span><span class="p">)</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+<span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">diag_matrix</span> <span class="o">@</span> <span class="n">adj_matrix</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="modify-the-transition-matrix-with-a-damping-factor">
+<h3>Modify the transition matrix with a damping factor<a class="headerlink" href="#modify-the-transition-matrix-with-a-damping-factor" title="Permalink to this headline">¶</a></h3>
+<p>The PageRank algorithm assumes that every node can be reached from every
+other node. To guard against case where a node has out-degree 0, we
+allow every node a small random chance of transitioning to any other
+node using a damping factor <span class="math">\(d\)</span>. Then we solve the linear system
+to find the pagerank score <span class="math">\(r\)</span>.</p>
+<div class="math">
+\[r = (I - dM)^{-1}\frac{1-d}{N}\mathbb{1}\]</div>
+<p>or equivalently in the <span class="math">\(Ax = b\)</span> format</p>
+<div class="math">
+\[(I - dM)r = \frac{1-d}{N}\mathbb{1}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">airports</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="mf">0.85</span>
+<span class="n">I</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;csc&#39;</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">I</span> <span class="o">-</span> <span class="n">d</span> <span class="o">*</span> <span class="n">M</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="c1"># so the sum of all page ranks is 1</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="o">...</span><span class="p">,</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">0.</span><span class="p">,</span>  <span class="mf">1.</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">import</span> <span class="n">spsolve</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">r</span> <span class="o">=</span>  <span class="n">spsolve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">r</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.99999999999999978</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">top10</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">bot10</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">airports</span><span class="p">[</span><span class="n">top10</span><span class="p">]]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_degrees</span><span class="p">[</span><span class="n">top10</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;pagerank&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">top10</span><span class="p">]</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Description</th>
+      <th>degree</th>
+      <th>pagerank</th>
+    </tr>
+    <tr>
+      <th>Code</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>10397</th>
+      <td>Atlanta, GA: Hartsfield-Jackson Atlanta Intern...</td>
+      <td>158</td>
+      <td>0.043286</td>
+    </tr>
+    <tr>
+      <th>13930</th>
+      <td>Chicago, IL: Chicago O'Hare International</td>
+      <td>139</td>
+      <td>0.033956</td>
+    </tr>
+    <tr>
+      <th>11292</th>
+      <td>Denver, CO: Denver International</td>
+      <td>129</td>
+      <td>0.031434</td>
+    </tr>
+    <tr>
+      <th>11298</th>
+      <td>Dallas/Fort Worth, TX: Dallas/Fort Worth Inter...</td>
+      <td>108</td>
+      <td>0.027596</td>
+    </tr>
+    <tr>
+      <th>13487</th>
+      <td>Minneapolis, MN: Minneapolis-St Paul Internati...</td>
+      <td>108</td>
+      <td>0.027511</td>
+    </tr>
+    <tr>
+      <th>12266</th>
+      <td>Houston, TX: George Bush Intercontinental/Houston</td>
+      <td>110</td>
+      <td>0.025967</td>
+    </tr>
+    <tr>
+      <th>11433</th>
+      <td>Detroit, MI: Detroit Metro Wayne County</td>
+      <td>100</td>
+      <td>0.024738</td>
+    </tr>
+    <tr>
+      <th>14869</th>
+      <td>Salt Lake City, UT: Salt Lake City International</td>
+      <td>78</td>
+      <td>0.019298</td>
+    </tr>
+    <tr>
+      <th>14771</th>
+      <td>San Francisco, CA: San Francisco International</td>
+      <td>76</td>
+      <td>0.017820</td>
+    </tr>
+    <tr>
+      <th>14107</th>
+      <td>Phoenix, AZ: Phoenix Sky Harbor International</td>
+      <td>79</td>
+      <td>0.017000</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">airports</span><span class="p">[</span><span class="n">bot10</span><span class="p">]]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;degree&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_degrees</span><span class="p">[</span><span class="n">bot10</span><span class="p">]</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;pagerank&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="n">bot10</span><span class="p">]</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Description</th>
+      <th>degree</th>
+      <th>pagerank</th>
+    </tr>
+    <tr>
+      <th>Code</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>12265</th>
+      <td>Niagara Falls, NY: Niagara Falls International</td>
+      <td>1</td>
+      <td>0.000693</td>
+    </tr>
+    <tr>
+      <th>14025</th>
+      <td>Plattsburgh, NY: Plattsburgh International</td>
+      <td>1</td>
+      <td>0.000693</td>
+    </tr>
+    <tr>
+      <th>11695</th>
+      <td>Flagstaff, AZ: Flagstaff Pulliam</td>
+      <td>1</td>
+      <td>0.000693</td>
+    </tr>
+    <tr>
+      <th>16218</th>
+      <td>Yuma, AZ: Yuma MCAS/Yuma International</td>
+      <td>1</td>
+      <td>0.000693</td>
+    </tr>
+    <tr>
+      <th>14905</th>
+      <td>Santa Maria, CA: Santa Maria Public/Capt. G. A...</td>
+      <td>1</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>13964</th>
+      <td>North Bend/Coos Bay, OR: Southwest Oregon Regi...</td>
+      <td>1</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>10157</th>
+      <td>Arcata/Eureka, CA: Arcata</td>
+      <td>1</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>14487</th>
+      <td>Redding, CA: Redding Municipal</td>
+      <td>1</td>
+      <td>0.000710</td>
+    </tr>
+    <tr>
+      <th>12177</th>
+      <td>Hobbs, NM: Lea County Regional</td>
+      <td>1</td>
+      <td>0.000711</td>
+    </tr>
+    <tr>
+      <th>11049</th>
+      <td>College Station/Bryan, TX: Easterwood Field</td>
+      <td>1</td>
+      <td>0.000711</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="visualize-the-airport-connections-graph-and-label-the-top-and-bottom-5-airports-by-pagerank">
+<h3>Visualize the airport connections graph and label the top and bottom 5 airports by pagerank<a class="headerlink" href="#visualize-the-airport-connections-graph-and-label-the-top-and-bottom-5-airports-by-pagerank" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">airports</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">lookup</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">airports</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">top10</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="n">bot10</span><span class="p">[:</span><span class="mi">5</span><span class="p">]]}</span>
+
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+            <span class="n">node_color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">font_color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">node_size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">5000</span><span class="o">*</span><span class="n">r</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5000</span><span class="o">*</span><span class="n">r</span><span class="p">),</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/13E_SparseMatrices_70_0.png" src="_images/13E_SparseMatrices_70_0.png" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sparse Matrices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-a-sparse-matrix">Creating a sparse matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#application-confusion-matrix">Application: Confusion matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#application-pagerank">Application: PageRank</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="13D_PCA.html"
+                          title="Previous page">&larr; Applications of Linear Alebra: PCA</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="14A_Optimization_One_Dimension.html"
+                          title="Next page">&rarr; Optimization and Root Finding</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/13E_SparseMatrices.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="14A_Optimization_One_Dimension.html" title="Optimization and Root Finding"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13D_PCA.html" title="Applications of Linear Alebra: PCA"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13E_SparseMatrices.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:50 GMT -->
+</html>
