@@ -5,34 +5,34 @@ Tags: Translation,Lesson,Programming,Python
 
 
 
-基于 Python 的计算机统计学
-=======
+#基于 Python 的计算机统计学
 
-# 简介
-
-
-这一套课件实际上是一些相当粗糙的讲座笔记的草稿，基于 IPython notebook ，这门课程从 2015 年春季开始的，针对硕士生的统计学课程，[课程地址原本在这里，但是这个链接实际上已经不能访问了](https://stat.duke.edu/courses/statistical-computing-and-computation)。译者注：现在的链接[可能应该是在这个链接](http://people.duke.edu/~ccc14/sta-663/index.html)。这个课程主要介绍的内容是在**优化**和**模拟**这两方面的各种算法的开发，这些内容也是计算统计学的核心内容。各种各样的算法和数据集的复杂度都会逐渐增加，（一维 -> 多维，固定 -> 自适应，线性 -> 并行 -> 大规模并行，少量数据 -> 巨量数据），这是为了让学这门课的学生能够掌握并联系下面这些内容：
-
-* 练习可重现的分析（reproducible analysis）
-* 掌握基本的数据管理和处理技能
-* 使用 Python 语言来进行统计计算
-* 使用数学和统计学的链接库来提高效率
-* 能够理解和优化线性代码（serial code）
-* 能够掌握不同的并行开发范式并高效利用
-
-算法上，主要集中在以下两方面：
-
-* 优化（Optimization）
-    * 牛顿-拉普森算法（Newton-Raphson，NR算法），函数式编程和向量化
-    * 积分算法（Quadrature），自适应方法
-    * 梯度下降法（Gradient descent），用于多个变量的情况
-    * 广义线性模型算法（Solving GLMs），多变量 + C/C++  的接口
-    * 期望最大化算法，多变量 + 有限混合模型
-* 仿真和重采样（Simulation and resampling0
-    * Bootstrap法，并行编程的基础
-    * "Map（映射）"和"Reduce（归约），适用于针对大规模数据的统计
-	* 蒙特卡罗模拟算法（Monte Carlo simulations），更大规模的并行编程
-    * MCMC算法（马尔可夫链蒙特卡罗(Markov Chain Monte Carlo)），多重采样，使用 GPU 进行编程
+#####译者的话
 
 
-我（原作者）相信在 Duke 大学本专业内，这应该是第一次基于 Python 来讲的这门课，所以这门课会非常有意思。这也意味着教这门课需要准备很多新内容，我（原作者）就直接从已有的各种公有领域的 IPython notebook 里面来摘抄了。
+
+这个是一个新系列，翻译 Duke University 的 STA 663 课程的全套内容，课件讲义教材练习题等等。
+
+之前我在[Computational Statistics in Python](https://zhuanlan.zhihu.com/p/26331447?fc=1&group_id=837074441317027840#comment-271427497) 这里提到了要翻译这套课程。
+这几天就开始了。
+本系列为对 Duke 大学 sta663 Computational-statistics-with-Python 课程的中文翻译。
+项目地址：[Kivy-CN/Computational-statistics-with-Python-CN](http://github.com/Kivy-CN/Computational-statistics-with-Python-CN)
+
+中文版阅读地址在[我们的专栏](https://zhuanlan.zhihu.com/python-kivy)。
+
+中文版翻译稿源文件地址：[https://github.com/Kivy-CN/Computational-statistics-with-Python-CN](http://github.com/Kivy-CN/Computational-statistics-with-Python-CN)
+
+英文原版官网地址：[Computational Statistics in Python](http://people.duke.edu/%7Eccc14/sta-663/index.html)
+
+英文版源文件地址：[https://github.com/cliburn/Computational-statistics-with-Python](http://github.com/cliburn/Computational-statistics-with-Python)
+
+首先，这个翻译的质量依然不会很高，因为我水平有限，以及是用空闲时间偶尔翻译，所以大家发现错误请一定提出批评，我会及时改正的。
+
+另外我会逐步翻译 Duke 大学的 STA 633 课程的课件、纲要、教案 等等全部内容
+
+他们的这个课程和之前 [我翻译ThinkPython](https://zhuanlan.zhihu.com/p/24644499) 正好能衔接
+
+这个课程之后，又正好有足够的知识储备来尝试 斯坦福的 CS229 ：[Machine Learning (Course handouts)](http://cs229.stanford.edu/materials.html)
+
+也就是吴恩达当年带的那个机器学习的课程
+
