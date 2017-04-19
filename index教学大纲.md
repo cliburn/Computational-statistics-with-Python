@@ -234,7 +234,7 @@ Lecture 6
 - 数值线性代数
     - 线性方程组
     - 列空间、行空间和阶（Column space, row space and rank）
-    - 阶、基、生成控件（Rank, basis, span）
+    - 阶、基、张成（Rank, basis, span）
     - 范数和距离（Norms and distance）
     - 迹和行列式（Trace and determinant）
     - 特征值和特征向量（Eigenvalues and eigenvectors）
