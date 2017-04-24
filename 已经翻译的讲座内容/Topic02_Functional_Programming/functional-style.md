@@ -18,7 +18,7 @@ import pandas as pd
 
 
 
-函数首先是类的对象（Functions are first class objects）
+函数 首先是类的对象/第一等的对象（Functions are first class objects）
 ----
 在 Python 里面， 函数就和其他的对象一样，比如int整数或者list列表之类的。这就意味着你可以把函数用作变量（argument）传递给其他函数，还可以把函数存成字典的键值，或者把函数作为返回值从另一个函数来返回。总之这样用函数就能有很多非常神奇的使用方法了。
 
