@@ -653,7 +653,7 @@ print(new_list)        # Obtain a list with unique elements
 模块 Modules
 ----
 
-随着代码规模越来越大，就应该把代码拆分成多个 *moudle* 模块或者包，这样组织起来也更方便。最简单的情况下，模块可以就是普通的 python 文件。我们常常要先用 `import` 导入模块，然后在后面的代码中就能使用这些模块中的内容：
+随着代码规模越来越大，就应该把代码拆分成多个 *module* 模块或者包，这样组织起来也更方便。最简单的情况下，模块可以就是普通的 python 文件。我们常常要先用 `import` 导入模块，然后在后面的代码中就能使用这些模块中的内容：
 
 ```python
 import numpy
