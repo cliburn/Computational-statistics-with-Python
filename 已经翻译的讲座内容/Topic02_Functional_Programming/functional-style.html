@@ -11778,12 +11778,12 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="o">%</span><span class="k">precision</span> 4
 </pre></div>
@@ -11827,7 +11827,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;求 x 的平方&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
 
@@ -11846,7 +11846,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 创建一个以函数为键值的字典（dictionary）</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 创建一个以函数为键值的字典（dictionary）</span>
 
 <span class="n">funcs</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;square&#39;</span><span class="p">:</span> <span class="n">square</span><span class="p">,</span>
@@ -11864,13 +11864,13 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="mi">2</span>
 
-<span class="nb">print</span> <span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">cube</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">cube</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">funcs</span><span class="p">):</span>
-    <span class="nb">print</span> <span class="n">func</span><span class="p">,</span> <span class="n">funcs</span><span class="p">[</span><span class="n">func</span><span class="p">](</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">func</span><span class="p">,</span> <span class="n">funcs</span><span class="p">[</span><span class="n">func</span><span class="p">](</span><span class="n">x</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11913,7 +11913,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># map 函数会对一个集合(collection) 里面的全部成员使用某个函数来进行操作</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># map 函数会对一个集合(collection) 里面的全部成员使用某个函数来进行操作</span>
 <span class="c1">#（译者注：在深度学习中，map和reduce好像是译作映射与规约，这里的map似乎也能从字面上这么理解，将每个元素都用一个函数映射到了一个新的集合中）</span>
 
 <span class="nb">map</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
@@ -11929,7 +11929,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># filter 函数会对一个集合中的每个成员进行一个判断（predciate） </span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># filter 函数会对一个集合中的每个成员进行一个判断（predciate） </span>
 <span class="c1"># 然后只保存判断的值为真（True）的成员（译者注：所以顾名思义，就是类似过滤器，基本也就是英文单词filter的原意）</span>
 
 <span class="k">def</span> <span class="nf">is_even</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -11948,7 +11948,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 通常 map 和 reduce 都是联合起来使用的 - 也就是很有名的&quot;map-reduce&quot; 结构（construct）</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 通常 map 和 reduce 都是联合起来使用的 - 也就是很有名的&quot;map-reduce&quot; 结构（construct）</span>
 <span class="c1">#（译者注：不知道这里是不是搞错了，原文说的就是 map-reduce，但是这里分明用的是 map-filter）</span>
 
 <span class="nb">map</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="nb">filter</span><span class="p">(</span><span class="n">is_even</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)))</span>
@@ -11964,7 +11964,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># The reduce function reduces a collection using a binary operator to combine items two at a time</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># The reduce function reduces a collection using a binary operator to combine items two at a time</span>
 <span class="c1"># reduce 函数每次对两个元素进行一种 二值化/二进制？运算 ，然后依次应用到整个集合。</span>
 <span class="c1">#（译者注：上面这句我把握不好怎么表达，所以带了英文原文）</span>
 
@@ -11972,7 +11972,7 @@ div#notebook {
     <span class="k">return</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 
 <span class="c1"># 下面这就是用 reduce 来实现的另外一种累加函数</span>
-<span class="n">reduce</span><span class="p">(</span><span class="n">my_add</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="nb">reduce</span><span class="p">(</span><span class="n">my_add</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -11985,15 +11985,15 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 自定义函数当然也可以以函数作为返回值，这样就也是高级函数（HOF）了</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 自定义函数当然也可以以函数作为返回值，这样就也是高级函数（HOF）了</span>
 
 <span class="k">def</span> <span class="nf">custom_sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">transform</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the sum of xs after a user specified transform.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">xs</span><span class="p">))</span>
 
 <span class="n">xs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">custom_sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">square</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">custom_sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">cube</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">custom_sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">square</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">custom_sum</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">cube</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12006,7 +12006,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 返回一个函数是很有用的</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 返回一个函数是很有用的</span>
 
 <span class="c1"># 一个闭包？（closure）</span>
 <span class="c1">#（译者注：我水平很初级，所以不太理解闭包的概念，回头我多学习一下）</span>
@@ -12032,7 +12032,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat <span class="s1">&#39;foo.txt&#39;</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="o">!</span>cat <span class="s1">&#39;foo.txt&#39;</span>
 </pre></div>
 
 </div>
@@ -12045,7 +12045,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#32431;&#20989;&#25968;">&#32431;&#20989;&#25968;<a class="anchor-link" href="#&#32431;&#20989;&#25968;">&#182;</a></h2><p>什么样的函数是纯函数呢？纯函数不能有任何<em>附带效果</em>，也不能依赖全局变量。穿函数就和数学意义上的函数差不多，每次给定相同的输入，也得返回相同的输出。这对于降低bug很有帮助，在并行开发中也是如此，因为每个函数的调用都是彼此独立的，也就是可并行的（parallelizable）</p>
+<h2 id="&#32431;&#20989;&#25968;">&#32431;&#20989;&#25968;<a class="anchor-link" href="#&#32431;&#20989;&#25968;">&#182;</a></h2><p>什么样的函数是纯函数呢？纯函数不能有任何<em>附带效果</em>，也不能依赖全局变量。纯函数就和数学意义上的函数差不多，每次给定相同的输入，也得返回相同的输出。这对于降低bug很有帮助，在并行开发中也是如此，因为每个函数的调用都是彼此独立的，也就是可并行的（parallelizable）</p>
 
 </div>
 </div>
@@ -12055,7 +12055,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">pure</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">pure</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;创建一个新的列表，然后用之作为返回值&quot;&quot;&quot;</span>
     <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">xs</span>
@@ -12071,10 +12071,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="nb">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
-<span class="nb">print</span> <span class="n">pure</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
-<span class="nb">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
+<span class="k">print</span> <span class="n">pure</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
 </pre></div>
 
 </div>
@@ -12087,7 +12087,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">impure</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">impure</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
         <span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span>
     <span class="k">return</span> <span class="n">xs</span>
@@ -12103,10 +12103,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<span class="nb">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
-<span class="nb">print</span> <span class="n">impure</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
-<span class="nb">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
+<span class="k">print</span> <span class="n">impure</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="k">print</span> <span class="s2">&quot;xs =&quot;</span><span class="p">,</span> <span class="n">xs</span>
 </pre></div>
 
 </div>
@@ -12119,7 +12119,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 要记住，可变函数（mutatble functions）是在函数声明的时候创建的，而不是使用的时候</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 要记住，可变函数（mutatble functions）是在函数声明的时候创建的，而不是使用的时候</span>
 <span class="c1"># 下面这个就是初学者常犯的一种错误：</span>
 
 <span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="p">[]):</span>
@@ -12138,9 +12138,9 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -12153,11 +12153,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 下面是正确的符合 Python 风格的示例：</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 下面是正确的符合 Python 风格的示例：</span>
 
-<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;检查一下y是不否空的，如果是，就创建一个列表来赋值给y&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -12173,9 +12173,9 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">f1</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -12202,7 +12202,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 阶乘函数函数（factorial function）可能是经典递归样例中最简单的一个了。</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 阶乘函数函数（factorial function）可能是经典递归样例中最简单的一个了。</span>
 
 <span class="k">def</span> <span class="nf">fact</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;返回 n 的阶乘&quot;&quot;&quot;</span>
@@ -12213,7 +12213,7 @@ div#notebook {
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">n</span> <span class="o">*</span> <span class="n">fact</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="p">[</span><span class="n">fact</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span> <span class="p">[</span><span class="n">fact</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -12226,7 +12226,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 斐波那契数列（Fibonacci sequence）是另外一个经典的递归样例。</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 斐波那契数列（Fibonacci sequence）是另外一个经典的递归样例。</span>
 
 <span class="k">def</span> <span class="nf">fib1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;使用递归给出斐波那契数列&quot;&quot;&quot;</span>
@@ -12238,7 +12238,7 @@ div#notebook {
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib1</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="p">[</span><span class="n">fib1</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span> <span class="p">[</span><span class="n">fib1</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -12251,7 +12251,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 在 Python 语言中个，还可以使用另外一种方法实现 斐波那契数列，不用递归，而且更有效率：</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 在 Python 语言中个，还可以使用另外一种方法实现 斐波那契数列，不用递归，而且更有效率：</span>
 
 <span class="k">def</span> <span class="nf">fib2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;不用递归实现的斐波那契数列&quot;&quot;&quot;</span>
@@ -12260,7 +12260,7 @@ div#notebook {
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
     <span class="k">return</span> <span class="n">b</span>
 
-<span class="nb">print</span> <span class="p">[</span><span class="n">fib2</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+<span class="k">print</span> <span class="p">[</span><span class="n">fib2</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -12273,7 +12273,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 一定要注意，使用了递归的版本速度要比不用递归的慢很多</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 一定要注意，使用了递归的版本速度要比不用递归的慢很多</span>
 
 <span class="o">%</span><span class="k">timeit</span> fib1(20)
 <span class="o">%</span><span class="k">timeit</span> fib2(20)
@@ -12297,7 +12297,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 当然可以用递归来演示分治法（dividde-and-conquer paradigm）</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 当然可以用递归来演示分治法（dividde-and-conquer paradigm）</span>
 
 <span class="k">def</span> <span class="nf">almost_quick_sort</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;差不多能算是一个快速排列&quot;&quot;&quot;</span>
@@ -12313,7 +12313,7 @@ div#notebook {
         <span class="k">return</span> <span class="n">almost_quick_sort</span><span class="p">(</span><span class="n">less_than</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">pivot</span><span class="p">]</span> <span class="o">+</span> <span class="n">almost_quick_sort</span><span class="p">(</span><span class="n">more_than</span><span class="p">)</span>
 
 <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
-<span class="nb">print</span> <span class="n">almost_quick_sort</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">almost_quick_sort</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12336,15 +12336,15 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 使用 iter() 这个 Python 的内置函数（built-in function） 就可以从一个有序的数据结构创建迭代器</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 使用 iter() 这个 Python 的内置函数（built-in function） 就可以从一个有序的数据结构创建迭代器</span>
 
 <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
 <span class="n">x_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-<span class="nb">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-<span class="nb">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-<span class="nb">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">x_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12357,12 +12357,12 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 大多数情况里，迭代器都在一个 for 循环里面被（自发地）使用了。</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 大多数情况里，迭代器都在一个 for 循环里面被（自发地）使用了。</span>
 <span class="c1"># 当遇到了停止迭代警告（StopIteration exception）的时候就会停止迭代</span>
 
 <span class="n">x_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_iter</span><span class="p">:</span>
-    <span class="nb">print</span> <span class="n">x</span>
+    <span class="k">print</span> <span class="n">x</span>
 </pre></div>
 
 </div>
@@ -12385,7 +12385,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 包含有&#39;yield&#39;这个关键词（keyword）的函数会返回迭代器（iterators）</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 包含有&#39;yield&#39;这个关键词（keyword）的函数会返回迭代器（iterators）</span>
 <span class="c1"># 在完成了 yielding 之后，这个函数还会恢复到之前的状态</span>
 
 <span class="k">def</span> <span class="nf">count_down</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
@@ -12403,11 +12403,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">counter</span> <span class="o">=</span> <span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">counter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-<span class="nb">print</span> <span class="n">counter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">counter</span> <span class="o">=</span> <span class="n">count_down</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">counter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">counter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">counter</span><span class="p">:</span>
-    <span class="nb">print</span> <span class="n">count</span><span class="p">,</span>
+    <span class="k">print</span> <span class="n">count</span><span class="p">,</span>
 </pre></div>
 
 </div>
@@ -12420,20 +12420,20 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 还可以使用&#39;生成器表达式（generator expressions）&#39;来生成迭代器</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 还可以使用&#39;生成器表达式（generator expressions）&#39;来生成迭代器</span>
 <span class="c1"># 其形式有点像“列表生成器list generators”</span>
 <span class="c1"># 不过不同的是生成器表达式用的是圆括号，而列表生成器使用的是方括号。</span>
 <span class="c1"># （译者注：这个很好记，列表就有方括号，所以列表生成器语句中要用的是方括号，这就好记忆一点不容易弄混了。</span>
 
 <span class="n">xs1</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
-<span class="nb">print</span> <span class="n">xs1</span>
+<span class="k">print</span> <span class="n">xs1</span>
 
 <span class="n">xs2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
-<span class="nb">print</span> <span class="n">xs2</span>
+<span class="k">print</span> <span class="n">xs2</span>
 
 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs2</span><span class="p">:</span>
-    <span class="nb">print</span> <span class="n">x</span><span class="p">,</span>
-<span class="nb">print</span>
+    <span class="k">print</span> <span class="n">x</span><span class="p">,</span>
+<span class="k">print</span>
 </pre></div>
 
 </div>
@@ -12446,11 +12446,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 迭代器可以用在无穷函数（infinite functions）上</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 迭代器可以用在无穷函数（infinite functions）上</span>
 
 <span class="k">def</span> <span class="nf">fib</span><span class="p">():</span>
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
-    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
         <span class="k">yield</span> <span class="n">a</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span>
 </pre></div>
@@ -12465,11 +12465,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fib</span><span class="p">():</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fib</span><span class="p">():</span>
     <span class="c1"># 生成器返回了一个无穷的流，所以必须停止条件判断</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="k">break</span>
-    <span class="nb">print</span> <span class="n">i</span><span class="p">,</span>
+    <span class="k">print</span> <span class="n">i</span><span class="p">,</span>
 </pre></div>
 
 </div>
@@ -12482,14 +12482,14 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 很多 Python 内置函数都返回迭代器</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 很多 Python 内置函数都返回迭代器</span>
 <span class="c1"># 例如 处理文件的 file handlers</span>
 <span class="c1"># 所以通过下面的示范（idiom）你就可以逐行地处理文件，哪怕有 1 TB（terabyte）那么大</span>
 <span class="c1"># 这样即便用性能比较一般的笔记本都可以，不会遇到什么问题</span>
 <span class="c1"># 在 Pyhton 3 里面 ，map 和 filter 返回的都是迭代器，而不再是列表了</span>
 
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;foo.txt&#39;</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12512,12 +12512,12 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 使用常规函数</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 使用常规函数</span>
 
 <span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
 
-<span class="nb">print</span> <span class="nb">map</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="k">print</span> <span class="nb">map</span><span class="p">(</span><span class="n">square</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12530,9 +12530,9 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 用匿名函数</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 用匿名函数</span>
 
-<span class="nb">print</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="k">print</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12561,7 +12561,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 下面是一个简单的装饰器，用来对一个任意函数进行计时</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 下面是一个简单的装饰器，用来对一个任意函数进行计时</span>
 
 <span class="k">def</span> <span class="nf">func_timer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;程序消耗的时间&quot;&quot;&quot;</span>
@@ -12570,7 +12570,7 @@ div#notebook {
         <span class="kn">import</span> <span class="nn">time</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="s2">&quot;Elapsed: </span><span class="si">%.2f</span><span class="s2">s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s2">&quot;Elapsed: </span><span class="si">%.2f</span><span class="s2">s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span>
     
     <span class="k">return</span> <span class="n">f</span>
@@ -12586,7 +12586,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 装饰器函数有一个特别的简短记号：（ a special shorthand notation for decorating functions）</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 装饰器函数有一个特别的简短记号：（ a special shorthand notation for decorating functions）</span>
 
 
 <span class="nd">@func_timer</span>
@@ -12594,7 +12594,7 @@ div#notebook {
     <span class="sd">&quot;&quot;&quot;响应之前沉睡给定的时间&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">time</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep</span><span class="p">)</span>
-    <span class="nb">print</span> <span class="n">msg</span>
+    <span class="k">print</span> <span class="n">msg</span>
 
 <span class="n">sleepy</span><span class="p">(</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
 </pre></div>
@@ -12604,26 +12604,15 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#36816;&#31639;&#22120;&#27169;&#22359;-operator">&#36816;&#31639;&#22120;&#27169;&#22359; <code>operator</code><a class="anchor-link" href="#&#36816;&#31639;&#22120;&#27169;&#22359;-operator">&#182;</a></h2><p><code>operator</code>模块提供了各种常规 Python 预算福（+, *, []等等）的”函数版本”，可以用到使用函数作为变量（argument）的情景</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="err">运算器模块</span> <span class="sb">`operator`</span>
+<span class="o">----</span>
 
-<span class="c1"># 先买就是求和函数的另一种表述方式</span>
-<span class="nb">print</span> <span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
-<span class="nb">print</span> <span class="n">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="sb">`operator`</span><span class="err">模块提供了各种常规</span> <span class="n">Python</span> <span class="err">运算符（</span><span class="o">+</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="p">[]</span><span class="err">等等）的”函数版本”，可以用到使用函数作为变量（</span><span class="n">argument</span><span class="err">）的情景</span>
 </pre></div>
 
 </div>
@@ -12636,13 +12625,30 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">my_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
+
+<span class="c1"># 先买就是求和函数的另一种表述方式</span>
+<span class="k">print</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="k">print</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">my_list</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)]</span>
 
 <span class="c1"># 标准排序</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">my_list</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">my_list</span><span class="p">))</span>
 
 <span class="c1"># 根据每个元素的位置1 来进行排列，然后返回该列表 (注意，Python 是从0开始计数，1就是第二个位置了。)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">my_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">my_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">op</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -12665,12 +12671,12 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
-<span class="n">sum_</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">reduce</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
-<span class="n">prod_</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">reduce</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sum_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">prod_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+<span class="n">sum_</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="nb">reduce</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
+<span class="n">prod_</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="nb">reduce</span><span class="p">,</span> <span class="n">op</span><span class="o">.</span><span class="n">mul</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sum_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">prod_</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
 </pre></div>
 
 </div>
@@ -12693,20 +12699,20 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">groupby</span><span class="p">,</span> <span class="n">islice</span><span class="p">,</span> <span class="n">permutations</span><span class="p">,</span> <span class="n">combinations</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">groupby</span><span class="p">,</span> <span class="n">islice</span><span class="p">,</span> <span class="n">permutations</span><span class="p">,</span> <span class="n">combinations</span>
 
-<span class="nb">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">cycle</span><span class="p">(</span><span class="s1">&#39;abcd&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-<span class="nb">print</span> 
+<span class="k">print</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">cycle</span><span class="p">(</span><span class="s1">&#39;abcd&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="k">print</span> 
 
 <span class="n">animals</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="s1">&#39;pig&#39;</span><span class="p">,</span> <span class="s1">&#39;cow&#39;</span><span class="p">,</span> <span class="s1">&#39;giraffe&#39;</span><span class="p">,</span> <span class="s1">&#39;elephant&#39;</span><span class="p">,</span> <span class="s1">&#39;dog&#39;</span><span class="p">,</span> <span class="s1">&#39;cat&#39;</span><span class="p">,</span> <span class="s1">&#39;hippo&#39;</span><span class="p">,</span> <span class="s1">&#39;lion&#39;</span><span class="p">,</span> <span class="s1">&#39;tiger&#39;</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">animals</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">):</span>
-    <span class="nb">print</span> <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-<span class="nb">print</span>
+    <span class="k">print</span> <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="k">print</span>
 
-<span class="nb">print</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">permutations</span><span class="p">(</span><span class="s1">&#39;abc&#39;</span><span class="p">)]</span>
-<span class="nb">print</span> 
+<span class="k">print</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">permutations</span><span class="p">(</span><span class="s1">&#39;abc&#39;</span><span class="p">)]</span>
+<span class="k">print</span> 
 
-<span class="nb">print</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
+<span class="k">print</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
 </pre></div>
 
 </div>
@@ -12734,7 +12740,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 下面是一个小例子，利用细菌酶（译者注：原文这里就是 bacterial enzyme）的DNA转换成对应的蛋白质序列</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 下面是一个小例子，利用细菌酶（译者注：原文这里就是 bacterial enzyme）的DNA转换成对应的蛋白质序列</span>
 <span class="c1"># 译者注：这里感觉明显是错的，酶通常就是催化作用，除非是特殊的，常规的酶就是蛋白或者肽链哪来的DNA，我记得染色体和线粒体才有吧</span>
 <span class="c1"># 另外DNA转换的应该是氨基酸序列吧，怎么能是蛋白质的序列呢？应该是氨基酸序列对应的肽链再组合才能成蛋白质吧？如果我记错了请更正。</span>
 <span class="c1"># 我的一位青年科学家朋友说：觉得原文的意思应该是，这个细菌酶所对应的DNA，然后将其转换成氨基酸序列。当然连成肽链和折叠成蛋白质的工作这里就不考虑了。</span>
@@ -12815,7 +12821,7 @@ div#notebook {
 <span class="s2">AGCCCGTCAGTATCGGCGGAATTCCAGCTGAGCGCCGGTCGCTACCATTACCAGTTGGTC</span>
 <span class="s2">TGGTGTCAAAAATAA</span>
 <span class="s2">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">toolz</span> <span class="k">import</span> <span class="n">partition</span>
+<span class="kn">from</span> <span class="nn">toolz</span> <span class="kn">import</span> <span class="n">partition</span>
 
 <span class="c1"># 把上面的 FASTA 转成一个单个的 DNA 序列</span>
 <span class="n">dna</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">gene</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> 
@@ -12872,7 +12878,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
@@ -12898,7 +12904,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
@@ -12932,7 +12938,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
@@ -12967,7 +12973,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
@@ -12999,7 +13005,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
@@ -13024,7 +13030,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># YOUR CODE HERE</span>
 </pre></div>
 
 </div>
