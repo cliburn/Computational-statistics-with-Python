@@ -357,7 +357,7 @@ print '\n'.join([''.join(line) for line
 
 **3**. 去古登堡计划网站（Project Gutenbrrg）下载简奥斯汀Jane Austem的'傲慢与偏见（Pride and Prejudice）' 
 
-- 移除所有标点符号，然后全文转换成消协
+- 移除所有标点符号，然后全文转换成小写
 - 查询计算其中单词'married'出现的次数
 - 查询计算在同一个十个单词的语段中，'daughter'和'married'这两个单词同时出现的次数
 
