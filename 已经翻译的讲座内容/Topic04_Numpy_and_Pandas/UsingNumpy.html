@@ -11714,6 +11714,240 @@ ul.typeahead-list > li > a {
 .ansi-bold { font-weight: bold; }
 
     </style>
+<style type="text/css">
+    /*
+Placeholder for custom user CSS
+
+mainly to be overridden in profile/static/custom/custom.css
+
+This will always be an empty file in IPython
+*/
+
+
+/*@import url('http://fonts.googleapis.com/css?family=Crimson+Text');*/
+@import url('http://fonts.googleapis.com/css?family=Kameron');
+@import url('http://fonts.googleapis.com/css?family=Lato:200,300,400');
+/*@import url('http://fonts.googleapis.com/css?family=Hack');*/
+
+
+/* Change code font */
+.CodeMirror pre {
+    font-family: 'Hack', Consolas, monocco, monospace;
+}
+
+div.input_area {
+    border-color: rgba(0,0,0,0.10);
+    background: rbga(0,0,0,0.5);
+}
+
+div.text_cell {
+    /*max-width: 105ex; */
+    /* instead of 100%, */
+}
+
+div.text_cell_render {
+    /*font-family: "Crimson Text";*/
+    font-size: 12pt;
+    line-height: 145%; /* added for some line spacing of text. */
+}
+
+/*div.text_cell_render h1,
+div.text_cell_render h2,
+div.text_cell_render h3,
+div.text_cell_render h4,
+div.text_cell_render h5,
+*/
+div.text_cell_render h6 {
+    font-family: 'Kameron';
+    font-weight: 300;
+}
+
+div.text_cell_render h1 {
+    font-size: 24pt;
+}
+
+div.text_cell_render h2 {
+    font-size: 18pt;
+}
+
+div.text_cell_render h3 {
+    font-size: 14pt;
+}
+
+.rendered_html pre,
+.rendered_html code {
+    /*font-size: medium;*/
+    font-family: Consolas, monocco, monospace;
+}
+
+.rendered_html ol {
+    list-style:decimal;
+    margin: 1em 2em;
+}
+
+.prompt.input_prompt {
+    color: rgba(0,0,0,0.5);
+}
+
+.cell.command_mode.selected {
+    border-color: rgba(0,0,0,0.1);
+}
+
+.cell.edit_mode.selected {
+    border-color: rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 5px #f0f0f0;
+    -webkit-box-shadow: 0px 0px 5px #f0f0f0;
+}
+
+div.output_scroll {
+    -webkit-box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+    border-radious: 2px;
+}
+
+#menubar .navbar-inner {
+    background: #fff;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    font-family: lato;
+    font-weight: 400;
+}
+
+.navbar-fixed-top .navbar-inner,
+.navbar-static-top .navbar-inner {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border: none;
+}
+
+div#notebook_panel {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-top: none;
+}
+
+div#notebook {
+    border-top: 1px solid rgba(0,0,0,0.15);
+}
+
+#menubar .navbar .navbar-inner,
+.toolbar-inner {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#checkpoint_status,
+#autosave_status {
+    color: rgba(0,0,0,0.5);
+}
+
+#header {
+    font-family: lato;
+}
+
+#notebook_name {
+    font-weight: 200;
+}
+
+/*
+    This is a lazy fix, we *should* fix the
+    background for each Bootstrap button type
+*/
+#site * .btn {
+    background: #fafafa;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+/* Pretty Pandas Dataframes */
+.dataframe * {border-color: #c0c0c0 !important;}
+.dataframe th{background: #eee;}
+.dataframe td{
+    background: #fff;
+    text-align: right;
+    min-width:5em;
+}
+
+/* Format summary rows */
+.dataframe-summary-row tr:last-child,
+.dataframe-summary-col td:last-child{
+    background: #eee;
+    font-weight: 500;
+}
+
+/*
+Customize the logo
+ */
+#ipython_notebook img{
+    display:block;
+    background: url(logo.png) no-repeat;
+    background-size: contain;
+    width: 233px;
+    height: 33px;
+    padding-left: 233px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#ipython_notebook {
+    height: 40px !important;
+}
+
+
+/*
+    Adapted for jupyter-themer from https://github.com/codemirror
+*/
+
+/*
+  MDN-LIKE Theme - Mozilla
+  Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
+  Report bugs/issues here: https://github.com/codemirror/CodeMirror/issues
+  GitHub: @peterkroon
+  The mdn-like theme is inspired on the displayed code examples at: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+*/
+.CodeMirror { color: #444; background-color: #fff; }
+.CodeMirror div.CodeMirror-selected { background: #cfc; }
+.CodeMirror .CodeMirror-line::selection, .CodeMirror .CodeMirror-line > span::selection, .CodeMirror .CodeMirror-line > span > span::selection { background: #cfc; }
+.CodeMirror .CodeMirror-line::-moz-selection, .CodeMirror .CodeMirror-line > span::-moz-selection, .CodeMirror .CodeMirror-line > span > span::-moz-selection { background: #cfc; }
+
+.CodeMirror .CodeMirror-gutters { background: #f8f8f8; border-left: 6px solid rgba(0,83,159,0.65); color: #333; }
+.CodeMirror .CodeMirror-linenumber { color: #aaa; padding-left: 8px; }
+.CodeMirror .CodeMirror-cursor { border-left: 2px solid #333; }
+
+.CodeMirror span.cm-keyword { color: #6262FF; }
+.CodeMirror span.cm-atom { color: #F90; }
+.CodeMirror span.cm-number { color:  #ca7841; }
+.CodeMirror span.cm-def { color: #8DA6CE; }
+.CodeMirror span.cm-variable-2, .CodeMirror span.cm-tag { color: #690; }
+.CodeMirror span.cm-variable-3, .CodeMirror span.cm-def { color: #07a; }
+
+.CodeMirror span.cm-variable { color: #029; }
+.CodeMirror span.cm-property { color: #905; }
+.CodeMirror span.cm-qualifier { color: #690; }
+
+.CodeMirror span.cm-operator { color: #cda869; }
+.CodeMirror span.cm-comment { color:#777; font-weight:normal; }
+/*.CodeMirror span.cm-string { color:#07a; font-style:italic; }*/
+.CodeMirror span.cm-string { color:#07a; font-style:italic; }*/
+.CodeMirror span.cm-string-2 { color:#bd6b18; } /*?*/
+.CodeMirror span.cm-meta { color: #000; } /*?*/
+.CodeMirror span.cm-builtin { color: #9B7536; } /*?*/
+.CodeMirror span.cm-tag { color: #997643; }
+.CodeMirror span.cm-attribute { color: #d6bb6d; } /*?*/
+.CodeMirror span.cm-header { color: #FF6400; }
+.CodeMirror span.cm-hr { color: #AEAEAE; }
+.CodeMirror span.cm-link { color:#ad9361; font-style:italic; text-decoration:none; }
+.CodeMirror span.cm-error { border-bottom: 1px solid red; }
+
+div.CodeMirror .CodeMirror-activeline-background { background: #efefff; }
+div.CodeMirror span.CodeMirror-matchingbracket { outline:1px solid grey; color: inherit; }
+
+.cm-s-mdn-like.CodeMirror { background-image: url(data:image/png;base64,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); }
+
+
+    </style>
 
 
 <style type="text/css">
@@ -11857,7 +12091,7 @@ div#notebook {
 <li>每年哪一种物种数量最多 (提示：可以使用np的索引： np.array(['H', 'L', 'C']))</li>
 <li>哪一年中有任意一种动物的数量超过50000 (提示：对比以及使用 np.any)</li>
 <li>每种物种数量最低的两年是哪两年(提示：可以使用argsort,fancy indexing)</li>
-<li>投图对比野兔数量（参考 np.gradient)和猞猁的数量，检查这两者是否具有相关性（参考np.corrcoefl)</li>
+<li>使用图形对比野兔数量（参考 np.gradient)和猞猁的数量，检查这两者是否具有相关性（参考np.corrcoefl)</li>
 </ul>
 <p>... 以上全部内容都不允许使用 for 循环</p>
 
@@ -12570,19 +12804,6 @@ taLX61m7di3du3eXsfl/rohn586dSUxMbPdjExyLZ0ZGBtnZ2URERKjHN0zhdnR8ekxyEUII4Tk8
 <h1 id="Python-&#20013;&#30340;&#25968;&#20540;&#35745;&#31639;">Python &#20013;&#30340;&#25968;&#20540;&#35745;&#31639;<a class="anchor-link" href="#Python-&#20013;&#30340;&#25968;&#20540;&#35745;&#31639;">&#182;</a></h1>
 </div>
 </div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span> 
-</pre></div>
-
-</div>
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
@@ -13445,7 +13666,7 @@ strides (48, 16)
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#36890;&#29992;&#20989;&#25968;&#65288;Universal-functions-&#65292;Ufuncs&#65289;">&#36890;&#29992;&#20989;&#25968;&#65288;Universal functions &#65292;Ufuncs&#65289;<a class="anchor-link" href="#&#36890;&#29992;&#20989;&#25968;&#65288;Universal-functions-&#65292;Ufuncs&#65289;">&#182;</a></h3><p>那些既能够处理标量（scalars)也能处理数组（arrays）的函数就叫做通用函数。对于数组，通用幻术会对每个元素来进行运算处理。在计算向量d时候，通用函数的使用是非常重要的，而且通常比针对每个元素来使用for循环要在计算上效率更高。</p>
+<h3 id="&#36890;&#29992;&#20989;&#25968;&#65288;Universal-functions-&#65292;Ufuncs&#65289;">&#36890;&#29992;&#20989;&#25968;&#65288;Universal functions &#65292;Ufuncs&#65289;<a class="anchor-link" href="#&#36890;&#29992;&#20989;&#25968;&#65288;Universal-functions-&#65292;Ufuncs&#65289;">&#182;</a></h3><p>那些既能够处理标量（scalars)也能处理数组（arrays）的函数就叫做通用函数。对于数组，通用函数会对每个元素来进行运算处理。在计算向量的时候，通用函数的使用是非常重要的，而且通常比针对每个元素来使用for循环要在计算上效率更高。</p>
 
 </div>
 </div>
@@ -13714,7 +13935,7 @@ FGA4+ImIAgwHPxFRgOHgJyIKMP8PDQfulhKL8EQAAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized-ufucns&#65289;">&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized ufucns&#65289;<a class="anchor-link" href="#&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized-ufucns&#65289;">&#182;</a></h3><p>一个通用函数会对标量按向量的方式进行遍历循环。而一个广义通用函数则会对向量或者数组进行遍历。目前numpy只提供了一种广义通用函数。不过这也已经很重要，尤其是在带有<code>numba</code>的 JIT （just in time 即时）编译的情况下，这个我们会在以后的章节中讲到。</p>
+<h3 id="&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized-ufucns&#65289;">&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized ufucns&#65289;<a class="anchor-link" href="#&#24191;&#20041;&#36890;&#29992;&#20989;&#25968;&#65288;Generalized-ufucns&#65289;">&#182;</a></h3><p>一个通用函数会对一组标量(scalars)按向量的方式进行遍历循环。而一个广义通用函数则会对一组向量或者一批数组进行遍历。目前numpy只提供了一种广义通用函数。不过这也已经很重要，尤其是在带有<code>numba</code>的 JIT （just in time 即时）编译的情况下，这个我们会在以后的章节中讲到。</p>
 
 </div>
 </div>
@@ -13803,7 +14024,7 @@ FGA4+ImIAgwHPxFRgOHgJyIKMP8PDQfulhKL8EQAAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#38543;&#26426;&#25968;">&#38543;&#26426;&#25968;<a class="anchor-link" href="#&#38543;&#26426;&#25968;">&#182;</a></h3><p>有两个模块，都能生成（伪）随机数，这种伪随机数是非常常用的。你只需要使用某种分布形来生成随机值，最简单的就是使用 <code>numpy.random</code>。如果需要相关分布的更多信息，例如分位数（quantiles）或者 PDF，就需要用 <code>scipy.stats</code>这个模块。</p>
+<h3 id="&#38543;&#26426;&#25968;">&#38543;&#26426;&#25968;<a class="anchor-link" href="#&#38543;&#26426;&#25968;">&#182;</a></h3><p>有两个模块，都能生成（伪）随机数，这种伪随机数是非常常用的。你只需要使用某种分布来生成随机值，最简单的就是使用 <code>numpy.random</code>。如果需要相关分布的更多信息，例如分位数（quantiles）或者 PDF，就需要用 <code>scipy.stats</code>这个模块。</p>
 
 </div>
 </div>
@@ -13824,7 +14045,7 @@ FGA4+ImIAgwHPxFRgOHgJyIKMP8PDQfulhKL8EQAAAAASUVORK5CYII=
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy.random</span> <span class="kn">as</span> <span class="nn">npr</span>
-<span class="n">npr</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span> <span class="c1"># 设定随机数结果d种子（seed for reproducible results）</span>
+<span class="n">npr</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span> <span class="c1"># 设定随机数结果的种子（seed for reproducible results）</span>
 </pre></div>
 
 </div>
@@ -14160,7 +14381,7 @@ B5jsiYh84P8BxNMci3BfalYAAAAASUVORK5CYII=
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 带替换的随机选取（radnom selection with replacement）</span>
-<span class="n">npr</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># this is default</span>
+<span class="n">npr</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># replace=True是默认的</span>
 </pre></div>
 
 </div>
@@ -14252,7 +14473,7 @@ B5jsiYh84P8BxNMci3BfalYAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[48]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 创建一个&quot;frozen&quot;分布，例如 distribution - i.e. a partially applied function</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 创建一个&quot;frozen&quot;分布，例如一个部分应用的函数(distribution - i.e. a partially applied function)</span>
 <span class="n">dist</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 </pre></div>
 
@@ -14266,7 +14487,7 @@ B5jsiYh84P8BxNMci3BfalYAAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[49]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1">#  same as rnorm</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 和rnorm一样(same as rnorm)</span>
 <span class="n">dist</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 
@@ -15625,7 +15846,8 @@ NZ+Pe8CUAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&lt;font-color=red&gt;&#32451;&#20064;&lt;/font&gt;">&lt;font color=red&gt;&#32451;&#20064;&lt;/font&gt;<a class="anchor-link" href="#&lt;font-color=red&gt;&#32451;&#20064;&lt;/font&gt;">&#182;</a></h2>
+<h2><font color=red>练习</font></h2>
+
 </div>
 </div>
 </div>
@@ -15686,16 +15908,13 @@ NZ+Pe8CUAAAAAElFTkSuQmCC
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="o">**</span><span class="mi">3</span><span class="o">**.</span> <span class="err">用随机数均匀分布创建一个</span> <span class="mi">10</span><span class="o">*</span><span class="mi">6</span> <span class="err">的矩阵，令所有行当中小于</span><span class="mf">0.1</span><span class="err">的所有元素都为</span><span class="mi">0</span><span class="err">。例如下面这就是一个</span> <span class="mi">4</span><span class="o">*</span><span class="mi">10</span> <span class="err">的矩阵，进行了同样操作：</span>
-
-
-<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
-<span class="n">array</span><span class="p">([[</span> <span class="mf">0.49722235</span><span class="p">,</span>  <span class="mf">0.88833973</span><span class="p">,</span>  <span class="mf">0.07289358</span><span class="p">,</span>  <span class="mf">0.12375223</span><span class="p">,</span>  <span class="mf">0.39659254</span><span class="p">,</span>
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>3</strong>. 用随机数均匀分布创建一个 10x6 的矩阵，令所有行当中小于0.1的所有元素都为0。例如下面这就是一个 4x10 的矩阵，进行了同样操作：</p>
+<div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.49722235</span><span class="p">,</span>  <span class="mf">0.88833973</span><span class="p">,</span>  <span class="mf">0.07289358</span><span class="p">,</span>  <span class="mf">0.12375223</span><span class="p">,</span>  <span class="mf">0.39659254</span><span class="p">,</span>
          <span class="mf">0.70267114</span><span class="p">],</span>
        <span class="p">[</span> <span class="mf">0.3954172</span> <span class="p">,</span>  <span class="mf">0.889077</span>  <span class="p">,</span>  <span class="mf">0.71286225</span><span class="p">,</span>  <span class="mf">0.06353112</span><span class="p">,</span>  <span class="mf">0.68107965</span><span class="p">,</span>
          <span class="mf">0.17186995</span><span class="p">],</span>
@@ -15703,12 +15922,9 @@ NZ+Pe8CUAAAAAElFTkSuQmCC
          <span class="mf">0.22304055</span><span class="p">],</span>
        <span class="p">[</span> <span class="mf">0.22582605</span><span class="p">,</span>  <span class="mf">0.37671244</span><span class="p">,</span>  <span class="mf">0.96510957</span><span class="p">,</span>  <span class="mf">0.88819053</span><span class="p">,</span>  <span class="mf">0.14654176</span><span class="p">,</span>
          <span class="mf">0.33987323</span><span class="p">]])</span>
-<span class="sb">``</span><span class="err">`</span>
-
-<span class="n">becomes</span>
-
-<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
-<span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>
+</pre></div>
+<p>变成</p>
+<div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>
          <span class="mf">0.</span>        <span class="p">],</span>
        <span class="p">[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>
          <span class="mf">0.</span>        <span class="p">],</span>
@@ -15716,15 +15932,11 @@ NZ+Pe8CUAAAAAElFTkSuQmCC
          <span class="mf">0.22304055</span><span class="p">],</span>
        <span class="p">[</span> <span class="mf">0.22582605</span><span class="p">,</span>  <span class="mf">0.37671244</span><span class="p">,</span>  <span class="mf">0.96510957</span><span class="p">,</span>  <span class="mf">0.88819053</span><span class="p">,</span>  <span class="mf">0.14654176</span><span class="p">,</span>
          <span class="mf">0.33987323</span><span class="p">]])</span>
-<span class="sb">``</span><span class="err">`</span>
-
-<span class="err">提示：使用下面这几个</span><span class="n">numpy</span><span class="err">的函数</span> <span class="o">-</span> <span class="sb">`np.random.random`</span><span class="p">,</span> <span class="sb">`np.any`</span> <span class="err">以及布尔值索引（</span><span class="n">Boolean</span> <span class="n">indexing</span><span class="err">）和坐标轴变量（</span><span class="n">axis</span> <span class="n">argument</span><span class="err">）。</span>
 </pre></div>
+<p>提示：使用下面这几个numpy的函数 - <code>np.random.random</code>, <code>np.any</code> 以及布尔值索引（Boolean indexing）和坐标轴变量（axis argument）。</p>
 
 </div>
 </div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -15746,8 +15958,8 @@ NZ+Pe8CUAAAAAElFTkSuQmCC
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>4</strong>. 使用<code>np.linspace</code> 创建一个数组，其中有100个数值，这些数值在 0 到 $2\pi$ 之间(包括这两个端点值，includsive).</p>
 <ul>
-<li>使用切片符号来每十个抽出来第十个元素（Extract every 10th element using slice notation）</li>
-<li>使用切片符号将数组逆向</li>
+<li>使用切片操作来每十个抽出来第十个元素（Extract every 10th element using slice notation）</li>
+<li>使用切片操作将数组逆向</li>
 <li>抽取所有正弦（sine）和余弦值（cosine）相差小于0.1的数值</li>
 <li>给这个数组进行投图</li>
 </ul>
@@ -16078,7 +16290,7 @@ AAAAAElFTkSuQmCC
 <li>常数值（a constant）</li>
 <li>二次方程（a quadratic equation）</li>
 <li>五次多项式（a 5th order polynomial）</li>
-<li>一个阶数为50的多项式（） polynomial of order 50</li>
+<li>一个阶数为50的多项式（polynomial of order 50）</li>
 </ul>
 
 </div>
