@@ -47,7 +47,7 @@ plt.style.use('ggplot')
 - 每年哪一种物种数量最多 (提示：可以使用np的索引： np.array(['H', 'L', 'C']))
 - 哪一年中有任意一种动物的数量超过50000 (提示：对比以及使用 np.any)
 - 每种物种数量最低的两年是哪两年(提示：可以使用argsort,fancy indexing)
-- 投图对比野兔数量（参考 np.gradient)和猞猁的数量，检查这两者是否具有相关性（参考np.corrcoefl)
+- 使用图形对比野兔数量（参考 np.gradient)和猞猁的数量，检查这两者是否具有相关性（参考np.corrcoefl)
 
 ... 以上全部内容都不允许使用 for 循环
 
@@ -111,7 +111,7 @@ print "Std (hare, lynx, carrot):", populations.std(axis=0)
 
 ```python
 # 每个物种各自哪一年到达最大数量
-print "Year with largest population (hare, lynx, carrot)", 
+print "Year with largest population (hare, lynx, carrot)",
 print year[np.argmax(populations, axis=0)]
 ```
 
@@ -183,16 +183,11 @@ print np.corrcoef(lynx, np.gradient(hare))
 
 
 
-![png](output_13_1.png)
+![](output_13_1.png)
 
 
 Python 中的数值计算
 ====
-
-
-```python
-
-```
 
 ### NDArray
 
@@ -260,8 +255,8 @@ x_array = np.array(x_list)
 print x_array
 ```
 
-    [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)] 
-    
+    [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2)]
+
     [[0 0]
      [0 1]
      [0 2]
@@ -283,20 +278,20 @@ print np.fromfunction(lambda i, j: (i-2)**2+(j-2)**2, (5,5))
 
     [[ 1.  1.]
      [ 1.  1.]
-     [ 1.  1.]] 
-    
+     [ 1.  1.]]
+
     [[ 0.  0.]
      [ 0.  0.]
-     [ 0.  0.]] 
-    
+     [ 0.  0.]]
+
     [[ 1.  0.  0.]
      [ 0.  1.  0.]
-     [ 0.  0.  1.]] 
-    
+     [ 0.  0.  1.]]
+
     [[1 0 0]
      [0 2 0]
-     [0 0 3]] 
-    
+     [0 0 3]]
+
     [[ 8.  5.  4.  5.  8.]
      [ 5.  2.  1.  2.  5.]
      [ 4.  1.  0.  1.  4.]
@@ -401,18 +396,18 @@ print np.triu(a, 1)
     [[ 0  1  2  3]
      [ 4  5  6  7]
      [ 8  9 10 11]
-     [12 13 14 15]] 
-    
+     [12 13 14 15]]
+
     [[ 0  0  0  0]
      [ 4  0  0  0]
      [ 8  9  0  0]
-     [12 13 14  0]] 
-    
+     [12 13 14  0]]
+
     [[ 0  0  0  0]
      [ 0  5  0  0]
      [ 0  0 10  0]
-     [ 0  0  0 15]] 
-    
+     [ 0  0  0 15]]
+
     [[ 0  1  2  3]
      [ 0  0  6  7]
      [ 0  0  0 11]
@@ -602,7 +597,7 @@ distance_matrix_np(pts)
 
 ### 通用函数（Universal functions ，Ufuncs）
 
-那些既能够处理标量（scalars)也能处理数组（arrays）的函数就叫做通用函数。对于数组，通用幻术会对每个元素来进行运算处理。在计算向量d时候，通用函数的使用是非常重要的，而且通常比针对每个元素来使用for循环要在计算上效率更高。
+那些既能够处理标量（scalars)也能处理数组（arrays）的函数就叫做通用函数。对于数组，通用函数会对每个元素来进行运算处理。在计算向量的时候，通用函数的使用是非常重要的，而且通常比针对每个元素来使用for循环要在计算上效率更高。
 
 
 ```python
@@ -612,7 +607,7 @@ plt.plot(xs, ys);
 ```
 
 
-![png](output_44_0.png)
+![](output_43_0.png)
 
 
 
@@ -638,7 +633,7 @@ print xs < 5
 
 ### 广义通用函数（Generalized ufucns）
 
-一个通用函数会对标量按向量的方式进行遍历循环。而一个广义通用函数则会对向量或者数组进行遍历。目前numpy只提供了一种广义通用函数。不过这也已经很重要，尤其是在带有`numba`的 JIT （just in time 即时）编译的情况下，这个我们会在以后的章节中讲到。
+一个通用函数会对一组标量(scalars)按向量的方式进行遍历循环。而一个广义通用函数则会对一组向量或者一批数组进行遍历。目前numpy只提供了一种广义通用函数。不过这也已经很重要，尤其是在带有`numba`的 JIT （just in time 即时）编译的情况下，这个我们会在以后的章节中讲到。
 
 
 
@@ -656,7 +651,7 @@ print matrix_multiply.signature
 us = np.random.random((5, 2, 3)) # 5 2x3 matrics
 vs = np.random.random((5, 3, 4)) # 5 3x4 matrices
 # 对五个矩阵集合中的所有元素都进行矩阵乘法
-ws = matrix_multiply(us, vs) 
+ws = matrix_multiply(us, vs)
 print ws.shape
 print ws
 ```
@@ -664,23 +659,23 @@ print ws
     (5, 2, 4)
     [[[ 0.9421  1.2886  0.6542  0.9562]
       [ 0.7672  1.1319  0.546   0.8148]]
-    
+
      [[ 0.4471  0.5582  0.3671  0.1876]
       [ 0.3807  0.3593  0.3259  0.1457]]
-    
+
      [[ 0.5528  0.5151  0.5762  0.7216]
       [ 0.8859  0.954   0.9029  0.7181]]
-    
+
      [[ 0.2883  0.6539  0.1948  0.4289]
       [ 0.2639  0.6634  0.1931  0.3793]]
-    
+
      [[ 0.4788  0.4683  0.9784  0.4239]
       [ 0.8316  0.8722  1.316   1.1181]]]
 
 
 ### 随机数
 
-有两个模块，都能生成（伪）随机数，这种伪随机数是非常常用的。你只需要使用某种分布形来生成随机值，最简单的就是使用 `numpy.random`。如果需要相关分布的更多信息，例如分位数（quantiles）或者 PDF，就需要用 `scipy.stats`这个模块。
+有两个模块，都能生成（伪）随机数，这种伪随机数是非常常用的。你只需要使用某种分布来生成随机值，最简单的就是使用 `numpy.random`。如果需要相关分布的更多信息，例如分位数（quantiles）或者 PDF，就需要用 `scipy.stats`这个模块。
 
 #### 使用 `numpy.random`
 
@@ -689,7 +684,7 @@ print ws
 
 ```python
 import numpy.random as npr
-npr.seed(123) # 设定随机数结果d种子（seed for reproducible results）
+npr.seed(123) # 设定随机数结果的种子（seed for reproducible results）
 ```
 
 
@@ -725,7 +720,7 @@ plt.axis([-1.05, 1.05, -1.05, 1.05]);
 ```
 
 
-![png](output_53_0.png)
+![](output_52_0.png)
 
 
 
@@ -773,7 +768,7 @@ npr.choice(x, 10, replace=False)
 
 ```python
 # 带替换的随机选取（radnom selection with replacement）
-npr.choice(x, (5, 10), replace=True) # this is default
+npr.choice(x, (5, 10), replace=True) # replace=True是默认的
 ```
 
 
@@ -813,13 +808,13 @@ import scipy.stats as stats
 
 
 ```python
-# 创建一个"frozen"分布，例如 distribution - i.e. a partially applied function
+# 创建一个"frozen"分布，例如一个部分应用的函数(distribution - i.e. a partially applied function)
 dist = stats.norm(10, 2)
 ```
 
 
 ```python
-#  same as rnorm
+# 和rnorm一样(same as rnorm)
 dist.rvs(10)
 ```
 
@@ -959,7 +954,7 @@ print(np.dot(L, U))
      [ 116.  116.   64.   98.   82.   98.  121.   70.  122.   98.]
      [ 112.  115.   74.   80.  106.  104.  114.  105.   80.   99.]
      [  93.   84.  107.  107.   80.   85.   96.   89.   85.  102.]]
-    
+
     [[ 118.  108.  103.  102.   68.   98.   88.   78.  103.   95.]
      [  83.  124.   67.  103.   73.  111.  125.   81.  122.   62.]
      [  94.   82.  125.  108.  105.   88.   99.   82.   97.  112.]
@@ -982,7 +977,7 @@ print(np.dot(Q, R))
      [ 116.  116.   64.   98.   82.   98.  121.   70.  122.   98.]
      [ 118.  108.  103.  102.   68.   98.   88.   78.  103.   95.]
      [ 112.  115.   74.   80.  106.  104.  114.  105.   80.   99.]]
-    
+
     [[  94.   82.  125.  108.  105.   88.   99.   82.   97.  112.]
      [  83.  124.   67.  103.   73.  111.  125.   81.  122.   62.]
      [  93.   84.  107.  107.   80.   85.   96.   89.   85.  102.]
@@ -1037,7 +1032,7 @@ print(np.real(np.dot(V, np.diag(u))))
      [ 598.7992   77.4348   -5.3372  -52.7843  -14.996    94.553 ]
      [ 170.8339  193.7335    5.8732   67.6135    1.1042   90.1451]
      [ 199.7105 -218.1547    6.1467   -5.6295   26.3372  101.0444]]
-    
+
     [[-280.8911  157.1032   12.1003  -60.7161    8.8142   -1.5134]
      [ 739.1179   34.4268    3.8974    4.3778   14.9092 -122.8749]
      [-134.1449  128.3162  -11.0569   -6.6382   37.3675   13.4467]
@@ -1060,7 +1055,7 @@ print(B)
      [-105.4444  371.0556  -48.8889  438.5     145.5     109.0556]
      [   1.2      90.8778   45.0222  145.5     215.4333  -39.7667]
      [-137.2      70.5667  -79.8     109.0556  -39.7667  234.1   ]]
-    
+
     [[ 187.7333 -182.4667   94.9333 -105.4444    1.2    -137.2   ]
      [-182.4667  609.6556  -83.3111  371.0556   90.8778   70.5667]
      [  94.9333  -83.3111   97.2889  -48.8889   45.0222  -79.8   ]
@@ -1083,8 +1078,8 @@ print np.cov(x.T)
 ```
 
     [[ 5.1286  3.0701]
-     [ 3.0701  9.0755]] 
-    
+     [ 3.0701  9.0755]]
+
     [[ 5.1286  3.0701]
      [ 3.0701  9.0755]]
 
@@ -1109,16 +1104,16 @@ $$
 y_1 \\
 y_2 \\
 y_3 \\
-y_4 
-\end{array} 
+y_4
+\end{array}
 \right) = \left( \begin{array}{cc}
 x_1 & 1 \\
 x_2 & 1 \\
 x_3 & 1 \\
 x_4 & 1 \end{array} \right)
-\left( 
+\left(
 \begin{array}{cc}
-b_0 & b_1 
+b_0 & b_1
 \end{array}
 \right)
 $$
@@ -1138,14 +1133,14 @@ $$
 y_1 \\
 y_2 \\
 y_3 \\
-y_4 
-\end{array} 
+y_4
+\end{array}
 \right) = \left( \begin{array}{ccc}
 x_1^2 & x_1 & 1 \\
 x_2^2 & x_2 & 1 \\
 x_3^2 & x_3 & 1 \\
 x_4^2 & x_4 & 1 \end{array} \right)
-\left( 
+\left(
 \begin{array}{ccc}
 b_0 & b_1 & b_2
 \end{array}
@@ -1184,7 +1179,7 @@ plt.plot(xi, yi, 'r-');
 
 
 
-![png](output_83_1.png)
+![](output_82_1.png)
 
 
 
@@ -1203,7 +1198,7 @@ plt.plot(xi, yi, 'r-');
 ```
 
 
-![png](output_84_0.png)
+![](output_83_0.png)
 
 
 
@@ -1213,7 +1208,7 @@ plt.plot(xi, yi, 'r-');
 
 b = np.random.randint(0, 10, 6)
 x = np.linspace(0, 1, 25)
-y = np.poly1d(b)(x) 
+y = np.poly1d(b)(x)
 y += np.random.normal(0, 5, y.shape)
 
 p = np.poly1d(np.polyfit(x, y, len(b)-1))
@@ -1235,7 +1230,7 @@ list(zip(b, p.coeffs))
 
 
 
-![png](output_85_1.png)
+![](output_84_1.png)
 
 
 <font color=red>练习</font>
@@ -1276,10 +1271,7 @@ v = np.array([2,4,6,8])
 
 ```
 
-
-```python
-**3**. 用随机数均匀分布创建一个 10*6 的矩阵，令所有行当中小于0.1的所有元素都为0。例如下面这就是一个 4*10 的矩阵，进行了同样操作：
-
+**3**. 用随机数均匀分布创建一个 10x6 的矩阵，令所有行当中小于0.1的所有元素都为0。例如下面这就是一个 4x10 的矩阵，进行了同样操作：
 
 ```python
 array([[ 0.49722235,  0.88833973,  0.07289358,  0.12375223,  0.39659254,
@@ -1292,7 +1284,7 @@ array([[ 0.49722235,  0.88833973,  0.07289358,  0.12375223,  0.39659254,
          0.33987323]])
 ```
 
-becomes
+变成
 
 ```python
 array([[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
@@ -1306,7 +1298,6 @@ array([[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
 ```
 
 提示：使用下面这几个numpy的函数 - `np.random.random`, `np.any` 以及布尔值索引（Boolean indexing）和坐标轴变量（axis argument）。
-```
 
 
 ```python
@@ -1316,10 +1307,10 @@ array([[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
 
 ```
 
-**4**. 使用`np.linspace` 创建一个数组，其中有100个数值，这些数值在 0 到 $2\pi$ 之间(包括这两个端点值，includsive). 
+**4**. 使用`np.linspace` 创建一个数组，其中有100个数值，这些数值在 0 到 $2\pi$ 之间(包括这两个端点值，includsive).
 
-- 使用切片符号来每十个抽出来第十个元素（Extract every 10th element using slice notation）
-- 使用切片符号将数组逆向
+- 使用切片操作来每十个抽出来第十个元素（Extract every 10th element using slice notation）
+- 使用切片操作将数组逆向
 - 抽取所有正弦（sine）和余弦值（cosine）相差小于0.1的数值
 - 给这个数组进行投图
 
@@ -1415,7 +1406,7 @@ plot_matrix_transform(m)
 ```
 
 
-![png](output_101_0.png)
+![](output_100_0.png)
 
 
 
@@ -1431,7 +1422,7 @@ plot_matrix_transform(m)
 - 常数值（a constant）
 - 二次方程（a quadratic equation）
 - 五次多项式（a 5th order polynomial）
-- 一个阶数为50的多项式（） polynomial of order 50
+- 一个阶数为50的多项式（polynomial of order 50）
 
 
 ```python
@@ -1451,7 +1442,7 @@ plt.plot(x, y, 'o')
 
 
 
-![png](output_104_1.png)
+![](output_103_1.png)
 
 
 
