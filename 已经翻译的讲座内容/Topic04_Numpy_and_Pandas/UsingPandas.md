@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore")
 使用 Pandas
 ----
 
-`numpy` 模块是用于处理数值计算的优秀工具，但当数据有缺失或者数组里面产混了其他类型的值等等，就比较麻烦了。而`pandas`这个模块就适合这些情况，该模块提供了类似 R 语言的数据结构 dataframe，此外还有很多各种常用的统计分析工具。`pandas`模块还提供了个很多方法能用来导入和操作数据，本节就讲一下这方面的用法。
+`numpy` 模块是用于处理数值计算的优秀工具，但当数据有缺失或者数组里面混合了多种类型的值等等，就比较麻烦了。而`pandas`这个模块就适合这些情况，该模块提供了类似 R 语言的数据结构 dataframe，此外还有很多各种常用的统计分析工具。`pandas`模块还提供了个很多方法能用来导入和操作数据，本节就讲一下这方面的用法。
 
 
 ```python
@@ -29,7 +29,7 @@ import pymc
 
 ### 序列 Series
 
-Series 是一个一维的数组，带有数轴标签（axis labels. ）
+Series 是一个一维的数组，带有数轴标签（axis labels）。
 
 
 ```python
@@ -94,7 +94,7 @@ plt.plot(xs, np.sin(xs), 'r-o', xs, np.cos(xs), 'b-x');
 
 
 ```python
-# Series 还可以转换成有值的 numpy 数组
+# 将 Series 中的值转换成 numpy 数组
 
 print xs.values
 ```
@@ -133,17 +133,14 @@ print ts['2014-06-02':'2014-06-05'], '\n' # Note - includes end time
 
 
 ```python
-# We can geenerate statistics for time ranges with the resample method
-# For example, suppose we are interested in weekly means, standard deviations and sum-of-squares
+# 对一个时间段，我们可以通过重新取样的方式生成统计信息
+# 比如, 假设我们对周平均(weekly means), 标准方差(standard deviations)和平方和(sum-of-squares)感兴趣
+
 
 df = ts.resample(rule='W', how=('mean', 'std', lambda x: sum(x*x)))
 df
 ```
 
-
-
-
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -192,13 +189,12 @@ df
     </tr>
   </tbody>
 </table>
-</div>
 
 
 
 ### DataFrame
 
-针对统计学家，Pandas 提供了一个类似 R语言里面的 dataframe 对象的 DataFrame。对于其他人，比如可能需要简单处理一下表格之类的，也可以使用 DataFrame。DataFrame的每一列都是一个 Series 对象。
+针对统计学家，Pandas 提供了一个类似 R 语言里面的 dataframe 对象的 DataFrame。对于其他人，比如可能需要简单处理一下表格之类的，也可以使用 DataFrame。DataFrame的每一列都是一个 Series 对象。
 
 
 ```python
@@ -233,8 +229,8 @@ print df
 ```python
 # 从一个 DataFrame 中提取列
 
-print df.mu, '\n' # by attribute
-print df['sigma'], '\n' # by column name
+print df.mu, '\n' # 通过属性的方式
+print df['sigma'], '\n' # 通过列名的方式
 ```
 
     2014-06-08     9.659576
@@ -353,8 +349,8 @@ score_panel['Girls'].transpose()
 
 
 
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
-<table border="1" class="dataframe">
+<div style="max-height:100px;max-width:150px;overflow:auto;">
+<table border="1">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -482,7 +478,7 @@ score_panel.ix['Girls', score_panel.Girls.Math >= 93, :]
 
 
 ```python
-# 首先导入一个 DataFrame 用来玩耍
+# 首先导入一个 DataFrame
 try:
     tips = pd.read_pickle('tips.pic')
 except:
@@ -921,7 +917,7 @@ grouped['total_bill', 'tip'].agg(['mean', 'min', 'max'])
 
 
 ```python
-# We can also apply specific functions to specific columns
+# 我们也可以在特定的列上应用特定的函数
 df = grouped.agg({'total_bill': (min, max), 'tip': sum})
 df
 ```
