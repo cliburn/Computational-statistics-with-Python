@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>LinearAlgebraReview</title>
+<title>LinearAlgebraMatrixDecomp</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -11748,7 +11748,7 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -11772,16 +11772,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="&#32447;&#24615;&#20195;&#25968;&#21644;&#32447;&#24615;&#31995;&#32479;&#65288;Linear-Algebra-and-Linear-Systems&#65289;">&#32447;&#24615;&#20195;&#25968;&#21644;&#32447;&#24615;&#31995;&#32479;&#65288;Linear Algebra and Linear Systems&#65289;<a class="anchor-link" href="#&#32447;&#24615;&#20195;&#25968;&#21644;&#32447;&#24615;&#31995;&#32479;&#65288;Linear-Algebra-and-Linear-Systems&#65289;">&#182;</a></h1>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>统计计算中很多问题都可以用线性代数来进行数学上的描述。本章内容主要就是回顾一些你此前在线性代数课程上面已经学过的概念。</p>
+<p><strong>参考</strong></p>
+<p><a href="http://docs.scipy.org/doc/scipy/reference/tutorial/linalg.html">SciPy 官方教程 -- 线性代数</a></p>
 
 </div>
 </div>
@@ -11791,7 +11783,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#32852;&#31435;&#26041;&#31243;&#65288;Simultaneous-Equations&#65289;">&#32852;&#31435;&#26041;&#31243;&#65288;Simultaneous Equations&#65289;<a class="anchor-link" href="#&#32852;&#31435;&#26041;&#31243;&#65288;Simultaneous-Equations&#65289;">&#182;</a></h2>
+<h1 id="&#22823;&#22411;&#32447;&#24615;&#31995;&#32479;">&#22823;&#22411;&#32447;&#24615;&#31995;&#32479;<a class="anchor-link" href="#&#22823;&#22411;&#32447;&#24615;&#31995;&#32479;">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -11800,7 +11792,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>假设有下面所示的 $m$ 个线性方程，其中有 $n$ 个不等式：</p>
+<p>这是大数据的时代。每一天的每一秒，全世界无数系统中的数据都会被记录。我们的购物习惯、书籍和电影的喜好、键入电子邮件信息的关键字、药品记录、拨打电话的 NSA 记录、基因数据 -- 并且不经过分析它们就毫无用处。</p>
 
 </div>
 </div>
@@ -11810,78 +11802,62 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-\begin{align*}
-a_{11} x_1 + &a_{12} x_2& +& ... + &a_{1n} x_n &=& b_1\\
-\vdots  && &&\vdots &= &\vdots\\
-a_{m1} x_1 + &a_{m2} x_2& +& ... + &a_{mn} x_n &=&b_m 
-\end{align*}
+<p>海量的数据集在处理中会有巨大的挑战。求解 $10$ 个未知数的 $10$ 个方程组很简单，并且我们不需要关心什么方式。但是随着系统规模的增长，算法复杂度和效率就变得十分重要了。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#31034;&#20363;&#65306;Netflix-&#31454;&#36187;&#65288;&#32422;-2006-~-2009&#65289;">&#31034;&#20363;&#65306;Netflix &#31454;&#36187;&#65288;&#32422; 2006 ~ 2009&#65289;<a class="anchor-link" href="#&#31034;&#20363;&#65306;Netflix-&#31454;&#36187;&#65288;&#32422;-2006-~-2009&#65289;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>更加详细的描述：</p>
+<p><a href="http://en.wikipedia.org/wiki/Netflix_Prize">http://en.wikipedia.org/wiki/Netflix_Prize</a></p>
+<p>完整的技术故事：</p>
+<p><a href="http://www.stat.osu.edu/~dmsl/GrandPrize2009_BPC_BigChaos.pdf">http://www.stat.osu.edu/~dmsl/GrandPrize2009_BPC_BigChaos.pdf</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>2006 年，Netflix 举办了一场竞赛，其中它提供了 $18,000$ 个电影的多于 $400,000$ 个评分。目标是预测用户对一个电影的评分，基于之前的评分<em>和</em>“相似”用户的评分。这个任务总需要分析 $400,000\times 18,000$ 个矩阵。上面的维基百科链接描述了这个竞赛，第二个链接是该方法的非常详细的描述（它考虑到了用户的重要特征，例如用户的口味如何随时间改变）。这个分析部分和矩阵分解相关 -- 我们不会深入获胜算法的细节，但是我们会在基本的矩阵分解上花一些时间。</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c">%%latex</span>
-可以改写成下面这种形式：
-
-<span class="k">\begin</span><span class="nb">{</span>align*<span class="nb">}</span>
-    A=<span class="k">\left</span>[<span class="k">\begin</span><span class="nb">{</span>matrix<span class="nb">}</span>a<span class="nb">_{</span>11<span class="nb">}&amp;</span><span class="k">\cdots</span><span class="nb">&amp;</span>a<span class="nb">_{</span>1n<span class="nb">}</span><span class="k">\\</span>
-               <span class="k">\vdots</span> <span class="nb">&amp;</span> <span class="nb">&amp;</span><span class="k">\vdots\\</span>
-               a<span class="nb">_{</span>m1<span class="nb">}&amp;</span><span class="k">\cdots</span><span class="nb">&amp;</span>a<span class="nb">_{</span>mn<span class="nb">}</span><span class="k">\end</span><span class="nb">{</span>matrix<span class="nb">}</span><span class="k">\right</span>], <span class="nb">&amp;</span> <span class="nb">&amp;</span> 
-
-x = <span class="k">\left</span>[<span class="k">\begin</span><span class="nb">{</span>matrix<span class="nb">}</span>x<span class="nb">_</span>1<span class="k">\\</span>
-               <span class="k">\vdots\\</span>
-               x<span class="nb">_</span>n<span class="k">\end</span><span class="nb">{</span>matrix<span class="nb">}</span><span class="k">\right</span>] <span class="nb">&amp;</span> <span class="k">\;\;\;\;\textrm</span><span class="nb">{</span>   and <span class="nb">}</span> <span class="nb">&amp;</span>
-b =  <span class="k">\left</span>[<span class="k">\begin</span><span class="nb">{</span>matrix<span class="nb">}</span>b<span class="nb">_</span>1<span class="k">\\</span>
-               <span class="k">\vdots\\</span>
-               b<span class="nb">_</span>m<span class="k">\end</span><span class="nb">{</span>matrix<span class="nb">}</span><span class="k">\right</span>]
-<span class="k">\end</span><span class="nb">{</span>align*<span class="nb">}</span>
+<div class=" highlight hl-ipython2"><pre><span></span> 
 </pre></div>
 
 </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-
-
-<div class="output_latex output_subarea ">
-可以改写成下面这种形式：
-
-\begin{align*}
-    A=\left[\begin{matrix}a_{11}&\cdots&a_{1n}\\
-               \vdots & &\vdots\\
-               a_{m1}&\cdots&a_{mn}\end{matrix}\right], & & 
-
-x = \left[\begin{matrix}x_1\\
-               \vdots\\
-               x_n\end{matrix}\right] & \;\;\;\;\textrm{   and } &
-b =  \left[\begin{matrix}b_1\\
-               \vdots\\
-               b_m\end{matrix}\right]
-\end{align*}
-
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>然后就可以把刚才的联立方程组改写成：</p>
-$$ Ax = b$$
+<h1 id="&#30697;&#38453;&#20998;&#35299;">&#30697;&#38453;&#20998;&#35299;<a class="anchor-link" href="#&#30697;&#38453;&#20998;&#35299;">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -11890,7 +11866,7 @@ $$ Ax = b$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>这样在解矩阵方程的时候就降低了难度，然后只要找到逆矩阵$A^{-1}$ 就可以解出来整个方程组了（大概就这样哈）。$A$ 这个矩阵的各种特定性质就能提取出这个线性方程组的各种重要信息。</p>
+<p>在使用计算高效方式求解线性方程组时，矩阵分解是个重要的步骤。</p>
 
 </div>
 </div>
@@ -11900,7 +11876,22 @@ $$ Ax = b$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3>欠定方程组(Underdetermined System) (也就是方程组个数小于未知数的个数 $m<n$)</h3>
+<h2 id="LU-&#20998;&#35299;&#21644;&#39640;&#26031;&#28040;&#20803;">LU &#20998;&#35299;&#21644;&#39640;&#26031;&#28040;&#20803;<a class="anchor-link" href="#LU-&#20998;&#35299;&#21644;&#39640;&#26031;&#28040;&#20803;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>LU 表示 'Lower Upper'，所以矩阵 $A$ 的 LU 分解是这样的分解：
+$$A= LU$$
+其中 $L$ 是下三角矩阵，$U$ 是上三角矩阵。</p>
+<p>现在， LU 分解本质上是高斯消元，但是我们我们只处理矩阵 $A$（而不是增广矩阵）。</p>
+<p>让我们回顾高斯消元（GE）如何工作。出于简洁性，我们会处理 $3\times 3$ 的方程组，但是这里的任何东西都可以推广到 $n\times n$ 的情况。考虑下面的方程组：</p>
+$$\left(\begin{matrix}a_{11}&a_{12} & a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{matrix}\right)\left(\begin{matrix}x_1\\x_2\\x_3\end{matrix}\right) = \left(\begin{matrix}b_1\\b_2\\b_3\end{matrix}\right)$$<p>出于简洁性，让我们假设最左侧的矩阵 $A$ 是非奇异的。为了使用 GE 求解这个方程组，我们从“增广矩阵”开始：</p>
+$$\left(\begin{array}{ccc|c}a_{11}&a_{12} & a_{13}& b_1 \\a_{21}&a_{22}&a_{23}&b_2\\a_{31}&a_{32}&a_{33}&b_3\end{array}\right)$$<p>我们从第一个元素 $a_{11}$ 开始。如果 $a_{11} \neq 0$，我们将第一行除以 $a_{11}$，之后从其它每一行减去第一行的适当倍数，使所有行的第一个元素变为零。（如果 $a_{11}$ 是零，我们需要交换行。我们不会在这里深入这个细节。）结果是这样：</p>
 
 </div>
 </div>
@@ -11910,7 +11901,61 @@ $$ Ax = b$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>当 $m<n$ 的时候，也就是方程的个数小于未知数的个数了，那么这个线性方程组是欠定方程组（<em>underdetermined</em>）。也就是说未知数比方程组的个数还多。这种情况下，要么就是无解(这时候说方程组是不协调的<em>inconsistent</em>)，要么就有无穷个解。唯一解是肯定没可能了。</p>
+$$\left(\begin{array}{ccc|c}
+1 & \frac{a_{12}}{a_{11}} & \frac{a_{13}}{a_{11}} & \frac{b_1}{a_{11}} \\
+0 & a_{22} - a_{21}\frac{a_{12}}{a_{11}} & a_{23} - a_{21}\frac{a_{13}}{a_{11}}  & b_2 - a_{21}\frac{b_1}{a_{11}}\\
+0&a_{32}-a_{31}\frac{a_{12}}{a_{11}} & a_{33} - a_{31}\frac{a_{13}}{a_{11}}  &b_3- a_{31}\frac{b_1}{a_{11}}\end{array}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>我们对第二行重复这个过程，首先除以开头的元素，之后从第三行和第一行减去结果的适当倍数，使第三行和第一行的第二个元素为零。我们继续这个过程，直到左边成为单位矩阵。这时，我们就可以“读出”解了：也就是，右侧的向量 $x$ 就是产生的列向量。通常，停在<em>简化的行阶梯形</em>（上三角，对角线上元素为一）更加有效，之后<em>回代</em>来获得最终结果。</p>
+<p>要注意有些时候，交换行来获得简化的行阶梯性非常必要。这就叫做<em>部分主元消去</em>。如果我们也操作列，就叫<em>完全主元消去</em>。</p>
+<p>需要提及的是，我们可以使用 GE 获得矩阵的逆，通过将单元矩阵作为增广部分，并将矩阵 $A$ 化简为单位矩阵。（译者注，也就是 $(A|I) \sim (I|A^{-1})$。）</p>
+<p>现在，当我们一次求解一个方程组，并且结果 $b$ 只有一个时，非常有效。许多应用涉及到求解多个问题，其中我们左侧的矩阵方程不变，但是结果向量 $b$ 有很多个。这里，<em>分解</em> $A$ 会更加高效。</p>
+<p>首先，我们以 GE 开始，但是我们保留消元所需的不同倍数的“踪迹”。例如，考虑这个矩阵</p>
+$$A = \left(\begin{matrix} 1 & 3 & 4 \\
+                           2& 1& 3\\
+                           4&1&2
+                           \end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>我们需要将第二行减去第一行的两倍，来消去第二行的第一个元素。之后将第三行减去第一行的四倍。我们不把第二行和第三行的第一个元素变为零，而是记录消元所需的倍数，所以：</p>
+$$\left(\begin{matrix} 1 & 3 & 4 \\
+                           (2)& -5 & -5\\
+                           (4)&-11&-14
+                           \end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>之后我们消去第三行的第二个元素：</p>
+$$\left(\begin{matrix} 1 & 3 & 4 \\
+                           (2)& -5 & -5\\
+                           (4)&(\frac{-11}{5})&-3
+                           \end{matrix}\right)$$<p>现在我们就完成了分解：
+$$L= \left(\begin{matrix} 1 & 0 & 0 \\
+                           2& 1 & 0\\
+                           4&\frac{-11}5&1
+                           \end{matrix}\right)
+                          U = \left(\begin{matrix} 1 & 3 & 4 \\
+                           0& -5 & -5\\
+                           0&0&-3
+                           \end{matrix}\right)$$</p>
 
 </div>
 </div>
@@ -11920,16 +11965,11 @@ $$ Ax = b$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#36229;&#23450;&#26041;&#31243;&#32452;&#65288;Overdetermined-System&#65289;">&#36229;&#23450;&#26041;&#31243;&#32452;&#65288;Overdetermined System&#65289;<a class="anchor-link" href="#&#36229;&#23450;&#26041;&#31243;&#32452;&#65288;Overdetermined-System&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>如果 $m>n$，也就是说方程的个数多于未知数的个数了，那么这个线性方程组就是超定方程组（<em>overdetermined</em>）。也就是说方程数比未知数多了。那么这个方程组也已是不协调的(<em>insistent</em>)，或者其中某些方程式是多余的（redundant）。</p>
+<p>我们可以通过求解两个回代问题来求解方程组：</p>
+$$Ly = b$$
+<pre><code>and
+</code></pre>
+$$Ux=y$$<p>这些都是 $O(n^2)$ 的，所以当有多个结果需要求解时，分解会更加高效。</p>
 
 </div>
 </div>
@@ -11939,573 +11979,31 @@ $$ Ax = b$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>分析和解线性方程组都有很多技术性的方法。我们的目标是让大家理解在各种内置函数背后的原理，以及这些函数解线性方程组的<em>效率</em>如何。
-是哦续i安，来回顾一下线性代数的基本内容：</p>
+<p>让我们使用 NumPy 来实现：</p>
 
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#32447;&#24615;&#26080;&#20851;&#65288;Linear-Independence&#65289;">&#32447;&#24615;&#26080;&#20851;&#65288;Linear Independence&#65289;<a class="anchor-link" href="#&#32447;&#24615;&#26080;&#20851;&#65288;Linear-Independence&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>当满足下列条件时，我们说一系列向量 $v_1,...,v_n$ 是线性无关的：</p>
-$$c_1v_1 + \cdots c_nv_n = 0$$$$\iff$$$$c_1=\cdots=c_n=0$$<p>换个说法，就是任何最终结果是 0 向量 的向量组合都是一个线性无关的向量集（Trivial）。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>另外这也暗示了这个向量集合当中的任意一个向量都无法用集合中其他向量的组合来表示。这样来表述的话，线性无关就成了一个向量集合中不具有重复向量的一种表述方法。</p>
-<p>定理（Fact）：任何由 $n$ 个向量组成的线性无关集合都可以张成一个$n$维的空间。（也就是说，所有可能的线性组合的集合就是$\mathbb{R}^n$。）符合这个特征的向量集合可以称为是$\mathbb{R}^n$的一个基（<em>basis</em>)。对基(<em>basis</em>)的另外一种描述就是最小张成集合（minimal spanning set)。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#19978;&#38754;&#30340;&#23450;&#29702;&#23545;&#32447;&#24615;&#26041;&#31243;&#32452;&#26377;&#20160;&#20040;&#24433;&#21709;&#65311;">&#19978;&#38754;&#30340;&#23450;&#29702;&#23545;&#32447;&#24615;&#26041;&#31243;&#32452;&#26377;&#20160;&#20040;&#24433;&#21709;&#65311;<a class="anchor-link" href="#&#19978;&#38754;&#30340;&#23450;&#29702;&#23545;&#32447;&#24615;&#26041;&#31243;&#32452;&#26377;&#20160;&#20040;&#24433;&#21709;&#65311;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>非常重要！！！</strong></p>
-<ul>
-<li><p>如果 $A$ 是一个 $m\times n$ 的矩阵，而 $m>n$, 若全部的 $m$ 列都是线性无关的，那么这个方程组就是<em>超定overdetermined</em>且<em>不协调inconsistent</em>的。 那么这个方程组就是不能得到确定解的。在数据分析的时候这种情况经常发生，因此最小二乘法就很重要了。</p>
-</li>
-<li><p>如果 $A$ 是一个 $m\times n$ 的矩阵，而 $m<n$, 若全部的 $m$ 列都是线性无关的，那么这个方程组就是<em>欠定underdetermined</em>的，就有<em>无数个infinite</em>解。</p>
-</li>
-<li><p>如果 $A$ 是一个 $m\times n$ 的矩阵，而其中的一些行是线性相关的（linearly dependent），那么这个方程组就是<em>冗余的reducible</em>。其中的一些方程式就可以消除掉。</p>
-</li>
-<li><p>如果 $A$ 是一个方阵，且其中的各行都是线性无关的，那么这个方程组就有一个唯一解。($A$ 是一个可逆矩阵invertible。)</p>
-</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>使用线性代数能获取的线性方程组信息还有很多很多，所以咱们接下来要复习一些基本内容。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#21521;&#37327;&#30340;&#33539;&#25968;&#19982;&#36317;&#31163;&#65288;Norms-and-Distance&#65289;">&#21521;&#37327;&#30340;&#33539;&#25968;&#19982;&#36317;&#31163;&#65288;Norms and Distance&#65289;<a class="anchor-link" href="#&#21521;&#37327;&#30340;&#33539;&#25968;&#19982;&#36317;&#31163;&#65288;Norms-and-Distance&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>一个向量 $v$ 的范数'norm', 表示为 $||v||$，也就是这个向量的长度。对于一个多维向量：
-$$v = \left(v_1,...,v_n\right)$$
-$v$ 的范数可用如下方法获得：
-$$||v|| = \sqrt{v_1^2+...+v_n^2}$$</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>两个向量之间的距离，也就是差向量的长度：
-$$d(v,w) = ||v-w||$$</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#26679;&#20363;">&#26679;&#20363;<a class="anchor-link" href="#&#26679;&#20363;">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-
-
-<span class="c1"># 求一个向量的范数</span>
-
-<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[16]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>2.2361</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 计算两个向量之间的距离</span>
-
-<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="o">-</span><span class="n">w</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[17]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>1.0000</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#20869;&#31215;&#65288;Inner-Products&#65289;">&#20869;&#31215;&#65288;Inner Products&#65289;<a class="anchor-link" href="#&#20869;&#31215;&#65288;Inner-Products&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>内积和范数与距离的关系非常密切。两个 $n$ 维向量 $v$ 和 $w$ 的标准的内积如下所示：</p>
-$$<v,w> = v_1w_1+...+v_nw_n$$<p>也就是说，内积就是对应项目相乘之后加到一起。某些特殊的矩阵也能定义内积，这些后面再说。</p>
-<p>任何的内积也都可以确定一种范数：</p>
-$$||v|| = <v,v>^{\frac12}$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#26679;&#20363;">&#26679;&#20363;<a class="anchor-link" href="#&#26679;&#20363;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">v</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[18]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>3</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#22806;&#31215;&#65288;Outer-Products&#65289;">&#22806;&#31215;&#65288;Outer Products&#65289;<a class="anchor-link" href="#&#22806;&#31215;&#65288;Outer-Products&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>这里我们会注意到，内积实际上就是两个矩阵相乘，也就是一个$1\times n$ 向量和另外一个 $n\times 1$ 这两个向量。所以，就也可以改写成下面这样：</p>
-$$<v,w> = v^tw$$<p>而两个向量的 <em>外积outer product</em> 则正好是相反的，如下所示：</p>
-$$v\otimes w = vw^t$$<p>注意这里是把$v$ 和 $w$ 看作例列向量<em>column</em>。所以内积的结果就是一个标量<em>scalar</em>，而外积的结果是一个矩阵<em>matrix</em>。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#26679;&#20363;">&#26679;&#20363;<a class="anchor-link" href="#&#26679;&#20363;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[19]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[1, 1],
-       [2, 2]])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>扩展</strong>: 协方差矩阵（covariance matrix）就是一个外积。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-
-<span class="c1"># 对 p 个变量进行 n 次观测</span>
-<span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span>
-<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">p</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 协方差矩阵（covariance matrix）就是一个 p×p 的矩阵</span>
-<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[21]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.0716, -0.0352,  0.0228,  0.0099],
-       [-0.0352,  0.0698, -0.0116,  0.0064],
-       [ 0.0228, -0.0116,  0.1009, -0.0239],
-       [ 0.0099,  0.0064, -0.0239,  0.0842]])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># From the definition, the covariance matrix </span>
-<span class="c1"># is just the outer product of the normalized </span>
-<span class="c1"># matrix where every variable has zero mean</span>
-<span class="c1"># divided by the number of degrees of freedom</span>
-
-<span class="c1"># 根据定义来看，协方差矩阵就是标准化后的矩阵的外积，标准化就是使得所有的值除以自由度后的均值为 0 </span>
-
-<span class="n">w</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">v</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
-<span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt output_prompt">Out[22]:</div>
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>array([[ 0.0716, -0.0352,  0.0228,  0.0099],
-       [-0.0352,  0.0698, -0.0116,  0.0064],
-       [ 0.0228, -0.0116,  0.1009, -0.0239],
-       [ 0.0099,  0.0064, -0.0239,  0.0842]])</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#30697;&#38453;&#30340;&#36857;&#21644;&#34892;&#21015;&#24335;&#65288;Trace-and-Determinant&#65289;">&#30697;&#38453;&#30340;&#36857;&#21644;&#34892;&#21015;&#24335;&#65288;Trace and Determinant&#65289;<a class="anchor-link" href="#&#30697;&#38453;&#30340;&#36857;&#21644;&#34892;&#21015;&#24335;&#65288;Trace-and-Determinant&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>矩阵 $A$ 的迹就是对角元素的和。这个变量很重要，因为：</p>
-<ul>
-<li>对于一个矩阵来说，迹是一个 <em>不变量（invariant）</em>，即便改变矩阵的基（后面会更深入地讲）。</li>
-<li>矩阵的迹定义了矩阵的一种范数（还是后面再深入讲）。</li>
-</ul>
-<p>矩阵的行列式的定义大概是对矩阵中所有元素的某种排列的交替求和（alternating sum of permutations of the elements of a matrix），（形式上行列式可以看作是取自不同行不同列的n个元素的乘积再作代数和，具体定义大家参考教材去吧，这里根本也就没说，只是随便一提而已，并不是权威定义）。眼下就先不弄那么细致了。先看看一个$2\times 2$ 矩阵的行列式是：</p>
-$$\left|\begin{matrix}a_{11} & a_{12}\\a_{21} & a_{22}\end{matrix}\right| = a_{11}a_{22} - a_{12}a_{21}$$<p>稍作扩展（minor expansion），就可以推广到 $n \times n 的矩阵上去了。这部分内容自己查去吧。咱们用 Python 中的 numpy 来计算行列式都有现成的工具，如下所示：</p>
-<p><code>np.linalg.det(A)</code></p>
-<p>行列式最重要的性质如下所示：</p>
-<ul>
-<li>跟迹类似，行列式也是一个不变量，不随基变化而变化。</li>
-<li>如果一个 $n\times n$ 的矩阵 $A$ 的行列式 det$(A)\neq 0$ $\iff$ 那么这个矩阵就是可逆矩阵 。</li>
-<li>如果det$(A)\neq 0$ $\iff$ 那么这个 $n\times n$ 矩阵 $A$ 的行或者列就都是线性无关的。</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#30697;&#38453;&#30340;&#21015;&#31354;&#38388;/&#34892;&#31354;&#38388;/&#31209;&#20197;&#21450;&#26680;&#65288;Column-space,-Row-space,-Rank-and-Kernel&#65289;">&#30697;&#38453;&#30340;&#21015;&#31354;&#38388;/&#34892;&#31354;&#38388;/&#31209;&#20197;&#21450;&#26680;&#65288;Column space, Row space, Rank and Kernel&#65289;<a class="anchor-link" href="#&#30697;&#38453;&#30340;&#21015;&#31354;&#38388;/&#34892;&#31354;&#38388;/&#31209;&#20197;&#21450;&#26680;&#65288;Column-space,-Row-space,-Rank-and-Kernel&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>设 $A$ 是一个 $m\times n$ 矩阵。然后就可以把 $A$ 的列当作向量，例如 $\textbf{a_1},...,\textbf{a_n}$等等。然后这些所有的列向量$\textbf{a_i}$进行线性组合得到的空间就称为矩阵$A$的<em>列空间column space</em> 。然后，如果列向量 $\textbf{a_1},...,\textbf{a_n}$ 这些都是<em>线性无关的linearly independent</em>，那么列空间的维度就是 $n$ 了。如果不是这样，那么列空间的维度就是线性无关的列向量$\textbf{a_i}$所组成的最大集合（maximal set）的维度。行空间与此同理，无非是使用的是矩阵 $A$ 的行向量而已。</p>
-<p>矩阵<em>A</em>的<em>秩（rank）</em>就是其列空间和行空间的维数。对任何矩阵来说都是这样。秩卡一理解为对线性方程组的非退化性（non-degeneracy）的一种量度，也就是由矩阵$A$所确定的<em>线性变换的图像维度（dimension of the image of the linear transformation）</em></p>
-<p>矩阵<em>A</em>的<em>核Kernel</em>，是一个这个矩阵 $A$ 所表示的线性变换空间映射到零的空间的维数（dimension of the space mapped to zero under the linear transformation that $A$ represents）。一个线性变换的<em>核kernel</em>的维度数也叫做 <em>nullity</em>。</p>
-<p>指数定理（Index theorem）：
-对于一个 $m\times n$ 矩阵 $A$, 
-rank($A$) + nullity($A$) = $n$.</p>
-<p>（译者注：这个核的概念我还真头一次见到，网上搜到了一个解释如下：满足线性方程AX=0的解组成的集合就叫矩阵A的核，A的核是子空间，也叫A的零空间,它的维数加上A的秩等于A的阶数。）</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#23558;&#30697;&#38453;&#29702;&#35299;&#20026;&#32447;&#24615;&#21464;&#25442;&#65288;Matrices-as-Linear-Transformations&#65289;">&#23558;&#30697;&#38453;&#29702;&#35299;&#20026;&#32447;&#24615;&#21464;&#25442;&#65288;Matrices as Linear Transformations&#65289;<a class="anchor-link" href="#&#23558;&#30697;&#38453;&#29702;&#35299;&#20026;&#32447;&#24615;&#21464;&#25442;&#65288;Matrices-as-Linear-Transformations&#65289;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>咱们来考虑一下这个问题：一个矩阵到底对一个向量<em>做</em>了什么？矩阵的操作有一种<em>几何 geometric</em>表述。当我们对一个向量进行操作的时候，通常就是旋转rotate,对称 reflect, 扩展 dilate 或者这几种操作的一些组合。矩阵也是这样对一个向量进行<em>变换 transform</em>，使之成为一个新的向量。这就是所谓的<em>线性变换 linear transformation</em></p>
-<p>下面是一些重要的定理：</p>
-<ul>
-<li>任意的一个矩阵，都定义了一个线性变换</li>
-<li>一个线性变换的矩阵形式的表述是不唯一的</li>
-<li>定义一个线性变换只需要考虑其对基向量<em>basis</em>的操作</li>
-</ul>
-<p>假设有一个矩阵 $A$ 定义了某种变换。然后咱们再有一个可逆矩阵（invertible matrix） $B$，那么</p>
-$$BAB^{-1}$$<p>就定义了同样的一个变换。这个操作也叫做<em>基变换 change of basis</em>，因为只是用了不同的基来表达同一个变换。</p>
-<p>这也是我们在主成分分析（Principal Component Analysis，PCA）里面要做的。用特征向量（eigenvectors）来表示矩阵（后面再详细讲）。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#26679;&#20363;&#65306;">&#26679;&#20363;&#65306;<a class="anchor-link" href="#&#26679;&#20363;&#65306;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>设 $f(x)$ 是一个线性变换，将$e_1=(1,0)$ 变换成 $f(e_1)=(2,3)$ ，将 $e_2=(0,1)$ 变换成 $f(e_2) = (1,1)$。那么用一个矩阵来表述这个变换 $f$ 则如下所示：</p>
-$$A = \left(\begin{matrix}2 & 1\\3&1\end{matrix}\right)$$<p>如果在$\mathbb{R}^2$ 实数域内的向量是下面这种线性组合的形式的话，上面的矩阵表示的就是对应的线性变换了。</p>
-$$c_1 e_1 + c_2 e_2$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>接下来，假设有另外一对的线性无关的向量，在实数域$\mathbb{R}^2$内取值，比如说就是 $v_1=(1,3)$ 和 $v_2=(4,1)$。首先要找出线性变换，该变换将$e_1$ 变为 $v_1$，将$e_2$ 变为 $v_2$。用矩阵来表示一下就是：</p>
-$$B = \left(\begin{matrix}1 & 4\\3&1\end{matrix}\right)$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>如果以 $v_1, v_2$ 作为基，那么咱们最开始的那个变换  $f$  就可以写成：</p>
-$$B^{-1}AB$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
-
-<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># 用标准基来表述的变换 f  </span>
-<span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>         <span class="c1"># 标准基向量 e1,e2</span>
-<span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">))</span>             <span class="c1"># 显示 Ae1 为 (2,3)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e2</span><span class="p">))</span>             <span class="c1"># 显示 Ae2 为 (1,1) </span>
-                              
-<span class="c1"># 新的基向量</span>
-<span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>         
-<span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-
-<span class="c1"># v1 和 v2 这两个向量怎么通过 A 变换得到</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Av1: &quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">))</span>   
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Av2: &quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v2</span><span class="p">))</span>
-
-<span class="c1"># 改变基向量，从标准基改为 v1,v2</span>
-<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
-<span class="n">B_inv</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;B B_inv &quot;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_inv</span><span class="p">))</span>   <span class="c1"># 检查一下矩阵 B 是否可逆</span>
-
-<span class="c1"># 在坐标系变化的背景下对 e1 进行变换</span>
-<span class="n">T</span> <span class="o">=</span> <span class="n">B_inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">))</span>        <span class="c1"># B^{-1} A B  </span>
-<span class="n">coeffs</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Compare to Av1: &quot;</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">v1</span> <span class="o">+</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">v2</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="kn">as</span> <span class="nn">la</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">suppress</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> 
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">P</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">lu</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+<span class="k">print</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">U</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12518,16 +12016,25 @@ $$B^{-1}AB$$
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[2 3]
-[1 1]
-Av1: 
-[5 6]
-Av2: 
-[ 9 13]
-B B_inv 
-[[  1.00000000e+00  -5.55111512e-17]
- [  5.55111512e-17   1.00000000e+00]]
-(&#39;Compare to Av1: &#39;, array([ 5.,  6.]))
+<pre>[[1 3 4]
+ [2 1 3]
+ [4 1 2]]
+[[ 4.  1.  2.]
+ [ 1.  3.  4.]
+ [ 2.  1.  3.]]
+
+[[ 4.  1.  2.]
+ [ 1.  3.  4.]
+ [ 2.  1.  3.]]
+[[ 0.  1.  0.]
+ [ 0.  0.  1.]
+ [ 1.  0.  0.]]
+[[ 1.      0.      0.    ]
+ [ 0.25    1.      0.    ]
+ [ 0.5     0.1818  1.    ]]
+[[ 4.      1.      2.    ]
+ [ 0.      2.75    3.5   ]
+ [ 0.      0.      1.3636]]
 </pre>
 </div>
 </div>
@@ -12536,75 +12043,140 @@ B B_inv
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>要注意 NumPy 使用<em>部分主元消去</em>来实现分解（使用最大的主元来交换矩阵的行）。这是由于较小主元可能导致数值不稳定。这也是应该尽可能使用库函数的另一个原因。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Cholesky-&#20998;&#35299;">Cholesky &#20998;&#35299;<a class="anchor-link" href="#Cholesky-&#20998;&#35299;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>回忆一下，如果对于任何非零 n 维向量 $u$，</p>
+$$u^TA u > 0$$<p>则方阵 $A$ 是正定的，</p>
+<p>并且，对称的正定阵 $A$ 是个正定阵，满足：</p>
+$$A = A^T$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>假设 $A$ 是个对称的正定阵。存在这样的唯一分解：</p>
+$$A = L L^T$$<p>其中 $L$ 是下三角矩阵，对角线元素为正，$L^T$ 是它的转置。这个分解称为 Cholesky 分解，$L$ 可以解释为 $A$ 的“平方根”。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#31639;&#27861;&#65306;">&#31639;&#27861;&#65306;<a class="anchor-link" href="#&#31639;&#27861;&#65306;">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>假设 $A$ 是 $n\times n$ 的矩阵。我们使用下面的迭代过程来寻找矩阵 $L$：</p>
+$$A = \left(\begin{matrix}a_{11}&A_{12}\\A_{12}&A_{22}\end{matrix}\right) =
+\left(\begin{matrix}\ell_{11}&0\\
+L_{12}&L_{22}\end{matrix}\right)
+\left(\begin{matrix}\ell_{11}&L_{12}\\0&L_{22}\end{matrix}\right)
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>1.) 令 $\ell_{11} = \sqrt{a_{11}}$</p>
+<p>2.) $L_{12} = \frac{1}{\ell_{11}}A_{12}$</p>
+<p>3.) 求解 $A_{22} - L_{12}L_{12}^T = L_{22}L_{22}^T$ 中的 $L_{22}$</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Example:">Example:<a class="anchor-link" href="#Example:">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$A = \left(\begin{matrix}1&3&5\\3&13&23\\5&23&42\end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$\ell_{11} = \sqrt{a_{11}} = 1$$$$L_{12} = \frac{1}{\ell_{11}} A_{12} = A_{12}$$<p>$\begin{eqnarray*}
+A_22 - L_{12}L_{12}^T &=& \left(\begin{matrix}13&23\\23&42\end{matrix}\right) - \left(\begin{matrix}9&15\\15&25\end{matrix}\right)\\
+&=& \left(\begin{matrix}4&8\\8&17\end{matrix}\right)\\
+&=& \left(\begin{matrix}2&0\\4&\ell_{33}\end{matrix}\right) \left(\begin{matrix}2&4\\0&\ell_{33}\end{matrix}\right)\\
+&=& \left(\begin{matrix}4&8\\8&16+\ell_{33}^2\end{matrix}\right)
+\end{eqnarray*}$</p>
+<p>所以我们可以推出 $\ell_{33}=1$。</p>
+<p>这就产生了分解：</p>
+$$\left(\begin{matrix}1&3&5\\3&13&23\\5&23&42\end{matrix}\right) = 
+\left(\begin{matrix}1&0&0\\3&2&0\\5&4&1\end{matrix}\right)\left(\begin{matrix}1&3&5\\0&2&4\\0&0&1\end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>现在使用 NumPy：</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">plot_vectors</span><span class="p">(</span><span class="n">vs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plot vectors in vs assuming origin at (0,0).&quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="n">U</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">U</span><span class="p">,</span> <span class="n">X</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">U</span><span class="p">,</span> <span class="n">X</span><span class="p">])</span>
-    <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">V</span><span class="p">,</span> <span class="n">Y</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">V</span><span class="p">,</span> <span class="n">Y</span><span class="p">])</span>
-    <span class="n">xrng</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
-    <span class="n">yrng</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span>
-    <span class="n">xmin</span> <span class="o">-=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">xrng</span>
-    <span class="n">xmax</span> <span class="o">+=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">xrng</span>
-    <span class="n">ymin</span> <span class="o">-=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">yrng</span>
-    <span class="n">ymax</span> <span class="o">+=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">yrng</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">])</span>
-</pre></div>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">23</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">42</span><span class="p">]])</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">L</span><span class="p">))</span>
 
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span> 
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-<span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># 下面是对 Ae_1 和 Ae_2 的投图展示</span>
-<span class="c1"># 当然你也可以来尝试用图像的方式来呈现其他变换</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">plot_vectors</span><span class="p">([</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">plot_vectors</span><span class="p">([</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">),</span> <span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e2</span><span class="p">)])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12616,245 +12188,18 @@ B B_inv
 
 
 <div class="output_area"><div class="prompt"></div>
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-TkSuQmCC
-"
->
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[  1.   3.   5.]
+ [  3.  13.  23.]
+ [  5.  23.  42.]]
+[[ 1.  3.  5.]
+ [ 0.  2.  4.]
+ [ 0.  0.  1.]]
+[[ 1  3  5]
+ [ 3 13 23]
+ [ 5 23 42]]
+</pre>
 </div>
-
 </div>
 
 </div>
@@ -12866,17 +12211,7 @@ TkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#29305;&#27530;&#30697;&#38453;">&#29305;&#27530;&#30697;&#38453;<a class="anchor-link" href="#&#29305;&#27530;&#30697;&#38453;">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Some matrices have interesting properties that allow us either simplify the underlying linear system or to understand more about it.</p>
-<p>有的矩阵有一些很有趣的性质，这样的一些性质有时候就可以简化对应的线性方程组以及对其的理解等等。</p>
+<p>Cholesky 分解的速度大约是 LU 分解的两倍（虽然二者的复杂度都是 $n^3$）。</p>
 
 </div>
 </div>
@@ -12886,7 +12221,7 @@ TkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#27491;&#26041;&#24418;&#30697;&#38453;">&#27491;&#26041;&#24418;&#30697;&#38453;<a class="anchor-link" href="#&#27491;&#26041;&#24418;&#30697;&#38453;">&#182;</a></h4>
+<h2 id="&#29992;&#20110;-PCA-&#21644;&#26368;&#23567;&#20108;&#20056;&#27861;&#30340;&#30697;&#38453;&#20998;&#35299;">&#29992;&#20110; PCA &#21644;&#26368;&#23567;&#20108;&#20056;&#27861;&#30340;&#30697;&#38453;&#20998;&#35299;<a class="anchor-link" href="#&#29992;&#20110;-PCA-&#21644;&#26368;&#23567;&#20108;&#20056;&#27861;&#30340;&#30697;&#38453;&#20998;&#35299;">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -12895,8 +12230,7 @@ TkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>正方形矩阵，简称方阵，就是行和列的数目$n$相同。对于任意的一个正方形矩阵，都可以说成是$n\times n$矩阵，或者说他是一个“维度为$n$的方阵”。如果一个$n\times n$ 方阵 $A$ 有 <em>满秩（full rank）</em>（ye'jiu'shi也就是说该矩阵的秩为$n$），那么这个矩阵$A$就是可逆的（invertible），而且逆矩阵（inverse）是唯一的。这种情况下对应的线性方程组就有唯一解了。</p>
-
+<h2 id="&#29305;&#24449;&#20540;&#20998;&#35299;">&#29305;&#24449;&#20540;&#20998;&#35299;<a class="anchor-link" href="#&#29305;&#24449;&#20540;&#20998;&#35299;">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -12905,7 +12239,7 @@ TkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#23545;&#35282;&#30697;&#38453;">&#23545;&#35282;&#30697;&#38453;<a class="anchor-link" href="#&#23545;&#35282;&#30697;&#38453;">&#182;</a></h4>
+<h3 id="&#29305;&#24449;&#21521;&#37327;&#21644;&#29305;&#24449;&#20540;">&#29305;&#24449;&#21521;&#37327;&#21644;&#29305;&#24449;&#20540;<a class="anchor-link" href="#&#29305;&#24449;&#21521;&#37327;&#21644;&#29305;&#24449;&#20540;">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12914,95 +12248,17 @@ TkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>对角矩阵就是除了对角线之外其他的元素都是零。严格来说，对角阵应该也是方阵才行，不过我们也可以扩展一下，认为一个$m\times n$矩形矩阵也可以是对角阵，只要满足对于$i\neq j$，$a_{ij}$等于0，即可。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#23545;&#31216;&#30697;&#38453;&#21644;&#21453;&#23545;&#31216;&#30697;&#38453;&#65288;Symmetric-and-Skew-Symmetric&#65289;">&#23545;&#31216;&#30697;&#38453;&#21644;&#21453;&#23545;&#31216;&#30697;&#38453;&#65288;Symmetric and Skew Symmetric&#65289;<a class="anchor-link" href="#&#23545;&#31216;&#30697;&#38453;&#21644;&#21453;&#23545;&#31216;&#30697;&#38453;&#65288;Symmetric-and-Skew-Symmetric&#65289;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>一个矩阵$A$ ，如果有$a_{ij} = (-)a_{ji}$，那么该矩阵就是对称的（symmetric），负号则为反对称(skew symmetric)。</p>
-<p>等价的表述如下，对应下面的条件，矩阵 $A$ 就是对称的，如果有括号中的负号，就是反对称的(skew symmetric)</p>
-$$A = (-)A^T$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#19978;&#19977;&#35282;&#38453;&#21644;&#19979;&#19977;&#35282;&#38453;">&#19978;&#19977;&#35282;&#38453;&#21644;&#19979;&#19977;&#35282;&#38453;<a class="anchor-link" href="#&#19978;&#19977;&#35282;&#38453;&#21644;&#19979;&#19977;&#35282;&#38453;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>一个矩阵$A$，如果 对于所有的 $i > j$ 都有$a_{ij} = 0$  ，则 $A$ 是上三角矩阵；</p>
-<p>如果 对于所有的 $i < j$ 都有$a_{ij} = 0$  ，则 $A$ 是下三角矩阵。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#27491;&#20132;&#30697;&#38453;&#21644;&#26631;&#20934;&#27491;&#20132;&#21270;&#65288;Orthogonal-and-Orthonormal&#65289;">&#27491;&#20132;&#30697;&#38453;&#21644;&#26631;&#20934;&#27491;&#20132;&#21270;&#65288;Orthogonal and Orthonormal&#65289;<a class="anchor-link" href="#&#27491;&#20132;&#30697;&#38453;&#21644;&#26631;&#20934;&#27491;&#20132;&#21270;&#65288;Orthogonal-and-Orthonormal&#65289;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>如果一个矩阵 $A$ 满足 $$A A^T = I$$，那么该矩阵为<em>正交（orthogonal）矩阵</em></p>
-<p>换种方式来表述就是，如果有 $$A^T=A^{-1}$$，那么矩阵$A$ 就是正交的。</p>
-<p>定理: 一个正交矩阵的行和列是标准正交化的向量集。</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="&#27491;&#23450;&#65288;Positive-Definite&#65289;">&#27491;&#23450;&#65288;Positive Definite&#65289;<a class="anchor-link" href="#&#27491;&#23450;&#65288;Positive-Definite&#65289;">&#182;</a></h4>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>正定矩阵是一类非常重要的矩阵，它们有一些非常理想的特性。
-对任意的非零的n维向量$u$，如果一个矩阵$A$满足下面条件，则$A$就是正定矩阵。</p>
-$$u^TA u > 0$$<p>对于一个对称的正定矩阵$A$，有下面的等式：</p>
-$$A = A^T$$<p>重要定理：</p>
+<p>首先回忆，矩阵 $A$ 的<em>特征向量</em>是一个非零向量 $v$，对于一些标量 $\lambda$，满足：</p>
+$$Av = \lambda v$$<p>值 $\lambda$ 就叫做 $A$ 的<em>特征值</em>。</p>
+<p>如果 $n\times n$ 的矩阵 $A$ 拥有 $n$ 个线性无关的特征向量，那么 $A$ 就可以用这种方式分解：</p>
+$$A = B\Lambda B^{-1}$$<p>其中 $\Lambda$ 是一个对角矩阵，对角线上的元素是 $A$ 的特征值，$B$ 的列向量是 $A$ 的对应特征向量。</p>
+<p>定理：</p>
 <ul>
-<li>对称正定矩阵都有一个“平方根”（大概类似这么个概念）</li>
-<li>任意的对称正定矩阵都是<em>可对角化的diagonizable</em>!!!</li>
-<li>协方差矩阵（Co-variance matrices）都是对称正定矩阵（symmetric and positive-definite）</li>
+<li>$n\times n$ 的矩阵是可对角化的 $\iff$ 它有 $n$ 个线性无关的特征向量。</li>
+<li>对称的正定阵只拥有正的特征值，并且它的特征值分解
+$$A=B\Lambda B^{-1}$$</li>
 </ul>
+<p>通过正交变换 $B$ 来实现。（也就是，它的特征向量是标准正交集）</p>
 
 </div>
 </div>
@@ -13012,7 +12268,418 @@ $$A = A^T$$<p>重要定理：</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>现在就讲完了基本内容了，接下来就可以去学习解方程组的数值方法了，也就是矩阵分解。</p>
+<h4 id="&#35745;&#31639;&#29305;&#24449;&#20540;">&#35745;&#31639;&#29305;&#24449;&#20540;<a class="anchor-link" href="#&#35745;&#31639;&#29305;&#24449;&#20540;">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>从定义中很容易看出，如果 $v$ 是 $n\times n$ 矩阵 $A$ 的特征向量，拥有特征值 $\lambda$，那么</p>
+$$(A - \lambda I)v = \bf{0}$$<p>其中 $I$ 是 $n$ 维单位矩阵，$\bf{0}$ 是 n 维零向量。因此，$A$ 的特征值满足：</p>
+$$\det\left(A-\lambda I\right)=0$$<p>上式的左边是 $\lambda$ 的多项式，叫做 $A$ 的<em>特征多项式</em>。所以，为了找到 $A$ 的特征值，我们需要找到特征多项式的根。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>但是，从计算上来说，计算特征多项式以及求解根，是极其复杂的。因此，在实践中，会使用数值方法 -- 来找到特征值以及相应的特征向量。我们不会陷入用于计算特征值的算法细节，这里是个 NumPy 的示例：</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]])</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">V</span><span class="p">))))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[-0.+0.j  1.+0.j  1.+0.j]
+ [ 2.+0.j  1.+0.j  0.+0.j]
+ [ 3.+0.j  4.+0.j  5.+0.j]]
+[ 5.8541+0.j -0.8541+0.j  1.0000+0.j]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>注意：</strong> 许多矩阵<em>无法</em>对角化，许多矩阵拥有<em>复数</em>特征值（即使所有元素都是实数）。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">la</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">V</span><span class="p">))))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[ 0  1]
+ [-1  0]]
+[[ 0.+0.j  1.+0.j]
+ [-1.+0.j  0.+0.j]]
+[ 0.+1.j  0.-1.j]
+[ 0.+1.j  0.-1.j]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># If you know the eigenvalues must be reeal </span>
+<span class="c1"># because A is a positive definite (e.g. covariance) matrix </span>
+<span class="c1"># use real_if_close</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]])</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">np</span><span class="o">.</span><span class="n">real_if_close</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[ 5.8541+0.j -0.8541+0.j  1.0000+0.j]
+[ 5.8541 -0.8541  1.    ]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="&#22855;&#24322;&#20540;">&#22855;&#24322;&#20540;<a class="anchor-link" href="#&#22855;&#24322;&#20540;">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>对于任何 $m\times n$ 的矩阵 $A$，我们将它的<em>奇异值</em>定义为 $A^TA$ 特征值的平方根。这是一个良好的定义，因为 $A^TA$ 永远是对称，并且正定的，所以它的特征值都是正实数。奇异值是矩阵的非常重要的属性。几何上，矩阵 $A$ 将 $\mathbb{R}^n$ 中的单位球映射为椭圆。 奇异值是半轴的长度。</p>
+<p>奇异值也提供了矩阵<em>稳定性</em>的度量。我们会在这篇文章末尾再次看到它。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="QR-&#20998;&#35299;">QR &#20998;&#35299;<a class="anchor-link" href="#QR-&#20998;&#35299;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>就像上一个分解那样，$QR$ 分解是一种方式，将矩阵 $A$ 写成两个形式更简单的矩阵乘积。这里，我们希望：</p>
+$$ A= QR$$<p>其中 $Q$ 是 $m\times n$ 的矩阵，满足 $Q Q^T = I$（即 $Q$ 是正交的），并且 $R$ 是 $n\times n$ 的上三角矩阵。</p>
+<p>这实际上是 $A$ 的列向量的 Gram-Schmidt 正交化的矩阵形式。G-S 算法本身是不稳定的，所以有多种其它算法被开发出来，来计算 QR 分解。我们不会详细涉及它们，因为它们有些超出我们的范围。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>$Q$ 的前 $k$ 列 是 $A$ 的前 $k$ 列列空间的标准正交基。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>可迭代的 QR 分解通常用于计算特征值。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#22855;&#24322;&#20540;&#20998;&#35299;">&#22855;&#24322;&#20540;&#20998;&#35299;<a class="anchor-link" href="#&#22855;&#24322;&#20540;&#20998;&#35299;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>另一种重要的矩阵分解是奇异值分解（SVD）。对于任何 $m\times n$ 的矩阵 $A$，我们可以写出：</p>
+$$A= UDV$$<p>其中 $U$ 是 $m\times m$ 的酉矩阵（实数情况下正交），$D$ 是 $m\times n$ 的对角长方阵，其对角线上的元素 $d_1,...,d_m$ 都是非负的。 $V$ 是 $n\times n$ 的酉矩阵（正交）。SVD 用于主成分分析，以及 Moore-Penrose 广义逆矩阵的计算。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#25968;">&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#25968;<a class="anchor-link" href="#&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#25968;">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>数值算法是<em>稳定的</em>和<em>高效的</em>十分重要。效率是算法的一个属性，但是稳定性是系统自身的一个属性。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#31034;&#20363;">&#31034;&#20363;<a class="anchor-link" href="#&#31034;&#20363;">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$\left(\begin{matrix}8&6&4&1\\1&4&5&1\\8&4&1&1\\1&4&3&6\end{matrix}\right)x = \left(\begin{matrix}19\\11\\14\\14\end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">]])</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">19</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">14</span><span class="p">])</span>
+<span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[9]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([ 1.,  1.,  1.,  1.])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">19.01</span><span class="p">,</span><span class="mf">11.05</span><span class="p">,</span><span class="mf">14.07</span><span class="p">,</span><span class="mf">14.05</span><span class="p">])</span>
+<span class="n">la</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([-2.34 ,  9.745, -4.85 , -1.34 ])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>要注意向量 $b$ 中的<em>微小</em>波动，会造成解中的非常大的差异！这种情况发生时，我们就说矩阵 $A$ 是病态的。当矩阵非常接近于奇异矩阵（也就是不可逆）时，会发生这种情况。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="&#26465;&#20214;&#25968;">&#26465;&#20214;&#25968;<a class="anchor-link" href="#&#26465;&#20214;&#25968;">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>这种行为的一个度量叫做<em>条件数</em>。它定义为：</p>
+$$ cond(A) = ||A||\cdot ||A^{-1}|| $$<p>通常，它比较难以计算。</p>
+<p>定理：</p>
+$$cond(A) = \frac{\lambda_1}{\lambda_n}$$<p>其中 $\lambda_1$ 是 $A$ 的最大奇异值，$\lambda_n$ 是最小奇异值。条件数越大，系统越不稳定。通常，如果最小值和最大值之间的差距很大，条件数就很大。</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="&#31034;&#20363;">&#31034;&#20363;<a class="anchor-link" href="#&#31034;&#20363;">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">U</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">/</span><span class="nb">min</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[ 15.5457   6.9002   3.8363   0.0049]
+3198.6725812
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="&#39044;&#22788;&#29702;">&#39044;&#22788;&#29702;<a class="anchor-link" href="#&#39044;&#22788;&#29702;">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>我们有时可以通过“预处理”来改善这个行为。我们不求解
+$$Ax=b$$
+而是求解
+$$D^{-1}Ax=D^{-1}b$$
+其中 $D^{-1}A$ 的条件数比 $A$ 本身要小。</p>
+<p>预处理是个<em>非常</em>难懂的话题，超出了这个课程的范围。这里提及它，只是为了让你意识到这样的东西存在，你应该曾经碰到过病态问题。</p>
 
 </div>
 </div>
@@ -13031,44 +12698,81 @@ $$A = A^T$$<p>重要定理：</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>1</strong>. <em>不解方程组</em>，判断下面的方程组是无解、无穷解还是有唯一解</p>
-$$\begin{eqnarray*}
-x+2y-z+w &=& 2\\
-3x-4y+2 w &=& 3\\
-2y+z &=& 4\\
-2x+2y-3z+2w&=&0\\
--2x+6y-z-w&=&-1
-\end{eqnarray*}$$
+<p><strong>1</strong>. 手动并使用 NumPy 计算下列矩阵的 LU 分解</p>
+$$\left(\begin{matrix}1&2&3\\2&-4&6\\3&-9&-3\end{matrix}\right)$$
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Your code here</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><strong>2</strong>. 设 $f(x)$是一个线性变换，针对实数域上的 $\mathbb{R}^3$ 有如下变换：
-$$\begin{eqnarray*}
-f(e_1) &=& (1,1,3)\\
-f(e_2) &=& (1,0,4)\\
-f(e_3) &=& (0,2,1)
-\end{eqnarray*}$$</p>
+<p><strong>2</strong>. 手动并使用 NumPy 计算下列矩阵的 Cholesky</p>
+$$\left(\begin{matrix}1&2&3\\2&-4&6\\3&6&-3\end{matrix}\right)$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Your code here</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>3</strong>. 使用 Python 编写函数，使用 SVD 分解来求解方程组</p>
+$$Ax = b$$<p>你的函数应该接受 $A$ and $b$ 作为输入，并返回 $x$。</p>
+<p>你的函数应包含下列操作：</p>
 <ul>
-<li>用一个矩阵来表示 $f$. </li>
-<li>改用下面的基向量，计算一下表示 $f$ 在改变基之后的矩阵表示
-$$\begin{eqnarray*}
-v_1 &=& (2,3,3)\\
-v_2 &=& (8,5,2)\\
-v_3 &=& (1,0,5)
-\end{eqnarray*}$$</li>
+<li>首先，检查 $A$ 是否可逆 - 不是的话返回错误信息</li>
+<li>使用 SVD 对 $A$ 求逆，并求解方程组</li>
+<li>返回 $x$</li>
 </ul>
+<p>测试你的函数的正确性。</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Your code here</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span> 

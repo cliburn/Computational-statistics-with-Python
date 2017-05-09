@@ -392,7 +392,7 @@ print("Compare to Av1: ", coeffs[0]*v1 + coeffs[1]*v2)
     [[  1.00000000e+00  -5.55111512e-17]
      [  5.55111512e-17   1.00000000e+00]]
     ('Compare to Av1: ', array([ 5.,  6.]))
-
+    
 
 
 ```python
@@ -456,11 +456,11 @@ Some matrices have interesting properties that allow us either simplify the unde
 
 对角矩阵就是除了对角线之外其他的元素都是零。严格来说，对角阵应该也是方阵才行，不过我们也可以扩展一下，认为一个$m\times n$矩形矩阵也可以是对角阵，只要满足对于$i\neq j$，$a_{ij}$等于0，即可。
 
-#### 对称矩阵和斜对称矩阵（Symmetric and Skew Symmetric)
+#### 对称矩阵和反对称矩阵（Symmetric and Skew Symmetric）
 
-一个矩阵$A$ ，如果有$a_{ij} = (-)a_{ji}$，那么该矩阵就是对称的（symmetric），负号则为斜对称(skew symmetric)。
+一个矩阵$A$ ，如果有$a_{ij} = (-)a_{ji}$，那么该矩阵就是对称的（symmetric），负号则为反对称(skew symmetric)。
 
-等价的表述如下，对应下面的条件，矩阵 $A$ 就是对称的，如果有括号中的负号，就是斜对称的(skew symmetric) 
+等价的表述如下，对应下面的条件，矩阵 $A$ 就是对称的，如果有括号中的负号，就是反对称的(skew symmetric) 
 
 $$A = (-)A^T$$
 
@@ -470,14 +470,13 @@ $$A = (-)A^T$$
 
 如果 对于所有的 $i < j$ 都有$a_{ij} = 0$  ，则 $A$ 是下三角矩阵。
 
-#### 直角矩阵和标准正交化（Orthogonal and Orthonormal）
+#### 正交矩阵和标准正交化（Orthogonal and Orthonormal）
 
-如果一个矩阵 $A$ 满足 $$A A^T = I$$，那么该矩阵为*直角矩阵orthogonal*
+如果一个矩阵 $A$ 满足 $$A A^T = I$$，那么该矩阵为*正交（orthogonal）矩阵*
 
-换种方式来表述就是，如果有 $$A^T=A^{-1}$$，那么矩阵$A$ 就是直角的的。
+换种方式来表述就是，如果有 $$A^T=A^{-1}$$，那么矩阵$A$ 就是正交的。
 
-定理: 一个直角矩阵的行和列是一对标准正交化的向量集。
-The rows and columns of an orthogonal matrix are an orthonormal set of vectors.
+定理: 一个正交矩阵的行和列是标准正交化的向量集。
 
 
 #### 正定（Positive Definite）
