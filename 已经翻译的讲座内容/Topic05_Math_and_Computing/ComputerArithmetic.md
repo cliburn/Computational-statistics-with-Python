@@ -52,21 +52,21 @@ normalize(ws)
 
 
 
-### 可能性比较（likleihoods）
+### 相似度比较（likelihoods）
 
 Assuming indepdnece, the likelihood of observing some data points given a distributional model for each data point is the product of the likelihood for each data point.
 
-假设独立性，给出每个数据点分配模型的一些数据点的可能性是每个数据点的可能性的乘积。
+假设数据是独立分布的，给出每个数据点都有分布模型的一组数据点，这些数据点的相似度是每个数据点的可能性的乘积。
 
 
 ```python
 from scipy.stats import norm
 
-rv1 = norm(0, 1)
+rv1 = norm(0, 1) #译者注: 使用正态分布
 rv2 = norm(0, 3)
 
 xs = np.random.normal(0, 3, 1000)
-likelihood1 = np.prod(rv1.pdf(xs))
+likelihood1 = np.prod(rv1.pdf(xs)) #译者注: 使用概率密度函数，probability density function
 likelihood2 = np.prod(rv2.pdf(xs))
 likelihood2 > likelihood1
 ```
@@ -139,7 +139,7 @@ var(xs)
 
 ## 对数值的有限表示（Finite representation of numbers）
 
-对于整数，不同的编程语言都有各自能表示的最大和最小值。Python的整数实际上是对象，所以在你超过了这些限制之后可以根据切换实现任意大的精度，但对于C和R语言来说则都不是这样。在 64位的体系中，最大值是 2^63 - 1，最小值是 -2^63 - 1
+对于整数，不同的编程语言都有各自能表示的最大和最小值。Python的整数实际上是对象，所以在你超过了这些限制之后整数对象会切换到任意大精度的数值，但对于C和R语言来说则都不是这样。在 64位的体系中，最大值是 `2^63 - 1`，最小值是 `-2^63 - 1`。
 
 
 
@@ -275,10 +275,15 @@ demo.limit(), demo.overflow()
 浮点数在存储的时候分成三部分，分别是符号位，指数和尾数（sign bit, exponent, mantissa），所有的浮点数都是通过 +/- mantissa ^ exponent 来实现的。因此，接近0、下限和上限的连续数之间的间隔最小（精度高）。
 
 
+指数需要使用符号位来代表小数和大数(both small and large numbers)，但是使用无符号位的数字会更方便，因此指数有一个偏移量(也称为指数偏倚，exponent bias)。 比如说，如果指数是一个无符号的8位数字(unsigned 8-bit number)，它可以代表(0,255)这样一个范围。 如果使用128作为偏移量，那么就可以表示为(-127, 128)这个范围。
+
+
 
 ```python
 from IPython.display import Image
 ```
+
+#### 二进制方式表示的浮点数
 
 
 ```python
@@ -384,7 +389,7 @@ print i
 
 
 
-<font color=blue>经验：算法中药避免两个非常接近的数字相减。 当两个数字都非常大时，由于可用的精确位数有限，出现问题的概率就特别大。</font>
+<font color=blue>经验：算法中要避免两个非常接近的数字相减。 当两个数字都非常大时，由于可用的精确位数有限，出现问题的概率就特别大。</font>
 
 
 ```python
@@ -418,12 +423,13 @@ np.sum(np.log(probs))
 使用无穷精度的库（arbitrary precision libraries）
 ----
 
-如果相比计算速度，你更需要计算精度（比如你的代码可能上下溢出，而你有找不到或者不想去折腾），Python也提供了个一些无限精度的数学库，例如：
+如果相比计算速度，你更需要计算精度（比如你的代码可能上下溢出，而你又找不到或者不想去折腾一个办法），Python也提供了一些无限精度的数学库，例如：
 
+- [The decimal package in the standard library](https://docs.python.org/2/library/decimal.html)
 - [The mpmath package](http://mpmath.org)
 - [The gmpy2 package](https://pypi.python.org/pypi/gmpy2)
 
-这两个库都可以通过pip安装
+mpmath和gmpy2这两个库都可以通过pip安装
 ```bash
 pip install gmpy2
 pip install mpmath
@@ -434,13 +440,18 @@ pip install mpmath
 稳定性和条件状态（Stability and conditioning）
 ----
 
-假如我们有一个计算机算法$g(x)$，它表示的是一个数学函数 $f(x)$。如果对于很小的扰动 $\epsilon$，有$g(x+\epsilon) \approx f(x)$，那么就认为 $g(x)$是稳定的（stable）。
+假如我们有一个计算机算法 $g(x)$，它表示的是一个数学函数 $f(x)$。如果对于很小的扰动 $\epsilon$，有$g(x+\epsilon) \approx f(x)$，那么就认为 $g(x)$是稳定的（stable）。
 
-也就是，如果这个<font color=red>算法algorithm</font>$g(x)$能针对正确的问题给出近似正确的解（gives *nearly the right answer to nearly the right problem*），那就是**数值稳定 numerically stable**的。例如，牛顿拉普森法（Newton-Raphson）在某些特定的初始条件下就可能是数值不稳定的，而且即便在根的附近也可能不收敛。
+
 
 对于一个数学函数 $f(x)$ 来说，如果在$\epsilon$是一个很小的扰动的时候，有 $f(x + \epsilon) \approx f(x)$，则认为$f(x)$是条件良好的（well-conditioned）。
 
-也就是，如果*随着问题的改变而解也逐渐改变*，那么就说这个<font color=red>函数function</font>$f(x)$ 是 **条件良好的 well-conditioned**。例如：给一个近似奇异矩阵（nearly singular matrix）求逆矩阵就是一个条件很差的问题（poorly condiitioned problem）。
+
+也就是，如果*随着问题的改变而解也逐渐改变*，那么就说这个<font color=red>函数function</font>$f(x)$ 是 **条件良好的 well-conditioned**。对于一个条件良好的数学函数，所有微小的扰动只会带来微小的变化。 然而，一个条件并不良好(pooly-conditioned)的函数，一点微小的扰动会带来巨大的变化。 例如：给一个近似奇异矩阵（nearly singular matrix）求逆矩阵就是一个条件很差的问题（poorly condiitioned problem）。
+
+一个数学算法 $g(x)$ ，给定 $x'\approx x$，如果 $g(x) \approx f(x')$，这个 $g(x)$ 就是**数值稳定 numerically stable**的
+ 
+也就是，如果这个算法$g(x)$能针对正确的问题给出近似正确的解（gives *nearly the right answer to nearly the right problem*），那就是**数值稳定 numerically stable**的。 数值不稳定的算法在计算机的计算过程中会放大预估的错误。 如果我们使用一个无限精度的数字系统，稳定和不稳定的算法将会有相同的精度。 然而，正如我们看到的(比如，前面检查浮点数的相等运算)，当使用浮点数时，数学上的等式会带来不同的结果。
 
 **不稳定的情况（Unstable version）**
 
@@ -462,7 +473,7 @@ plt.xlim([-4e-8, 4e-8]);
 ```
 
 
-![png](output_44_0.png)
+![png](output_45_0.png)
 
 
 
@@ -501,7 +512,7 @@ plt.xlim([-4e-8, 4e-8]);
 ```
 
 
-![png](output_48_0.png)
+![png](output_49_0.png)
 
 
 ### 方差的稳定版和不稳定版（Stable and unstable versions of variance）
@@ -527,7 +538,7 @@ def direct_var(x):
     return 1.0/(n-1)*np.sum((x - xbar)**2)
 ```
 
-<font color=blue>注意就好多了，毕竟是先做了差然后才平方</font>
+<font color=blue>这就好多了，毕竟是先做了差然后才平方</font>
 
 
 ```python
@@ -601,6 +612,13 @@ welford_var(x)
 <font color=blue>经验:把数学公式直接转换成代码时候要小心，因为运算效果可能不一定一样！</font>
 
 这个问题也出现在查找简单回归系数和Pearson相关系数的导航算法中。
+
+可以查看以下一系列的清晰解释:
+
+- http://www.johndcook.com/blog/2008/09/28/theoretical-explanation-for-numerical-results/
+- http://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/
+- http://www.johndcook.com/blog/2008/10/20/comparing-two-ways-to-fit-a-line-to-data/
+- http://www.johndcook.com/blog/2008/11/05/how-to-calculate-pearson-correlation-accurately/
 
 ### 条件性差的问题（Poorly conditioned problems）
 
@@ -736,11 +754,10 @@ except la.LinAlgError:
 练习
 ----
 
-The topic is rather specialized and the main goal is just to have you aware of the "leaky abstraction" of computer numbers as simulations of mathematical numbers, and common situations where this can casue problems. Once you are aware of these areas, you can either avoid them using simple rules, or look for an apprpriate numerical library fuctionn to use instead. So there will be no exericses on the topic of computer arithmetic, conditioning and stability given.
-
 本章的主要内容是让你了解一下计算机中的数值作为数学上数值的一种模拟，是一种“有遗漏的抽象（leaky abstraction）”，以及可能会导致问题的一些常见情况。 一旦你了解了这些内容，就可以避免只是使用简单规则，或者还可以选择合适的数值库函数而不是自己去重新实现。 所以在本章的这些计算机计算、条件优劣判断和数值稳定性等内容，就都没有什么习题了。
 
 此外，你需要习惯使用 numpy 里面的数组，尤其是在本课程的后续内容中。想要练习的话，可以看看下面这个链接里面的样例和练习题：
+
 [Nicolas P. Rougier's  numpy tutorial](http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html)
 
 像这样的 numpy 简介还有很多，大家可以多练一练！
