@@ -11714,6 +11714,240 @@ ul.typeahead-list > li > a {
 .ansi-bold { font-weight: bold; }
 
     </style>
+<style type="text/css">
+    /*
+Placeholder for custom user CSS
+
+mainly to be overridden in profile/static/custom/custom.css
+
+This will always be an empty file in IPython
+*/
+
+
+/*@import url('http://fonts.googleapis.com/css?family=Crimson+Text');*/
+@import url('http://fonts.googleapis.com/css?family=Kameron');
+@import url('http://fonts.googleapis.com/css?family=Lato:200,300,400');
+/*@import url('http://fonts.googleapis.com/css?family=Hack');*/
+
+
+/* Change code font */
+.CodeMirror pre {
+    font-family: 'Hack', Consolas, monocco, monospace;
+}
+
+div.input_area {
+    border-color: rgba(0,0,0,0.10);
+    background: rbga(0,0,0,0.5);
+}
+
+div.text_cell {
+    /*max-width: 105ex; */
+    /* instead of 100%, */
+}
+
+div.text_cell_render {
+    /*font-family: "Crimson Text";*/
+    font-size: 12pt;
+    line-height: 145%; /* added for some line spacing of text. */
+}
+
+/*div.text_cell_render h1,
+div.text_cell_render h2,
+div.text_cell_render h3,
+div.text_cell_render h4,
+div.text_cell_render h5,
+*/
+div.text_cell_render h6 {
+    font-family: 'Kameron';
+    font-weight: 300;
+}
+
+div.text_cell_render h1 {
+    font-size: 24pt;
+}
+
+div.text_cell_render h2 {
+    font-size: 18pt;
+}
+
+div.text_cell_render h3 {
+    font-size: 14pt;
+}
+
+.rendered_html pre,
+.rendered_html code {
+    /*font-size: medium;*/
+    font-family: Consolas, monocco, monospace;
+}
+
+.rendered_html ol {
+    list-style:decimal;
+    margin: 1em 2em;
+}
+
+.prompt.input_prompt {
+    color: rgba(0,0,0,0.5);
+}
+
+.cell.command_mode.selected {
+    border-color: rgba(0,0,0,0.1);
+}
+
+.cell.edit_mode.selected {
+    border-color: rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 5px #f0f0f0;
+    -webkit-box-shadow: 0px 0px 5px #f0f0f0;
+}
+
+div.output_scroll {
+    -webkit-box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+    border-radious: 2px;
+}
+
+#menubar .navbar-inner {
+    background: #fff;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
+    font-family: lato;
+    font-weight: 400;
+}
+
+.navbar-fixed-top .navbar-inner,
+.navbar-static-top .navbar-inner {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border: none;
+}
+
+div#notebook_panel {
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border-top: none;
+}
+
+div#notebook {
+    border-top: 1px solid rgba(0,0,0,0.15);
+}
+
+#menubar .navbar .navbar-inner,
+.toolbar-inner {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#checkpoint_status,
+#autosave_status {
+    color: rgba(0,0,0,0.5);
+}
+
+#header {
+    font-family: lato;
+}
+
+#notebook_name {
+    font-weight: 200;
+}
+
+/*
+    This is a lazy fix, we *should* fix the
+    background for each Bootstrap button type
+*/
+#site * .btn {
+    background: #fafafa;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+/* Pretty Pandas Dataframes */
+.dataframe * {border-color: #c0c0c0 !important;}
+.dataframe th{background: #eee;}
+.dataframe td{
+    background: #fff;
+    text-align: right;
+    min-width:5em;
+}
+
+/* Format summary rows */
+.dataframe-summary-row tr:last-child,
+.dataframe-summary-col td:last-child{
+    background: #eee;
+    font-weight: 500;
+}
+
+/*
+Customize the logo
+ */
+#ipython_notebook img{
+    display:block;
+    background: url(logo.png) no-repeat;
+    background-size: contain;
+    width: 233px;
+    height: 33px;
+    padding-left: 233px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#ipython_notebook {
+    height: 40px !important;
+}
+
+
+/*
+    Adapted for jupyter-themer from https://github.com/codemirror
+*/
+
+/*
+  MDN-LIKE Theme - Mozilla
+  Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
+  Report bugs/issues here: https://github.com/codemirror/CodeMirror/issues
+  GitHub: @peterkroon
+  The mdn-like theme is inspired on the displayed code examples at: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+*/
+.CodeMirror { color: #444; background-color: #fff; }
+.CodeMirror div.CodeMirror-selected { background: #cfc; }
+.CodeMirror .CodeMirror-line::selection, .CodeMirror .CodeMirror-line > span::selection, .CodeMirror .CodeMirror-line > span > span::selection { background: #cfc; }
+.CodeMirror .CodeMirror-line::-moz-selection, .CodeMirror .CodeMirror-line > span::-moz-selection, .CodeMirror .CodeMirror-line > span > span::-moz-selection { background: #cfc; }
+
+.CodeMirror .CodeMirror-gutters { background: #f8f8f8; border-left: 6px solid rgba(0,83,159,0.65); color: #333; }
+.CodeMirror .CodeMirror-linenumber { color: #aaa; padding-left: 8px; }
+.CodeMirror .CodeMirror-cursor { border-left: 2px solid #333; }
+
+.CodeMirror span.cm-keyword { color: #6262FF; }
+.CodeMirror span.cm-atom { color: #F90; }
+.CodeMirror span.cm-number { color:  #ca7841; }
+.CodeMirror span.cm-def { color: #8DA6CE; }
+.CodeMirror span.cm-variable-2, .CodeMirror span.cm-tag { color: #690; }
+.CodeMirror span.cm-variable-3, .CodeMirror span.cm-def { color: #07a; }
+
+.CodeMirror span.cm-variable { color: #029; }
+.CodeMirror span.cm-property { color: #905; }
+.CodeMirror span.cm-qualifier { color: #690; }
+
+.CodeMirror span.cm-operator { color: #cda869; }
+.CodeMirror span.cm-comment { color:#777; font-weight:normal; }
+/*.CodeMirror span.cm-string { color:#07a; font-style:italic; }*/
+.CodeMirror span.cm-string { color:#07a; font-style:italic; }*/
+.CodeMirror span.cm-string-2 { color:#bd6b18; } /*?*/
+.CodeMirror span.cm-meta { color: #000; } /*?*/
+.CodeMirror span.cm-builtin { color: #9B7536; } /*?*/
+.CodeMirror span.cm-tag { color: #997643; }
+.CodeMirror span.cm-attribute { color: #d6bb6d; } /*?*/
+.CodeMirror span.cm-header { color: #FF6400; }
+.CodeMirror span.cm-hr { color: #AEAEAE; }
+.CodeMirror span.cm-link { color:#ad9361; font-style:italic; text-decoration:none; }
+.CodeMirror span.cm-error { border-bottom: 1px solid red; }
+
+div.CodeMirror .CodeMirror-activeline-background { background: #efefff; }
+div.CodeMirror span.CodeMirror-matchingbracket { outline:1px solid grey; color: inherit; }
+
+.cm-s-mdn-like.CodeMirror { background-image: url(data:image/png;base64,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); }
+
+
+    </style>
 
 
 <style type="text/css">
@@ -11883,8 +12117,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="&#21487;&#33021;&#24615;&#27604;&#36739;&#65288;likleihoods&#65289;">&#21487;&#33021;&#24615;&#27604;&#36739;&#65288;likleihoods&#65289;<a class="anchor-link" href="#&#21487;&#33021;&#24615;&#27604;&#36739;&#65288;likleihoods&#65289;">&#182;</a></h3><p>Assuming indepdnece, the likelihood of observing some data points given a distributional model for each data point is the product of the likelihood for each data point.</p>
-<p>假设独立性，给出每个数据点分配模型的一些数据点的可能性是每个数据点的可能性的乘积。</p>
+<h3 id="&#30456;&#20284;&#24230;&#27604;&#36739;&#65288;likelihoods&#65289;">&#30456;&#20284;&#24230;&#27604;&#36739;&#65288;likelihoods&#65289;<a class="anchor-link" href="#&#30456;&#20284;&#24230;&#27604;&#36739;&#65288;likelihoods&#65289;">&#182;</a></h3><p>Assuming indepdnece, the likelihood of observing some data points given a distributional model for each data point is the product of the likelihood for each data point.</p>
+<p>假设数据是独立分布的，给出每个数据点都有分布模型的一组数据点，这些数据点的相似度是每个数据点的可能性的乘积。</p>
 
 </div>
 </div>
@@ -11896,11 +12130,11 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
 
-<span class="n">rv1</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">rv1</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">#译者注: 使用正态分布</span>
 <span class="n">rv2</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
 <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-<span class="n">likelihood1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">rv1</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+<span class="n">likelihood1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">rv1</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span> <span class="c1">#译者注: 使用概率密度函数，probability density function</span>
 <span class="n">likelihood2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">rv2</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
 <span class="n">likelihood2</span> <span class="o">&gt;</span> <span class="n">likelihood1</span>
 </pre></div>
@@ -12050,7 +12284,7 @@ $$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite-representation-of-numbers&#65289;">&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite representation of numbers&#65289;<a class="anchor-link" href="#&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite-representation-of-numbers&#65289;">&#182;</a></h2><p>对于整数，不同的编程语言都有各自能表示的最大和最小值。Python的整数实际上是对象，所以在你超过了这些限制之后可以根据切换实现任意大的精度，但对于C和R语言来说则都不是这样。在 64位的体系中，最大值是 2^63 - 1，最小值是 -2^63 - 1</p>
+<h2 id="&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite-representation-of-numbers&#65289;">&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite representation of numbers&#65289;<a class="anchor-link" href="#&#23545;&#25968;&#20540;&#30340;&#26377;&#38480;&#34920;&#31034;&#65288;Finite-representation-of-numbers&#65289;">&#182;</a></h2><p>对于整数，不同的编程语言都有各自能表示的最大和最小值。Python的整数实际上是对象，所以在你超过了这些限制之后整数对象会切换到任意大精度的数值，但对于C和R语言来说则都不是这样。在 64位的体系中，最大值是 <code>2^63 - 1</code>，最小值是 <code>-2^63 - 1</code>。</p>
 
 </div>
 </div>
@@ -12377,6 +12611,7 @@ long overflow() {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="&#28014;&#28857;&#25968;&#65288;Floating-point-numbers&#65289;">&#28014;&#28857;&#25968;&#65288;Floating point numbers&#65289;<a class="anchor-link" href="#&#28014;&#28857;&#25968;&#65288;Floating-point-numbers&#65289;">&#182;</a></h3><p>浮点数在存储的时候分成三部分，分别是符号位，指数和尾数（sign bit, exponent, mantissa），所有的浮点数都是通过 +/- mantissa ^ exponent 来实现的。因此，接近0、下限和上限的连续数之间的间隔最小（精度高）。</p>
+<p>指数需要使用符号位来代表小数和大数(both small and large numbers)，但是使用无符号位的数字会更方便，因此指数有一个偏移量(也称为指数偏倚，exponent bias)。 比如说，如果指数是一个无符号的8位数字(unsigned 8-bit number)，它可以代表(0,255)这样一个范围。 如果使用128作为偏移量，那么就可以表示为(-127, 128)这个范围。</p>
 
 </div>
 </div>
@@ -12393,6 +12628,15 @@ long overflow() {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="&#20108;&#36827;&#21046;&#26041;&#24335;&#34920;&#31034;&#30340;&#28014;&#28857;&#25968;">&#20108;&#36827;&#21046;&#26041;&#24335;&#34920;&#31034;&#30340;&#28014;&#28857;&#25968;<a class="anchor-link" href="#&#20108;&#36827;&#21046;&#26041;&#24335;&#34920;&#31034;&#30340;&#28014;&#28857;&#25968;">&#182;</a></h4>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -12646,7 +12890,7 @@ long overflow() {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;经验：算法中药避免两个非常接近的数字相减。 当两个数字都非常大时，由于可用的精确位数有限，出现问题的概率就特别大。&lt;/font&gt;</p>
+<p><font color=blue>经验：算法中要避免两个非常接近的数字相减。 当两个数字都非常大时，由于可用的精确位数有限，出现问题的概率就特别大。</font></p>
 
 </div>
 </div>
@@ -12721,7 +12965,7 @@ long overflow() {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;经验: 特别大或者特别小的数进行运算的时候都应当使用对数，这样能降低上下溢出的概率（reduce underflow/overflow）&lt;/font&gt;</p>
+<p><font color=blue>经验: 特别大或者特别小的数进行运算的时候都应当使用对数，这样能降低上下溢出的概率（reduce underflow/overflow）</font></p>
 
 </div>
 </div>
@@ -12731,12 +12975,13 @@ long overflow() {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary-precision-libraries&#65289;">&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary precision libraries&#65289;<a class="anchor-link" href="#&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary-precision-libraries&#65289;">&#182;</a></h2><p>如果相比计算速度，你更需要计算精度（比如你的代码可能上下溢出，而你有找不到或者不想去折腾），Python也提供了个一些无限精度的数学库，例如：</p>
+<h2 id="&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary-precision-libraries&#65289;">&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary precision libraries&#65289;<a class="anchor-link" href="#&#20351;&#29992;&#26080;&#31351;&#31934;&#24230;&#30340;&#24211;&#65288;arbitrary-precision-libraries&#65289;">&#182;</a></h2><p>如果相比计算速度，你更需要计算精度（比如你的代码可能上下溢出，而你又找不到或者不想去折腾一个办法），Python也提供了一些无限精度的数学库，例如：</p>
 <ul>
+<li><a href="https://docs.python.org/2/library/decimal.html">The decimal package in the standard library</a></li>
 <li><a href="http://mpmath.org">The mpmath package</a></li>
 <li><a href="https://pypi.python.org/pypi/gmpy2">The gmpy2 package</a></li>
 </ul>
-<p>这两个库都可以通过pip安装</p>
+<p>mpmath和gmpy2这两个库都可以通过pip安装</p>
 <div class="highlight"><pre><span></span>pip install gmpy2
 pip install mpmath
 </pre></div>
@@ -12750,10 +12995,11 @@ pip install mpmath
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability-and-conditioning&#65289;">&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability and conditioning&#65289;<a class="anchor-link" href="#&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability-and-conditioning&#65289;">&#182;</a></h2><p>假如我们有一个计算机算法$g(x)$，它表示的是一个数学函数 $f(x)$。如果对于很小的扰动 $\epsilon$，有$g(x+\epsilon) \approx f(x)$，那么就认为 $g(x)$是稳定的（stable）。</p>
-<p>也就是，如果这个&lt;font color=red&gt;算法algorithm&lt;/font&gt;$g(x)$能针对正确的问题给出近似正确的解（gives <em>nearly the right answer to nearly the right problem</em>），那就是<strong>数值稳定 numerically stable</strong>的。例如，牛顿拉普森法（Newton-Raphson）在某些特定的初始条件下就可能是数值不稳定的，而且即便在根的附近也可能不收敛。</p>
+<h2 id="&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability-and-conditioning&#65289;">&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability and conditioning&#65289;<a class="anchor-link" href="#&#31283;&#23450;&#24615;&#21644;&#26465;&#20214;&#29366;&#24577;&#65288;Stability-and-conditioning&#65289;">&#182;</a></h2><p>假如我们有一个计算机算法 $g(x)$，它表示的是一个数学函数 $f(x)$。如果对于很小的扰动 $\epsilon$，有$g(x+\epsilon) \approx f(x)$，那么就认为 $g(x)$是稳定的（stable）。</p>
 <p>对于一个数学函数 $f(x)$ 来说，如果在$\epsilon$是一个很小的扰动的时候，有 $f(x + \epsilon) \approx f(x)$，则认为$f(x)$是条件良好的（well-conditioned）。</p>
-<p>也就是，如果<em>随着问题的改变而解也逐渐改变</em>，那么就说这个&lt;font color=red&gt;函数function&lt;/font&gt;$f(x)$ 是 <strong>条件良好的 well-conditioned</strong>。例如：给一个近似奇异矩阵（nearly singular matrix）求逆矩阵就是一个条件很差的问题（poorly condiitioned problem）。</p>
+<p>也就是，如果<em>随着问题的改变而解也逐渐改变</em>，那么就说这个<font color=red>函数function</font>$f(x)$ 是 <strong>条件良好的 well-conditioned</strong>。对于一个条件良好的数学函数，所有微小的扰动只会带来微小的变化。 然而，一个条件并不良好(pooly-conditioned)的函数，一点微小的扰动会带来巨大的变化。 例如：给一个近似奇异矩阵（nearly singular matrix）求逆矩阵就是一个条件很差的问题（poorly condiitioned problem）。</p>
+<p>一个数学算法 $g(x)$ ，给定 $x'\approx x$，如果 $g(x) \approx f(x')$，这个 $g(x)$ 就是<strong>数值稳定 numerically stable</strong>的</p>
+<p>也就是，如果这个算法$g(x)$能针对正确的问题给出近似正确的解（gives <em>nearly the right answer to nearly the right problem</em>），那就是<strong>数值稳定 numerically stable</strong>的。 数值不稳定的算法在计算机的计算过程中会放大预估的错误。 如果我们使用一个无限精度的数字系统，稳定和不稳定的算法将会有相同的精度。 然而，正如我们看到的(比如，前面检查浮点数的相等运算)，当使用浮点数时，数学上的等式会带来不同的结果。</p>
 
 </div>
 </div>
@@ -13243,7 +13489,7 @@ $$s^2 = \frac{1}{n-1}\sum(x - \bar{x})^2$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;这就应该注意了 - 大数减大数!&lt;/font&gt;</p>
+<p><font color=blue>这就应该注意了 - 大数减大数!</font></p>
 
 </div>
 </div>
@@ -13270,7 +13516,7 @@ $$s^2 = \frac{1}{n-1}\sum(x - \bar{x})^2$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;注意就好多了，毕竟是先做了差然后才平方&lt;/font&gt;</p>
+<p><font color=blue>这就好多了，毕竟是先做了差然后才平方</font></p>
 
 </div>
 </div>
@@ -13300,7 +13546,7 @@ $$s^2 = \frac{1}{n-1}\sum(x - \bar{x})^2$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;Knuth的计算机编程艺术（Art of Computer Programming）里面的经典方法&lt;/font&gt;</p>
+<p><font color=blue>Knuth的计算机编程艺术（Art of Computer Programming）里面的经典方法</font></p>
 
 </div>
 </div>
@@ -13449,8 +13695,15 @@ $$s^2 = \frac{1}{n-1}\sum(x - \bar{x})^2$$
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;经验:把数学公式直接转换成代码时候要小心，因为运算效果可能不一定一样！&lt;/font&gt;</p>
+<p><font color=blue>经验:把数学公式直接转换成代码时候要小心，因为运算效果可能不一定一样！</font></p>
 <p>这个问题也出现在查找简单回归系数和Pearson相关系数的导航算法中。</p>
+<p>可以查看以下一系列的清晰解释:</p>
+<ul>
+<li><a href="http://www.johndcook.com/blog/2008/09/28/theoretical-explanation-for-numerical-results/">http://www.johndcook.com/blog/2008/09/28/theoretical-explanation-for-numerical-results/</a></li>
+<li><a href="http://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/">http://www.johndcook.com/blog/2008/09/26/comparing-three-methods-of-computing-standard-deviation/</a></li>
+<li><a href="http://www.johndcook.com/blog/2008/10/20/comparing-two-ways-to-fit-a-line-to-data/">http://www.johndcook.com/blog/2008/10/20/comparing-two-ways-to-fit-a-line-to-data/</a></li>
+<li><a href="http://www.johndcook.com/blog/2008/11/05/how-to-calculate-pearson-correlation-accurately/">http://www.johndcook.com/blog/2008/11/05/how-to-calculate-pearson-correlation-accurately/</a></li>
+</ul>
 
 </div>
 </div>
@@ -13691,7 +13944,7 @@ t2 = 158057.913416
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>&lt;font color=blue&gt;经验: 准确性同时取决于稳定性和条件的好坏（stability and conditioning）。&lt;/font&gt;</p>
+<p><font color=blue>经验: 准确性同时取决于稳定性和条件的好坏（stability and conditioning）。</font></p>
 
 </div>
 </div>
@@ -13782,7 +14035,6 @@ Singluar matrix
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The topic is rather specialized and the main goal is just to have you aware of the "leaky abstraction" of computer numbers as simulations of mathematical numbers, and common situations where this can casue problems. Once you are aware of these areas, you can either avoid them using simple rules, or look for an apprpriate numerical library fuctionn to use instead. So there will be no exericses on the topic of computer arithmetic, conditioning and stability given.</p>
 <p>本章的主要内容是让你了解一下计算机中的数值作为数学上数值的一种模拟，是一种“有遗漏的抽象（leaky abstraction）”，以及可能会导致问题的一些常见情况。 一旦你了解了这些内容，就可以避免只是使用简单规则，或者还可以选择合适的数值库函数而不是自己去重新实现。 所以在本章的这些计算机计算、条件优劣判断和数值稳定性等内容，就都没有什么习题了。</p>
 
 </div>
@@ -13793,8 +14045,8 @@ Singluar matrix
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>此外，你需要习惯使用 numpy 里面的数组，尤其是在本课程的后续内容中。想要练习的话，可以看看下面这个链接里面的样例和练习题：
-<a href="http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html">Nicolas P. Rougier's  numpy tutorial</a></p>
+<p>此外，你需要习惯使用 numpy 里面的数组，尤其是在本课程的后续内容中。想要练习的话，可以看看下面这个链接里面的样例和练习题：</p>
+<p><a href="http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html">Nicolas P. Rougier's  numpy tutorial</a></p>
 <p>像这样的 numpy 简介还有很多，大家可以多练一练！</p>
 
 </div>
