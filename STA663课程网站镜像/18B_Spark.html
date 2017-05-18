@@ -1,0 +1,884 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18B_Spark.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:26 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Spark &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using Spark Efficiently" href="18C_Efficiency_In_Spark.html" />
+    <link rel="prev" title="Working with large data sets" href="18A_Dask.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="18C_Efficiency_In_Spark.html" title="Using Spark Efficiently"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18A_Dask.html" title="Working with large data sets"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-spark">
+<h1>Using Spark<a class="headerlink" href="#using-spark" title="Permalink to this headline">¶</a></h1>
+<p>With massive data, we need to load, extract, transform and analyze the
+data on multiple computers to overcome I/O and processing bottlenecks.
+However, when working on multiple computers (possibly hundreds to
+thousands), there is a high risk of failure in one or more nodes.
+Distributed computing frameworks are designed to handle failures
+gracefully, allowing the developer to focus on algorithm development
+rather than system administration.</p>
+<p>The first such widely used open source framework was the Hadoop
+MapReduce framework. This provided transparent fault tolerance, and
+popularized the functional programming approach to distributed
+computing. The Hadoop work-flow uses repeated invocations of the
+following instructions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">load</span> <span class="n">dataset</span> <span class="kn">from</span> <span class="nn">disk</span> <span class="n">to</span> <span class="n">memory</span>
+<span class="nb">map</span> <span class="n">function</span> <span class="n">to</span> <span class="n">elements</span> <span class="n">of</span> <span class="n">dataset</span>
+<span class="n">reduce</span> <span class="n">results</span> <span class="n">of</span> <span class="nb">map</span> <span class="n">to</span> <span class="n">get</span> <span class="n">new</span> <span class="n">aggregate</span> <span class="n">dataset</span>
+<span class="n">save</span> <span class="n">new</span> <span class="n">dataset</span> <span class="n">to</span> <span class="n">disk</span>
+</pre></div>
+</div>
+<p>Hadoop has two main limitations:</p>
+<ul class="simple">
+<li>the repeated saving and loading of data to disk can be slow, and
+makes interactive development very challenging</li>
+<li>restriction to only <code class="docutils literal"><span class="pre">map</span></code> and <code class="docutils literal"><span class="pre">reduce</span></code> constructs results in
+increased code complexity, since every problem must be tailored to
+the <code class="docutils literal"><span class="pre">map-reduce</span></code> format</li>
+</ul>
+<p>Spark is a more recent framework for distributed computing that
+addresses the limitations of Hadoop by allowing the use of in-memory
+datasets for iterative computation, and providing a rich set of
+functional programming constructs to make the developer&#8217;s job easier.
+Spark also provides libraries for common big data tasks, such as the
+need to run SQL queries, perform machine learning and process large
+graphical structures.</p>
+<div class="section" id="cheat-sheet">
+<h2>Cheat sheet<a class="headerlink" href="#cheat-sheet" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://s3.amazonaws.com/assets.datacamp.com/blog_assets/PySpark_Cheat_Sheet_Python.pdf">Spark cheat
+sheet</a></p>
+<div class="section" id="spark-and-cluster-computing">
+<h3>Spark and cluster computing<a class="headerlink" href="#spark-and-cluster-computing" title="Permalink to this headline">¶</a></h3>
+<div class="figure" id="id1">
+<img alt="Spark components" src="http://spark.apache.org/docs/latest/img/cluster-overview.png" />
+<p class="caption"><span class="caption-text">Spark components</span></p>
+</div>
+</div>
+</div>
+<div class="section" id="local-installation-of-spark">
+<h2>Local installation of Spark<a class="headerlink" href="#local-installation-of-spark" title="Permalink to this headline">¶</a></h2>
+<p>These notes are based on a local installation of Spark. Usage of Spark
+on the OIT docker cluster is slightly different.</p>
+<p><strong>Note</strong>: This is a local installation. That means that it is intended
+for use with a <strong>local</strong> copy of Jupyter, and is independent of the
+Docker container on the OIT website. You would get access to this by
+opening your local copy of Jupyter (that you presumably installed using
+the Anaconda distribution), either form the Anaconda launcher or by
+opening a terminal and typing <code class="docutils literal"><span class="pre">jupyter</span> <span class="pre">notebook</span></code>. Then you can open
+this notebook and run it.</p>
+<p>If you are not clear about what is being described, please don&#8217;t attempt
+this. Use the Docker notebook for pyspark that OIT will provide.</p>
+<p>If you want to install locally, see instructions at
+<a class="reference external" href="http://spark.apache.org/downloads.html">http://spark.apache.org/downloads.html</a>. It is simplest to use the
+provided binaries</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~</span>
+<span class="n">wget</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">d3kbcqa49mib13</span><span class="o">.</span><span class="n">cloudfront</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">spark</span><span class="o">-</span><span class="mf">2.1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="nb">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="o">.</span><span class="mf">7.</span><span class="n">tgz</span>
+<span class="n">tar</span> <span class="n">xzf</span> <span class="n">spark</span><span class="o">-</span><span class="mf">2.1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="nb">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="o">.</span><span class="mf">7.</span><span class="n">tgz</span>
+<span class="n">mv</span> <span class="n">spark</span><span class="o">-</span><span class="mf">2.1</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="nb">bin</span><span class="o">-</span><span class="n">hadoop2</span><span class="o">.</span><span class="mi">7</span> <span class="n">spark</span>
+</pre></div>
+</div>
+<p>Next install <code class="docutils literal"><span class="pre">py4j</span></code></p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">py4j</span>
+</pre></div>
+</div>
+<p>Finally, edit your .bashrc or .bash_profile to incldue</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span>export SPARK_HOME=~/spark
+export PYSPARK_PYTHON=python3
+export PYTHONPATH=$SPARK_HOME/python/:$PYTHONPATH
+export PYSPARK_SUBMIT_ARGS=&quot;--packages ${PACKAGES} pyspark-shell&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="start-a-spark-session">
+<h2>Start a spark session<a class="headerlink" href="#start-a-spark-session" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark</span> <span class="k">import</span> <span class="n">SparkContext</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="p">(</span><span class="n">master</span> <span class="o">=</span> <span class="s1">&#39;local[*]&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="checking-spark-status">
+<h3>Checking Spark status<a class="headerlink" href="#checking-spark-status" title="Permalink to this headline">¶</a></h3>
+<p>If you are running Spark locally, you can check the status of your Spark
+environment and jobs using the <a class="reference external" href="http://localhost:4040/">Spark UI</a>.</p>
+</div>
+</div>
+<div class="section" id="sparkcontext">
+<h2>SparkContext<a class="headerlink" href="#sparkcontext" title="Permalink to this headline">¶</a></h2>
+<p>A SparkContext represents the connection to a Spark cluster, and can be
+used to create RDDs, accumulators and broadcast variables on that
+cluster. Here we set it up to use local nodes - the argument
+<code class="docutils literal"><span class="pre">locals[*]</span></code> means to use the local machine as the cluster, using as
+many worker threads as there are cores. You can also explicitly set the
+number of cores with <code class="docutils literal"><span class="pre">locals[k]</span></code> where <code class="docutils literal"><span class="pre">k</span></code> is an integer.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">version</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;1.6.1&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">pythonVer</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;3.5&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">master</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;local[*]&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">sparkUser</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;cliburn&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">appName</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;pyspark-shell&#39;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">defaultParallelism</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">8</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="actions-and-transforms-with-parallelized-collections">
+<h2>Actions and transforms with parallelized collections<a class="headerlink" href="#actions-and-transforms-with-parallelized-collections" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>transform</strong> maps an RDD to another RDD - it is a lazy operation that
+only changes the direct acyclic graph representation. To actually
+perform any work, we need to apply an <strong>action</strong>.</p>
+<div class="section" id="simple-lists">
+<h3>Simple lists<a class="headerlink" href="#simple-lists" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">getNumPartitions</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">8</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">45</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">rdd</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">rdd</span><span class="o">.</span><span class="n">stdev</span><span class="p">(),</span> <span class="n">rdd</span><span class="o">.</span><span class="n">variance</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mf">2.8722813232690143</span><span class="p">,</span> <span class="mf">8.25</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">count</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="n">mean</span><span class="p">:</span> <span class="mf">4.5</span><span class="p">,</span> <span class="n">stdev</span><span class="p">:</span> <span class="mf">2.87228132327</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="mf">9.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="getting-values">
+<h4>Getting values<a class="headerlink" href="#getting-values" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">0</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">top</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">withReplacement</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="see-how-the-data-is-partitioned">
+<h4>See how the data is partitioned<a class="headerlink" href="#see-how-the-data-is-partitioned" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">glom</span><span class="p">()</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="applying-functions">
+<h3>Applying functions<a class="headerlink" href="#applying-functions" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">xs</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">xs</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+<span class="n">xs</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">45</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">45</span>
+</pre></div>
+</div>
+<div class="section" id="using-aggregate">
+<h4>Using <code class="docutils literal"><span class="pre">aggregate</span></code><a class="headerlink" href="#using-aggregate" title="Permalink to this headline">¶</a></h4>
+<p>Count</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">acc</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span> <span class="n">acc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span>
+</pre></div>
+</div>
+<p>Sum</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">45</span>
+</pre></div>
+</div>
+<p>Think of aggregate as first doing a transform then a reduce.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ss</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="s1">&#39;the quick brown fox jumps over the lazy dog&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ss</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">acc</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="n">acc</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">35</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;the quick brown fox jumps over the lazy dog&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">35</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chaining">
+<h4>Chaining<a class="headerlink" href="#chaining" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">rdd</span><span class="o">.</span>
+ <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+ <span class="n">fold</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3628800</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">rdd</span><span class="o">.</span>
+<span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+<span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3628800</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="key-value-pairs">
+<h3>Key-value pairs<a class="headerlink" href="#key-value-pairs" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">string</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="convert-to-dictionary">
+<h4>Convert to dictionary<a class="headerlink" href="#convert-to-dictionary" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">collectAsMap</span><span class="p">()</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">())[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions-for-key-value-pairs">
+<h4>Functions for key-value pairs<a class="headerlink" href="#functions-for-key-value-pairs" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ys</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">mapValues</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">49</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">81</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">countByKey</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">rdd</span><span class="o">.</span><span class="n">countByValue</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span>
+            <span class="p">{(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span>
+             <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span> <span class="mi">1</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ys</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">ys</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="working-with-text">
+<h3>Working with text<a class="headerlink" href="#working-with-text" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;data/Ulysses.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ulysses</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;The Project Gutenberg EBook of Ulysses, by James Joyce&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;This eBook is for the use of anyone anywhere at no cost and with&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;almost no restrictions whatsoever.  You may copy it, give it away or&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;re-use it under the terms of the Project Gutenberg License included&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;with this eBook or online at www.gutenberg.org&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Title: Ulysses&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">words</span> <span class="o">=</span> <span class="n">ulysses</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+<span class="n">words</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;the&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;project&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;gutenberg&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ebook&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;of&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ulysses&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;by&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;james&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;joyce&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;this&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="word-count-if-you-want-all-words">
+<h4>Word count if you want all words<a class="headerlink" href="#word-count-if-you-want-all-words" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">words</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">countByKey</span><span class="p">()</span>
+<span class="nb">sorted</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">15107</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">8257</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">7282</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">6553</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="mi">5042</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="mi">4981</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;he&#39;</span><span class="p">,</span> <span class="mi">4033</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;his&#39;</span><span class="p">,</span> <span class="mi">3333</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">2698</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="mi">2621</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="word-count-without-returning-all-words-to-memory">
+<h4>Word count without returning all words to memory<a class="headerlink" href="#word-count-without-returning-all-words-to-memory" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">words1</span> <span class="o">=</span> <span class="n">words</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">words1</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;project&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;gutenberg&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ebook&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">words1</span><span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">counts</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;kyries&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gasteropod&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;calamitous&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">takeOrdered</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">15107</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">8257</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">7282</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">6553</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="mi">5042</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="mi">4981</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;he&#39;</span><span class="p">,</span> <span class="mi">4033</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;his&#39;</span><span class="p">,</span> <span class="mi">3333</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">2698</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="mi">2621</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-chain">
+<h4>Using a chain<a class="headerlink" href="#using-a-chain" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;data/Ulysses.txt&#39;</span><span class="p">)</span><span class="o">.</span>
+<span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">))</span><span class="o">.</span>
+<span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span>
+<span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span><span class="o">.</span>
+<span class="n">takeOrdered</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">15107</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">8257</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">7282</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">6553</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="mi">5042</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="mi">4981</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;he&#39;</span><span class="p">,</span> <span class="mi">4033</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;his&#39;</span><span class="p">,</span> <span class="mi">3333</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">2698</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;that&#39;</span><span class="p">,</span> <span class="mi">2621</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="persisting-data">
+<h3>Persisting data<a class="headerlink" href="#persisting-data" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal"><span class="pre">top_word</span></code> program will repeat ALL the computations each time we
+take an action such as <code class="docutils literal"><span class="pre">takeOrdered</span></code>. We need to <code class="docutils literal"><span class="pre">persist</span></code> or
+<code class="docutils literal"><span class="pre">cache</span></code> the results - they are similar except that <code class="docutils literal"><span class="pre">persist</span></code> gives
+more control over how the data is retained.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">is_cached</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">False</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">persist</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">PythonRDD</span><span class="p">[</span><span class="mi">58</span><span class="p">]</span> <span class="n">at</span> <span class="n">RDD</span> <span class="n">at</span> <span class="n">PythonRDD</span><span class="o">.</span><span class="n">scala</span><span class="p">:</span><span class="mi">43</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">is_cached</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kc">True</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">takeOrdered</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="mi">15107</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;of&#39;</span><span class="p">,</span> <span class="mi">8257</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="mi">7282</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="mi">6553</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="mi">5042</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts</span><span class="o">.</span><span class="n">takeOrdered</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;kyries&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;gasteropod&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;calamitous&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;kneecap&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;riotously&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">count_dict</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">collectAsMap</span><span class="p">()</span>
+<span class="n">count_dict</span><span class="p">[</span><span class="s1">&#39;circle&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">20</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="merging-key-value-datasets">
+<h3>Merging key, value datasets<a class="headerlink" href="#merging-key-value-datasets" title="Permalink to this headline">¶</a></h3>
+<p>We will build a second counts key: value RDD from another of Joyce&#8217;s
+works - Portrait of the Artist as a Young Man.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">portrait</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">textFile</span><span class="p">(</span><span class="s1">&#39;data/Portrait.txt&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">portrait</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s2">&quot;Project Gutenberg&#39;s A Portrait of the Artist as a Young Man, by James Joyce&quot;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;This eBook is for the use of anyone anywhere at no cost and with&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;almost no restrictions whatsoever.  You may copy it, give it away or&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;re-use it under the terms of the Project Gutenberg License included&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;with this eBook or online at www.gutenberg.net&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;Title: A Portrait of the Artist as a Young Man&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts1</span> <span class="o">=</span> <span class="p">(</span>
+<span class="n">portrait</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts1</span><span class="o">.</span><span class="n">persist</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">PythonRDD</span><span class="p">[</span><span class="mi">70</span><span class="p">]</span> <span class="n">at</span> <span class="n">RDD</span> <span class="n">at</span> <span class="n">PythonRDD</span><span class="o">.</span><span class="n">scala</span><span class="p">:</span><span class="mi">43</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">counts1</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;desisting&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;inaction&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;ablative&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;vastness&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">counts1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;temptations&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;withering&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+ <span class="p">(</span><span class="s1">&#39;spoken&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">15</span><span class="p">))]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined2</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">mapValues</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined2</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;temptations&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;withering&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;spoken&#39;</span><span class="p">,</span> <span class="mi">31</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined3</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">mapValues</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">joined3</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="mf">10.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;temptations&#39;</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;withering&#39;</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;spoken&#39;</span><span class="p">,</span> <span class="mf">15.5</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using Spark</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cheat-sheet">Cheat sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#local-installation-of-spark">Local installation of Spark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#start-a-spark-session">Start a spark session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparkcontext">SparkContext</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#actions-and-transforms-with-parallelized-collections">Actions and transforms with parallelized collections</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="18A_Dask.html"
+                          title="Previous page">&larr; Working with large data sets</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="18C_Efficiency_In_Spark.html"
+                          title="Next page">&rarr; Using Spark Efficiently</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/18B_Spark.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="18C_Efficiency_In_Spark.html" title="Using Spark Efficiently"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18A_Dask.html" title="Working with large data sets"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/18B_Spark.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:28 GMT -->
+</html>

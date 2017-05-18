@@ -1,0 +1,1403 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/19A_PyMC3.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:13:39 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using PyMC3 &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="PyStan" href="19B_Pystan.html" />
+    <link rel="prev" title="Spark on Cloud" href="18H_Spark_Cloud.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="19B_Pystan.html" title="PyStan"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18H_Spark_Cloud.html" title="Spark on Cloud"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="using-pymc3">
+<h1>Using PyMC3<a class="headerlink" href="#using-pymc3" title="Permalink to this headline">¶</a></h1>
+<p>PyMC3 is a Python package for doing MCMC using a variety of samplers,
+including Metropolis, Slice and Hamiltonian Monte Carlo. See
+<a class="reference external" href="http://arxiv.org/abs/1507.08050">Probabilistic Programming in Python using
+PyMC</a> for a description. The GitHub
+<a class="reference external" href="https://github.com/pymc-devs/pymc3">site</a> also has many examples and
+links for further exploration.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! pip install --quiet pymc3
+! pip install --quiet daft
+! pip install --quiet seaborn
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! conda install --yes --quiet mkl-service
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Fetching</span> <span class="n">package</span> <span class="n">metadata</span> <span class="o">.........</span>
+<span class="n">Solving</span> <span class="n">package</span> <span class="n">specifications</span><span class="p">:</span> <span class="o">..........</span>
+
+<span class="c1"># All requested packages already installed.</span>
+<span class="c1"># packages in environment at /opt/conda:</span>
+<span class="c1">#</span>
+<span class="n">mkl</span><span class="o">-</span><span class="n">service</span>               <span class="mf">1.1</span><span class="o">.</span><span class="mi">2</span>                    <span class="n">py35_3</span>
+</pre></div>
+</div>
+<p><strong>Other resources</strong></p>
+<p>Some examples are adapted from:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/">Probabilistic Programming &amp; Bayesian Methods for
+Hackers</a></li>
+<li><a class="reference external" href="https://theclevermachine.wordpress.com/2012/11/19/a-gentle-introduction-to-markov-chain-monte-carlo-mcmc/">MCMC tutorial
+series</a></li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">rng</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pymc3</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span> <span class="nn">daft</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">theano</span>
+<span class="n">theano</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">warn</span><span class="o">.</span><span class="n">round</span><span class="o">=</span><span class="kc">False</span>
+</pre></div>
+</div>
+<div class="section" id="part-1-a-tutorial-example-estimating-coin-bias">
+<h2>Part 1 - A tutorial example: Estimating coin bias<a class="headerlink" href="#part-1-a-tutorial-example-estimating-coin-bias" title="Permalink to this headline">¶</a></h2>
+<p>We start with the simplest model - that of determining the bias of a
+coin from observed outcomes.</p>
+<div class="section" id="setting-up-the-model">
+<h3>Setting up the model<a class="headerlink" href="#setting-up-the-model" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">heads</span> <span class="o">=</span> <span class="mi">61</span>
+</pre></div>
+</div>
+<div class="section" id="analytical-solution">
+<h4>Analytical solution<a class="headerlink" href="#analytical-solution" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span>
+<span class="n">prior</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">post</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">heads</span><span class="o">+</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">heads</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+<span class="n">ci</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">interval</span><span class="p">(</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prior</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Prior&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Posterior&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">heads</span><span class="o">/</span><span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MLE&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">ci</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ci</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;95% CI&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_11_0.png" src="_images/19A_PyMC3_11_0.png" />
+</div>
+<div class="section" id="graphical-model">
+<h4>Graphical model<a class="headerlink" href="#graphical-model" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pgm</span> <span class="o">=</span> <span class="n">daft</span><span class="o">.</span><span class="n">PGM</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">])</span>
+
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\alpha$&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\beta$&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">r&quot;$p$&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">r&quot;$n$&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">r&quot;$y$&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="n">pgm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_13_0.png" src="_images/19A_PyMC3_13_0.png" />
+</div>
+</div>
+<div class="section" id="introduction-to-pymc3">
+<h3>Introduction to PyMC3<a class="headerlink" href="#introduction-to-pymc3" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">coin_context</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">heads</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -4.2744: 100%|██████████| 200000/200000 [00:15&lt;00:00, 12698.15it/s]
+Finished [100%]: Average ELBO = -4.2693
+100%|██████████| 2000/2000 [00:01&lt;00:00, 1753.85it/s]
+</pre></div>
+</div>
+</div>
+<div class="section" id="specifying-start-sampler-step-and-multiple-chains">
+<h3>Specifying start, sampler (step) and multiple chains<a class="headerlink" href="#specifying-start-sampler-step-and-multiple-chains" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">coin_context</span><span class="p">:</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">find_MAP</span><span class="p">()</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Metropolis</span><span class="p">()</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">njobs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Optimization</span> <span class="n">terminated</span> <span class="n">successfully</span><span class="o">.</span>
+         <span class="n">Current</span> <span class="n">function</span> <span class="n">value</span><span class="p">:</span> <span class="mf">3.582379</span>
+         <span class="n">Iterations</span><span class="p">:</span> <span class="mi">3</span>
+         <span class="n">Function</span> <span class="n">evaluations</span><span class="p">:</span> <span class="mi">5</span>
+         <span class="n">Gradient</span> <span class="n">evaluations</span><span class="p">:</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>100%|██████████| 2000/2000 [00:00&lt;00:00, 5656.17it/s]
+</pre></div>
+</div>
+<div class="section" id="map-estimate">
+<h4>MAP estimate<a class="headerlink" href="#map-estimate" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">start</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;p_logodds_&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">(</span><span class="mf">0.42956265615645184</span><span class="p">)}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="summary-of-results">
+<h3>Summary of results<a class="headerlink" href="#summary-of-results" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="discard-50-as-burn-in">
+<h4>Discard 50% as burn-in<a class="headerlink" href="#discard-50-as-burn-in" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">t</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">4000</span><span class="p">,)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="getting-values-from-the-trace">
+<h4>Getting values from the trace<a class="headerlink" href="#getting-values-from-the-trace" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">burn</span><span class="o">=</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">p</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">2000</span><span class="p">,)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="autocorrelation-plot">
+<h4>Autocorrelation plot<a class="headerlink" href="#autocorrelation-plot" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">autocorrplot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_26_0.png" src="_images/19A_PyMC3_26_0.png" />
+</div>
+<div class="section" id="calculate-effective-sample-size">
+<h4>Calculate effective sample size<a class="headerlink" href="#calculate-effective-sample-size" title="Permalink to this headline">¶</a></h4>
+<div class="math">
+\[\hat{n}_{eff} = \frac{mn}{1 + 2 \sum_{t=1}^T \hat{\rho}_t}\]</div>
+<p>where <span class="math">\(m\)</span> is the number of chains, <span class="math">\(n\)</span> the number of steps
+per chain, <span class="math">\(T\)</span> the time when the autocorrelation first becomes
+negative, and <span class="math">\(\hat{\rho}_t\)</span> the autocorrelation at lag <span class="math">\(t\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">effective_n</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mf">767.0</span><span class="p">,</span> <span class="s1">&#39;p_logodds_&#39;</span><span class="p">:</span> <span class="mf">765.0</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="evaluate-convergence">
+<h4>Evaluate convergence<a class="headerlink" href="#evaluate-convergence" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="gelman-rubin">
+<h5>Gelman-Rubin<a class="headerlink" href="#gelman-rubin" title="Permalink to this headline">¶</a></h5>
+<div class="math">
+\[\hat{R} = \frac{\hat{V}}{W}\]</div>
+<p>where <span class="math">\(W\)</span> is the within-chain variance and <span class="math">\(\hat{V}\)</span> is the
+posterior variance estimate for the pooled traces. Values greater than
+one indicate that one or more chains have not yet converged.</p>
+<p>Discrad burn-in steps for each chain. The idea is to see if the starting
+values of each chain come from the same distribution as the stationary
+state.</p>
+<ul class="simple">
+<li><span class="math">\(W\)</span> is the number of chains <span class="math">\(m \times\)</span> the variacne of
+each individual chain</li>
+<li><span class="math">\(B\)</span> is the number of steps <span class="math">\(n \times\)</span> the variance of the
+chain means</li>
+<li><span class="math">\(\hat{V}\)</span> is the weigthed average
+<span class="math">\((1 - \frac{1}{n})W + \frac{1}{n}B\)</span></li>
+</ul>
+<p>The idea is that <span class="math">\(\hat{V}\)</span> is an unbiased estimator of <span class="math">\(W\)</span>
+if the starting values of each chain come from the same distribution as
+the stationary state. Hence if <span class="math">\(\hat{R}\)</span> differs significantly
+from 1, there is probsbly no convergence and we need more iterations.
+This is done for each parameter <span class="math">\(\theta\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">gelman_rubin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mf">0.99949987493746084</span><span class="p">,</span> <span class="s1">&#39;p_logodds_&#39;</span><span class="p">:</span> <span class="mf">0.99949987493746095</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="geweke">
+<h5>Geweke<a class="headerlink" href="#geweke" title="Permalink to this headline">¶</a></h5>
+<p>Compares mean of initial with later segments of a trace for a parameter.
+Should have absolute value less than 1 at convergence.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">geweke</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_33_0.png" src="_images/19A_PyMC3_33_0.png" />
+</div>
+</div>
+<div class="section" id="textual-summary">
+<h4>Textual summary<a class="headerlink" href="#textual-summary" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span><span class="p">:</span>
+
+  <span class="n">Mean</span>             <span class="n">SD</span>               <span class="n">MC</span> <span class="n">Error</span>         <span class="mi">95</span><span class="o">%</span> <span class="n">HPD</span> <span class="n">interval</span>
+  <span class="o">-------------------------------------------------------------------</span>
+
+  <span class="mf">0.615</span>            <span class="mf">0.050</span>            <span class="mf">0.002</span>            <span class="p">[</span><span class="mf">0.517</span><span class="p">,</span> <span class="mf">0.698</span><span class="p">]</span>
+
+  <span class="n">Posterior</span> <span class="n">quantiles</span><span class="p">:</span>
+  <span class="mf">2.5</span>            <span class="mi">25</span>             <span class="mi">50</span>             <span class="mi">75</span>             <span class="mf">97.5</span>
+  <span class="o">|--------------|==============|==============|--------------|</span>
+
+  <span class="mf">0.517</span>          <span class="mf">0.581</span>          <span class="mf">0.616</span>          <span class="mf">0.654</span>          <span class="mf">0.698</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visual-summary">
+<h4>Visual summary<a class="headerlink" href="#visual-summary" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_37_0.png" src="_images/19A_PyMC3_37_0.png" />
+</div>
+<div class="section" id="posterior-predictive-samples">
+<h4>Posterior predictive samples<a class="headerlink" href="#posterior-predictive-samples" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">coin_context</span><span class="p">:</span>
+    <span class="n">ppc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_ppc</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ppc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>100%|██████████| 100/100 [00:00&lt;00:00, 337.12it/s]
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span><span class="mi">67</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span>
+       <span class="mi">66</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">73</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span>
+       <span class="mi">70</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">63</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span>
+       <span class="mi">59</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">59</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span>
+       <span class="mi">71</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">69</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span>
+       <span class="mi">65</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">70</span><span class="p">,</span> <span class="mi">61</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">68</span><span class="p">,</span> <span class="mi">73</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="saving-traces">
+<h3>Saving traces<a class="headerlink" href="#saving-traces" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymc3.backends</span> <span class="k">import</span> <span class="n">Text</span>
+
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">text_save_demo</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">heads</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -4.2758: 100%|██████████| 200000/200000 [00:16&lt;00:00, 12263.44it/s]
+Finished [100%]: Average ELBO = -4.2726
+100%|██████████| 2000/2000 [00:01&lt;00:00, 1655.80it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">text_save_demo</span><span class="p">:</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_43_0.png" src="_images/19A_PyMC3_43_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">trace</span><span class="o">.</span><span class="n">varnames</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;p_logodds_&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you are fitting a large complex model that may not fit in memory, you
+can use the SQLite3 backend to save the trace incremnetally to disk.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymc3.backends</span> <span class="k">import</span> <span class="n">SQLite</span>
+
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">sqlie3_save_demo</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Beta</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">heads</span><span class="p">)</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">SQLite</span><span class="p">(</span><span class="s1">&#39;trace.db&#39;</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">trace</span><span class="o">=</span><span class="n">db</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -4.2776: 100%|██████████| 200000/200000 [00:17&lt;00:00, 11746.28it/s]
+Finished [100%]: Average ELBO = -4.2749
+100%|██████████| 2000/2000 [00:01&lt;00:00, 1496.41it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">sqlie3_save_demo</span><span class="p">:</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">sqlite</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;trace.db&#39;</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_47_0.png" src="_images/19A_PyMC3_47_0.png" />
+</div>
+<div class="section" id="sampling-from-prior">
+<h3>Sampling from prior<a class="headerlink" href="#sampling-from-prior" title="Permalink to this headline">¶</a></h3>
+<p>Just omit the <code class="docutils literal"><span class="pre">observed=</span></code> argument.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">prior_context</span><span class="p">:</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">Metropolis</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>100%|██████████| 2000/2000 [00:00&lt;00:00, 4522.74it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_50_0.png" src="_images/19A_PyMC3_50_0.png" />
+</div>
+<div class="section" id="univariate-normal-distribution">
+<h3>Univariate normal distribution<a class="headerlink" href="#univariate-normal-distribution" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">statsmodels</span><span class="o">/</span><span class="n">nonparametric</span><span class="o">/</span><span class="n">kdetools</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span> <span class="n">VisibleDeprecationWarning</span><span class="p">:</span> <span class="n">using</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">integer</span> <span class="n">number</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">an</span> <span class="n">integer</span> <span class="n">will</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">future</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">m</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_53_1.png" src="_images/19A_PyMC3_53_1.png" />
+</div>
+<div class="section" id="sampling-from-posterior">
+<h3>Sampling from posterior<a class="headerlink" href="#sampling-from-posterior" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">normal_context</span><span class="p">:</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">sd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s1">&#39;sd&#39;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sd</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">xs</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -223.18: 100%|██████████| 200000/200000 [00:19&lt;00:00, 10185.34it/s]
+Finished [100%]: Average ELBO = -223.18
+100%|██████████| 2000/2000 [00:02&lt;00:00, 847.15it/s]
+</pre></div>
+</div>
+<div class="section" id="find-highest-posterior-density-credible-intervals">
+<h4>Find Highest Posterior Density (Credible intervals)<a class="headerlink" href="#find-highest-posterior-density-credible-intervals" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">hpd</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">hpd</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">hpd</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">4.87008876</span><span class="p">,</span>  <span class="mf">5.68313862</span><span class="p">]),</span>
+ <span class="s1">&#39;sd&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">1.80810522</span><span class="p">,</span>  <span class="mf">2.38210096</span><span class="p">]),</span>
+ <span class="s1">&#39;sd_log_&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.59227946</span><span class="p">,</span>  <span class="mf">0.86798286</span><span class="p">])}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="s1">&#39;sd&#39;</span><span class="p">],)</span>
+
+<span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">ymin</span> <span class="o">+</span> <span class="mf">0.05</span><span class="o">*</span><span class="p">(</span><span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hpd</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">y</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">ymin</span> <span class="o">+</span> <span class="mf">0.05</span><span class="o">*</span><span class="p">(</span><span class="n">ymax</span><span class="o">-</span><span class="n">ymin</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hpd</span><span class="p">[</span><span class="s1">&#39;sd&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">y</span><span class="p">,</span><span class="n">y</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_58_0.png" src="_images/19A_PyMC3_58_0.png" />
+</div>
+</div>
+<div class="section" id="evaluating-goodness-of-fit">
+<h3>Evaluating goodness-of-fit<a class="headerlink" href="#evaluating-goodness-of-fit" title="Permalink to this headline">¶</a></h3>
+<p>DIC, WAIC and BPIC are approximations to the out-of-sample error and can
+be used for model compariosn. Likelihood is depnedent on model
+complexity and should not be used for model comparions.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">post_mean</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">df_summary</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">varnames</span><span class="p">)[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="n">post_mean</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="mf">5.2774425669706622</span><span class="p">,</span>
+ <span class="s1">&#39;sd&#39;</span><span class="p">:</span> <span class="mf">2.083811018098618</span><span class="p">,</span>
+ <span class="s1">&#39;sd_log_&#39;</span><span class="p">:</span> <span class="mf">0.73163253719625909</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="likelihood">
+<h4>Likelihood<a class="headerlink" href="#likelihood" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">normal_context</span><span class="o">.</span><span class="n">logp</span><span class="p">(</span><span class="n">post_mean</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">(</span><span class="o">-</span><span class="mf">220.7824869198777</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dic">
+<h4>DIC<a class="headerlink" href="#dic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">normal_context</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">dic</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">445.508693887</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="waic">
+<h4>WAIC<a class="headerlink" href="#waic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">normal_context</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">waic</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">432.18295932008124</span><span class="p">,</span> <span class="mf">14.386599474961665</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bpic">
+<h4>BPIC<a class="headerlink" href="#bpic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">normal_context</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">pm</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">bpic</span><span class="p">(</span><span class="n">trace</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">447.480553911</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="part-2-gallery">
+<h2>Part 2: Gallery<a class="headerlink" href="#part-2-gallery" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="linear-regression">
+<h3>Linear regression<a class="headerlink" href="#linear-regression" title="Permalink to this headline">¶</a></h3>
+<p>We will show how to estimate regression parameters using a simple linear
+model</p>
+<div class="math">
+\[y \sim ax + b\]</div>
+<p>We can restate the linear model</p>
+<div class="math">
+\[y = ax + b + \epsilon\]</div>
+<p>as sampling from a probability distribution</p>
+<div class="math">
+\[y \sim \mathcal{N}(ax + b, \sigma^2)\]</div>
+<p>Now we can use <code class="docutils literal"><span class="pre">pymc</span></code> to estimate the parameters <span class="math">\(a\)</span>, <span class="math">\(b\)</span>
+and <span class="math">\(\sigma\)</span>. We will assume the following priors</p>
+<div class="math">
+\[\begin{split}a \sim \mathcal{N}(0, 100) \\
+b \sim \mathcal{N}(0, 100) \\
+\sigma \sim | \mathcal{N(0, 1)} |\end{split}\]</div>
+<div class="section" id="plate-diagram">
+<h4>Plate diagram<a class="headerlink" href="#plate-diagram" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">daft</span>
+
+<span class="c1"># Instantiate the PGM.</span>
+<span class="n">pgm</span> <span class="o">=</span> <span class="n">daft</span><span class="o">.</span><span class="n">PGM</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7</span><span class="p">])</span>
+
+<span class="c1"># Hierarchical parameters.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\alpha$&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\beta$&quot;</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\sigma$&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+<span class="c1"># Deterministic variable.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="s2">r&quot;$\mu_n$&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Data.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">r&quot;$x_n$&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">r&quot;$y_n$&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="c1"># Add in the edges.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span> <span class="s2">&quot;mu&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="s2">&quot;mu&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;mu&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;mu&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+
+<span class="c1"># And a plate.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">add_plate</span><span class="p">(</span><span class="n">daft</span><span class="o">.</span><span class="n">Plate</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">r&quot;$n = 1, \cdots, N$&quot;</span><span class="p">,</span>
+    <span class="n">shift</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">))</span>
+
+<span class="c1"># Render and save.</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+<span class="n">pgm</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;lm.pdf&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_73_0.png" src="_images/19A_PyMC3_73_0.png" />
+</div>
+<div class="section" id="setting-up-and-fitting-linear-model">
+<h4>Setting up and fitting linear model<a class="headerlink" href="#setting-up-and-fitting-linear-model" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># observed data</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">_a</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">_b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">_a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">linreg</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_est</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">likelihood</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">y_est</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -29.675: 100%|██████████| 200000/200000 [00:20&lt;00:00, 9819.42it/s]
+Finished [100%]: Average ELBO = -29.672
+100%|██████████| 10000/10000 [00:16&lt;00:00, 590.17it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_77_0.png" src="_images/19A_PyMC3_77_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a_</span><span class="p">,</span> <span class="n">b_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:],</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:]):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a_</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b_</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">_a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">_b</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;true regression line&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_78_0.png" src="_images/19A_PyMC3_78_0.png" />
+</div>
+<div class="section" id="posterior-predictive-checks">
+<h4>Posterior predictive checks<a class="headerlink" href="#posterior-predictive-checks" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ppc</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample_ppc</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">linreg</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>100%|██████████| 500/500 [00:05&lt;00:00, 87.95it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ppc</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]],</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">conda</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">5</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">statsmodels</span><span class="o">/</span><span class="n">nonparametric</span><span class="o">/</span><span class="n">kdetools</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span> <span class="n">VisibleDeprecationWarning</span><span class="p">:</span> <span class="n">using</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">integer</span> <span class="n">number</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">an</span> <span class="n">integer</span> <span class="n">will</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">an</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">future</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">m</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">X</span><span class="p">[</span><span class="n">m</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span><span class="p">:],</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">1</span><span class="n">j</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_81_1.png" src="_images/19A_PyMC3_81_1.png" />
+</div>
+</div>
+<div class="section" id="using-the-glm-module">
+<h3>Using the GLM module<a class="headerlink" href="#using-the-glm-module" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.914369</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.1</td>
+      <td>3.597345</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.2</td>
+      <td>3.482978</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.3</td>
+      <td>2.293705</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.4</td>
+      <td>3.821400</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="s1">&#39;y ~ x&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -49.658: 100%|██████████| 200000/200000 [00:25&lt;00:00, 7767.70it/s]
+Finished [100%]: Average ELBO = -49.655
+100%|██████████| 2000/2000 [00:06&lt;00:00, 321.26it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Intercept&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_85_0.png" src="_images/19A_PyMC3_85_0.png" />
+</div>
+<div class="section" id="robust-linear-regression">
+<h3>Robust linear regression<a class="headerlink" href="#robust-linear-regression" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># observed data</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">_a</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">_b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">_a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">y</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*=</span><span class="mi">10</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">})</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>0.914369</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.1</td>
+      <td>3.597345</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.2</td>
+      <td>3.482978</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.3</td>
+      <td>2.293705</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.4</td>
+      <td>3.821400</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="scale-the-data">
+<h4>Scale the data<a class="headerlink" href="#scale-the-data" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="effect-of-outlier">
+<h4>Effect of outlier<a class="headerlink" href="#effect-of-outlier" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">linreg</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_est</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y_obs&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">y_est</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -28.536: 100%|██████████| 200000/200000 [00:20&lt;00:00, 9643.07it/s]
+Finished [100%]: Average ELBO = -28.523
+100%|██████████| 10000/10000 [00:11&lt;00:00, 838.53it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a_</span><span class="p">,</span> <span class="n">b_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:],</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:]):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a_</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b_</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_92_0.png" src="_images/19A_PyMC3_92_0.png" />
+</div>
+<div class="section" id="use-a-t-distribution-for-the-errors-for-a-more-robust-fit">
+<h4>Use a T-distribution for the errors for a more robust fit<a class="headerlink" href="#use-a-t-distribution-for-the-errors-for-a-more-robust-fit" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">robust_linreg</span><span class="p">:</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Exponential</span><span class="p">(</span><span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">y_est</span> <span class="o">=</span> <span class="n">beta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">beta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span>
+    <span class="n">y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">StudentT</span><span class="p">(</span><span class="s1">&#39;y_obs&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">y_est</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">nu</span><span class="o">=</span><span class="n">nu</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -12.964: 100%|██████████| 200000/200000 [00:33&lt;00:00, 5908.80it/s]
+Finished [100%]: Average ELBO = -12.963
+100%|██████████| 10000/10000 [00:22&lt;00:00, 451.48it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a_</span><span class="p">,</span> <span class="n">b_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">100</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a_</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b_</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_95_0.png" src="_images/19A_PyMC3_95_0.png" />
+</div>
+</div>
+<div class="section" id="logistic-regression">
+<h3>Logistic regression<a class="headerlink" href="#logistic-regression" title="Permalink to this headline">¶</a></h3>
+<p>We will look at the effect of strongly correlated variabels using a data
+set from Kruschke&#8217;s book.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;HtWt.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>male</th>
+      <th>height</th>
+      <th>weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>63.2</td>
+      <td>168.7</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>68.7</td>
+      <td>169.8</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>64.8</td>
+      <td>176.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>67.9</td>
+      <td>246.8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>68.9</td>
+      <td>151.6</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="s1">&#39;male ~ height + weight&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Binomial</span><span class="p">())</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">njobs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -96.159: 100%|██████████| 200000/200000 [00:26&lt;00:00, 7659.27it/s]
+Finished [100%]: Average ELBO = -95.563
+100%|██████████| 1000/1000 [00:49&lt;00:00, 20.14it/s]
+</pre></div>
+</div>
+<div class="section" id="note-poor-convergence-due-to-correlation-between-height-and-weight">
+<h4>Note poor convergence due to correlation between height and weight<a class="headerlink" href="#note-poor-convergence-due-to-correlation-between-height-and-weight" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">trace_to_dataframe</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:])</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">df_trace</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">-</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:,</span> <span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;Intercept&#39;</span><span class="p">]],</span> <span class="n">diagonal</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_100_0.png" src="_images/19A_PyMC3_100_0.png" />
+</div>
+<div class="section" id="hamiltonian-monte-carlo-is-faster-and-converges-better">
+<h4>Hamiltonian Monte Carlo is faster and converges better<a class="headerlink" href="#hamiltonian-monte-carlo-is-faster-and-converges-better" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">niter</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="s1">&#39;male ~ height + weight&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">glm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Binomial</span><span class="p">())</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">njobs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -96.161: 100%|██████████| 200000/200000 [00:27&lt;00:00, 7353.06it/s]
+Finished [100%]: Average ELBO = -95.552
+100%|██████████| 1000/1000 [00:53&lt;00:00, 18.65it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">trace_to_dataframe</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:])</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">df_trace</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">-</span><span class="n">niter</span><span class="o">//</span><span class="mi">2</span><span class="p">:,</span> <span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;Intercept&#39;</span><span class="p">]],</span> <span class="n">diagonal</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_103_0.png" src="_images/19A_PyMC3_103_0.png" />
+</div>
+</div>
+<div class="section" id="logistic-regression-for-classification">
+<h3>Logistic regression for classification<a class="headerlink" href="#logistic-regression-for-classification" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">intercept</span> <span class="o">=</span> <span class="n">df_trace</span><span class="p">[[</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;Intercept&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="n">intercept</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weight</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Predict gender given weight (w) and height (h) values.&quot;&quot;&quot;</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">height</span><span class="o">*</span><span class="n">h</span> <span class="o">+</span> <span class="n">weight</span><span class="o">*</span><span class="n">w</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+<span class="c1"># calculate predictions on grid</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="c1"># plot 0.5 contour line - classify as male if above this line</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">])</span>
+
+<span class="c1"># classify all subjects</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lime&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="k">else</span> <span class="s1">&#39;yellow&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">male</span><span class="p">]</span>
+<span class="n">ps</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+<span class="n">errs</span> <span class="o">=</span> <span class="p">((</span><span class="n">ps</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">male</span><span class="p">)</span> <span class="o">|</span><span class="p">((</span><span class="n">ps</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">df</span><span class="o">.</span><span class="n">male</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">weight</span><span class="p">[</span><span class="n">errs</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">[</span><span class="n">errs</span><span class="p">],</span> <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">facecolors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Weight&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Height&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Gender classification by weight and height&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_105_0.png" src="_images/19A_PyMC3_105_0.png" />
+</div>
+<div class="section" id="estimating-parameters-of-a-logistic-model">
+<h3>Estimating parameters of a logistic model<a class="headerlink" href="#estimating-parameters-of-a-logistic-model" title="Permalink to this headline">¶</a></h3>
+<p>Gelman&#8217;s book has an example where the dose of a drug may be affected to
+the number of rat deaths in an experiment.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="24%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Dose (log g/ml)</th>
+<th class="head"># Rats</th>
+<th class="head"># Deaths</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>-0.896</td>
+<td>5</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>-0.296</td>
+<td>5</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>-0.053</td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr class="row-odd"><td>0.727</td>
+<td>5</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>We will model the number of deaths as a random sample from a binomial
+distribution, where <span class="math">\(n\)</span> is the number of rats and <span class="math">\(p\)</span> the
+probability of a rat dying. We are given <span class="math">\(n = 5\)</span>, but we believe
+that <span class="math">\(p\)</span> may be related to the drug dose <span class="math">\(x\)</span>. As <span class="math">\(x\)</span>
+increases the number of rats dying seems to increase, and since
+<span class="math">\(p\)</span> is a probability, we use the following model:</p>
+<div class="math">
+\[\begin{split}y \sim \text{Bin}(n, p) \\
+\text{logit}(p) = \alpha + \beta x \\
+\alpha \sim \mathcal{N}(0, 5) \\
+\beta \sim \mathcal{N}(0, 10)\end{split}\]</div>
+<p>where we set vague priors for <span class="math">\(\alpha\)</span> and <span class="math">\(\beta\)</span>, the
+parameters for the logistic model.</p>
+<div class="section" id="observed-data">
+<h4>Observed data<a class="headerlink" href="#observed-data" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.896</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.296</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.053</span><span class="p">,</span> <span class="mf">0.727</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">invlogit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">model</span><span class="p">:</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Flat</span><span class="p">(</span><span class="s1">&#39;beta&#39;</span><span class="p">)</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">invlogit</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Binomial</span><span class="p">(</span><span class="s1">&#39;y_obs&#39;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -inf: 100%|██████████| 200000/200000 [00:15&lt;00:00, 12530.06it/s]
+Finished [100%]: Average ELBO = -inf
+100%|██████████| 1000/1000 [00:05&lt;00:00, 185.80it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">xp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">xp</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">xp</span><span class="p">))</span>
+
+<span class="n">xp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">trace</span><span class="o">.</span><span class="n">get_values</span><span class="p">(</span><span class="s1">&#39;beta&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">xp</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">/</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Log does of drug&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Risk of death&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_110_0.png" src="_images/19A_PyMC3_110_0.png" />
+</div>
+</div>
+<div class="section" id="hierarchical-model">
+<h3>Hierarchical model<a class="headerlink" href="#hierarchical-model" title="Permalink to this headline">¶</a></h3>
+<p>This uses the Gelman radon data set and is based off this <a class="reference external" href="http://twiecki.github.io/blog/2014/03/17/bayesian-glms-3/">IPython
+notebook</a>.
+Radon levels were measured in houses from all counties in several
+states. Here we want to know if the presence of a basement affects the
+level of radon, and if this is affected by which county the house is
+located in.</p>
+<div class="figure" id="id2">
+<img alt="Radon" src="http://www.fix-your-radon.com/images/how_radon_enters.jpg" />
+<p class="caption"><span class="caption-text">Radon</span></p>
+</div>
+<p>The data set provided is just for the state of Minnesota, which has 85
+counties with 2 to 116 measurements per county. We only need 3 columns
+for this example <code class="docutils literal"><span class="pre">county</span></code>, <code class="docutils literal"><span class="pre">log_radon</span></code>, <code class="docutils literal"><span class="pre">floor</span></code>, where <code class="docutils literal"><span class="pre">floor=0</span></code>
+indicates that there is a basement.</p>
+<p>We will perform simple linear regression on log_radon as a function of
+county and floor.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">radon</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;radon.csv&#39;</span><span class="p">)[[</span><span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="s1">&#39;floor&#39;</span><span class="p">,</span> <span class="s1">&#39;log_radon&#39;</span><span class="p">]]</span>
+<span class="n">radon</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>county</th>
+      <th>floor</th>
+      <th>log_radon</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>AITKIN</td>
+      <td>1.0</td>
+      <td>0.832909</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AITKIN</td>
+      <td>0.0</td>
+      <td>0.832909</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>AITKIN</td>
+      <td>0.0</td>
+      <td>1.098612</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>AITKIN</td>
+      <td>0.0</td>
+      <td>0.095310</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>ANOKA</td>
+      <td>0.0</td>
+      <td>1.163151</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="pooled-model">
+<h3>Pooled model<a class="headerlink" href="#pooled-model" title="Permalink to this headline">¶</a></h3>
+<p>In the pooled model, we ignore the county infomraiton.</p>
+<div class="math">
+\[y \sim \mathcal{N}(a + bx, \sigma^2)\]</div>
+<p>where <span class="math">\(y\)</span> is the log radon level, and <span class="math">\(x\)</span> an indicator
+variable for whether there is a basement or not.</p>
+<p>We make up some choices for the fairly uniformative priors as usual</p>
+<div class="math">
+\[\begin{split}a \sim \mathcal{N}(\mu, \sigma_a^2) \\
+b \sim \mathcal{N}(\mu, \sigma_b^2) \\
+\sigma \sim \text{Gamma(10, 1)}\end{split}\]</div>
+<p>However, since the radon level varies by geographical location, it might
+make sense to include county information in the model. One way to do
+this is to build a separate regression model for each county, but the
+sample sizes for some counties may be too small for precise estimates. A
+compromise between the pooled and separate county models is to use a
+hierarchical model for <em>patial pooling</em> - the practical efffect of this
+is to shrink per county estimates towards the group mean, especially for
+counties with few observations.</p>
+<div class="section" id="id1">
+<h4>Hierarchical model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>With a hierarchical model, there is an <span class="math">\(a_c\)</span> and a <span class="math">\(b_c\)</span> for
+each county <span class="math">\(c\)</span> just as in the individual county model, but they
+are no longer independent but assumed to come from a common group
+distribution</p>
+<div class="math">
+\[\begin{split}a_c \sim \mathcal{N}(\mu_a, \sigma_a^2) \\
+b_c \sim \mathcal{N}(\mu_b, \sigma_b^2)\end{split}\]</div>
+<p>we further assume that the hyperparameters come from the following
+distributions</p>
+<div class="math">
+\[\begin{split}\mu_a \sim \mathcal{N}(0, 10^2) \\
+\sigma_a \sim \text{|Cauchy(1)|} \\
+\mu_b \sim \mathcal{N}(0, 10^2) \\
+\sigma_b \sim \text{|Cauchy(1)|} \\\end{split}\]</div>
+<p>The variance for observations does not change, so the model for the
+radon level is</p>
+<div class="math">
+\[y \sim \mathcal{N}(a_c + b_c x, \sigma^2)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">county</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">radon</span><span class="p">[</span><span class="s1">&#39;county&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">codes</span>
+
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">hm</span><span class="p">:</span>
+    <span class="c1"># County hyperpriors</span>
+    <span class="n">mu_a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu_a&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">sigma_a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s1">&#39;sigma_a&#39;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">mu_b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mu_b&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">sigma_b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfCauchy</span><span class="p">(</span><span class="s1">&#39;sigma_b&#39;</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># County slopes and intercepts</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;slope&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_a</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma_a</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">county</span><span class="p">)))</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;intercept&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_b</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma_b</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">county</span><span class="p">)))</span>
+
+    <span class="c1"># Houseehold errors</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Model prediction of radon level</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="n">county</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">county</span><span class="p">]</span> <span class="o">*</span> <span class="n">radon</span><span class="o">.</span><span class="n">floor</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Data likelihood</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">radon</span><span class="o">.</span><span class="n">log_radon</span><span class="p">)</span>
+
+    <span class="n">hm_trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -1,087.9: 100%|██████████| 200000/200000 [00:55&lt;00:00, 3635.46it/s]
+Finished [100%]: Average ELBO = -1,088.2
+100%|██████████| 1000/1000 [00:23&lt;00:00, 42.18it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">forestplot</span><span class="p">(</span><span class="n">hm_trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">,</span> <span class="s1">&#39;intercept&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_115_0.png" src="_images/19A_PyMC3_115_0.png" />
+</div>
+</div>
+<div class="section" id="gaussian-mixture-model">
+<h3>Gaussian Mixture Model<a class="headerlink" href="#gaussian-mixture-model" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">theano.compile.ops</span> <span class="k">import</span>  <span class="n">as_op</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="nn">T</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+          <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">300</span><span class="p">)]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_119_0.png" src="_images/19A_PyMC3_119_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">niter</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">()</span> <span class="k">as</span> <span class="n">gmm</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Dirichlet</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">mus</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;mus&#39;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sd</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">sds</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s1">&#39;sds&#39;</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="n">Y_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NormalMixture</span><span class="p">(</span><span class="s1">&#39;Y_obs&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">mus</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="n">sds</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>Auto-assigning NUTS sampler...
+Initializing NUTS using advi...
+Average ELBO = -8,888.4: 100%|██████████| 200000/200000 [01:43&lt;00:00, 1927.51it/s]
+Finished [100%]: Average ELBO = -8,888.5
+100%|██████████| 1000/1000 [08:55&lt;00:00,  3.19it/s]
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">burn</span> <span class="o">=</span> <span class="n">niter</span><span class="o">//</span><span class="mi">2</span>
+<span class="n">trace</span> <span class="o">=</span> <span class="n">trace</span><span class="p">[</span><span class="n">burn</span><span class="p">:]</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">traceplot</span><span class="p">(</span><span class="n">trace</span><span class="p">,</span> <span class="n">varnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;mus&#39;</span><span class="p">,</span> <span class="s1">&#39;sds&#39;</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/19A_PyMC3_121_0.png" src="_images/19A_PyMC3_121_0.png" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using PyMC3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#part-1-a-tutorial-example-estimating-coin-bias">Part 1 - A tutorial example: Estimating coin bias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#part-2-gallery">Part 2: Gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="18H_Spark_Cloud.html"
+                          title="Previous page">&larr; Spark on Cloud</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="19B_Pystan.html"
+                          title="Next page">&rarr; PyStan</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/19A_PyMC3.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="19B_Pystan.html" title="PyStan"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="18H_Spark_Cloud.html" title="Spark on Cloud"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/19A_PyMC3.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:15:15 GMT -->
+</html>

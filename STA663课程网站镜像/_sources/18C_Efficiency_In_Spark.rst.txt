@@ -1,0 +1,573 @@
+
+Using Spark Efficiently
+=======================
+
+Focus in this lecture is on Spark constructs that can make your programs
+more efficient. In general, this means minimizing the amount of data
+transfer across nodes, since this is usually the bottleneck for big data
+analysis problems.
+
+-  Shared variables
+
+   -  Accumulators
+   -  Broadcast variables
+
+-  DataFrames
+-  Partitioning and the Spark shuffle
+-  Piping to external programs
+
+Spark tuning and optimization is complicated - this tutorial only
+touches on some of the basic concepts.
+
+.. code:: python
+
+    import numpy as np
+    import string
+
+.. code:: python
+
+    from pyspark import SparkContext
+    sc = SparkContext('local[*]')
+
+Resources
+---------
+
+`The Spark Programming
+Guide <http://spark.apache.org/docs/latest/programming-guide.html>`__
+
+Accumulators
+------------
+
+Spark functions such as ``map`` can use variables defined in the driver
+program, but they make local copies of the variable that are not passed
+back to the driver program. Accumulators are *shared variables* that
+allow the aggregation of results from workers back to the driver
+program, for example, as an event counter. Suppose we want to count the
+number of rows of data with missing information. The most efficient way
+is to use an **accumulator**.
+
+.. code:: python
+
+    ulysses = sc.textFile('data/Ulysses.txt')
+
+.. code:: python
+
+    ulysses.take(10)
+
+
+
+
+.. parsed-literal::
+
+    ['The Project Gutenberg EBook of Ulysses, by James Joyce',
+     '',
+     'This eBook is for the use of anyone anywhere at no cost and with',
+     'almost no restrictions whatsoever.  You may copy it, give it away or',
+     're-use it under the terms of the Project Gutenberg License included',
+     'with this eBook or online at www.gutenberg.org',
+     '',
+     '',
+     'Title: Ulysses',
+     '']
+
+
+
+Event counting
+~~~~~~~~~~~~~~
+
+Notice that we have some empty lines. We want to count the number of
+non-empty lines.
+
+.. code:: python
+
+    num_lines = sc.accumulator(0)
+    
+    def tokenize(line):
+        table = dict.fromkeys(map(ord, string.punctuation))
+        return line.translate(table).lower().strip().split()
+    
+    def tokenize_count(line):
+        global num_lines
+        
+        if line:
+            num_lines += 1
+    
+        return tokenize(line)
+
+.. code:: python
+
+    counter = ulysses.flatMap(lambda line: tokenize_count(line)).countByValue()
+
+.. code:: python
+
+    counter['circle']
+
+
+
+
+.. parsed-literal::
+
+    20
+
+
+
+.. code:: python
+
+    num_lines.value
+
+
+
+
+.. parsed-literal::
+
+    25396
+
+
+
+Broadcast Variables
+-------------------
+
+Sometimes we need to send a large read only variable to all workers. For
+example, we might want to share a large feature matrix to all workers as
+a part of a machine learning application. This same variable will be
+sent separately for each parallel operation unless you use a **broadcast
+variable**. Also, the default variable passing mechanism is optimized
+for small variables and can be slow when the variable is large.
+
+.. code:: python
+
+    from itertools import count
+    
+    table = dict(zip(string.ascii_letters, count()))
+
+.. code:: python
+
+    def weight_first(line, table):
+        words = tokenize(line)
+        return sum(table.get(word[0], 0) for word in words if word.isalpha())
+    
+    def weight_last(line, table):
+        words = tokenize(line)
+        return sum(table.get(word[-1], 0) for word in words if word.isalpha())
+
+The dictionary ``table`` is sent out twice to worker nodes, one for each call
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    ulysses.map(lambda line: weight_first(line, table)).sum()
+
+
+
+
+.. parsed-literal::
+
+    2941855
+
+
+
+.. code:: python
+
+    ulysses.map(lambda line: weight_last(line, table)).sum()
+
+
+
+
+.. parsed-literal::
+
+    2995994
+
+
+
+Converting to use broadast variables is simple and more efficient
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-  Use SparkContext.broadcast() to create a broadcast variable
+-  Where you would use var, use var.value
+-  The broadcast variable is sent once to each node and can be re-used
+
+.. code:: python
+
+    table_bc = sc.broadcast(table)
+
+.. code:: python
+
+    def weight_first_bc(line, table):
+        words = tokenize(line)
+        return sum(table.value.get(word[0], 0) for word in words if word.isalpha())
+    
+    def weight_last_bc(line, table):
+        words = tokenize(line)
+        return sum(table.value.get(word[-1], 0) for word in words if word.isalpha())
+
+table\_bc is sent to nodes only once.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Although it looks like table\_bc is being passed to each function, all
+that is passed is a path to the table. The worker checks if the path has
+been cached and uses the cache instead of loading from the path.
+
+.. code:: python
+
+    ulysses.map(lambda line: weight_first_bc(line, table_bc)).sum()
+
+
+
+
+.. parsed-literal::
+
+    2941855
+
+
+
+.. code:: python
+
+    ulysses.map(lambda line: weight_last_bc(line, table_bc)).sum()
+
+
+
+
+.. parsed-literal::
+
+    2995994
+
+
+
+The Spark Shuffle and Partitioning
+----------------------------------
+
+Some events trigger the redistribution of data across partitions, and
+involves the (expensive) copying of data across executors and machines.
+This is known as the **shuffle**. For example, if we do a
+``reduceByKey`` operation on key-value pair RDD, Spark needs to collect
+all pairs with the same key in the same partition to do the reduction.
+
+For key-value RDDs, you have some control over the partitioning of the
+RDDs. In particular, you can ask Spark to partition a set of keys so
+that they are guaranteed to appear together on some node. This can
+minimize a lot of data transfer. For example, suppose you have a large
+key-value RDD consisting of user\_name: comments from a web user
+community. Every night, you want to update with new user comments with a
+join operation
+
+.. code:: python
+
+    def fake_data(n, val):
+        users = list(map(''.join, np.random.choice(list(string.ascii_lowercase), (n,2))))
+        comments = [val]*n
+        return tuple(zip(users, comments))
+
+.. code:: python
+
+    data = fake_data(10000, 'a')
+    list(data)[:10]
+
+
+
+
+.. parsed-literal::
+
+    [('uw', 'a'),
+     ('iv', 'a'),
+     ('cy', 'a'),
+     ('to', 'a'),
+     ('ea', 'a'),
+     ('jc', 'a'),
+     ('th', 'a'),
+     ('pe', 'a'),
+     ('rf', 'a'),
+     ('ng', 'a')]
+
+
+
+.. code:: python
+
+    rdd = sc.parallelize(data).reduceByKey(lambda x, y: x+y)
+
+.. code:: python
+
+    new_data = fake_data(1000,  'b')
+    list(new_data)[:10]
+
+
+
+
+.. parsed-literal::
+
+    [('ro', 'b'),
+     ('vf', 'b'),
+     ('es', 'b'),
+     ('er', 'b'),
+     ('kq', 'b'),
+     ('gw', 'b'),
+     ('jt', 'b'),
+     ('my', 'b'),
+     ('xx', 'b'),
+     ('ui', 'b')]
+
+
+
+.. code:: python
+
+    rdd_new = sc.parallelize(new_data).reduceByKey(lambda x, y: x+y).cache()
+
+.. code:: python
+
+    rdd_updated = rdd.join(rdd_new)
+
+.. code:: python
+
+    rdd_updated.take(10)
+
+
+
+
+.. parsed-literal::
+
+    [('sz', ('aaaaaaaaaaaaaaaa', 'bbb')),
+     ('sc', ('aaaaaaaaaaaaaa', 'bb')),
+     ('kt', ('aaaaaaaaaaaaaaaa', 'b')),
+     ('wg', ('aaaaaaaaaaaaaaaaaaa', 'bb')),
+     ('vt', ('aaaaaaaaaaaaa', 'b')),
+     ('xb', ('aaaaaaaaaaaaaaaaaaa', 'b')),
+     ('oa', ('aaaaaaaaaaaaaaa', 'bb')),
+     ('uy', ('aaaaaaaaaaaaaaaaaaaaa', 'b')),
+     ('gu', ('aaaaaaaaaa', 'bb')),
+     ('gb', ('aaaaaaaaaaaaaaaa', 'bb'))]
+
+
+
+Using ``partitionBy``
+~~~~~~~~~~~~~~~~~~~~~
+
+The ``join`` operation will hash all the keys of both ``rdd`` and
+``rdd_nerw``, sending keys with the same hashes to the same node for the
+actual join operation. There is a lot of unnecessary data transfer.
+Since ``rdd`` is a much larger data set than ``rdd_new``, we can instead
+fix the partitioning of ``rdd`` and just transfer the keys of
+``rdd_new``. This is done by ``rdd.partitionBy(numPartitions)`` where
+``numPartitions`` should be at least twice the number of cores.
+
+.. code:: python
+
+    rdd2 = sc.parallelize(data).reduceByKey(lambda x, y: x+y)
+    rdd2 = rdd2.partitionBy(10).cache()
+
+.. code:: python
+
+    rdd2_updated = rdd2.join(rdd_new)
+
+.. code:: python
+
+    rdd2_updated.take(10)
+
+
+
+
+.. parsed-literal::
+
+    [('sz', ('aaaaaaaaaaaaaaaa', 'bbb')),
+     ('tp', ('aaaaaaaaaaaaaaa', 'b')),
+     ('sf', ('aaaaaaaaaaaaaaaaaaaaaa', 'bbb')),
+     ('qo', ('aaaaaaaaaaaaaaaaaaa', 'bbb')),
+     ('nh', ('aaaaaaaaaaaaa', 'b')),
+     ('df', ('aaaaaaaaaaaa', 'bb')),
+     ('kw', ('aaaaaaaaaaaaaaaaaa', 'bb')),
+     ('fo', ('aaaaaaaaaaaaaaa', 'b')),
+     ('tl', ('aaaaaaaaaaaaaa', 'bb')),
+     ('lh', ('aaaaaaaaaaaaa', 'b'))]
+
+
+
+Piping to External Programs
+---------------------------
+
+Suppose it is more convenient or efficient to write a function in some
+other language to process data. We can **pipe** data from Spark to the
+external program (script) that performs the calculation via standard
+input and output. The example below shows using a C++ program to
+calculate the sum of squares for collections of numbers.
+
+.. code:: python
+
+    %%file foo.cpp
+    
+    #include <iostream>
+    #include <sstream>
+    #include <string>
+    #include <numeric>
+    #include <vector>
+    using namespace std;
+    
+    double sum_squares(double x, double y) {
+      return x + y*y;
+    };
+    
+    int main() {
+    
+        string s;
+    
+        while (cin) {
+    
+            getline(cin, s);
+            stringstream stream(s);
+            vector<double> v;
+    
+            while(1) {
+                double u;
+                stream >> u;
+                if(!stream)
+                    break;
+                v.push_back(u);
+            }
+            if (v.size()) {
+                double x = accumulate(v.begin(), v.end(), 0.0, sum_squares);
+                cout << x << endl;
+            }
+        }
+    }
+
+
+.. parsed-literal::
+
+    Overwriting foo.cpp
+
+
+.. code:: python
+
+    ! g++ foo.cpp -o foo
+
+.. code:: python
+
+    xs = np.random.random((10, 3))
+    np.savetxt('numbers.txt', xs)
+
+Feed data via re-direction
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %%bash
+    
+    ./foo < numbers.txt
+
+
+.. parsed-literal::
+
+    2.12948
+    1.27958
+    0.711174
+    0.145084
+    1.53344
+    1.00307
+    1.64678
+    1.35042
+    1.77033
+    1.26898
+
+
+Feed data via piping
+^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %%bash
+    
+    cat numbers.txt | ./foo
+
+
+.. parsed-literal::
+
+    2.12948
+    1.27958
+    0.711174
+    0.145084
+    1.53344
+    1.00307
+    1.64678
+    1.35042
+    1.77033
+    1.26898
+
+
+.. code:: python
+
+    !head numbers.txt
+
+
+.. parsed-literal::
+
+    5.270539741683482049e-01 9.538059079198231149e-01 9.705379757246932471e-01
+    8.224342507879207620e-01 4.863559000065119653e-01 6.055084142317349594e-01
+    3.776646942097252602e-01 6.458831090447878509e-01 3.890739818068755795e-01
+    3.894152894179003788e-02 3.690381691456464663e-01 8.589506712912342579e-02
+    7.596819591747848710e-01 5.785597615102290314e-01 7.884100040999678649e-01
+    8.717886662425843314e-01 4.836717890004667009e-01 9.547083256957378250e-02
+    7.107374952186653605e-01 5.218853770211685505e-01 9.323470966394742376e-01
+    8.793413319051871513e-01 3.959469860304939415e-01 6.483846319494085408e-01
+    9.579829009525054895e-01 2.739685046015039038e-01 8.817835757073387848e-01
+    5.315242953832449713e-01 3.254503074377856908e-01 9.383707453566396683e-01
+
+
+.. code:: python
+
+    rdd = sc.textFile('numbers.txt')
+
+.. code:: python
+
+    from pyspark import SparkFiles
+    
+    def prepare(line):
+        """Each line contains numbers separated by a space."""
+        return ' '.join(line.split()) + '\n'
+    
+    # pipe data to external function
+    func = './foo'
+    sc.addFile(func)
+    ss = rdd.map(lambda s: prepare(s)).pipe(SparkFiles.get(func))
+
+.. code:: python
+
+    np.array(ss.collect(), dtype='float')
+
+
+
+
+.. parsed-literal::
+
+    array([ 2.12948 ,  1.27958 ,  0.711174,  0.145084,  1.53344 ,  1.00307 ,
+            1.64678 ,  1.35042 ,  1.77033 ,  1.26898 ])
+
+
+
+.. code:: python
+
+    np.sum(xs**2, 1)
+
+
+
+
+.. parsed-literal::
+
+    array([ 2.12947556,  1.2795806 ,  0.71117418,  0.14508358,  1.53343841,
+            1.00306856,  1.64678324,  1.35041782,  1.77033225,  1.26897563])
+
+
+
+Version
+~~~~~~~
+
+.. code:: python
+
+    %load_ext version_information
+    %version_information pyspark, numpy
+
+
+
+
+.. raw:: html
+
+    <table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.3</td></tr><tr><td>OS</td><td>Darwin 15.4.0 x86_64 i386 64bit</td></tr><tr><td>pyspark</td><td>The 'pyspark' distribution was not found and is required by the application</td></tr><tr><td>numpy</td><td>1.10.4</td></tr><tr><td colspan='2'>Tue Apr 19 13:19:24 2016 EDT</td></tr></table>
+
+
+

@@ -1,0 +1,955 @@
+
+Sparse Matrices
+===============
+
+.. code:: python
+
+    %matplotlib inline
+    import numpy as np
+    import pandas as pd
+    from scipy import sparse
+    import scipy.sparse.linalg as spla
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+.. code:: python
+
+    sns.set_context('notebook', font_scale=1.5)
+
+Creating a sparse matrix
+------------------------
+
+There are many applications in which we deal with matrices that are
+mostly zeros. For example, a matrix representing social networks is very
+sparse - there are 7 billion people, but most people are only connected
+to a few hundred or thousand others directly. Storing such a social
+network as a sparse rather than dense matrix will offer orders of
+magnitude reductions in memory requirements and corresponding speed-ups
+in computation.
+
+Coordinate format
+~~~~~~~~~~~~~~~~~
+
+The simplest sparse matrix format is built from the coordinates and
+values of the non-zero entries.
+
+From dense matrix
+^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    A = np.random.poisson(0.2, (5,15)) * np.random.randint(0, 10, (5, 15))
+    A
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0,  5,  0,  0,  8,  0,  4,  0,  0,  0,  7,  0,  0,  0,  0],
+           [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+           [ 0,  0,  0,  8,  0,  0,  2,  2,  4,  0,  0,  0,  7,  0,  0],
+           [ 0,  0,  7,  0,  9,  0,  0,  0,  0,  1, 12,  0,  0,  0,  0],
+           [ 9,  2,  0,  2,  0,  0,  0,  0,  4,  0,  0,  0,  8,  0,  0]])
+
+
+
+.. code:: python
+
+    rows, cols = np.nonzero(A)
+    vals = A[rows, cols]
+
+.. code:: python
+
+    vals
+
+
+
+
+.. parsed-literal::
+
+    array([ 5,  8,  4,  7,  8,  2,  2,  4,  7,  7,  9,  1, 12,  9,  2,  2,  4,
+            8])
+
+
+
+.. code:: python
+
+    rows
+
+
+
+
+.. parsed-literal::
+
+    array([0, 0, 0, 0, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4])
+
+
+
+.. code:: python
+
+    cols
+
+
+
+
+.. parsed-literal::
+
+    array([ 1,  4,  6, 10,  3,  6,  7,  8, 12,  2,  4,  9, 10,  0,  1,  3,  8,
+           12])
+
+
+
+.. code:: python
+
+    X1 = sparse.coo_matrix(A)
+    X1
+
+
+
+
+.. parsed-literal::
+
+    <5x15 sparse matrix of type '<class 'numpy.int64'>'
+    	with 18 stored elements in COOrdinate format>
+
+
+
+.. code:: python
+
+    print(X1)
+
+
+.. parsed-literal::
+
+      (0, 1)	5
+      (0, 4)	8
+      (0, 6)	4
+      (0, 10)	7
+      (2, 3)	8
+      (2, 6)	2
+      (2, 7)	2
+      (2, 8)	4
+      (2, 12)	7
+      (3, 2)	7
+      (3, 4)	9
+      (3, 9)	1
+      (3, 10)	12
+      (4, 0)	9
+      (4, 1)	2
+      (4, 3)	2
+      (4, 8)	4
+      (4, 12)	8
+
+
+From coordinates
+^^^^^^^^^^^^^^^^
+
+Note that the (values, (rows, cols)) argument is a single tuple.
+
+.. code:: python
+
+    X2 = sparse.coo_matrix((vals, (rows, cols)))
+    X2
+
+
+
+
+.. parsed-literal::
+
+    <5x13 sparse matrix of type '<class 'numpy.int64'>'
+    	with 18 stored elements in COOrdinate format>
+
+
+
+.. code:: python
+
+    print(X2)
+
+
+.. parsed-literal::
+
+      (0, 1)	5
+      (0, 4)	8
+      (0, 6)	4
+      (0, 10)	7
+      (2, 3)	8
+      (2, 6)	2
+      (2, 7)	2
+      (2, 8)	4
+      (2, 12)	7
+      (3, 2)	7
+      (3, 4)	9
+      (3, 9)	1
+      (3, 10)	12
+      (4, 0)	9
+      (4, 1)	2
+      (4, 3)	2
+      (4, 8)	4
+      (4, 12)	8
+
+
+Convert back to dense matrix
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    X2.todense()
+
+
+
+
+.. parsed-literal::
+
+    matrix([[ 0,  5,  0,  0,  8,  0,  4,  0,  0,  0,  7,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  8,  0,  0,  2,  2,  4,  0,  0,  0,  7],
+            [ 0,  0,  7,  0,  9,  0,  0,  0,  0,  1, 12,  0,  0],
+            [ 9,  2,  0,  2,  0,  0,  0,  0,  4,  0,  0,  0,  8]])
+
+
+
+Compressed Sparse Row and Column formats
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When we have 2 or more repeated entries in the rows or cols, we can
+remove the redundancy by indicating the location of the first occurrence
+of a value and its increment instead of the full coordinates. These are
+known as CSR or CSC formats.
+
+.. code:: python
+
+    np.vstack([rows, cols])
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0,  0,  0,  0,  2,  2,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,
+             4],
+           [ 1,  4,  6, 10,  3,  6,  7,  8, 12,  2,  4,  9, 10,  0,  1,  3,  8,
+            12]])
+
+
+
+.. code:: python
+
+    indptr = np.r_[np.searchsorted(rows, np.unique(rows)), len(rows)]
+    indptr
+
+
+
+
+.. parsed-literal::
+
+    array([ 0,  4,  9, 13, 18])
+
+
+
+.. code:: python
+
+    X3 = sparse.csr_matrix((vals, cols, indptr))
+    X3
+
+
+
+
+.. parsed-literal::
+
+    <4x13 sparse matrix of type '<class 'numpy.int64'>'
+    	with 18 stored elements in Compressed Sparse Row format>
+
+
+
+.. code:: python
+
+    X3.todense()
+
+
+
+
+.. parsed-literal::
+
+    matrix([[ 0,  5,  0,  0,  8,  0,  4,  0,  0,  0,  7,  0,  0],
+            [ 0,  0,  0,  8,  0,  0,  2,  2,  4,  0,  0,  0,  7],
+            [ 0,  0,  7,  0,  9,  0,  0,  0,  0,  1, 12,  0,  0],
+            [ 9,  2,  0,  2,  0,  0,  0,  0,  4,  0,  0,  0,  8]])
+
+
+
+Casting from COO format
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Because the coordinate format is more intuitive, it is often more
+convenient to first create a COO matrix then cast to CSR or CSC form.
+
+.. code:: python
+
+    X4 = X2.tocsr()
+
+.. code:: python
+
+    X4
+
+
+
+
+.. parsed-literal::
+
+    <5x13 sparse matrix of type '<class 'numpy.int64'>'
+    	with 18 stored elements in Compressed Sparse Row format>
+
+
+
+COO summation convention
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+When entries are repeated in a COO matrix, they are **summed**. This
+provides a quick way to construct confusion matrices for evaluation of
+multi-class classification algorithms.
+
+.. code:: python
+
+    rows = np.r_[np.zeros(4), np.ones(4)]
+    cols = np.repeat([0,1], 4)
+    vals = np.arange(8)
+
+.. code:: python
+
+    rows
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.,  0.,  0.,  0.,  1.,  1.,  1.,  1.])
+
+
+
+.. code:: python
+
+    cols
+
+
+
+
+.. parsed-literal::
+
+    array([0, 0, 0, 0, 1, 1, 1, 1])
+
+
+
+.. code:: python
+
+    vals
+
+
+
+
+.. parsed-literal::
+
+    array([0, 1, 2, 3, 4, 5, 6, 7])
+
+
+
+.. code:: python
+
+    X5 = sparse.csr_matrix((vals, (rows, cols)))
+
+.. code:: python
+
+    print(X5)
+
+
+.. parsed-literal::
+
+      (0, 0)	6
+      (1, 1)	22
+
+
+Application: Confusion matrix
+-----------------------------
+
+Creating a 2 by 2 confusion matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    obs = np.random.randint(0, 2, 100)
+    pred = np.random.randint(0, 2, 100)
+    vals = np.ones(100).astype('int')
+
+.. code:: python
+
+    pred
+
+
+
+
+.. parsed-literal::
+
+    array([1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0,
+           1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1,
+           1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0,
+           1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+           0, 0, 1, 1, 0, 1, 0, 1])
+
+
+
+.. code:: python
+
+    vals.shape, obs.shape , pred.shape
+
+
+
+
+.. parsed-literal::
+
+    ((100,), (100,), (100,))
+
+
+
+.. code:: python
+
+    X6 = sparse.coo_matrix((vals, (pred, obs)))
+
+.. code:: python
+
+    X6.todense()
+
+
+
+
+.. parsed-literal::
+
+    matrix([[21, 22],
+            [34, 23]])
+
+
+
+Creating an :math:`n` by :math:`n` confusion matrix
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For classifications with a large number of classes (e.g. image
+segmentation), the savings are even more dramatic.
+
+.. code:: python
+
+    from sklearn import datasets
+    from sklearn.model_selection import train_test_split
+    from sklearn.neighbors import KNeighborsClassifier
+
+.. code:: python
+
+    iris = datasets.load_iris()
+
+.. code:: python
+
+    knn = KNeighborsClassifier()
+    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, 
+                                                        test_size=0.5, random_state=42)
+
+.. code:: python
+
+    pred = knn.fit(X_train, y_train).predict(X_test)
+
+.. code:: python
+
+    X7 = sparse.coo_matrix((np.ones(len(pred)).astype('int'), (pred, y_test)))
+    pd.DataFrame(X7.todense(), index=iris.target_names, columns=iris.target_names)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>setosa</th>
+          <th>versicolor</th>
+          <th>virginica</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>setosa</th>
+          <td>29</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <th>versicolor</th>
+          <td>0</td>
+          <td>23</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>virginica</th>
+          <td>0</td>
+          <td>0</td>
+          <td>19</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Application: PageRank
+---------------------
+
+SciPy provides efficient routines for solving large sparse systems as
+for dense matrices. We will illustrate by calculating the page rank for
+airports using data from the `Bureau of Transportation
+Statisitcs <http://www.transtats.bts.gov/DL_SelectFields.asp?Table_ID=236>`__.
+
+.. code:: python
+
+    data = pd.read_csv('data/airports.csv', usecols=[0,1])
+
+.. code:: python
+
+    data.shape
+
+
+
+
+.. parsed-literal::
+
+    (445827, 2)
+
+
+
+.. code:: python
+
+    data.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>ORIGIN_AIRPORT_ID</th>
+          <th>DEST_AIRPORT_ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>10135</td>
+          <td>10397</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>10135</td>
+          <td>10397</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>10135</td>
+          <td>10397</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>10135</td>
+          <td>10397</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>10135</td>
+          <td>10397</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    lookup = pd.read_csv('data/names.csv', index_col=0)
+
+.. code:: python
+
+    lookup.shape
+
+
+
+
+.. parsed-literal::
+
+    (6404, 1)
+
+
+
+.. code:: python
+
+    lookup.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <th>Code</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>10001</th>
+          <td>Afognak Lake, AK: Afognak Lake Airport</td>
+        </tr>
+        <tr>
+          <th>10003</th>
+          <td>Granite Mountain, AK: Bear Creek Mining Strip</td>
+        </tr>
+        <tr>
+          <th>10004</th>
+          <td>Lik, AK: Lik Mining Camp</td>
+        </tr>
+        <tr>
+          <th>10005</th>
+          <td>Little Squaw, AK: Little Squaw Airport</td>
+        </tr>
+        <tr>
+          <th>10006</th>
+          <td>Kizhuyak, AK: Kizhuyak Bay</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    import networkx as nx
+
+Construct the sparse adjacency matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    g = nx.from_pandas_dataframe(data, source='ORIGIN_AIRPORT_ID', target='DEST_AIRPORT_ID')
+
+.. code:: python
+
+    airports = np.array(g.nodes())
+    adj_matrix = nx.to_scipy_sparse_matrix(g)
+
+Construct the transition matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    out_degrees = np.ravel(adj_matrix.sum(axis=1))
+    diag_matrix = sparse.diags(1 / out_degrees).tocsr()
+    M = (diag_matrix @ adj_matrix).T
+
+Modify the transition matrix with a damping factor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The PageRank algorithm assumes that every node can be reached from every
+other node. To guard against case where a node has out-degree 0, we
+allow every node a small random chance of transitioning to any other
+node using a damping factor :math:`d`. Then we solve the linear system
+to find the pagerank score :math:`r`.
+
+.. math::
+
+
+   r = (I - dM)^{-1}\frac{1-d}{N}\mathbb{1}
+
+or equivalently in the :math:`Ax = b` format
+
+.. math::
+
+
+   (I - dM)r = \frac{1-d}{N}\mathbb{1}
+
+.. code:: python
+
+    n = len(airports) 
+    d = 0.85 
+    I = sparse.eye(n, format='csc')
+    A = I - d * M
+    b = (1-d) / n * np.ones(n) # so the sum of all page ranks is 1
+
+.. code:: python
+
+    A.todense()
+
+
+
+
+.. parsed-literal::
+
+    matrix([[ 1.,  0.,  0., ...,  0.,  0.,  0.],
+            [ 0.,  1.,  0., ...,  0.,  0.,  0.],
+            [ 0.,  0.,  1., ...,  0.,  0.,  0.],
+            ..., 
+            [ 0.,  0.,  0., ...,  1.,  0.,  0.],
+            [ 0.,  0.,  0., ...,  0.,  1.,  0.],
+            [ 0.,  0.,  0., ...,  0.,  0.,  1.]])
+
+
+
+.. code:: python
+
+    from scipy.sparse.linalg import spsolve
+
+.. code:: python
+
+    r =  spsolve(A, b)
+    r.sum()
+
+
+
+
+.. parsed-literal::
+
+    0.99999999999999978
+
+
+
+.. code:: python
+
+    idx = np.argsort(r)
+
+.. code:: python
+
+    top10 = idx[-10:][::-1]
+    bot10 = idx[:10]
+
+.. code:: python
+
+    df = lookup.loc[airports[top10]]
+    df['degree'] = out_degrees[top10]
+    df['pagerank']= r[top10]
+    df
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Description</th>
+          <th>degree</th>
+          <th>pagerank</th>
+        </tr>
+        <tr>
+          <th>Code</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>10397</th>
+          <td>Atlanta, GA: Hartsfield-Jackson Atlanta Intern...</td>
+          <td>158</td>
+          <td>0.043286</td>
+        </tr>
+        <tr>
+          <th>13930</th>
+          <td>Chicago, IL: Chicago O'Hare International</td>
+          <td>139</td>
+          <td>0.033956</td>
+        </tr>
+        <tr>
+          <th>11292</th>
+          <td>Denver, CO: Denver International</td>
+          <td>129</td>
+          <td>0.031434</td>
+        </tr>
+        <tr>
+          <th>11298</th>
+          <td>Dallas/Fort Worth, TX: Dallas/Fort Worth Inter...</td>
+          <td>108</td>
+          <td>0.027596</td>
+        </tr>
+        <tr>
+          <th>13487</th>
+          <td>Minneapolis, MN: Minneapolis-St Paul Internati...</td>
+          <td>108</td>
+          <td>0.027511</td>
+        </tr>
+        <tr>
+          <th>12266</th>
+          <td>Houston, TX: George Bush Intercontinental/Houston</td>
+          <td>110</td>
+          <td>0.025967</td>
+        </tr>
+        <tr>
+          <th>11433</th>
+          <td>Detroit, MI: Detroit Metro Wayne County</td>
+          <td>100</td>
+          <td>0.024738</td>
+        </tr>
+        <tr>
+          <th>14869</th>
+          <td>Salt Lake City, UT: Salt Lake City International</td>
+          <td>78</td>
+          <td>0.019298</td>
+        </tr>
+        <tr>
+          <th>14771</th>
+          <td>San Francisco, CA: San Francisco International</td>
+          <td>76</td>
+          <td>0.017820</td>
+        </tr>
+        <tr>
+          <th>14107</th>
+          <td>Phoenix, AZ: Phoenix Sky Harbor International</td>
+          <td>79</td>
+          <td>0.017000</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    df = lookup.loc[airports[bot10]]
+    df['degree'] = out_degrees[bot10]
+    df['pagerank']= r[bot10]
+    df
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>Description</th>
+          <th>degree</th>
+          <th>pagerank</th>
+        </tr>
+        <tr>
+          <th>Code</th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>12265</th>
+          <td>Niagara Falls, NY: Niagara Falls International</td>
+          <td>1</td>
+          <td>0.000693</td>
+        </tr>
+        <tr>
+          <th>14025</th>
+          <td>Plattsburgh, NY: Plattsburgh International</td>
+          <td>1</td>
+          <td>0.000693</td>
+        </tr>
+        <tr>
+          <th>11695</th>
+          <td>Flagstaff, AZ: Flagstaff Pulliam</td>
+          <td>1</td>
+          <td>0.000693</td>
+        </tr>
+        <tr>
+          <th>16218</th>
+          <td>Yuma, AZ: Yuma MCAS/Yuma International</td>
+          <td>1</td>
+          <td>0.000693</td>
+        </tr>
+        <tr>
+          <th>14905</th>
+          <td>Santa Maria, CA: Santa Maria Public/Capt. G. A...</td>
+          <td>1</td>
+          <td>0.000710</td>
+        </tr>
+        <tr>
+          <th>13964</th>
+          <td>North Bend/Coos Bay, OR: Southwest Oregon Regi...</td>
+          <td>1</td>
+          <td>0.000710</td>
+        </tr>
+        <tr>
+          <th>10157</th>
+          <td>Arcata/Eureka, CA: Arcata</td>
+          <td>1</td>
+          <td>0.000710</td>
+        </tr>
+        <tr>
+          <th>14487</th>
+          <td>Redding, CA: Redding Municipal</td>
+          <td>1</td>
+          <td>0.000710</td>
+        </tr>
+        <tr>
+          <th>12177</th>
+          <td>Hobbs, NM: Lea County Regional</td>
+          <td>1</td>
+          <td>0.000711</td>
+        </tr>
+        <tr>
+          <th>11049</th>
+          <td>College Station/Bryan, TX: Easterwood Field</td>
+          <td>1</td>
+          <td>0.000711</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Visualize the airport connections graph and label the top and bottom 5 airports by pagerank
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    import warnings
+
+.. code:: python
+
+    labels = {airports[i]: lookup.loc[airports[i]].str.split(':').str[0].values[0] 
+              for i in np.r_[top10[:5], bot10[:5]]}
+    
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        nx.draw(g, pos=nx.spring_layout(g), labels=labels, 
+                node_color='blue', font_color='red', alpha=0.5,
+                node_size=np.clip(5000*r, 1, 5000*r), width=0.1)
+
+
+
+.. image:: 13E_SparseMatrices_files/13E_SparseMatrices_70_0.png
+
+

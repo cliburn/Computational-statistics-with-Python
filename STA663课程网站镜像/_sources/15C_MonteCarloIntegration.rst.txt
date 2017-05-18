@@ -1,0 +1,960 @@
+
+.. code:: python
+
+    %matplotlib inline
+    import numpy as np
+    import scipy.stats as stats
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+Numerical Evaluation of Integrals
+=================================
+
+Integration problems are common in statistics whenever we are dealing
+with continuous distributions. For example the expectation of a function
+is an integration problem
+
+.. math::
+
+
+   E[f(x)] = \int{f(x) \, p(x) \, dx}
+
+In Bayesian statistics, we need to solve the integration problem for the
+marginal likelihood or evidence
+
+.. math::
+
+
+   p(X \mid \alpha) = \int{p(X \mid \theta) \, p(\theta \mid \alpha) d\theta}
+
+where :math:`\alpha` is a hyperparameter and :math:`p(X \mid \alpha)`
+appears in the denominator of Bayes theorem
+
+.. math::
+
+
+   p(\theta | X) = \frac{p(X \mid \theta) \, p(\theta \mid \alpha)}{p(X \mid \alpha)}
+
+In general, there is no closed form solution to these integrals, and we
+have to approximate them numerically. The first step is to check if
+there is some **reparameterization** that will simplify the problem.
+Then, the general approaches to solving integration problems are
+
+1. Numerical quadrature
+2. Importance sampling, adaptive importance sampling and variance
+   reduction techniques (Monte Carlo swindles)
+3. Markov Chain Monte Carlo
+4. Asymptotic approximations (Laplace method and its modern version in
+   variational inference)
+
+This lecture will review the concepts for quadrature and Monte Carlo
+integration.
+
+Quadrature
+----------
+
+You may recall from Calculus that integrals can be numerically evaluated
+using quadrature methods such as Trapezoid and Simpson's's rules. This
+is easy to do in Python, but has the drawback of the complexity growing
+as :math:`O(n^d)` where :math:`d` is the dimensionality of the data, and
+hence infeasible once :math:`d` grows beyond a modest number.
+
+Integrating functions
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from scipy.integrate import quad
+
+.. code:: python
+
+    def f(x):
+        return x * np.cos(71*x) + np.sin(13*x)
+
+.. code:: python
+
+    x = np.linspace(0, 1, 100)
+    plt.plot(x, f(x))
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_6_0.png
+
+
+Exact solution
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    from sympy import sin, cos, symbols, integrate
+    
+    x = symbols('x')
+    integrate(x * cos(71*x) + sin(13*x), (x, 0,1)).evalf(6)
+
+
+
+
+.. parsed-literal::
+
+    0.0202549
+
+
+
+Using quadrature
+^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    y, err = quad(f, 0, 1.0)
+    y
+
+
+
+
+.. parsed-literal::
+
+    0.02025493910239419
+
+
+
+Multiple integration
+^^^^^^^^^^^^^^^^^^^^
+
+Following the ``scipy.integrate``
+`documentation <http://docs.scipy.org/doc/scipy/reference/tutorial/integrate.html>`__,
+we integrate
+
+.. math::
+
+
+   I=\int_{y=0}^{1/2}\int_{x=0}^{1-2y} x y \, dx\, dy
+
+.. code:: python
+
+    x, y = symbols('x y')
+    integrate(x*y, (x, 0, 1-2*y), (y, 0, 0.5))
+
+
+
+
+.. parsed-literal::
+
+    0.0104166666666667
+
+
+
+.. code:: python
+
+    from scipy.integrate import nquad
+    
+    def f(x, y):
+        return x*y
+    
+    def bounds_y():
+        return [0, 0.5]
+    
+    def bounds_x(y):
+        return [0, 1-2*y]
+    
+    y, err = nquad(f, [bounds_x, bounds_y])
+    y
+
+
+
+
+.. parsed-literal::
+
+    0.010416666666666668
+
+
+
+Monte Carlo integration
+-----------------------
+
+The basic idea of Monte Carlo integration is very simple and only
+requires elementary statistics. Suppose we want to find the value of
+
+.. math::
+
+
+   I = \int_a^b f(x) dx
+
+in some region with volume :math:`V`. Monte Carlo integration estimates
+this integral by estimating the fraction of random points that fall
+below :math:`f(x)` multiplied by :math:`V`.
+
+In a statistical context, we use Monte Carlo integration to estimate the
+expectation
+
+.. math::
+
+
+   E[g(X)] = \int_X g(x) p(x) dx
+
+with
+
+.. math::
+
+
+   \bar{g_n} = \frac{1}{n} \sum_{i=1}^n g(x_i)
+
+where :math:`x_i \sim p` is a draw from the density :math:`p`.
+
+We can estimate the Monte Carlo variance of the approximation as
+
+.. math::
+
+
+   v_n = \frac{1}{n^2} \sum_{o=1}^n (g(x_i) - \bar{g_n})^2)
+
+Also, from the Central Limit Theorem,
+
+.. math::
+
+
+   \frac{\bar{g_n} - E[g(X)]}{\sqrt{v_n}} \sim \mathcal{N}(0, 1)
+
+The convergence of Monte Carlo integration is
+:math:`\mathcal{0}(n^{1/2})` and independent of the dimensionality.
+Hence Monte Carlo integration generally beats numerical integration for
+moderate- and high-dimensional integration since numerical integration
+(quadrature) converges as :math:`\mathcal{0}(n^{d})`. Even for low
+dimensional problems, Monte Carlo integration may have an advantage when
+the volume to be integrated is concentrated in a very small region and
+we can use information from the distribution to draw samples more often
+in the region of importance.
+
+An elementary, readable description of Monte Carlo integration and
+variance reduction techniques can be found
+`here <https://www.cs.dartmouth.edu/~wjarosz/publications/dissertation/appendixA.pdf>`__.
+
+Intuition behind Monte Carlo integration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We want to find some integral
+
+.. math:: I = \int{f(x)} \, dx
+
+Consider the expectation of a function :math:`g(x)` with respect to some
+distribution :math:`p(x)`. By definition, we have
+
+.. math::
+
+
+   E[g(x)] = \int{g(x) \, p(x) \, dx}
+
+If we choose :math:`g(x) = f(x)/p(x)`, then we have
+
+.. math::
+
+
+   \begin{align}
+   E[g(x)] &= \int{\frac{f(x}{p(x)} \, p(x) \, dx} \\
+   &= \int{f(x) dx} \\
+   &= I
+   \end{align}
+
+By the law of large numbers, the average converges on the expectation,
+so we have
+
+.. math::
+
+
+   I \approx \bar{g_n} = \frac{1}{n} \sum_{i=1}^n g(x_i)
+
+If :math:`f(x)` is a proper integral (i.e. bounded), and :math:`p(x)` is
+the uniform distribution, then :math:`g(x) = f(x)` and this is known as
+ordinary Monte Carlo. If the integral of :math:`f(x)` is improper, then
+we need to use another distribution with the same support as
+:math:`f(x)`.
+
+Intuition for error rate
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will just work this out for a proper integral :math:`f(x)` defined in
+the unit cube and bounded by :math:`|f(x)| \le 1`. Draw a random uniform
+vector :math:`x` in the unit cube. Then
+
+.. math::
+
+
+   \begin{align}
+   E[f(x_i)] &= \int{f(x) p(x) dx} = I \\
+   \text{Var}[f(x_i)] &= \int{(f(x_i) - I )^2 p(x) \, dx} \\
+   &= \int{f(x)^2 \, p(x) \, dx} - 2I \int(f(x) \, p(x) \, dx + I^2 \int{p(x) \, dx} \\
+   & \le \int{f(x)^2 \, p(x) \, dx}  + I^2 \\
+   & \le \int{f(x)^2 \, p(x) \, dx} \\
+   & \le \int{p(x) \, dx} = 1
+   \end{align}
+
+Now consider summing over many such IID draws
+:math:`S_n = f(x_1) + f(x_2) + \cdots + f(x_n)`. We have
+
+.. math::
+
+
+   \begin{align}
+   E[S_n] &= nI \\
+   \text{Var}[S_n] & \le n
+   \end{align}
+
+and as expected, we see that :math:`I \approx S_n/n`. From Chebyshev's
+inequality,
+
+.. math::
+
+
+   \begin{align}
+   P \left( \left| \frac{s_n}{n} - I \right| \ge \epsilon \right)  &= 
+   P \left( \left| s_n - nI \right| \ge n \epsilon \right) & \le \frac{\text{Var}[s_n]}{n^2 \epsilon^2} & \le
+   \frac{1}{n \epsilon^2} = \delta
+   \end{align}
+
+Suppose we want 1% accuracy and 99% confidence - i.e. set
+:math:`\epsilon = \delta = 0.01`. The above inequality tells us that we
+can achieve this with just :math:`n = 1/(\delta \epsilon^2) = 1,000,000`
+samples, regardless of the data dimensionality.
+
+Example
+~~~~~~~
+
+We want to estimate the following integral :math:`\int_0^1 e^x dx`. The
+minimum value of the function is 1 at :math:`x=0` and :math:`e` at
+:math:`x=1`.
+
+.. code:: python
+
+    x = np.linspace(0, 1, 100)
+    plt.plot(x, np.exp(x))
+    plt.xlim([0,1])
+    plt.ylim([0, np.e])
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_19_0.png
+
+
+Analytic solution
+^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    from sympy import symbols, integrate, exp
+    
+    x = symbols('x')
+    expr = integrate(exp(x), (x,0,1))
+    expr.evalf()
+
+
+
+
+.. parsed-literal::
+
+    1.71828182845905
+
+
+
+Using quadrature
+^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    from scipy import integrate
+    
+    y, err = integrate.quad(exp, 0, 1)
+    y
+
+
+
+
+.. parsed-literal::
+
+    1.7182818284590453
+
+
+
+Monte Carlo integration
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    for n in 10**np.array([1,2,3,4,5,6,7,8]):
+        x = np.random.uniform(0, 1, n)
+        sol = np.mean(np.exp(x))
+        print('%10d %.6f' % (n, sol))
+
+
+.. parsed-literal::
+
+            10 1.657995
+           100 1.736252
+          1000 1.712426
+         10000 1.718823
+        100000 1.718524
+       1000000 1.718875
+      10000000 1.718498
+     100000000 1.718227
+
+
+Monitoring variance in Monte Carlo integration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We are often interested in knowing how many iterations it takes for
+Monte Carlo integration to "converge". To do this, we would like some
+estimate of the variance, and it is useful to inspect such plots. One
+simple way to get confidence intervals for the plot of Monte Carlo
+estimate against number of iterations is simply to do many such
+simulations.
+
+For the example, we will try to estimate the function (again)
+
+.. math::
+
+
+   f(x) = x \cos 71 x + \sin 13x, \ \  0 \le x \le 1
+
+.. code:: python
+
+    def f(x):
+        return x * np.cos(71*x) + np.sin(13*x)
+
+.. code:: python
+
+    x = np.linspace(0, 1, 100)
+    plt.plot(x, f(x))
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_28_0.png
+
+
+Single MC integration estimate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    n = 100
+    x = f(np.random.random(n))
+    y = 1.0/n * np.sum(x)
+    y
+
+
+
+
+.. parsed-literal::
+
+    -0.13559989390095498
+
+
+
+Using multiple independent sequences to monitor convergence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We vary the sample size from 1 to 100 and calculate the value of
+:math:`y = \sum{x}/n` for 1000 replicates. We then plot the 2.5th and
+97.5th percentile of the 1000 values of :math:`y` to see how the
+variation in :math:`y` changes with sample size. The blue lines indicate
+the 2.5th and 97.5th percentiles, and the red line a sample path.
+
+.. code:: python
+
+    n = 100
+    reps = 1000
+    
+    x = f(np.random.random((n, reps)))
+    y = 1/np.arange(1, n+1)[:, None] * np.cumsum(x, axis=0)
+    upper, lower = np.percentile(y, [2.5, 97.5], axis=1)
+
+.. code:: python
+
+    plt.plot(np.arange(1, n+1), y, c='grey', alpha=0.02)
+    plt.plot(np.arange(1, n+1), y[:, 0], c='red', linewidth=1);
+    plt.plot(np.arange(1, n+1), upper, 'b', np.arange(1, n+1), lower, 'b')
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_33_0.png
+
+
+Using bootstrap to monitor convergence
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If it is too expensive to do 1000 replicates, we can use a bootstrap
+instead.
+
+.. code:: python
+
+    xb = np.random.choice(x[:,0], (n, reps), replace=True)
+    yb = 1/np.arange(1, n+1)[:, None] * np.cumsum(xb, axis=0)
+    upper, lower = np.percentile(yb, [2.5, 97.5], axis=1)
+
+.. code:: python
+
+    plt.plot(np.arange(1, n+1)[:, None], yb, c='grey', alpha=0.02)
+    plt.plot(np.arange(1, n+1), yb[:, 0], c='red', linewidth=1)
+    plt.plot(np.arange(1, n+1), upper, 'b', np.arange(1, n+1), lower, 'b')
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_36_0.png
+
+
+Variance Reduction
+------------------
+
+With independent samples, the variance of the Monte Carlo estimate is
+
+.. math::
+
+
+   \begin{align}
+   \text{Var}[\bar{g_n}] &= \text{Var} \left[ \frac{1}{N}\sum_{i=1}^{N} \frac{f(x_i)}{p(x_i)} \right] \\
+   &= \frac{1}{N^2} \sum_{i=1}^{N}  \text{Var} \left[ \frac{f(x_i)}{p(x_i)} \right] \\
+   &= \frac{1}{N^2} \sum_{i=1}^{N} \text{Var}[Y_i] \\
+   &= \frac{1}{N} \text{Var}[Y_i]
+   \end{align}
+
+where :math:`Y_i = f(x_i)/p(x_i)`. The objective of Monte Carlo swindles
+is to make :math:`\text{Var}[\bar{g_n}]` as small as possible for the
+same number of samples.
+
+Change of variables
+~~~~~~~~~~~~~~~~~~~
+
+The Cauchy distribution is given by
+
+.. math::
+
+
+   f(x) = \frac{1}{\pi (1 + x^2)}, \ \ -\infty \lt x \lt \infty 
+
+Suppose we want to integrate the tail probability :math:`P(X > 3)` using
+Monte Carlo. One way to do this is to draw many samples form a Cauchy
+distribution, and count how many of them are greater than 3, but this is
+extremely inefficient.
+
+Only 10% of samples will be used
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import scipy.stats as stats
+    
+    h_true = 1 - stats.cauchy().cdf(3)
+    h_true
+
+
+
+
+.. parsed-literal::
+
+    0.10241638234956674
+
+
+
+.. code:: python
+
+    n = 100
+    
+    x = stats.cauchy().rvs(n)
+    h_mc = 1.0/n * np.sum(x > 3)
+    h_mc, np.abs(h_mc - h_true)/h_true
+
+
+
+
+.. parsed-literal::
+
+    (0.14000000000000001, 0.36696880702301304)
+
+
+
+A change of variables lets us use 100% of draws
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We are trying to estimate the quantity
+
+.. math::
+
+
+   \int_3^\infty \frac{1}{\pi (1 + x^2)} dx
+
+Using the substitution :math:`y = 3/x` (and a little algebra), we get
+
+.. math::
+
+
+   \int_0^1 \frac{3}{\pi(9 + y^2)} dy
+
+Hence, a much more efficient MC estimator is
+
+.. math::
+
+
+   \frac{1}{n} \sum_{i=1}^n \frac{3}{\pi(9 + y_i^2)}
+
+where :math:`y_i \sim \mathcal{U}(0, 1)`.
+
+.. code:: python
+
+    y = stats.uniform().rvs(n)
+    h_cv = 1.0/n * np.sum(3.0/(np.pi * (9 + y**2)))
+    h_cv, np.abs(h_cv - h_true)/h_true
+
+
+
+
+.. parsed-literal::
+
+    (0.10213456867129996, 0.0027516464827364996)
+
+
+
+Monte Carlo swindles
+~~~~~~~~~~~~~~~~~~~~
+
+Apart from change of variables, there are several general techniques for
+variance reduction, sometimes known as Monte Carlo swindles since these
+methods improve the accuracy and convergence rate of Monte Carlo
+integration without increasing the number of Monte Carlo samples. Some
+Monte Carlo swindles are:
+
+-  importance sampling
+-  stratified sampling
+-  control variates
+-  antithetic variates
+-  conditioning swindles including Rao-Blackwellization and independent
+   variance decomposition
+
+Most of these techniques are not particularly computational in nature,
+so we will not cover them in the course. I expect you will learn them
+elsewhere. We will illustrate importance sampling and antithetic
+variables here as examples.
+
+Antithetic variables
+~~~~~~~~~~~~~~~~~~~~
+
+The idea behind antithetic variables is to choose two sets of random
+numbers that are negatively correlated, then take their average, so that
+the total variance of the estimator is smaller than it would be with two
+sets of IID random variables.
+
+.. code:: python
+
+    def f(x):
+        return x * np.cos(71*x) + np.sin(13*x)
+
+.. code:: python
+
+    from sympy import sin, cos, symbols, integrate
+    
+    x = symbols('x')
+    sol = integrate(x * cos(71*x) + sin(13*x), (x, 0,1)).evalf(16)
+    sol
+
+
+
+
+.. parsed-literal::
+
+    0.02025493910239406
+
+
+
+Vanilla Monte Carlo
+^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    n = 10000
+    u = np.random.random(n)
+    x = f(u)
+    y = 1.0/n * np.sum(x)
+    y, abs(y-sol)/sol
+
+
+
+
+.. parsed-literal::
+
+    (0.019429826681871879, 0.04073635651783584)
+
+
+
+Antithetic variables use first half of ``u`` supplemented with ``1-u``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This works because the random draws are now negatively correlated, and
+hence the sum of the variances will be less than in the IID case, while
+the expectation is unchanged.
+
+.. code:: python
+
+    u = np.r_[u[:n//2], 1-u[:n//2]]
+    x = f(u)
+    y = 1.0/n * np.sum(x)
+    y, abs(y-sol)/sol
+
+
+
+
+.. parsed-literal::
+
+    (0.021069877090343692, 0.04023403792180801)
+
+
+
+Importance sampling
+~~~~~~~~~~~~~~~~~~~
+
+Ordinary Monte Carlo sampling evaluates
+
+.. math::
+
+
+   E[g(X)] = \int_X g(x)\, p(x) \, dx
+
+Using another distribution :math:`h(x)` - the so-called "importance
+function", we can rewrite the above expression as an expectation with
+respect to :math:`h`
+
+.. math::
+
+
+   E_p[g(x)] \ = \  \int_X g(x) \frac{p(x)}{h(x)} h(x) dx \ = \ E_h\left[ \frac{g(X) p(X)}{h(X)} \right]
+
+giving us the new estimator
+
+.. math::
+
+
+   \bar{g_n} = \frac{1}{n} \sum_{i=1}^n \frac{p(x_i)}{h(x_i)} g(x_i)
+
+where :math:`x_i \sim g` is a draw from the density :math:`h`. This is
+helpful if the distribution :math:`h` has a similar shape as the
+function :math:`f(x)` that we are integrating over, since we will draw
+more samples from places where the integrand makes a larger or more
+"important" contribution. This is very dependent on a good choice for
+the importance function :math:`h`. Two simple choices for :math:`h` are
+scaling
+
+.. math::
+
+
+   h(x) = \frac{1}{a} p(x/a)
+
+and translation
+
+.. math::
+
+
+   h(x) = p*(x - a)
+
+In these cases, the parameter :math:`a` is typically chosen using some
+adaptive algorithm, giving rise to adaptive importance sampling.
+Alternatively, a different distribution can be chosen as shown in the
+example below.
+
+Example
+^^^^^^^
+
+Suppose we want to estimate the tail probability of
+:math:`\mathcal{N}(0, 1)` for :math:`P(X > 5)`. Regular MC integration
+using samples from :math:`\mathcal{N}(0, 1)` is hopeless since nearly
+all samples will be rejected. However, we can use the exponential
+density truncated at 5 as the importance function and use importance
+sampling.
+
+.. code:: python
+
+    x = np.linspace(4, 10, 100)
+    plt.plot(x, stats.expon(5).pdf(x))
+    plt.plot(x, stats.norm().pdf(x))
+    pass
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_54_0.png
+
+
+Expected answer
+^^^^^^^^^^^^^^^
+
+We expect about 3 draws out of 10,000,000 from :math:`\mathcal{N}(0, 1)`
+to have a value greater than 5. Hence simply sampling from
+:math:`\mathcal{N}(0, 1)` is hopelessly inefficient for Monte Carlo
+integration.
+
+.. code:: python
+
+    %precision 10
+
+
+
+
+.. parsed-literal::
+
+    '%.10f'
+
+
+
+.. code:: python
+
+    h_true =1 - stats.norm().cdf(5)
+    h_true
+
+
+
+
+.. parsed-literal::
+
+    0.0000002867
+
+
+
+Using direct Monte Carlo integration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    n = 10000
+    y = stats.norm().rvs(n)
+    h_mc = 1.0/n * np.sum(y > 5)
+    # estimate and relative error
+    h_mc, np.abs(h_mc - h_true)/h_true 
+
+
+
+
+.. parsed-literal::
+
+    (0.0000000000, 1.0000000000)
+
+
+
+Using importance sampling
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    n = 10000
+    y = stats.expon(loc=5).rvs(n)
+    h_is = 1.0/n * np.sum(stats.norm().pdf(y)/stats.expon(loc=5).pdf(y))
+    # estimate and relative error
+    h_is, np.abs(h_is- h_true)/h_true
+
+
+
+
+.. parsed-literal::
+
+    (0.0000002944, 0.0270524683)
+
+
+
+Quasi-random numbers
+--------------------
+
+Recall that the convergence of Monte Carlo integration is
+:math:`\mathcal{0}(n^{1/2})`. One issue with simple Monte Carlo is that
+randomly chosen points tend to be clumped. Clumping reduces accuracy
+since nearby points provide little additional information about the
+function begin estimated. One way to address this is to split the space
+into multiple integration regions, then sum them up. This is known as
+**stratified sampling**. Another alternative is to use quasi-random
+numbers which fill space more efficiently than random sequences
+
+It turns out that if we use quasi-random or low discrepancy sequences,
+we can get convergence approaching :math:`\mathcal{0}(1/n)`. There are
+several such generators, but their use in statistical settings is
+limited to cases where we are integrating with respect to uniform
+distributions. The regularity can also give rise to errors when
+estimating integrals of periodic functions. However, these quasi-Monte
+Carlo methods are used in computational finance models.
+
+Run
+
+::
+
+    ! pip install ghalton
+
+if ``ghalton`` is not installed.
+
+.. code:: python
+
+    import ghalton
+    
+    gen = ghalton.Halton(2)
+
+.. code:: python
+
+    plt.figure(figsize=(10,5))
+    plt.subplot(121)
+    xs = np.random.random((100,2))
+    plt.scatter(xs[:, 0], xs[:,1])
+    plt.axis([-0.05, 1.05, -0.05, 1.05])
+    plt.title('Pseudo-random', fontsize=20)
+    plt.subplot(122)
+    ys = np.array(gen.get(100))
+    plt.scatter(ys[:, 0], ys[:,1])
+    plt.axis([-0.05, 1.05, -0.05, 1.05])
+    plt.title('Quasi-random', fontsize=20);
+
+
+
+.. image:: 15C_MonteCarloIntegration_files/15C_MonteCarloIntegration_65_0.png
+
+
+Quasi-Monte Carlo integration can reduce variance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    h_true = 1 - stats.cauchy().cdf(3)
+
+.. code:: python
+
+    n = 10
+    x = stats.uniform().rvs((n, 5))
+    y = 3.0/(np.pi * (9 + x**2))
+    h_mc = np.sum(y, 0)/n
+    list(zip(h_mc, 100*np.abs(h_mc - h_true)/h_true))
+
+
+
+
+.. parsed-literal::
+
+    [(0.0995639331, 2.7851493922),
+     (0.1013519751, 1.0392939477),
+     (0.1018614640, 0.5418257479),
+     (0.1006039674, 1.7696533966),
+     (0.1030816150, 0.6495373689)]
+
+
+
+.. code:: python
+
+    gen1 = ghalton.Halton(1)
+    x = np.reshape(gen1.get(n*5), (n, 5))
+    y = 3.0/(np.pi * (9 + x**2))
+    h_qmc = np.sum(y, 0)/n
+    list(zip(h_qmc, 100*np.abs(h_qmc - h_true)/h_true))
+
+
+
+
+.. parsed-literal::
+
+    [(0.1026632536, 0.2410466633),
+     (0.1023042949, 0.1094428682),
+     (0.1026741252, 0.2516617574),
+     (0.1029118212, 0.4837496311),
+     (0.1026111501, 0.1901724534)]
+
+

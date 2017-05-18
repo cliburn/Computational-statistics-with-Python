@@ -1,0 +1,148 @@
+
+
+```python
+import os
+import sys
+import glob
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+%matplotlib inline
+%precision 4
+plt.style.use('ggplot')
+
+```
+
+算法复杂度（Algorithmic complexity）
+----
+
+数据结构，顾名思义就是用于存储数据的抽象结构。 咱们已经讲过了几个了，比如Python自带的列表list和字典dict等等。
+算法，则是用于处理各种数据结构的基本*配方recipes*。 当我们进行更多的计算密集型计算时，就需要更好地理解如何衡量数据结构和算法的性能，以便选择适当策略。
+
+### 分析测试和评分基准测试（Profling and benchmarking）
+
+我们可以根据执行的时间以及基本操作数来衡量性能。对运行时间的测量也称为分析测试或评分基准测试，在IPython Notebook里面可以方便地实现。
+
+
+```python
+# 使用 %timeit 来衡量函数调用需要的时间（to measure function calls）
+def f():
+    import time
+    time.sleep(2)
+
+%timeit -n1 f()
+```
+
+    1 loop, best of 3: 2 s per loop
+
+
+### 衡量算法复杂度（Measuring algorithmic complexity）
+
+然而，上面这种评分的相当一部分是受到本地硬件配置的影响，所以如果换一台其他的电脑，那这种评分对算法的参考意义就不那么可靠了。怎么来建立一个独立于硬件设备的评分测试基准呢？我们要引入一个大O记号（你可能在微积分课程里面已经看到过了）。大O记号在形式上表示的是函数增长速率方面的特征。
+
+设想你想在一个长度为$ n $的未排序列表中搜索一个项目。一种方法是从开始位置按照顺序对该列表进行扫描，直到找到为止（或者遍历完了也没找到）。 如果要找的这个项确实存在于在列表中，那么平均来看大概就需要扫描其中的（$ n / 2 $）个项来找到目标项。 如果要查找的项不在列表中，就需要扫描所有$ n $个项。 在任何情况下，搜索的复杂性都是随着列表$ n $的长度增长而线性增长。 所以就说这种线性扫描的搜索算法复杂度是$ \ mathcal {O}（n）$。
+
+严格来说，应该说 *平均* 的复杂度是$ \ mathcal {O}（n）$。然后还可以计算一下最差情况（也就是目标项不在列表的情景），这种情况下的这个搜索示例的平均复杂度也是$ \ mathcal {O}（n）$。 由于最坏情况下可能还需要对输入进行组织（例如，调用一个排序函数来对已排序列表进行排序），因此随机的输入有时就可以到视为平均情况。
+
+更正式地说，我们有一个比较函数$ g（n）$和另一个函数$ f（n）$ 其返回值是要测试的算法在输入大小为$n$ 中执行的“基本操作”的数量。在这个例子中，基本操作就是对两个项目的比较。这在统计学算法中通常是一次浮点运算（FLOP），和两个浮点数的加法、乘法类似。现在，如果$| f（n）/ g（n）| $的比值在$ n $趋于无穷大的时候收敛于$ M $，我们就说$ f（n）$的复杂度为$ g （n）$。例如，如果$ f（n）= 10n ^ 2 $而$ g（n）= n $，那么没有这样的收敛值$ M $，而$ f（n）$ 也就** 不能表示为 ** $ \ mathcal { O}（n）$，但如果$ g（n）= n ^ 2 $，那么$ M = 10 $ ，这样我们就说$ f（n）$的复杂度是$ \ mathcal {O}（n ^ 2） $。所以我们的搜索函数是$ \ mathcal {O}（n）$。正规地说，它实际上也符合$ \ mathcal {O}（n ^ 2）$以及其他的类型等，但是我们通常总是要选择“最简单的”$ g $函数。我们也不那么啰嗦太多的术语和项目，只使用最高次项来表征复杂度 - 所以不说$ \ mathcal {O}（n ^ 3 + n ^ 2 + n）$，而只使用最高的三次方$ \ mathcal {O}（n ^ 3）$。
+
+请注意，由于常数部分不能用大O记号表示，所以具有相同的大O复杂度的两种算法完全可能具有相差悬殊的性能！ 但大O记号对于理解我们的算法的*可扩展性*还是很有帮助的。 下面我们将对$ \ mathcal {O}（n ^ 2）$算法（例如起泡法排序）和$ \ mathcal {O}（n \ log {n}）$算法（例如合并排序）进行比较。 其中我们先忽略掉常数因素的差异，因为随着$ n $变大，常数项的影响作用就微不足道了。
+
+
+```python
+def f1(n, k):
+    return k*n*n
+
+def f2(n, k):
+    return k*n*np.log(n)
+
+n = np.arange(0, 20001)
+
+plt.plot(n, f1(n, 1), c='blue')
+plt.plot(n, f2(n, 1000), c='red')
+plt.xlabel('Size of input (n)', fontsize=16)
+plt.ylabel('Number of operations', fontsize=16)
+plt.legend(['$\mathcal{O}(n^2)$', '$\mathcal{O}(n \log n)$'], loc='best', fontsize=20);
+```
+
+### 常见的大O记号类型的性能比对（Ranking of common Big O complexity classes）
+
+- consstant = $\mathcal{O}(1)$
+- logarithmic = $\mathcal{O}(\log n)$
+- linear = $\mathcal{O}(n)$
+- n log n = $\mathcal{O}(n \log n)$
+- quadratic = $\mathcal{O}(n^2)$
+- cubic = $\mathcal{O}(n^3)$
+- polynomial = $\mathcal{O}(n^k)$
+- exponential = $\mathcal{O}(k^n)$
+- factorial =$\mathcal{O}(n!)$
+
+
+![](https://raw.githubusercontent.com/RehanSaeed/.NET-Big-O-Algorithm-Complexity-Cheat-Sheet/master/Cheat%20Sheet.png)
+
+### Python 数据结构中常见运算的复杂度（Complexity of common operations on Python data structures）
+
+参考 [这个链接](https://wiki.python.org/moin/TimeComplexity) 来了解标准 Python 数据结构中各种运算的复杂度。要注意，在实际应用中，在列表中搜索要比字典中的搜索消耗更多的性能开销。
+
+
+```python
+# 在列表 list 中进行搜索的复杂度是 O(n)
+
+alist = range(1000000)
+r = np.random.randint(100000)
+%timeit -n3 r in alist
+```
+
+
+```python
+# 在字典 dictionary 中搜索的复杂度是 O(1)
+
+adict = dict.fromkeys(alist)
+%timeit -n3 r in adict
+```
+
+空间复杂度（Space complexity）
+----
+
+我们还可以用大O记号来表征算法的空间复杂度。 基本思路也是相似的。 当数据量与可用的内存基本相同的时候，空间复杂度这个概念就非常重要了。 在这种情况下，具有高空间复杂性的算法可能需要不断对内存进行交换，然后这样就将导致实际执行起来的时间复杂度可能会远比其大O记号的理论值更差。
+
+所以有的时候，我们就需要对空间复杂度与时间复杂度进行权衡，牺牲空间复杂度来换取时间复杂度上的降低 - 缓存和动态编程就是这样的例子。
+
+### 需要多大的内存空间？（How much space do I need?）
+
+随着$ n $的增加，你需要清楚自己的算法的扩展性，同样道理，你也要了解你的数据结构需要多大的内存空间。例如，假如你有一个 $n \times p$ 的整数矩阵 ，一个 $n \times p$ 的浮点数矩阵，还有一个 $n \times p$的复数浮点数矩阵，那么按照你所有的全部RAM内存来计算，这些$n$ 和 $p$最大可以是多大呢？
+
+
+```python
+# 在 Unix 系统里面使用 %%time 来衡量 cell 的运行时间
+%time
+
+f()
+```
+
+    CPU times: user 1e+03 ns, sys: 0 ns, total: 1e+03 ns
+    Wall time: 4.05 µs
+
+
+
+```python
+# 这里要注意 Python 当中的不同对象在内存中有多大的开销
+# 原生的整数（raw integer ）应该是是64位（bit）或8字节（bytes）
+
+print sys.getsizeof(1)
+print sys.getsizeof(1234567890123456789012345678901234567890)
+print sys.getsizeof(3.14)
+print sys.getsizeof(3j)
+print sys.getsizeof('a')
+print sys.getsizeof('hello world')
+```
+
+
+```python
+print np.ones((100,100), dtype='byte').nbytes
+print np.ones((100,100), dtype='i2').nbytes
+print np.ones((100,100), dtype='int').nbytes # default is 64 bits or 8 bytes
+print np.ones((100,100), dtype='f4').nbytes
+print np.ones((100,100), dtype='float').nbytes # default is 64 bits or 8 bytes
+print np.ones((100,100), dtype='complex').nbytes
+```

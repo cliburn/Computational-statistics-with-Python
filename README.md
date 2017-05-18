@@ -1,27 +1,42 @@
-Computational Statistics with Python
-=======
+Title: Introduction of STA663
+Date: 2017-04-16
+Category: Duke
+Tags: Translation,Lesson,Programming,Python
 
-Very rough drafts  of IPython notebook based lecture notes for the MS Statistical Science course on [Statistical Computing and Computation](https://stat.duke.edu/courses/statistical-computing-and-computation), to be taught in Spring 2015.  The course will focus on the development of various algorithms for *optimization* and *simulation*, the workhorses of much of computational statistics. A variety of algorithms and data sets of gradually increasing complexity (1 dimension $\rightarrow$ many dimensions, fixed $\rightarrow$ adaptive, serial $\rightarrow$ parallel $\rightarrow$ massively parallel, small data $\rightarrow$ big data) will allow students to develop and practise the following skills:
 
-* Practices for reproducible analysis
-* Fundamentals of data management and munging
-* Use Python as a language for statistical computing
-* Use mathematical and statistical libraries effectively
-* Profile and optimize serial code
-* Effective use of different parallel programming paradigms
 
-In particular, the focus in on algorithms for:
+# 基于 Python 的计算机统计学
 
-* Optimization
-    * Newton-Raphson (functional programming and vectorization)
-    * Quadrature (adaptive methods)
-    * Gradient descent (multivariable)
-    * Solving GLMs (multivariable  + interface to C/C++)
-    * Expectation-maximization (multivariable + finite mixture models)
-* Simulation and resampling
-    * Bootstrap (basics of parallel programming)
-    * Map-reduce applications in statistics for big data
-	* Monte Carlo simulations (more parallel programming)
-    * MCMC (various samplers - GPU programming)
+##### 译者的话
 
-I believe that this is the first time a python based course will be offered in the Department, so it is really exciting. It also means a lot of new material needs to be developed, and I am borrowing freely from existing public domain IPython notebooks.
+
+
+这个是一个新系列，翻译 Duke University 的 STA 663 课程的全套内容，课件讲义教材练习题等等。
+
+之前我在[Computational Statistics in Python](https://zhuanlan.zhihu.com/p/26331447?fc=1&group_id=837074441317027840#comment-271427497) 这里提到了要翻译这套课程。
+这几天就开始了。
+本系列为对 Duke 大学 sta663 Computational-statistics-with-Python 课程的中文翻译。
+项目地址：[Kivy-CN/Computational-statistics-with-Python-CN](http://github.com/Kivy-CN/Computational-statistics-with-Python-CN)
+
+我们的专栏：<https://zhuanlan.zhihu.com/python-kivy>
+
+中文版阅读地址：<http://nbviewer.jupyter.org/github/Kivy-CN/Duke-STA-633-CN/blob/master/%E5%B7%B2%E7%BB%8F%E7%BF%BB%E8%AF%91%E7%9A%84%E8%AE%B2%E5%BA%A7%E5%86%85%E5%AE%B9/>
+
+中文版翻译稿源文件地址：[https://github.com/Kivy-CN/Computational-statistics-with-Python-CN](http://github.com/Kivy-CN/Computational-statistics-with-Python-CN)
+
+英文原版官网地址：[Computational Statistics in Python](http://people.duke.edu/%7Eccc14/sta-663/index.html)
+
+英文版源文件地址：[https://github.com/cliburn/Computational-statistics-with-Python](http://github.com/cliburn/Computational-statistics-with-Python)
+
+贡献者：<https://github.com/Kivy-CN/Duke-STA-663-CN/graphs/contributors>
+
+首先，这个翻译的质量依然不会很高，因为我水平有限，以及是用空闲时间偶尔翻译，所以大家发现错误请一定提出批评，我会及时改正的。
+
+另外我会逐步翻译 Duke 大学的 STA 633 课程的课件、纲要、教案 等等全部内容
+
+他们的这个课程和之前 [我翻译ThinkPython](https://zhuanlan.zhihu.com/p/24644499) 正好能衔接
+
+这个课程之后，又正好有足够的知识储备来尝试 斯坦福的 CS229 ：[Machine Learning (Course handouts)](http://cs229.stanford.edu/materials.html)
+
+也就是吴恩达当年带的那个机器学习的课程
+

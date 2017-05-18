@@ -1,0 +1,1279 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/09_Machine_Learning.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:10 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Machine Learning with sklearn &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code Optimization" href="10A_CodeOptimization.html" />
+    <link rel="prev" title="SQL" href="08_SQL.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="10A_CodeOptimization.html" title="Code Optimization"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="08_SQL.html" title="SQL"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="machine-learning-with-sklearn">
+<h1>Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code><a class="headerlink" href="#machine-learning-with-sklearn" title="Permalink to this headline">¶</a></h1>
+<p>This is mostly a tutorial to illustrate how to use <code class="docutils literal"><span class="pre">scikit-learn</span></code> to
+perform common machine learning pipelines. It is NOT meant to show how
+to do machine learning tasks well - you should take a machine learning
+course for that.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://scikit-learn.org/stable/documentation.html">Official scikit-learn
+documentation</a></p>
+</div>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>We will try to separate rocks from mines using this [data
+set](<a class="reference external" href="https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+(Sonar,+Mines+vs.+Rocks">https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+(Sonar,+Mines+vs.+Rocks</a>).</p>
+<p>From the description provided:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Data</span> <span class="n">Set</span> <span class="n">Information</span><span class="p">:</span>
+
+<span class="n">The</span> <span class="n">file</span> <span class="s2">&quot;sonar.mines&quot;</span> <span class="n">contains</span> <span class="mi">111</span> <span class="n">patterns</span> <span class="n">obtained</span> <span class="n">by</span> <span class="n">bouncing</span> <span class="n">sonar</span> <span class="n">signals</span> <span class="n">off</span> <span class="n">a</span> <span class="n">metal</span> <span class="n">cylinder</span> <span class="n">at</span> <span class="n">various</span> <span class="n">angles</span> <span class="ow">and</span> <span class="n">under</span> <span class="n">various</span> <span class="n">conditions</span><span class="o">.</span> <span class="n">The</span> <span class="n">file</span> <span class="s2">&quot;sonar.rocks&quot;</span> <span class="n">contains</span> <span class="mi">97</span> <span class="n">patterns</span> <span class="n">obtained</span> <span class="kn">from</span> <span class="nn">rocks</span> <span class="n">under</span> <span class="n">similar</span> <span class="n">conditions</span><span class="o">.</span> <span class="n">The</span> <span class="n">transmitted</span> <span class="n">sonar</span> <span class="n">signal</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">frequency</span><span class="o">-</span><span class="n">modulated</span> <span class="n">chirp</span><span class="p">,</span> <span class="n">rising</span> <span class="ow">in</span> <span class="n">frequency</span><span class="o">.</span> <span class="n">The</span> <span class="n">data</span> <span class="nb">set</span> <span class="n">contains</span> <span class="n">signals</span> <span class="n">obtained</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">variety</span> <span class="n">of</span> <span class="n">different</span> <span class="n">aspect</span> <span class="n">angles</span><span class="p">,</span> <span class="n">spanning</span> <span class="mi">90</span> <span class="n">degrees</span> <span class="k">for</span> <span class="n">the</span> <span class="n">cylinder</span> <span class="ow">and</span> <span class="mi">180</span> <span class="n">degrees</span> <span class="k">for</span> <span class="n">the</span> <span class="n">rock</span><span class="o">.</span>
+
+<span class="n">Each</span> <span class="n">pattern</span> <span class="ow">is</span> <span class="n">a</span> <span class="nb">set</span> <span class="n">of</span> <span class="mi">60</span> <span class="n">numbers</span> <span class="ow">in</span> <span class="n">the</span> <span class="nb">range</span> <span class="mf">0.0</span> <span class="n">to</span> <span class="mf">1.0</span><span class="o">.</span> <span class="n">Each</span> <span class="n">number</span> <span class="n">represents</span> <span class="n">the</span> <span class="n">energy</span> <span class="n">within</span> <span class="n">a</span> <span class="n">particular</span> <span class="n">frequency</span> <span class="n">band</span><span class="p">,</span> <span class="n">integrated</span> <span class="n">over</span> <span class="n">a</span> <span class="n">certain</span> <span class="n">period</span> <span class="n">of</span> <span class="n">time</span><span class="o">.</span> <span class="n">The</span> <span class="n">integration</span> <span class="n">aperture</span> <span class="k">for</span> <span class="n">higher</span> <span class="n">frequencies</span> <span class="n">occur</span> <span class="n">later</span> <span class="ow">in</span> <span class="n">time</span><span class="p">,</span> <span class="n">since</span> <span class="n">these</span> <span class="n">frequencies</span> <span class="n">are</span> <span class="n">transmitted</span> <span class="n">later</span> <span class="n">during</span> <span class="n">the</span> <span class="n">chirp</span><span class="o">.</span>
+
+<span class="n">The</span> <span class="n">label</span> <span class="n">associated</span> <span class="k">with</span> <span class="n">each</span> <span class="n">record</span> <span class="n">contains</span> <span class="n">the</span> <span class="n">letter</span> <span class="s2">&quot;R&quot;</span> <span class="k">if</span> <span class="n">the</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">rock</span> <span class="ow">and</span> <span class="s2">&quot;M&quot;</span> <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">mine</span> <span class="p">(</span><span class="n">metal</span> <span class="n">cylinder</span><span class="p">)</span><span class="o">.</span> <span class="n">The</span> <span class="n">numbers</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">labels</span> <span class="n">are</span> <span class="ow">in</span> <span class="n">increasing</span> <span class="n">order</span> <span class="n">of</span> <span class="n">aspect</span> <span class="n">angle</span><span class="p">,</span> <span class="n">but</span> <span class="n">they</span> <span class="n">do</span> <span class="ow">not</span> <span class="n">encode</span> <span class="n">the</span> <span class="n">angle</span> <span class="n">directly</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/sonar/sonar.all-data&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;X&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">208</span><span class="p">,</span> <span class="mi">61</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="the-last-column-are-labels-make-it-a-category">
+<h3>The last column are labels - make it a category<a class="headerlink" href="#the-last-column-are-labels-make-it-a-category" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X60&#39;</span><span class="p">:</span><span class="s1">&#39;Label&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">Label</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Label</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X0</th>
+      <th>X1</th>
+      <th>X2</th>
+      <th>X3</th>
+      <th>X4</th>
+      <th>X5</th>
+      <th>X6</th>
+      <th>X7</th>
+      <th>X8</th>
+      <th>X9</th>
+      <th>...</th>
+      <th>X51</th>
+      <th>X52</th>
+      <th>X53</th>
+      <th>X54</th>
+      <th>X55</th>
+      <th>X56</th>
+      <th>X57</th>
+      <th>X58</th>
+      <th>X59</th>
+      <th>Label</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0200</td>
+      <td>0.0371</td>
+      <td>0.0428</td>
+      <td>0.0207</td>
+      <td>0.0954</td>
+      <td>0.0986</td>
+      <td>0.1539</td>
+      <td>0.1601</td>
+      <td>0.3109</td>
+      <td>0.2111</td>
+      <td>...</td>
+      <td>0.0027</td>
+      <td>0.0065</td>
+      <td>0.0159</td>
+      <td>0.0072</td>
+      <td>0.0167</td>
+      <td>0.0180</td>
+      <td>0.0084</td>
+      <td>0.0090</td>
+      <td>0.0032</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0453</td>
+      <td>0.0523</td>
+      <td>0.0843</td>
+      <td>0.0689</td>
+      <td>0.1183</td>
+      <td>0.2583</td>
+      <td>0.2156</td>
+      <td>0.3481</td>
+      <td>0.3337</td>
+      <td>0.2872</td>
+      <td>...</td>
+      <td>0.0084</td>
+      <td>0.0089</td>
+      <td>0.0048</td>
+      <td>0.0094</td>
+      <td>0.0191</td>
+      <td>0.0140</td>
+      <td>0.0049</td>
+      <td>0.0052</td>
+      <td>0.0044</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0262</td>
+      <td>0.0582</td>
+      <td>0.1099</td>
+      <td>0.1083</td>
+      <td>0.0974</td>
+      <td>0.2280</td>
+      <td>0.2431</td>
+      <td>0.3771</td>
+      <td>0.5598</td>
+      <td>0.6194</td>
+      <td>...</td>
+      <td>0.0232</td>
+      <td>0.0166</td>
+      <td>0.0095</td>
+      <td>0.0180</td>
+      <td>0.0244</td>
+      <td>0.0316</td>
+      <td>0.0164</td>
+      <td>0.0095</td>
+      <td>0.0078</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.0100</td>
+      <td>0.0171</td>
+      <td>0.0623</td>
+      <td>0.0205</td>
+      <td>0.0205</td>
+      <td>0.0368</td>
+      <td>0.1098</td>
+      <td>0.1276</td>
+      <td>0.0598</td>
+      <td>0.1264</td>
+      <td>...</td>
+      <td>0.0121</td>
+      <td>0.0036</td>
+      <td>0.0150</td>
+      <td>0.0085</td>
+      <td>0.0073</td>
+      <td>0.0050</td>
+      <td>0.0044</td>
+      <td>0.0040</td>
+      <td>0.0117</td>
+      <td>R</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.0762</td>
+      <td>0.0666</td>
+      <td>0.0481</td>
+      <td>0.0394</td>
+      <td>0.0590</td>
+      <td>0.0649</td>
+      <td>0.1209</td>
+      <td>0.2467</td>
+      <td>0.3564</td>
+      <td>0.4459</td>
+      <td>...</td>
+      <td>0.0031</td>
+      <td>0.0054</td>
+      <td>0.0105</td>
+      <td>0.0110</td>
+      <td>0.0015</td>
+      <td>0.0072</td>
+      <td>0.0048</td>
+      <td>0.0107</td>
+      <td>0.0094</td>
+      <td>R</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 61 columns</p>
+</div></div>
+</div>
+<div class="section" id="exploratory-data-analysis">
+<h2>Exploratory data analysis<a class="headerlink" href="#exploratory-data-analysis" title="Permalink to this headline">¶</a></h2>
+<p>We can use simple plots to get some idea of what the data looks like</p>
+<ul class="simple">
+<li>Is the separation between rocks and mines obvious?</li>
+<li>How correlated are the variables?</li>
+<li>Do we need to standardize?</li>
+<li>Are there outliers?</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas.tools.plotting</span> <span class="k">import</span> <span class="n">andrews_curves</span><span class="p">,</span> <span class="n">parallel_coordinates</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">andrews_curves</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Label&#39;</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">parallel_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;Label&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">axvlines_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="mf">0.5</span><span class="p">})</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_12_0.png" src="_images/09_Machine_Learning_12_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="k">import</span> <span class="n">MDS</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mds</span> <span class="o">=</span> <span class="n">MDS</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mds_data</span> <span class="o">=</span> <span class="n">mds</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">mds_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">mds_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">Label</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_17_0.png" src="_images/09_Machine_Learning_17_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">heatmap</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_19_0.png" src="_images/09_Machine_Learning_19_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">box</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">xticks</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_21_0.png" src="_images/09_Machine_Learning_21_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">yticks</span><span class="o">=</span><span class="p">[])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_23_0.png" src="_images/09_Machine_Learning_23_0.png" />
+</div>
+<div class="section" id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="box-plots-suggest-we-should-standardize-the-data">
+<h3>Box plots suggest we should standardize the data<a class="headerlink" href="#box-plots-suggest-we-should-standardize-the-data" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">RobustScaler</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X0</th>
+      <th>X1</th>
+      <th>X2</th>
+      <th>X3</th>
+      <th>X4</th>
+      <th>X5</th>
+      <th>X6</th>
+      <th>X7</th>
+      <th>X8</th>
+      <th>X9</th>
+      <th>...</th>
+      <th>X50</th>
+      <th>X51</th>
+      <th>X52</th>
+      <th>X53</th>
+      <th>X54</th>
+      <th>X55</th>
+      <th>X56</th>
+      <th>X57</th>
+      <th>X58</th>
+      <th>X59</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0200</td>
+      <td>0.0371</td>
+      <td>0.0428</td>
+      <td>0.0207</td>
+      <td>0.0954</td>
+      <td>0.0986</td>
+      <td>0.1539</td>
+      <td>0.1601</td>
+      <td>0.3109</td>
+      <td>0.2111</td>
+      <td>...</td>
+      <td>0.0232</td>
+      <td>0.0027</td>
+      <td>0.0065</td>
+      <td>0.0159</td>
+      <td>0.0072</td>
+      <td>0.0167</td>
+      <td>0.0180</td>
+      <td>0.0084</td>
+      <td>0.0090</td>
+      <td>0.0032</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0453</td>
+      <td>0.0523</td>
+      <td>0.0843</td>
+      <td>0.0689</td>
+      <td>0.1183</td>
+      <td>0.2583</td>
+      <td>0.2156</td>
+      <td>0.3481</td>
+      <td>0.3337</td>
+      <td>0.2872</td>
+      <td>...</td>
+      <td>0.0125</td>
+      <td>0.0084</td>
+      <td>0.0089</td>
+      <td>0.0048</td>
+      <td>0.0094</td>
+      <td>0.0191</td>
+      <td>0.0140</td>
+      <td>0.0049</td>
+      <td>0.0052</td>
+      <td>0.0044</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.0262</td>
+      <td>0.0582</td>
+      <td>0.1099</td>
+      <td>0.1083</td>
+      <td>0.0974</td>
+      <td>0.2280</td>
+      <td>0.2431</td>
+      <td>0.3771</td>
+      <td>0.5598</td>
+      <td>0.6194</td>
+      <td>...</td>
+      <td>0.0033</td>
+      <td>0.0232</td>
+      <td>0.0166</td>
+      <td>0.0095</td>
+      <td>0.0180</td>
+      <td>0.0244</td>
+      <td>0.0316</td>
+      <td>0.0164</td>
+      <td>0.0095</td>
+      <td>0.0078</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 60 columns</p>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_scaled</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_scaled</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X0</th>
+      <th>X1</th>
+      <th>X2</th>
+      <th>X3</th>
+      <th>X4</th>
+      <th>X5</th>
+      <th>X6</th>
+      <th>X7</th>
+      <th>X8</th>
+      <th>X9</th>
+      <th>...</th>
+      <th>X50</th>
+      <th>X51</th>
+      <th>X52</th>
+      <th>X53</th>
+      <th>X54</th>
+      <th>X55</th>
+      <th>X56</th>
+      <th>X57</th>
+      <th>X58</th>
+      <th>X59</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.399551</td>
+      <td>-0.040648</td>
+      <td>-0.026926</td>
+      <td>-0.715105</td>
+      <td>0.364456</td>
+      <td>-0.101253</td>
+      <td>0.521638</td>
+      <td>0.297843</td>
+      <td>1.125272</td>
+      <td>0.021186</td>
+      <td>...</td>
+      <td>0.595283</td>
+      <td>-1.115432</td>
+      <td>-0.597604</td>
+      <td>0.680897</td>
+      <td>-0.295646</td>
+      <td>1.481635</td>
+      <td>1.763784</td>
+      <td>0.069870</td>
+      <td>0.171678</td>
+      <td>-0.658947</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.703538</td>
+      <td>0.421630</td>
+      <td>1.055618</td>
+      <td>0.323330</td>
+      <td>0.777676</td>
+      <td>2.607217</td>
+      <td>1.522625</td>
+      <td>2.510982</td>
+      <td>1.318325</td>
+      <td>0.588706</td>
+      <td>...</td>
+      <td>-0.297902</td>
+      <td>-0.522349</td>
+      <td>-0.256857</td>
+      <td>-0.843151</td>
+      <td>0.015503</td>
+      <td>1.901046</td>
+      <td>1.070732</td>
+      <td>-0.472406</td>
+      <td>-0.444554</td>
+      <td>-0.419852</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-0.129229</td>
+      <td>0.601067</td>
+      <td>1.723404</td>
+      <td>1.172176</td>
+      <td>0.400545</td>
+      <td>2.093337</td>
+      <td>1.968770</td>
+      <td>2.852370</td>
+      <td>3.232767</td>
+      <td>3.066105</td>
+      <td>...</td>
+      <td>-1.065875</td>
+      <td>1.017585</td>
+      <td>0.836373</td>
+      <td>-0.197833</td>
+      <td>1.231812</td>
+      <td>2.827246</td>
+      <td>4.120162</td>
+      <td>1.309360</td>
+      <td>0.252761</td>
+      <td>0.257582</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 60 columns</p>
+</div></div>
+<div class="section" id="if-there-are-gross-outliers-we-can-use-a-robust-routine">
+<h3>If there are gross outliers, we can use a robust routine<a class="headerlink" href="#if-there-are-gross-outliers-we-can-use-a-robust-routine" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_robust</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">RobustScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_robust</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X0</th>
+      <th>X1</th>
+      <th>X2</th>
+      <th>X3</th>
+      <th>X4</th>
+      <th>X5</th>
+      <th>X6</th>
+      <th>X7</th>
+      <th>X8</th>
+      <th>X9</th>
+      <th>...</th>
+      <th>X50</th>
+      <th>X51</th>
+      <th>X52</th>
+      <th>X53</th>
+      <th>X54</th>
+      <th>X55</th>
+      <th>X56</th>
+      <th>X57</th>
+      <th>X58</th>
+      <th>X59</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-0.126126</td>
+      <td>0.200000</td>
+      <td>0.217949</td>
+      <td>-0.581931</td>
+      <td>0.528726</td>
+      <td>0.096125</td>
+      <td>0.642271</td>
+      <td>0.538267</td>
+      <td>1.163123</td>
+      <td>0.182309</td>
+      <td>...</td>
+      <td>0.750000</td>
+      <td>-0.920635</td>
+      <td>-0.310433</td>
+      <td>0.723288</td>
+      <td>-0.037736</td>
+      <td>1.595142</td>
+      <td>1.791822</td>
+      <td>0.385185</td>
+      <td>0.390977</td>
+      <td>-0.387097</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.013514</td>
+      <td>0.682540</td>
+      <td>1.282051</td>
+      <td>0.619315</td>
+      <td>0.896746</td>
+      <td>2.476155</td>
+      <td>1.486320</td>
+      <td>2.646482</td>
+      <td>1.330279</td>
+      <td>0.665714</td>
+      <td>...</td>
+      <td>-0.112903</td>
+      <td>-0.317460</td>
+      <td>-0.066158</td>
+      <td>-0.493151</td>
+      <td>0.238994</td>
+      <td>1.983806</td>
+      <td>1.197026</td>
+      <td>-0.133333</td>
+      <td>-0.180451</td>
+      <td>-0.165899</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.153153</td>
+      <td>0.869841</td>
+      <td>1.938462</td>
+      <td>1.601246</td>
+      <td>0.560868</td>
+      <td>2.024590</td>
+      <td>1.862517</td>
+      <td>2.971685</td>
+      <td>2.987903</td>
+      <td>2.775925</td>
+      <td>...</td>
+      <td>-0.854839</td>
+      <td>1.248677</td>
+      <td>0.717557</td>
+      <td>0.021918</td>
+      <td>1.320755</td>
+      <td>2.842105</td>
+      <td>3.814126</td>
+      <td>1.570370</td>
+      <td>0.466165</td>
+      <td>0.460829</td>
+    </tr>
+  </tbody>
+</table>
+<p>3 rows × 60 columns</p>
+</div></div>
+</div>
+<div class="section" id="dimension-reduction">
+<h2>Dimension reduction<a class="headerlink" href="#dimension-reduction" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">PCA</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">208</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span>
+<span class="n">data_scaled_pca</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data_scaled</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_scaled</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">208</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span>
+<span class="n">vc</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+<span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="n">v</span><span class="p">,</span> <span class="n">vc</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;pc&#39;</span><span class="p">,</span> <span class="s1">&#39;explained&#39;</span><span class="p">,</span> <span class="s1">&#39;cumsum&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pc</th>
+      <th>explained</th>
+      <th>cumsum</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0.203466</td>
+      <td>0.203466</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>0.188972</td>
+      <td>0.392438</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>0.085500</td>
+      <td>0.477938</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3</td>
+      <td>0.056792</td>
+      <td>0.534730</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4</td>
+      <td>0.050071</td>
+      <td>0.584800</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>5</td>
+      <td>0.040650</td>
+      <td>0.625450</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>6</td>
+      <td>0.032790</td>
+      <td>0.658240</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>7</td>
+      <td>0.030465</td>
+      <td>0.688705</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>8</td>
+      <td>0.025660</td>
+      <td>0.714364</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>9</td>
+      <td>0.024911</td>
+      <td>0.739275</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="let-s-just-use-the-principal-components-that-explain-at-least-95-of-total-variance">
+<h3>Let&#8217;s just use the principal components that explain at least 95% of total variance<a class="headerlink" href="#let-s-just-use-the-principal-components-that-explain-at-least-95-of-total-variance" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n_comps</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">vc</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">)</span>
+<span class="n">n_comps</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">30</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_scaled_pca</span> <span class="o">=</span> <span class="n">data_scaled_pca</span><span class="o">.</span><span class="n">ix</span><span class="p">[:,</span> <span class="p">:</span><span class="n">n_comps</span><span class="p">]</span>
+<span class="n">data_scaled_pca</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">208</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">data_scaled_pca</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>X0</th>
+      <th>X1</th>
+      <th>X2</th>
+      <th>X3</th>
+      <th>X4</th>
+      <th>X5</th>
+      <th>X6</th>
+      <th>X7</th>
+      <th>X8</th>
+      <th>X9</th>
+      <th>...</th>
+      <th>X20</th>
+      <th>X21</th>
+      <th>X22</th>
+      <th>X23</th>
+      <th>X24</th>
+      <th>X25</th>
+      <th>X26</th>
+      <th>X27</th>
+      <th>X28</th>
+      <th>X29</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.921168</td>
+      <td>-1.370893</td>
+      <td>-1.666476</td>
+      <td>0.837913</td>
+      <td>-1.057324</td>
+      <td>1.712504</td>
+      <td>1.785716</td>
+      <td>-1.581264</td>
+      <td>0.335418</td>
+      <td>-1.028065</td>
+      <td>...</td>
+      <td>-1.208238</td>
+      <td>0.723202</td>
+      <td>0.304876</td>
+      <td>0.120470</td>
+      <td>-0.458567</td>
+      <td>-0.021847</td>
+      <td>-1.089710</td>
+      <td>0.096606</td>
+      <td>0.168123</td>
+      <td>-0.753434</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-0.480125</td>
+      <td>7.586388</td>
+      <td>-1.275734</td>
+      <td>3.859346</td>
+      <td>2.121112</td>
+      <td>-2.186818</td>
+      <td>-1.742764</td>
+      <td>1.517061</td>
+      <td>0.307933</td>
+      <td>-1.341882</td>
+      <td>...</td>
+      <td>-2.388110</td>
+      <td>0.021429</td>
+      <td>-0.145524</td>
+      <td>-0.246021</td>
+      <td>0.117770</td>
+      <td>0.704112</td>
+      <td>-0.052387</td>
+      <td>-0.240064</td>
+      <td>-0.178744</td>
+      <td>-0.554605</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.859228</td>
+      <td>6.439860</td>
+      <td>-0.030635</td>
+      <td>5.454599</td>
+      <td>1.552060</td>
+      <td>1.181619</td>
+      <td>-1.820138</td>
+      <td>-1.495929</td>
+      <td>-1.152459</td>
+      <td>-1.006030</td>
+      <td>...</td>
+      <td>-1.740823</td>
+      <td>-2.000942</td>
+      <td>-0.295682</td>
+      <td>1.931963</td>
+      <td>0.758036</td>
+      <td>-0.113901</td>
+      <td>0.964319</td>
+      <td>0.214707</td>
+      <td>0.527529</td>
+      <td>-0.033003</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4.597419</td>
+      <td>-3.104089</td>
+      <td>-1.785344</td>
+      <td>-1.115908</td>
+      <td>-2.785528</td>
+      <td>-2.072673</td>
+      <td>2.084530</td>
+      <td>1.707289</td>
+      <td>0.452390</td>
+      <td>-1.117318</td>
+      <td>...</td>
+      <td>-0.685825</td>
+      <td>1.307367</td>
+      <td>-0.662918</td>
+      <td>1.142591</td>
+      <td>-0.352601</td>
+      <td>-0.491193</td>
+      <td>-0.061186</td>
+      <td>0.150725</td>
+      <td>1.389191</td>
+      <td>0.642030</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-0.533868</td>
+      <td>1.849847</td>
+      <td>-0.860097</td>
+      <td>3.302076</td>
+      <td>2.808954</td>
+      <td>-0.783945</td>
+      <td>0.362657</td>
+      <td>0.812621</td>
+      <td>0.184578</td>
+      <td>-0.023594</td>
+      <td>...</td>
+      <td>0.503340</td>
+      <td>0.258970</td>
+      <td>0.253982</td>
+      <td>1.199262</td>
+      <td>-0.165722</td>
+      <td>-0.041342</td>
+      <td>-0.589311</td>
+      <td>-0.500720</td>
+      <td>-1.549835</td>
+      <td>-0.783667</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 30 columns</p>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df_pca</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">data_scaled_pca</span><span class="p">,</span> <span class="n">labels</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_pca</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mi">208</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> \
+  <span class="n">train_test_split</span><span class="p">(</span><span class="n">data_scaled_pca</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">class_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dual</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+          <span class="n">intercept_scaling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">multi_class</span><span class="o">=</span><span class="s1">&#39;ovr&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">penalty</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;liblinear&#39;</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">warm_start</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="accuracy-score">
+<h3>Accuracy score<a class="headerlink" href="#accuracy-score" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lr</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.78260869565217395</span>
+</pre></div>
+</div>
+<div class="section" id="using-support-vector-classifier-and-grid-search">
+<h4>Using Support Vector Classifier and Grid Search<a class="headerlink" href="#using-support-vector-classifier-and-grid-search" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="k">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">GridSearchCV</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;rbf&#39;</span><span class="p">],</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span>
+               <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]},</span>
+               <span class="p">{</span><span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">],</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]}]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="do-grid-search-with-parallel-jobs">
+<h3>Do grid search with parallel jobs<a class="headerlink" href="#do-grid-search-with-parallel-jobs" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">SVC</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">best_params_</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="s1">&#39;kernel&#39;</span><span class="p">:</span> <span class="s1">&#39;rbf&#39;</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">best_score_</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.76978417266187049</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.88405797101449279</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">classification_report</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">codes</span><span class="p">,</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>             <span class="n">precision</span>    <span class="n">recall</span>  <span class="n">f1</span><span class="o">-</span><span class="n">score</span>   <span class="n">support</span>
+
+          <span class="mi">0</span>       <span class="mf">0.88</span>      <span class="mf">0.92</span>      <span class="mf">0.90</span>        <span class="mi">38</span>
+          <span class="mi">1</span>       <span class="mf">0.90</span>      <span class="mf">0.84</span>      <span class="mf">0.87</span>        <span class="mi">31</span>
+
+<span class="n">avg</span> <span class="o">/</span> <span class="n">total</span>       <span class="mf">0.88</span>      <span class="mf">0.88</span>      <span class="mf">0.88</span>        <span class="mi">69</span>
+</pre></div>
+</div>
+<div class="section" id="using-a-random-forests-classifier">
+<h4>Using a Random Forests Classifier<a class="headerlink" href="#using-a-random-forests-classifier" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="k">import</span> <span class="n">RandomForestClassifier</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> \
+  <span class="n">train_test_split</span><span class="p">(</span><span class="n">data_scaled</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">25</span><span class="p">)),</span>
+               <span class="s1">&#39;max_features&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2</span><span class="p">))}]</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">RandomForestClassifier</span><span class="p">(),</span> <span class="n">parameters</span><span class="p">,</span>
+                   <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">best_params_</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;max_features&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;n_estimators&#39;</span><span class="p">:</span> <span class="mi">150</span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">clf</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.85507246376811596</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="which-features-are-important">
+<h3>Which features are important?<a class="headerlink" href="#which-features-are-important" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">imp</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">feature_importances_</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">imp</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imp</span><span class="p">)),</span> <span class="n">imp</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imp</span><span class="p">))</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/09_Machine_Learning_73_0.png" src="_images/09_Machine_Learning_73_0.png" />
+</div>
+</div>
+<div class="section" id="using-a-pipeline">
+<h2>Using a Pipeline<a class="headerlink" href="#using-a-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>For cross-validation (e.g. grid search for best parameters), we often
+need to chain a series of steps and treat it as a single model. This
+chaining can be done with a Pipeline object.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="k">import</span> <span class="n">Pipeline</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> \
+  <span class="n">train_test_split</span><span class="p">(</span><span class="n">data_scaled</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;scaler&#39;</span><span class="p">,</span> <span class="n">scaler</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;pca&#39;</span><span class="p">,</span> <span class="n">pca</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;clf&#39;</span><span class="p">,</span> <span class="n">clf</span><span class="p">)])</span>
+<span class="n">n_components</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">]</span>
+<span class="n">Cs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">estimator</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span>
+                         <span class="nb">dict</span><span class="p">(</span><span class="n">pca__n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span>
+                         <span class="n">clf__C</span><span class="o">=</span><span class="n">Cs</span><span class="p">),</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">estimator</span><span class="o">.</span><span class="n">best_estimator_</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s1">&#39;pca&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">n_components</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">30</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">estimator</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="o">.</span><span class="n">codes</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.76811594202898548</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">codes</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span>             <span class="n">precision</span>    <span class="n">recall</span>  <span class="n">f1</span><span class="o">-</span><span class="n">score</span>   <span class="n">support</span>
+
+          <span class="mi">0</span>       <span class="mf">0.84</span>      <span class="mf">0.71</span>      <span class="mf">0.77</span>        <span class="mi">38</span>
+          <span class="mi">1</span>       <span class="mf">0.70</span>      <span class="mf">0.84</span>      <span class="mf">0.76</span>        <span class="mi">31</span>
+
+<span class="n">avg</span> <span class="o">/</span> <span class="n">total</span>       <span class="mf">0.78</span>      <span class="mf">0.77</span>      <span class="mf">0.77</span>        <span class="mi">69</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exploratory-data-analysis">Exploratory data analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dimension-reduction">Dimension reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-a-pipeline">Using a Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="08_SQL.html"
+                          title="Previous page">&larr; SQL</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="10A_CodeOptimization.html"
+                          title="Next page">&rarr; Code Optimization</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/09_Machine_Learning.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="10A_CodeOptimization.html" title="Code Optimization"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="08_SQL.html" title="SQL"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/09_Machine_Learning.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:28 GMT -->
+</html>

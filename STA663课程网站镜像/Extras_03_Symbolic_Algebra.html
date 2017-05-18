@@ -1,0 +1,1138 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/Extras_03_Symbolic_Algebra.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:17:07 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Symbolic Algebra with sympy &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Bonus Material: Word count" href="Extras_02_Functional_Word_Counting.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Extras_02_Functional_Word_Counting.html" title="Bonus Material: Word count"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="symbolic-algebra-with-sympy">
+<h1>Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code><a class="headerlink" href="#symbolic-algebra-with-sympy" title="Permalink to this headline">¶</a></h1>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">init_session</span>
+<span class="n">init_session</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">IPython</span> <span class="n">console</span> <span class="k">for</span> <span class="n">SymPy</span> <span class="mf">0.7</span><span class="o">.</span><span class="mf">6.1</span> <span class="p">(</span><span class="n">Python</span> <span class="mf">3.5</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">)</span> <span class="p">(</span><span class="n">ground</span> <span class="n">types</span><span class="p">:</span> <span class="n">python</span><span class="p">)</span>
+
+<span class="n">These</span> <span class="n">commands</span> <span class="n">were</span> <span class="n">executed</span><span class="p">:</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x y z t&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;k m n&#39;</span><span class="p">,</span> <span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;f g h&#39;</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">init_printing</span><span class="p">()</span>
+
+<span class="n">Documentation</span> <span class="n">can</span> <span class="n">be</span> <span class="n">found</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">sympy</span><span class="o">.</span><span class="n">org</span>
+</pre></div>
+</div>
+<div class="section" id="basics">
+<h2>Basics<a class="headerlink" href="#basics" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy.stats</span> <span class="k">import</span> <span class="o">*</span>
+<span class="n">E</span><span class="p">(</span><span class="n">Die</span><span class="p">(</span><span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{7}{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[2 \sqrt{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr2</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">expr</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr2</span>
+</pre></div>
+</div>
+<div class="math">
+\[x \left(x + 2 y\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand</span><span class="p">(</span><span class="n">expr2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{2} + 2 x y\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factor</span><span class="p">(</span><span class="n">expand</span><span class="p">(</span><span class="n">expr2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[x \left(x + 2 y\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diff</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[e^{x} \sin{\left (x \right )} + e^{x} \cos{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[e^{x} \sin{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">oo</span><span class="p">,</span> <span class="n">oo</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\sqrt{2} \sqrt{\pi}}{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dsolve</span><span class="p">(</span><span class="n">Eq</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">exp</span><span class="p">(</span><span class="n">t</span><span class="p">)),</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[f{\left (t \right )} = C_{2} e^{- t} + \left(C_{1} + \frac{t}{2}\right) e^{t}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">eigenvals</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left \{ \frac{3}{2} + \frac{\sqrt{17}}{2} : 1, \quad - \frac{\sqrt{17}}{2} + \frac{3}{2} : 1\right \}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">nu</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;nu&#39;</span><span class="p">)</span>
+<span class="n">besselj</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">rewrite</span><span class="p">(</span><span class="n">jn</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\sqrt{2} \sqrt{z}}{\sqrt{\pi}} j_{\nu - \frac{1}{2}}\left(z\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">latex</span><span class="p">(</span><span class="n">Integral</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pi</span><span class="p">)))</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+'\int_{0}^{\pi} \cos^{2}{\left (x \right )}\, dx'
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\cos{\left (y \right )} + 1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="n">y</span>
+<span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="n">y</span><span class="p">)</span>
+<span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="n">y</span><span class="p">)</span>
+<span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(x^{x}\right)^{\left(x^{x}\right)^{\left(x^{x}\right)^{y}}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">expand_trig</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[2 \sin{\left (x \right )} \cos{\left (x \right )} + 2 \cos^{2}{\left (x \right )} - 1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">),</span> <span class="mi">2</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[2 \sin{\left (x \right )} \cos{\left (x \right )} + \cos{\left (2 x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span><span class="mi">3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">replacements</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="o">**</span><span class="n">i</span><span class="p">,</span> <span class="n">y</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">expr</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">replacements</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[- 4 x^{3} - 2 x + y^{4} + 4 y^{2} + 3\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sexpr</span> <span class="o">=</span> <span class="s2">&quot;x**4 - 4*x**3 + 4*x**2 - 2*x +3&quot;</span>
+<span class="n">sympify</span><span class="p">(</span><span class="n">sexpr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{4} - 4 x^{3} + 4 x^{2} - 2 x + 3\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[2.82842712474619\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pi</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">subs</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mf">2.4</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.0874989834394464\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">subs</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span> <span class="n">chop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[1.0\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">expr</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">lambdify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.84147098</span><span class="p">,</span>  <span class="mf">0.90929743</span><span class="p">,</span>  <span class="mf">0.14112001</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.7568025</span> <span class="p">,</span>
+       <span class="o">-</span><span class="mf">0.95892427</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2794155</span> <span class="p">,</span>  <span class="mf">0.6569866</span> <span class="p">,</span>  <span class="mf">0.98935825</span><span class="p">,</span>  <span class="mf">0.41211849</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="simplify">
+<h2>Simplify<a class="headerlink" href="#simplify" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">simplify</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">simplify</span><span class="p">(</span><span class="n">gamma</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">gamma</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(x - 2\right) \left(x - 1\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand</span><span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{3} + 3 x^{2} y + 3 x y^{2} + y^{3}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factor</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(x - 1\right) \left(x^{2} + 1\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factor_list</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left ( 1, \quad \left [ \left ( x - 1, \quad 1\right ), \quad \left ( x^{2} + 1, \quad 1\right )\right ]\right )\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand</span><span class="p">((</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\sin^{2}{\left (x \right )} + 2 \sin{\left (x \right )} \cos{\left (x \right )} + \cos^{2}{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">x</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">z</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span>
+<span class="n">cexpr</span> <span class="o">=</span> <span class="n">collect</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">cexpr</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{3} + x^{2} \left(- z + 2\right) + x \left(y + 1\right) - 3\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cexpr</span><span class="o">.</span><span class="n">coeff</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[- z + 2\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cancel</span><span class="p">((</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{1}{x} \left(x + 1\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">x</span><span class="o">*</span><span class="n">z</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cancel</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{1}{x - 1} \left(y^{2} - 2 y z + z^{2}\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factor</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\left(y - z\right)^{2}}{x - 1}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">21</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">12</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">apart</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{2 x - 1}{x^{2} + x + 1} - \frac{1}{x + 4} + \frac{3}{x}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">trigsimp</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="n">tan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">sec</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\sin^{2}{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">trigsimp</span><span class="p">(</span><span class="n">cosh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sinh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\cosh{\left (2 x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_trig</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\sin{\left (x \right )} \cos{\left (y \right )} + \sin{\left (y \right )} \cos{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x y&#39;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;a b&#39;</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">z</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;z t c&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">powsimp</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{a + b}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">powsimp</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">a</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(x y\right)^{a}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">powsimp</span><span class="p">(</span><span class="n">t</span><span class="o">**</span><span class="n">c</span><span class="o">*</span><span class="n">z</span><span class="o">**</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[t^{c} z^{c}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">powsimp</span><span class="p">(</span><span class="n">t</span><span class="o">**</span><span class="n">c</span><span class="o">*</span><span class="n">z</span><span class="o">**</span><span class="n">c</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(t z\right)^{c}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_power_exp</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{a} x^{b}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_power_base</span><span class="p">((</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="n">a</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{a} y^{a}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">powdenest</span><span class="p">((</span><span class="n">x</span><span class="o">**</span><span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{a b}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="n">real</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_log</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\log{\left (x \right )} + \log{\left (y \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_log</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[n \log{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">logcombine</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\log{\left (x^{n} \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x y z&#39;</span><span class="p">)</span>
+<span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;k m n&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[n!\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[{\binom{n}{k}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">hyper</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}{{}_{2}F_{1}\left(\begin{matrix} 1, 2 \\ 3 \end{matrix}\middle| {z} \right)}\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factorial</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">rewrite</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\Gamma{\left(x + 1 \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">tan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">rewrite</span><span class="p">(</span><span class="n">sin</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{2 \sin^{2}{\left (x \right )}}{\sin{\left (2 x \right )}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expand_func</span><span class="p">(</span><span class="n">gamma</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[x \left(x + 1\right) \left(x + 2\right) \Gamma{\left(x \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">hyperexpand</span><span class="p">(</span><span class="n">hyper</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">z</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[- \frac{1}{z} \log{\left (- z + 1 \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span>  <span class="n">meijerg</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],[]],</span> <span class="o">-</span><span class="n">z</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}{G_{2, 1}^{1, 1}\left(\begin{matrix} 1 &amp; 1 \\1 &amp;  \end{matrix} \middle| {- z} \right)}\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">hyperexpand</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[e^{\frac{1}{z}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">combsimp</span><span class="p">(</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{n + 1}{k + 1}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">list_to_frac</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+    <span class="n">expr</span> <span class="o">=</span> <span class="n">Integer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="n">expr</span> <span class="o">+=</span> <span class="n">i</span>
+        <span class="n">expr</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">expr</span>
+    <span class="k">return</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">expr</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">list_to_frac</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{43}{30}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">syms</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;a0:5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">syms</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left ( a_{0}, \quad a_{1}, \quad a_{2}, \quad a_{3}, \quad a_{4}\right )\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">frac</span> <span class="o">=</span> <span class="n">list_to_frac</span><span class="p">(</span><span class="n">syms</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">frac</span>
+</pre></div>
+</div>
+<div class="math">
+\[a_{0} + \frac{1}{a_{1} + \frac{1}{a_{2} + \frac{1}{a_{3} + \frac{1}{a_{4}}}}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">frac</span> <span class="o">=</span> <span class="n">cancel</span><span class="p">(</span><span class="n">frac</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">frac</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{a_{0} a_{1} a_{2} a_{3} a_{4} + a_{0} a_{1} a_{2} + a_{0} a_{1} a_{4} + a_{0} a_{3} a_{4} + a_{0} + a_{2} a_{3} a_{4} + a_{2} + a_{4}}{a_{1} a_{2} a_{3} a_{4} + a_{1} a_{2} + a_{1} a_{4} + a_{3} a_{4} + 1}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy.printing</span> <span class="k">import</span> <span class="n">print_ccode</span>
+<span class="n">print_ccode</span><span class="p">(</span><span class="n">frac</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">a0</span><span class="o">*</span><span class="n">a1</span><span class="o">*</span><span class="n">a2</span><span class="o">*</span><span class="n">a3</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a0</span><span class="o">*</span><span class="n">a1</span><span class="o">*</span><span class="n">a2</span> <span class="o">+</span> <span class="n">a0</span><span class="o">*</span><span class="n">a1</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a0</span><span class="o">*</span><span class="n">a3</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a0</span> <span class="o">+</span> <span class="n">a2</span><span class="o">*</span><span class="n">a3</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a2</span> <span class="o">+</span> <span class="n">a4</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">a1</span><span class="o">*</span><span class="n">a2</span><span class="o">*</span><span class="n">a3</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a1</span><span class="o">*</span><span class="n">a2</span> <span class="o">+</span> <span class="n">a1</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="n">a3</span><span class="o">*</span><span class="n">a4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="calculus">
+<h2>Calculus<a class="headerlink" href="#calculus" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diff</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[- \sin{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[24 x\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">*</span><span class="n">z</span><span class="p">)</span>
+<span class="n">diff</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">deriv</span> <span class="o">=</span> <span class="n">Derivative</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">deriv</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\partial^{7}}{\partial x\partial y^{2}\partial z^{4}}  e^{x y z}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">deriv</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\sin{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">oo</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">oo</span><span class="p">,</span> <span class="n">oo</span><span class="p">),</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">oo</span><span class="p">,</span> <span class="n">oo</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\pi\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\int x^{x}\, dx\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">Integral</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\int \log^{2}{\left (x \right )}\, dx\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[x \log^{2}{\left (x \right )} - 2 x \log{\left (x \right )} + 2 x\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{3 \sqrt{2} \sqrt{\pi} S\left(\frac{\sqrt{2} x}{\sqrt{\pi}}\right)}{8 \Gamma{\left(\frac{7}{4} \right)}} \Gamma{\left(\frac{3}{4} \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">integrate</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="n">y</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">oo</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\begin{cases} \Gamma{\left(y + 1 \right)} &amp; \text{for}\: - \Re{y} &lt; 1 \\\int_{0}^{\infty} x^{y} e^{- x}\, dx &amp; \text{otherwise} \end{cases}\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">limit</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">Limit</span><span class="p">((</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\lim_{x \to 0^+}\left(\frac{1}{x} \left(\cos{\left (x \right )} - 1\right)\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">doit</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[0\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">limit</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[-\infty\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">expr</span><span class="o">.</span><span class="n">series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[1 + x + \frac{x^{2}}{2} + \mathcal{O}\left(x^{4}\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">x</span><span class="o">**</span><span class="mi">6</span> <span class="o">+</span> <span class="n">O</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x + x^{3} + \mathcal{O}\left(x^{4}\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">*</span> <span class="n">O</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\mathcal{O}\left(x\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">removeO</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{x^{2}}{2} + x + 1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exp</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[-5 + \frac{1}{2} \left(x - 6\right)^{2} + \frac{1}{6} \left(x - 6\right)^{3} + \frac{1}{24} \left(x - 6\right)^{4} + \frac{1}{120} \left(x - 6\right)^{5} + x + \mathcal{O}\left(\left(x - 6\right)^{6}; x\rightarrow6\right)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">exp</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">series</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">removeO</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[x + \frac{1}{120} \left(x - 12\right)^{5} + \frac{1}{24} \left(x - 12\right)^{4} + \frac{1}{6} \left(x - 12\right)^{3} + \frac{1}{2} \left(x - 12\right)^{2} - 11\]</div>
+</div>
+<div class="section" id="working-with-matrices">
+<h2>Working with matrices<a class="headerlink" href="#working-with-matrices" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">P</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">M</span><span class="o">*</span><span class="n">P</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}5\\3\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; 2 &amp; 3\\3 &amp; 2 &amp; 1\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left ( 2, \quad 3\right )\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}3\\1\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<span class="n">M</span><span class="o">**-</span><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}\frac{1}{3} &amp; - \frac{1}{3}\\\frac{2}{9} &amp; \frac{1}{9}\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; -2\\3 &amp; 3\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; 0 &amp; 0\\0 &amp; 1 &amp; 0\\0 &amp; 0 &amp; 1\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; 0 &amp; 0\\0 &amp; 2 &amp; 0\\0 &amp; 0 &amp; 3\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">det</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[9\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">4</span><span class="p">]])</span>
+<span class="n">M</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; 0 &amp; 1 &amp; 3\\2 &amp; 3 &amp; 4 &amp; 7\\-1 &amp; -3 &amp; -3 &amp; -4\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">rref</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left ( \left[\begin{matrix}1 &amp; 0 &amp; 1 &amp; 3\\0 &amp; 1 &amp; \frac{2}{3} &amp; \frac{1}{3}\\0 &amp; 0 &amp; 0 &amp; 0\end{matrix}\right], \quad \left [ 0, \quad 1\right ]\right )\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">4</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">M</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}1 &amp; 2 &amp; 3 &amp; 0 &amp; 0\\4 &amp; 10 &amp; 0 &amp; 0 &amp; 1\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">nullspace</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left [ \left[\begin{matrix}-15\\6\\1\\0\\0\end{matrix}\right], \quad \left[\begin{matrix}0\\0\\0\\1\\0\end{matrix}\right], \quad \left[\begin{matrix}1\\- \frac{1}{2}\\0\\0\\1\end{matrix}\right]\right ]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]])</span>
+<span class="n">M</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}3 &amp; -2 &amp; 4 &amp; -2\\5 &amp; 3 &amp; -3 &amp; -2\\5 &amp; -2 &amp; 2 &amp; -2\\5 &amp; -2 &amp; -3 &amp; 3\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">eigenvals</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left \{ -2 : 1, \quad 3 : 1, \quad 5 : 2\right \}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">.</span><span class="n">eigenvects</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left [ \left ( -2, \quad 1, \quad \left [ \left[\begin{matrix}0\\1\\1\\1\end{matrix}\right]\right ]\right ), \quad \left ( 3, \quad 1, \quad \left [ \left[\begin{matrix}1\\1\\1\\1\end{matrix}\right]\right ]\right ), \quad \left ( 5, \quad 2, \quad \left [ \left[\begin{matrix}1\\1\\1\\0\end{matrix}\right], \quad \left[\begin{matrix}0\\-1\\0\\1\end{matrix}\right]\right ]\right )\right ]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">P</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">diagonalize</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">P</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}0 &amp; 1 &amp; 1 &amp; 0\\1 &amp; 1 &amp; 1 &amp; -1\\1 &amp; 1 &amp; 1 &amp; 0\\1 &amp; 1 &amp; 0 &amp; 1\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">D</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}-2 &amp; 0 &amp; 0 &amp; 0\\0 &amp; 3 &amp; 0 &amp; 0\\0 &amp; 0 &amp; 5 &amp; 0\\0 &amp; 0 &amp; 0 &amp; 5\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">P</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">P</span><span class="o">**-</span><span class="mi">1</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\left[\begin{matrix}3 &amp; -2 &amp; 4 &amp; -2\\5 &amp; 3 &amp; -3 &amp; -2\\5 &amp; -2 &amp; 2 &amp; -2\\5 &amp; -2 &amp; -3 &amp; 3\end{matrix}\right]\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lamda</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;lamda&#39;</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">charpoly</span><span class="p">(</span><span class="n">lamda</span><span class="p">)</span>
+<span class="n">p</span>
+</pre></div>
+</div>
+<div class="math">
+\[\operatorname{PurePoly}{\left( \lambda^{4} - 11 \lambda^{3} + 29 \lambda^{2} + 35 \lambda - 150, \lambda, domain=\mathbb{Z} \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">factor</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left(\lambda - 5\right)^{2} \left(\lambda - 3\right) \left(\lambda + 2\right)\]</div>
+</div>
+<div class="section" id="solving-algebraic-and-differential-equations">
+<h2>Solving Algebraic and Differential Equations<a class="headerlink" href="#solving-algebraic-and-differential-equations" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">solve</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left [ -1, \quad 1\right ]\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">solve</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">-</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left \{ x : \frac{1}{2}, \quad y : \frac{5}{2}\right \}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">solve</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">6</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">9</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left [ 0, \quad 3\right ]\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">roots</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">6</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">9</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\left \{ 0 : 1, \quad 3 : 2\right \}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;f g&#39;</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{d}{d x} f{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diffeq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diffeq</span>
+</pre></div>
+</div>
+<div class="math">
+\[f{\left (x \right )} - 2 \frac{d}{d x} f{\left (x \right )} + \frac{d^{2}}{d x^{2}}  f{\left (x \right )} = \sin{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dsolve</span><span class="p">(</span><span class="n">diffeq</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{1}{2} \cos{\left (x \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dsolve</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">sin</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;a t&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">diffeq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">a</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">diffeq</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{d}{d t} f{\left (t \right )} = a t\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dsolve</span><span class="p">(</span><span class="n">diffeq</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[f{\left (t \right )} = C_{1} + \frac{a t^{2}}{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">Function</span><span class="p">)</span>
+<span class="n">diffeq</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">a</span><span class="o">*</span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+<span class="n">diffeq</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{d}{d t} x{\left (t \right )} = a x{\left (t \right )}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">dsolve</span><span class="p">(</span><span class="n">diffeq</span><span class="p">,</span> <span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[x{\left (t \right )} = C_{1} e^{a t}\]</div>
+</div>
+<div class="section" id="numerics">
+<h2>Numerics<a class="headerlink" href="#numerics" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">N</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[3.141592654\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">Integral</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">oo</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.5\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">maxn</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.5\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">quad</span><span class="o">=</span><span class="s1">&#39;osc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.504067061906928\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">quad</span><span class="o">=</span><span class="s1">&#39;osc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.50406706190692837199\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">Integral</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\int_{0}^{1} \sin{\left (\frac{1}{x} \right )}\, dx\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.5\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">x</span><span class="p">)</span>
+<span class="n">expr</span>
+</pre></div>
+</div>
+<div class="math">
+\[\int_{1}^{\infty} \frac{1}{x^{2}} \sin{\left (x \right )}\, dx\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">quad</span><span class="o">=</span><span class="s1">&#39;osc&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.504067061906928\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">nsimplify</span><span class="p">(</span><span class="n">pi</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{355}{113}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">expr</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">expr</span><span class="o">.</span><span class="n">evalf</span><span class="p">(</span><span class="n">subs</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mf">3.14</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">397</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">=</span> <span class="n">lambdify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">expr</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">f1</span><span class="p">(</span><span class="mf">3.14</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">slowest</span> <span class="n">run</span> <span class="n">took</span> <span class="mf">13.44</span> <span class="n">times</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">fastest</span><span class="o">.</span> <span class="n">This</span> <span class="n">could</span> <span class="n">mean</span> <span class="n">that</span> <span class="n">an</span> <span class="n">intermediate</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">cached</span>
+<span class="mi">1000000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">308</span> <span class="n">ns</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f2</span> <span class="o">=</span> <span class="n">lambdify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="n">f2</span><span class="p">(</span><span class="mf">3.14</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">The</span> <span class="n">slowest</span> <span class="n">run</span> <span class="n">took</span> <span class="mf">16.41</span> <span class="n">times</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">fastest</span><span class="o">.</span> <span class="n">This</span> <span class="n">could</span> <span class="n">mean</span> <span class="n">that</span> <span class="n">an</span> <span class="n">intermediate</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">cached</span>
+<span class="mi">100000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">2.2</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10000</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">306</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="p">[</span><span class="n">f1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">100</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">5.19</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpmath</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">odefun</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]:</span>
+    <span class="n">nprint</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">nprint</span><span class="p">([</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)],</span> <span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">0.54030230586814</span><span class="p">,</span> <span class="mf">0.841470984807897</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">0.54030230586814</span><span class="p">,</span> <span class="mf">0.841470984807897</span><span class="p">]</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">0.801143615546934</span><span class="p">,</span> <span class="mf">0.598472144103957</span><span class="p">]</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">0.801143615546934</span><span class="p">,</span> <span class="mf">0.598472144103957</span><span class="p">]</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">0.839071529076452</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.54402111088937</span><span class="p">]</span>
+<span class="p">[</span><span class="o">-</span><span class="mf">0.839071529076452</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.54402111088937</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy.plotting</span> <span class="k">import</span> <span class="n">plot</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">y</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/Extras_03_Symbolic_Algebra_167_0.png" src="_images/Extras_03_Symbolic_Algebra_167_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy.plotting</span> <span class="k">import</span> <span class="n">plot3d_parametric_surface</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span>
+<span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;u v&#39;</span><span class="p">)</span>
+<span class="n">plot3d_parametric_surface</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">u</span> <span class="o">+</span> <span class="n">v</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="n">u</span> <span class="o">-</span> <span class="n">v</span><span class="p">),</span> <span class="n">u</span><span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/Extras_03_Symbolic_Algebra_168_0.png" src="_images/Extras_03_Symbolic_Algebra_168_0.png" />
+</div>
+<div class="section" id="statistics">
+<h2>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sympy.stats</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="n">Symbol</span><span class="p">(</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">theta</span> <span class="o">=</span> <span class="n">Symbol</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">Symbol</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">D</span> <span class="o">=</span> <span class="n">density</span><span class="p">(</span><span class="n">X</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">D</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{z^{k - 1} e^{- \frac{z}{\theta}}}{\theta^{k} \Gamma{\left(k \right)}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="n">cdf</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">meijerg</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">C</span>
+</pre></div>
+</div>
+<div class="math">
+\[\begin{split}\begin{cases} - \frac{k \gamma\left(k, 0\right)}{\Gamma{\left(k + 1 \right)}} + \frac{k \gamma\left(k, \frac{z}{\theta}\right)}{\Gamma{\left(k + 1 \right)}} &amp; \text{for}\: z \geq 0 \\0 &amp; \text{otherwise} \end{cases}\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">E</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\theta}{\Gamma{\left(k \right)}} \Gamma{\left(k + 1 \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">V</span> <span class="o">=</span> <span class="n">variance</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">V</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\theta^{3} \theta^{k - 1}}{\theta^{k} \Gamma^{2}{\left(k \right)}} \Gamma^{2}{\left(k + 1 \right)} - \frac{2 \theta^{2}}{\Gamma^{2}{\left(k \right)}} \Gamma^{2}{\left(k + 1 \right)} + \frac{\theta \theta^{k + 1}}{\theta^{k} \Gamma{\left(k \right)}} \Gamma{\left(k + 2 \right)}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">simplify</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[k \theta^{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="n">Normal</span><span class="p">(</span><span class="s1">&#39;Gaussian&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">density</span><span class="p">(</span><span class="n">N</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{\sqrt{2}}{10 \sqrt{\pi}} e^{- \frac{1}{50} \left(z - 10\right)^{2}}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">density</span><span class="p">(</span><span class="n">N</span><span class="p">)(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">evalf</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="math">
+\[0.029945493127149\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">simplify</span><span class="p">(</span><span class="n">cdf</span><span class="p">(</span><span class="n">N</span><span class="p">)(</span><span class="n">z</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{1}{2} \operatorname{erf}{\left (\frac{\sqrt{2}}{10} \left(z - 10\right) \right )} + \frac{1}{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">P</span><span class="p">(</span><span class="n">N</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[\frac{1}{2}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sample</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="math">
+\[6.30254802079348\]</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simplify">Simplify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#calculus">Calculus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#working-with-matrices">Working with matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solving-algebraic-and-differential-equations">Solving Algebraic and Differential Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#numerics">Numerics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#statistics">Statistics</a></li>
+</ul>
+</li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="Extras_02_Functional_Word_Counting.html"
+                          title="Previous page">&larr; Bonus Material: Word count</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Extras_03_Symbolic_Algebra.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Extras_02_Functional_Word_Counting.html" title="Bonus Material: Word count"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/Extras_03_Symbolic_Algebra.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:17:14 GMT -->
+</html>

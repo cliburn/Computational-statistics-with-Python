@@ -1,0 +1,1323 @@
+
+Machine Learning with ``sklearn``
+=================================
+
+This is mostly a tutorial to illustrate how to use ``scikit-learn`` to
+perform common machine learning pipelines. It is NOT meant to show how
+to do machine learning tasks well - you should take a machine learning
+course for that.
+
+.. code:: python
+
+    %matplotlib inline
+    import itertools as it
+    import numpy as np
+    import pandas as pd
+    from pandas import DataFrame, Series
+    import matplotlib.pyplot as plt
+
+Resources
+---------
+
+`Official scikit-learn
+documentation <http://scikit-learn.org/stable/documentation.html>`__
+
+Example
+-------
+
+We will try to separate rocks from mines using this [data
+set](https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+(Sonar,+Mines+vs.+Rocks).
+
+From the description provided:
+
+::
+
+    Data Set Information:
+
+    The file "sonar.mines" contains 111 patterns obtained by bouncing sonar signals off a metal cylinder at various angles and under various conditions. The file "sonar.rocks" contains 97 patterns obtained from rocks under similar conditions. The transmitted sonar signal is a frequency-modulated chirp, rising in frequency. The data set contains signals obtained from a variety of different aspect angles, spanning 90 degrees for the cylinder and 180 degrees for the rock. 
+
+    Each pattern is a set of 60 numbers in the range 0.0 to 1.0. Each number represents the energy within a particular frequency band, integrated over a certain period of time. The integration aperture for higher frequencies occur later in time, since these frequencies are transmitted later during the chirp. 
+
+    The label associated with each record contains the letter "R" if the object is a rock and "M" if it is a mine (metal cylinder). The numbers in the labels are in increasing order of aspect angle, but they do not encode the angle directly.
+
+.. code:: python
+
+    df = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/connectionist-bench/sonar/sonar.all-data', header=None, prefix='X')
+
+.. code:: python
+
+    df.shape
+
+
+
+
+.. parsed-literal::
+
+    (208, 61)
+
+
+
+The last column are labels - make it a category
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    df.rename(columns={'X60':'Label'}, inplace=True)
+    df.Label = df.Label.astype('category')
+
+.. code:: python
+
+    df.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X0</th>
+          <th>X1</th>
+          <th>X2</th>
+          <th>X3</th>
+          <th>X4</th>
+          <th>X5</th>
+          <th>X6</th>
+          <th>X7</th>
+          <th>X8</th>
+          <th>X9</th>
+          <th>...</th>
+          <th>X51</th>
+          <th>X52</th>
+          <th>X53</th>
+          <th>X54</th>
+          <th>X55</th>
+          <th>X56</th>
+          <th>X57</th>
+          <th>X58</th>
+          <th>X59</th>
+          <th>Label</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.0200</td>
+          <td>0.0371</td>
+          <td>0.0428</td>
+          <td>0.0207</td>
+          <td>0.0954</td>
+          <td>0.0986</td>
+          <td>0.1539</td>
+          <td>0.1601</td>
+          <td>0.3109</td>
+          <td>0.2111</td>
+          <td>...</td>
+          <td>0.0027</td>
+          <td>0.0065</td>
+          <td>0.0159</td>
+          <td>0.0072</td>
+          <td>0.0167</td>
+          <td>0.0180</td>
+          <td>0.0084</td>
+          <td>0.0090</td>
+          <td>0.0032</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.0453</td>
+          <td>0.0523</td>
+          <td>0.0843</td>
+          <td>0.0689</td>
+          <td>0.1183</td>
+          <td>0.2583</td>
+          <td>0.2156</td>
+          <td>0.3481</td>
+          <td>0.3337</td>
+          <td>0.2872</td>
+          <td>...</td>
+          <td>0.0084</td>
+          <td>0.0089</td>
+          <td>0.0048</td>
+          <td>0.0094</td>
+          <td>0.0191</td>
+          <td>0.0140</td>
+          <td>0.0049</td>
+          <td>0.0052</td>
+          <td>0.0044</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.0262</td>
+          <td>0.0582</td>
+          <td>0.1099</td>
+          <td>0.1083</td>
+          <td>0.0974</td>
+          <td>0.2280</td>
+          <td>0.2431</td>
+          <td>0.3771</td>
+          <td>0.5598</td>
+          <td>0.6194</td>
+          <td>...</td>
+          <td>0.0232</td>
+          <td>0.0166</td>
+          <td>0.0095</td>
+          <td>0.0180</td>
+          <td>0.0244</td>
+          <td>0.0316</td>
+          <td>0.0164</td>
+          <td>0.0095</td>
+          <td>0.0078</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>0.0100</td>
+          <td>0.0171</td>
+          <td>0.0623</td>
+          <td>0.0205</td>
+          <td>0.0205</td>
+          <td>0.0368</td>
+          <td>0.1098</td>
+          <td>0.1276</td>
+          <td>0.0598</td>
+          <td>0.1264</td>
+          <td>...</td>
+          <td>0.0121</td>
+          <td>0.0036</td>
+          <td>0.0150</td>
+          <td>0.0085</td>
+          <td>0.0073</td>
+          <td>0.0050</td>
+          <td>0.0044</td>
+          <td>0.0040</td>
+          <td>0.0117</td>
+          <td>R</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>0.0762</td>
+          <td>0.0666</td>
+          <td>0.0481</td>
+          <td>0.0394</td>
+          <td>0.0590</td>
+          <td>0.0649</td>
+          <td>0.1209</td>
+          <td>0.2467</td>
+          <td>0.3564</td>
+          <td>0.4459</td>
+          <td>...</td>
+          <td>0.0031</td>
+          <td>0.0054</td>
+          <td>0.0105</td>
+          <td>0.0110</td>
+          <td>0.0015</td>
+          <td>0.0072</td>
+          <td>0.0048</td>
+          <td>0.0107</td>
+          <td>0.0094</td>
+          <td>R</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>5 rows × 61 columns</p>
+    </div>
+
+
+
+Exploratory data analysis
+-------------------------
+
+We can use simple plots to get some idea of what the data looks like
+
+-  Is the separation between rocks and mines obvious?
+-  How correlated are the variables?
+-  Do we need to standardize?
+-  Are there outliers?
+
+.. code:: python
+
+    from pandas.tools.plotting import andrews_curves, parallel_coordinates
+
+Is there a clear separation between rocks and mines?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    fig, axes = plt.subplots(2,1,figsize=(12,8))
+    andrews_curves(df, 'Label', samples=50, linewidth=0.5, ax=axes[0])
+    axes[0].set_xticks([])
+    parallel_coordinates(df, 'Label', linewidth=0.5, ax=axes[1], 
+                         axvlines_kwds={'linewidth': 0.5, 'color': 'black', 'alpha':0.5})
+    axes[1].set_xticks([])
+    axes[1].margins(0.05)
+    pass
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_12_0.png
+
+
+Visualize separation, clustering and outliers wtih MDS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sklearn.manifold import MDS
+
+.. code:: python
+
+    mds = MDS(n_components=2)
+
+.. code:: python
+
+    mds_data = mds.fit_transform(df.ix[:, :-1])
+
+.. code:: python
+
+    plt.scatter(mds_data[:, 0], mds_data[:, 1], c=df.Label.cat.codes, s=50);
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_17_0.png
+
+
+How correlated are the 60 columns?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    heatmap = plt.pcolor(df.corr(), cmap='jet')
+    plt.colorbar(heatmap)
+    plt.gca().set_aspect('equal')
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_19_0.png
+
+
+Are the variables on the same scale? Are there outliers?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    df.plot.box(figsize=(12,4), xticks=[])
+    pass
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_21_0.png
+
+
+What does the distribution of each variable look like?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    df.plot.density(figsize=(6, 60), subplots=True, yticks=[])
+    pass
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_23_0.png
+
+
+Preprocessing
+-------------
+
+Box plots suggest we should standardize the data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    from sklearn.preprocessing import StandardScaler, RobustScaler
+
+.. code:: python
+
+    data, labels = df.ix[:, :-1], df.ix[:, -1]
+
+.. code:: python
+
+    data.head(3)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X0</th>
+          <th>X1</th>
+          <th>X2</th>
+          <th>X3</th>
+          <th>X4</th>
+          <th>X5</th>
+          <th>X6</th>
+          <th>X7</th>
+          <th>X8</th>
+          <th>X9</th>
+          <th>...</th>
+          <th>X50</th>
+          <th>X51</th>
+          <th>X52</th>
+          <th>X53</th>
+          <th>X54</th>
+          <th>X55</th>
+          <th>X56</th>
+          <th>X57</th>
+          <th>X58</th>
+          <th>X59</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.0200</td>
+          <td>0.0371</td>
+          <td>0.0428</td>
+          <td>0.0207</td>
+          <td>0.0954</td>
+          <td>0.0986</td>
+          <td>0.1539</td>
+          <td>0.1601</td>
+          <td>0.3109</td>
+          <td>0.2111</td>
+          <td>...</td>
+          <td>0.0232</td>
+          <td>0.0027</td>
+          <td>0.0065</td>
+          <td>0.0159</td>
+          <td>0.0072</td>
+          <td>0.0167</td>
+          <td>0.0180</td>
+          <td>0.0084</td>
+          <td>0.0090</td>
+          <td>0.0032</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.0453</td>
+          <td>0.0523</td>
+          <td>0.0843</td>
+          <td>0.0689</td>
+          <td>0.1183</td>
+          <td>0.2583</td>
+          <td>0.2156</td>
+          <td>0.3481</td>
+          <td>0.3337</td>
+          <td>0.2872</td>
+          <td>...</td>
+          <td>0.0125</td>
+          <td>0.0084</td>
+          <td>0.0089</td>
+          <td>0.0048</td>
+          <td>0.0094</td>
+          <td>0.0191</td>
+          <td>0.0140</td>
+          <td>0.0049</td>
+          <td>0.0052</td>
+          <td>0.0044</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.0262</td>
+          <td>0.0582</td>
+          <td>0.1099</td>
+          <td>0.1083</td>
+          <td>0.0974</td>
+          <td>0.2280</td>
+          <td>0.2431</td>
+          <td>0.3771</td>
+          <td>0.5598</td>
+          <td>0.6194</td>
+          <td>...</td>
+          <td>0.0033</td>
+          <td>0.0232</td>
+          <td>0.0166</td>
+          <td>0.0095</td>
+          <td>0.0180</td>
+          <td>0.0244</td>
+          <td>0.0316</td>
+          <td>0.0164</td>
+          <td>0.0095</td>
+          <td>0.0078</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>3 rows × 60 columns</p>
+    </div>
+
+
+
+.. code:: python
+
+    data_scaled = DataFrame(StandardScaler().fit_transform(data), columns=data.columns)
+
+.. code:: python
+
+    data_scaled.head(3)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X0</th>
+          <th>X1</th>
+          <th>X2</th>
+          <th>X3</th>
+          <th>X4</th>
+          <th>X5</th>
+          <th>X6</th>
+          <th>X7</th>
+          <th>X8</th>
+          <th>X9</th>
+          <th>...</th>
+          <th>X50</th>
+          <th>X51</th>
+          <th>X52</th>
+          <th>X53</th>
+          <th>X54</th>
+          <th>X55</th>
+          <th>X56</th>
+          <th>X57</th>
+          <th>X58</th>
+          <th>X59</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>-0.399551</td>
+          <td>-0.040648</td>
+          <td>-0.026926</td>
+          <td>-0.715105</td>
+          <td>0.364456</td>
+          <td>-0.101253</td>
+          <td>0.521638</td>
+          <td>0.297843</td>
+          <td>1.125272</td>
+          <td>0.021186</td>
+          <td>...</td>
+          <td>0.595283</td>
+          <td>-1.115432</td>
+          <td>-0.597604</td>
+          <td>0.680897</td>
+          <td>-0.295646</td>
+          <td>1.481635</td>
+          <td>1.763784</td>
+          <td>0.069870</td>
+          <td>0.171678</td>
+          <td>-0.658947</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.703538</td>
+          <td>0.421630</td>
+          <td>1.055618</td>
+          <td>0.323330</td>
+          <td>0.777676</td>
+          <td>2.607217</td>
+          <td>1.522625</td>
+          <td>2.510982</td>
+          <td>1.318325</td>
+          <td>0.588706</td>
+          <td>...</td>
+          <td>-0.297902</td>
+          <td>-0.522349</td>
+          <td>-0.256857</td>
+          <td>-0.843151</td>
+          <td>0.015503</td>
+          <td>1.901046</td>
+          <td>1.070732</td>
+          <td>-0.472406</td>
+          <td>-0.444554</td>
+          <td>-0.419852</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>-0.129229</td>
+          <td>0.601067</td>
+          <td>1.723404</td>
+          <td>1.172176</td>
+          <td>0.400545</td>
+          <td>2.093337</td>
+          <td>1.968770</td>
+          <td>2.852370</td>
+          <td>3.232767</td>
+          <td>3.066105</td>
+          <td>...</td>
+          <td>-1.065875</td>
+          <td>1.017585</td>
+          <td>0.836373</td>
+          <td>-0.197833</td>
+          <td>1.231812</td>
+          <td>2.827246</td>
+          <td>4.120162</td>
+          <td>1.309360</td>
+          <td>0.252761</td>
+          <td>0.257582</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>3 rows × 60 columns</p>
+    </div>
+
+
+
+If there are gross outliers, we can use a robust routine
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    data_robust = DataFrame(RobustScaler().fit_transform(data), columns=data.columns)
+
+.. code:: python
+
+    data_robust.head(3)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X0</th>
+          <th>X1</th>
+          <th>X2</th>
+          <th>X3</th>
+          <th>X4</th>
+          <th>X5</th>
+          <th>X6</th>
+          <th>X7</th>
+          <th>X8</th>
+          <th>X9</th>
+          <th>...</th>
+          <th>X50</th>
+          <th>X51</th>
+          <th>X52</th>
+          <th>X53</th>
+          <th>X54</th>
+          <th>X55</th>
+          <th>X56</th>
+          <th>X57</th>
+          <th>X58</th>
+          <th>X59</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>-0.126126</td>
+          <td>0.200000</td>
+          <td>0.217949</td>
+          <td>-0.581931</td>
+          <td>0.528726</td>
+          <td>0.096125</td>
+          <td>0.642271</td>
+          <td>0.538267</td>
+          <td>1.163123</td>
+          <td>0.182309</td>
+          <td>...</td>
+          <td>0.750000</td>
+          <td>-0.920635</td>
+          <td>-0.310433</td>
+          <td>0.723288</td>
+          <td>-0.037736</td>
+          <td>1.595142</td>
+          <td>1.791822</td>
+          <td>0.385185</td>
+          <td>0.390977</td>
+          <td>-0.387097</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1.013514</td>
+          <td>0.682540</td>
+          <td>1.282051</td>
+          <td>0.619315</td>
+          <td>0.896746</td>
+          <td>2.476155</td>
+          <td>1.486320</td>
+          <td>2.646482</td>
+          <td>1.330279</td>
+          <td>0.665714</td>
+          <td>...</td>
+          <td>-0.112903</td>
+          <td>-0.317460</td>
+          <td>-0.066158</td>
+          <td>-0.493151</td>
+          <td>0.238994</td>
+          <td>1.983806</td>
+          <td>1.197026</td>
+          <td>-0.133333</td>
+          <td>-0.180451</td>
+          <td>-0.165899</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.153153</td>
+          <td>0.869841</td>
+          <td>1.938462</td>
+          <td>1.601246</td>
+          <td>0.560868</td>
+          <td>2.024590</td>
+          <td>1.862517</td>
+          <td>2.971685</td>
+          <td>2.987903</td>
+          <td>2.775925</td>
+          <td>...</td>
+          <td>-0.854839</td>
+          <td>1.248677</td>
+          <td>0.717557</td>
+          <td>0.021918</td>
+          <td>1.320755</td>
+          <td>2.842105</td>
+          <td>3.814126</td>
+          <td>1.570370</td>
+          <td>0.466165</td>
+          <td>0.460829</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>3 rows × 60 columns</p>
+    </div>
+
+
+
+Dimension reduction
+-------------------
+
+.. code:: python
+
+    from sklearn.decomposition import PCA
+
+.. code:: python
+
+    data.shape
+
+
+
+
+.. parsed-literal::
+
+    (208, 60)
+
+
+
+.. code:: python
+
+    pca = PCA()
+    data_scaled_pca = DataFrame(pca.fit_transform(data_scaled), columns=data.columns)
+
+.. code:: python
+
+    data_scaled.shape
+
+
+
+
+.. parsed-literal::
+
+    (208, 60)
+
+
+
+.. code:: python
+
+    v = pca.explained_variance_ratio_
+    vc = v.cumsum()
+    DataFrame(list(zip(it.count(), v, vc)), columns=['pc', 'explained', 'cumsum']).head(10)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>pc</th>
+          <th>explained</th>
+          <th>cumsum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0</td>
+          <td>0.203466</td>
+          <td>0.203466</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1</td>
+          <td>0.188972</td>
+          <td>0.392438</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>2</td>
+          <td>0.085500</td>
+          <td>0.477938</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>3</td>
+          <td>0.056792</td>
+          <td>0.534730</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>4</td>
+          <td>0.050071</td>
+          <td>0.584800</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>5</td>
+          <td>0.040650</td>
+          <td>0.625450</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>6</td>
+          <td>0.032790</td>
+          <td>0.658240</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>7</td>
+          <td>0.030465</td>
+          <td>0.688705</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>8</td>
+          <td>0.025660</td>
+          <td>0.714364</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>9</td>
+          <td>0.024911</td>
+          <td>0.739275</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Let's just use the principal components that explain at least 95% of total variance
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    n_comps = 1 + np.argmax(vc > 0.95) 
+    n_comps
+
+
+
+
+.. parsed-literal::
+
+    30
+
+
+
+.. code:: python
+
+    data_scaled_pca = data_scaled_pca.ix[:, :n_comps]
+    data_scaled_pca.shape
+
+
+
+
+.. parsed-literal::
+
+    (208, 30)
+
+
+
+.. code:: python
+
+    data_scaled_pca.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>X0</th>
+          <th>X1</th>
+          <th>X2</th>
+          <th>X3</th>
+          <th>X4</th>
+          <th>X5</th>
+          <th>X6</th>
+          <th>X7</th>
+          <th>X8</th>
+          <th>X9</th>
+          <th>...</th>
+          <th>X20</th>
+          <th>X21</th>
+          <th>X22</th>
+          <th>X23</th>
+          <th>X24</th>
+          <th>X25</th>
+          <th>X26</th>
+          <th>X27</th>
+          <th>X28</th>
+          <th>X29</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1.921168</td>
+          <td>-1.370893</td>
+          <td>-1.666476</td>
+          <td>0.837913</td>
+          <td>-1.057324</td>
+          <td>1.712504</td>
+          <td>1.785716</td>
+          <td>-1.581264</td>
+          <td>0.335418</td>
+          <td>-1.028065</td>
+          <td>...</td>
+          <td>-1.208238</td>
+          <td>0.723202</td>
+          <td>0.304876</td>
+          <td>0.120470</td>
+          <td>-0.458567</td>
+          <td>-0.021847</td>
+          <td>-1.089710</td>
+          <td>0.096606</td>
+          <td>0.168123</td>
+          <td>-0.753434</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>-0.480125</td>
+          <td>7.586388</td>
+          <td>-1.275734</td>
+          <td>3.859346</td>
+          <td>2.121112</td>
+          <td>-2.186818</td>
+          <td>-1.742764</td>
+          <td>1.517061</td>
+          <td>0.307933</td>
+          <td>-1.341882</td>
+          <td>...</td>
+          <td>-2.388110</td>
+          <td>0.021429</td>
+          <td>-0.145524</td>
+          <td>-0.246021</td>
+          <td>0.117770</td>
+          <td>0.704112</td>
+          <td>-0.052387</td>
+          <td>-0.240064</td>
+          <td>-0.178744</td>
+          <td>-0.554605</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>3.859228</td>
+          <td>6.439860</td>
+          <td>-0.030635</td>
+          <td>5.454599</td>
+          <td>1.552060</td>
+          <td>1.181619</td>
+          <td>-1.820138</td>
+          <td>-1.495929</td>
+          <td>-1.152459</td>
+          <td>-1.006030</td>
+          <td>...</td>
+          <td>-1.740823</td>
+          <td>-2.000942</td>
+          <td>-0.295682</td>
+          <td>1.931963</td>
+          <td>0.758036</td>
+          <td>-0.113901</td>
+          <td>0.964319</td>
+          <td>0.214707</td>
+          <td>0.527529</td>
+          <td>-0.033003</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>4.597419</td>
+          <td>-3.104089</td>
+          <td>-1.785344</td>
+          <td>-1.115908</td>
+          <td>-2.785528</td>
+          <td>-2.072673</td>
+          <td>2.084530</td>
+          <td>1.707289</td>
+          <td>0.452390</td>
+          <td>-1.117318</td>
+          <td>...</td>
+          <td>-0.685825</td>
+          <td>1.307367</td>
+          <td>-0.662918</td>
+          <td>1.142591</td>
+          <td>-0.352601</td>
+          <td>-0.491193</td>
+          <td>-0.061186</td>
+          <td>0.150725</td>
+          <td>1.389191</td>
+          <td>0.642030</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>-0.533868</td>
+          <td>1.849847</td>
+          <td>-0.860097</td>
+          <td>3.302076</td>
+          <td>2.808954</td>
+          <td>-0.783945</td>
+          <td>0.362657</td>
+          <td>0.812621</td>
+          <td>0.184578</td>
+          <td>-0.023594</td>
+          <td>...</td>
+          <td>0.503340</td>
+          <td>0.258970</td>
+          <td>0.253982</td>
+          <td>1.199262</td>
+          <td>-0.165722</td>
+          <td>-0.041342</td>
+          <td>-0.589311</td>
+          <td>-0.500720</td>
+          <td>-1.549835</td>
+          <td>-0.783667</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>5 rows × 30 columns</p>
+    </div>
+
+
+
+.. code:: python
+
+    df_pca = pd.concat([data_scaled_pca, labels], axis=1)
+    df_pca.shape
+
+
+
+
+.. parsed-literal::
+
+    (208, 31)
+
+
+
+Classification
+--------------
+
+Create test and training data sets
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sklearn.model_selection import train_test_split
+
+.. code:: python
+
+    X_train, X_test, y_train, y_test = \
+      train_test_split(data_scaled_pca, labels, test_size=0.33, random_state=42)
+
+Using logistic regression
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sklearn.linear_model import LogisticRegression
+
+.. code:: python
+
+    lr = LogisticRegression()
+
+.. code:: python
+
+    lr.fit(X_train, y_train)
+
+
+
+
+.. parsed-literal::
+
+    LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+              intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+              penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+              verbose=0, warm_start=False)
+
+
+
+Accuracy score
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    lr.score(X_test, y_test)
+
+
+
+
+.. parsed-literal::
+
+    0.78260869565217395
+
+
+
+Using Support Vector Classifier and Grid Search
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sklearn.svm import SVC
+    from sklearn.model_selection import GridSearchCV
+
+.. code:: python
+
+    parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
+                   'C': [1, 10, 100, 1000]},
+                   {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}]
+
+Do grid search with parallel jobs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    clf = GridSearchCV(SVC(C=1), parameters, cv=5, scoring='accuracy', n_jobs=-1)
+    clf.fit(X_train, y_train.codes)
+    pass
+
+.. code:: python
+
+    clf.best_params_
+
+
+
+
+.. parsed-literal::
+
+    {'C': 1000, 'gamma': 0.001, 'kernel': 'rbf'}
+
+
+
+.. code:: python
+
+    clf.best_score_
+
+
+
+
+.. parsed-literal::
+
+    0.76978417266187049
+
+
+
+.. code:: python
+
+    clf.score(X_test, y_test.codes)
+
+
+
+
+.. parsed-literal::
+
+    0.88405797101449279
+
+
+
+.. code:: python
+
+    from sklearn.metrics import classification_report
+
+.. code:: python
+
+    y_true, y_pred = y_test.codes, clf.predict(X_test)
+    print(classification_report(y_true, y_pred))
+
+
+.. parsed-literal::
+
+                 precision    recall  f1-score   support
+    
+              0       0.88      0.92      0.90        38
+              1       0.90      0.84      0.87        31
+    
+    avg / total       0.88      0.88      0.88        69
+    
+
+
+Using a Random Forests Classifier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from sklearn.ensemble import RandomForestClassifier
+
+.. code:: python
+
+    X_train, X_test, y_train, y_test = \
+      train_test_split(data_scaled, labels, test_size=0.33, random_state=42)
+
+.. code:: python
+
+    parameters = [{'n_estimators': list(range(25, 201, 25)),
+                   'max_features': list(range(2, 15, 2))}]
+    clf = GridSearchCV(RandomForestClassifier(), parameters, 
+                       cv=5, scoring='accuracy', n_jobs=-1)
+    clf.fit(X_train, y_train.codes)
+    pass
+
+.. code:: python
+
+    clf.best_params_
+
+
+
+
+.. parsed-literal::
+
+    {'max_features': 6, 'n_estimators': 150}
+
+
+
+.. code:: python
+
+    clf.score(X_test, y_test.codes)
+
+
+
+
+.. parsed-literal::
+
+    0.85507246376811596
+
+
+
+Which features are important?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    imp = clf.best_estimator_.feature_importances_
+    idx = np.argsort(imp)
+
+.. code:: python
+
+    plt.figure(figsize=(6, 18))
+    plt.barh(range(len(imp)), imp[idx])
+    plt.yticks(np.arange(len(imp))+0.5, idx)
+    pass
+
+
+
+.. image:: 09_Machine_Learning_files/09_Machine_Learning_73_0.png
+
+
+Using a Pipeline
+----------------
+
+For cross-validation (e.g. grid search for best parameters), we often
+need to chain a series of steps and treat it as a single model. This
+chaining can be done with a Pipeline object.
+
+.. code:: python
+
+    from sklearn.pipeline import Pipeline
+
+.. code:: python
+
+    X_train, X_test, y_train, y_test = \
+      train_test_split(data_scaled, labels, test_size=0.33, random_state=42)
+
+.. code:: python
+
+    scaler = StandardScaler()
+    pca = PCA()
+    clf = LogisticRegression()
+    
+    pipe = Pipeline(steps=[('scaler', scaler), ('pca', pca), ('clf', clf)])
+    n_components = [20, 30, 40, 50, 60]
+    Cs = np.logspace(-4, 4, 1)
+    
+    estimator = GridSearchCV(pipe,
+                             dict(pca__n_components=n_components,
+                             clf__C=Cs), n_jobs=-1)
+    estimator.fit(X_train, y_train.codes)
+    pass
+
+.. code:: python
+
+    estimator.best_estimator_.named_steps['pca'].n_components
+
+
+
+
+.. parsed-literal::
+
+    30
+
+
+
+.. code:: python
+
+    estimator.score(X_test, y_test.codes)
+
+
+
+
+.. parsed-literal::
+
+    0.76811594202898548
+
+
+
+.. code:: python
+
+    y_true, y_pred = y_test.codes, estimator.predict(X_test)
+    print(classification_report(y_true, y_pred))
+
+
+.. parsed-literal::
+
+                 precision    recall  f1-score   support
+    
+              0       0.84      0.71      0.77        38
+              1       0.70      0.84      0.76        31
+    
+    avg / total       0.78      0.77      0.77        69
+    
+

@@ -1,0 +1,1804 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/08_SQL.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:09 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SQL &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Machine Learning with sklearn" href="09_Machine_Learning.html" />
+    <link rel="prev" title="Data" href="07_Data.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="09_Machine_Learning.html" title="Machine Learning with sklearn"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="07_Data.html" title="Data"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sql">
+<h1>SQL<a class="headerlink" href="#sql" title="Permalink to this headline">¶</a></h1>
+<p>SQL is a language for getting data from databases. It is also becoming
+essential to have some basic familiarity with SQL because it is
+universally used to slice and dice data across many different data
+storage formats and technologies.</p>
+<p>We will only show the use of SQL as a query language here, since that is
+probably all that a statistician will use SQL for. However, SQL can also
+be used to create and modify tables, as well as manage database
+permissions.</p>
+<div class="section" id="sql-via-pandas-dataframes">
+<h2>SQL via <code class="docutils literal"><span class="pre">pandas</span></code> DataFrames<a class="headerlink" href="#sql-via-pandas-dataframes" title="Permalink to this headline">¶</a></h2>
+<p>We will use the <a class="reference external" href="https://github.com/yhat/pandasql/">pandas-sql</a>
+package to practice SQL syntax for querying a <code class="docutils literal"><span class="pre">pandas</span></code> DataFrame.
+Later, we will see how to use an actual relational database.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandasql</span> <span class="k">import</span> <span class="n">PandaSQL</span>
+<span class="n">pdsql</span> <span class="o">=</span> <span class="n">PandaSQL</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">tips</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;tips&#39;</span><span class="p">)</span>
+<span class="n">tips</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.34</td>
+      <td>1.66</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21.01</td>
+      <td>3.50</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>23.68</td>
+      <td>3.31</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24.59</td>
+      <td>3.61</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="using-sql-for-queries">
+<h3>Using SQL for Queries<a class="headerlink" href="#using-sql-for-queries" title="Permalink to this headline">¶</a></h3>
+<p>Note that SQL is case-insensitive, but it is traditional to use ALL CAPS
+for SQL keywords. It is also standard to end SQL statements with a
+semi-colon.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pdsql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM tips LIMIT 5;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>10.34</td>
+      <td>1.66</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>21.01</td>
+      <td>3.50</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>23.68</td>
+      <td>3.31</td>
+      <td>Male</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24.59</td>
+      <td>3.61</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pdsql</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM tips WHERE sex=&#39;Female&#39; LIMIT 5;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>16.99</td>
+      <td>1.01</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>24.59</td>
+      <td>3.61</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>35.26</td>
+      <td>5.00</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>14.83</td>
+      <td>3.02</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>10.33</td>
+      <td>1.67</td>
+      <td>Female</td>
+      <td>No</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">pdsql</span><span class="p">(</span><span class="s2">&quot;SELECT tip, sex, size FROM tips WHERE total_bill&lt; 10 LIMIT 5;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2.00</td>
+      <td>Male</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.45</td>
+      <td>Male</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.32</td>
+      <td>Male</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.56</td>
+      <td>Male</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.00</td>
+      <td>Female</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="ordering">
+<h3>Ordering<a class="headerlink" href="#ordering" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT * FROM tips</span>
+<span class="s2">WHERE sex=&#39;Female&#39; and smoker=&#39;Yes&#39;</span>
+<span class="s2">ORDER BY total_bill ASC</span>
+<span class="s2">LIMIT 5;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>total_bill</th>
+      <th>tip</th>
+      <th>sex</th>
+      <th>smoker</th>
+      <th>day</th>
+      <th>time</th>
+      <th>size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>3.07</td>
+      <td>1.00</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Sat</td>
+      <td>Dinner</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5.75</td>
+      <td>1.00</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Fri</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>9.60</td>
+      <td>4.00</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Sun</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>10.09</td>
+      <td>2.00</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Fri</td>
+      <td>Lunch</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>10.59</td>
+      <td>1.61</td>
+      <td>Female</td>
+      <td>Yes</td>
+      <td>Sat</td>
+      <td>Dinner</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="aggregate-queries">
+<h3>Aggregate queries<a class="headerlink" href="#aggregate-queries" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT count(*) AS count, max(tip) AS max, min(tip) AS min FROM tips</span>
+<span class="s2">WHERE size &gt; 1</span>
+<span class="s2">GROUP BY sex, day</span>
+<span class="s2">HAVING max &lt; 6</span>
+<span class="s2">ORDER BY count DESC</span>
+<span class="s2">LIMIT 5;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>count</th>
+      <th>max</th>
+      <th>min</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>31</td>
+      <td>5.17</td>
+      <td>1.25</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>18</td>
+      <td>5.20</td>
+      <td>1.01</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>9</td>
+      <td>4.30</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>9</td>
+      <td>4.73</td>
+      <td>1.50</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="joins">
+<h2>Joins<a class="headerlink" href="#joins" title="Permalink to this headline">¶</a></h2>
+<p>A <strong>join</strong> occurs when you combine information from two or more database
+tables, based on information in a column that is common among the
+tables. As usual, it is easier to understand the concept with examples.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/student.txt&#39;</span><span class="p">)</span>
+<span class="n">student</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>student_id</th>
+      <th>first</th>
+      <th>last</th>
+      <th>email</th>
+      <th>major_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>frodo.baggins@duke.edu</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>b_baggins@duke.edu</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>golum</td>
+      <td>golum</td>
+      <td>golum.golum@duke.edu</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>g.white@duke.edu</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>gandalf</td>
+      <td>grey</td>
+      <td>g.grey@duke.edu</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6</td>
+      <td>saruman</td>
+      <td>wise</td>
+      <td>s.wise@duke.edu</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/class.txt&#39;</span><span class="p">)</span>
+<span class="n">cls</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>class_id</th>
+      <th>code</th>
+      <th>name</th>
+      <th>credits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>ANT01</td>
+      <td>Introduction to Hobbits</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>MAT802</td>
+      <td>Abstrct Nonsense</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>ENG234</td>
+      <td>Jabberwocky</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>STA007</td>
+      <td>Statistics for Secret Agens</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>PHY211</td>
+      <td>Physics of Star Wars</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">major</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/major.txt&#39;</span><span class="p">)</span>
+<span class="n">major</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>major_id</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Computer Science</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Physics</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Statisitcs</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>English</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>History</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">student_cls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/student_class.txt&#39;</span><span class="p">)</span>
+<span class="n">student_cls</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>student_id</th>
+      <th>class_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>3</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>4</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>4</td>
+      <td>5</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="section" id="matching-students-and-majors">
+<h3>Matching students and majors<a class="headerlink" href="#matching-students-and-majors" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="inner-join">
+<h4>Inner join<a class="headerlink" href="#inner-join" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT s.first, s.last, m.name</span>
+<span class="s2">FROM student s</span>
+<span class="s2">INNER JOIN major m</span>
+<span class="s2">ON s.major_id = m.major_id;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>first</th>
+      <th>last</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>Computer Science</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>Statisitcs</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>Physics</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>History</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>saruman</td>
+      <td>wise</td>
+      <td>Physics</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="left-outer-join">
+<h4>Left outer join<a class="headerlink" href="#left-outer-join" title="Permalink to this headline">¶</a></h4>
+<p>SQL also has RIGHT OUTER JOIN and FULL OUTER JOIN but these are not
+currently supported by SQLite3 (the database engine used by <code class="docutils literal"><span class="pre">pdsql</span></code>).</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT s.first, s.last, m.name</span>
+<span class="s2">FROM student s</span>
+<span class="s2">LEFT OUTER JOIN major m</span>
+<span class="s2">ON s.major_id = m.major_id;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>first</th>
+      <th>last</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>Computer Science</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>Statisitcs</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>Physics</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>History</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>gandalf</td>
+      <td>grey</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>saruman</td>
+      <td>wise</td>
+      <td>Physics</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="emulating-a-full-outer-join-with-union-all">
+<h4>Emulating a full outer join with UNION ALL<a class="headerlink" href="#emulating-a-full-outer-join-with-union-all" title="Permalink to this headline">¶</a></h4>
+<p>Only necessary if the database does not proivde FULL OUTER JOIN</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT s.first, s.last, m.name</span>
+<span class="s2">FROM   student s</span>
+<span class="s2">       LEFT JOIN major m</span>
+<span class="s2">          ON s.major_id = m.major_id</span>
+<span class="s2">UNION All</span>
+<span class="s2">SELECT s.first, s.last, m.name</span>
+<span class="s2">FROM   major m</span>
+<span class="s2">       LEFT JOIN student s</span>
+<span class="s2">          ON s.major_id = m.major_id</span>
+<span class="s2">WHERE  s.major_id IS NULL;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>first</th>
+      <th>last</th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>Computer Science</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>Statisitcs</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>Physics</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>History</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>gandalf</td>
+      <td>grey</td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>saruman</td>
+      <td>wise</td>
+      <td>Physics</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>None</td>
+      <td>None</td>
+      <td>English</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="using-linker-tables-to-match-students-to-classes-a-many-to-many-join">
+<h4>Using linker tables to match students to classes (a MANY TO MANY join)<a class="headerlink" href="#using-linker-tables-to-match-students-to-classes-a-many-to-many-join" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT s.first, s.last, c.code, c.name, c.credits</span>
+<span class="s2">FROM student s</span>
+<span class="s2">INNER JOIN student_cls sc ON s.student_id = sc.student_id</span>
+<span class="s2">INNER JOIN cls c ON c.class_id = sc.class_id;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>first</th>
+      <th>last</th>
+      <th>code</th>
+      <th>name</th>
+      <th>credits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>ENG234</td>
+      <td>Jabberwocky</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>STA007</td>
+      <td>Statistics for Secret Agens</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>ANT01</td>
+      <td>Introduction to Hobbits</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>STA007</td>
+      <td>Statistics for Secret Agens</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>ANT01</td>
+      <td>Introduction to Hobbits</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>MAT802</td>
+      <td>Abstrct Nonsense</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>ENG234</td>
+      <td>Jabberwocky</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>PHY211</td>
+      <td>Physics of Star Wars</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>MAT802</td>
+      <td>Abstrct Nonsense</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>PHY211</td>
+      <td>Physics of Star Wars</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="same-thing-but-including-students-with-no-majors">
+<h4>Same thing but including students with no majors<a class="headerlink" href="#same-thing-but-including-students-with-no-majors" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">SELECT s.first, s.last, c.code, c.name, c.credits</span>
+<span class="s2">FROM student s</span>
+<span class="s2">LEFT OUTER JOIN student_cls sc ON s.student_id = sc.student_id</span>
+<span class="s2">LEFT OUTER JOIN cls c ON c.class_id = sc.class_id;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="n">pdsql</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>first</th>
+      <th>last</th>
+      <th>code</th>
+      <th>name</th>
+      <th>credits</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>ENG234</td>
+      <td>Jabberwocky</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>frodo</td>
+      <td>baggins</td>
+      <td>STA007</td>
+      <td>Statistics for Secret Agens</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>ANT01</td>
+      <td>Introduction to Hobbits</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>bilbo</td>
+      <td>baggins</td>
+      <td>STA007</td>
+      <td>Statistics for Secret Agens</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>ANT01</td>
+      <td>Introduction to Hobbits</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>MAT802</td>
+      <td>Abstrct Nonsense</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>ENG234</td>
+      <td>Jabberwocky</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>golum</td>
+      <td>golum</td>
+      <td>PHY211</td>
+      <td>Physics of Star Wars</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>MAT802</td>
+      <td>Abstrct Nonsense</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>gandalf</td>
+      <td>white</td>
+      <td>PHY211</td>
+      <td>Physics of Star Wars</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>gandalf</td>
+      <td>grey</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>saruman</td>
+      <td>wise</td>
+      <td>None</td>
+      <td>None</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="section" id="using-sqlite3">
+<h3>Using SQLite3<a class="headerlink" href="#using-sqlite3" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="https://docs.python.org/3.5/library/sqlite3.html">SQLite3</a> is part
+of the standard library. However, the mechanics of using essentially any
+database in Python is similar, because of the Python
+<a class="reference external" href="https://www.python.org/dev/peps/pep-0249/">DB-API</a>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sqlite3</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;data/Chinook_Sqlite.sqlite&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sqlite-specific-commands-to-get-metadata">
+<h3>SQLite specific commands to get metadata<a class="headerlink" href="#sqlite-specific-commands-to-get-metadata" title="Permalink to this headline">¶</a></h3>
+<p>Unlike SQL syntax for queries, how you get metadata from a relational
+database is vendor-specific. You&#8217;ll have to read the docs to find out
+what is needed for your SQL flavor.</p>
+<div class="section" id="what-tables-are-there-in-the-database">
+<h4>What tables are there in the database?<a class="headerlink" href="#what-tables-are-there-in-the-database" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM sqlite_master WHERE type=&#39;table&#39;;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;Album&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Artist&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Customer&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Employee&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Genre&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Invoice&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;InvoiceLine&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;MediaType&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Playlist&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;PlaylistTrack&#39;</span><span class="p">,),</span>
+ <span class="p">(</span><span class="s1">&#39;Track&#39;</span><span class="p">,)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-are-the-columns-of-the-table-album">
+<h4>What are the columns of the table &#8220;Album&#8221;?<a class="headerlink" href="#what-are-the-columns-of-the-table-album" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA table_info(Album);&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;AlbumId&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Title&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(160)&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;ArtistId&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="standard-sql-statements-with-parameter-substitution">
+<h3>Standard SQL statements with parameter substitution<a class="headerlink" href="#standard-sql-statements-with-parameter-substitution" title="Permalink to this headline">¶</a></h3>
+<p>Note: Using Python string substitution for Python defined parameters is
+dangerous because of the risk of <a class="reference external" href="http://xkcd.com/327/">SQL injection
+attacks</a>. Use parameter substitution with <code class="docutils literal"><span class="pre">?</span></code>
+instead.</p>
+<div class="section" id="do-this">
+<h4>Do this<a class="headerlink" href="#do-this" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">ock%&#39;</span><span class="p">]</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM Album WHERE Title like ? LIMIT 5;&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;For Those About To Rock We Salute You&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Let There Be Rock&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">59</span><span class="p">,</span> <span class="s1">&#39;Deep Purple In Rock&#39;</span><span class="p">,</span> <span class="mi">58</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">108</span><span class="p">,</span> <span class="s1">&#39;Rock In Rio [CD1]&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">109</span><span class="p">,</span> <span class="s1">&#39;Rock In Rio [CD2]&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="not-this">
+<h4>Not this<a class="headerlink" href="#not-this" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;</span><span class="si">%r</span><span class="s2">ock%&#39;&quot;</span><span class="p">]</span>
+<span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM Album WHERE Title like </span><span class="si">%s</span><span class="s2"> LIMIT 5;&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;For Those About To Rock We Salute You&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Let There Be Rock&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">59</span><span class="p">,</span> <span class="s1">&#39;Deep Purple In Rock&#39;</span><span class="p">,</span> <span class="mi">58</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">108</span><span class="p">,</span> <span class="s1">&#39;Rock In Rio [CD1]&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">109</span><span class="p">,</span> <span class="s1">&#39;Rock In Rio [CD2]&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="user-defined-functions">
+<h2>User defined functions<a class="headerlink" href="#user-defined-functions" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes it is useful to have custom functions that run on the database
+server rather than on the client. These are called User Defined
+Functions or UDF. How do to do this varies with the database used, but
+it is fairly simple with Python and SQLite.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Caesar cipher of text with given offset.&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">string</span> <span class="k">import</span> <span class="n">ascii_lowercase</span><span class="p">,</span> <span class="n">ascii_uppercase</span>
+    <span class="n">tbl</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">ord</span><span class="p">,</span> <span class="n">ascii_lowercase</span> <span class="o">+</span> <span class="n">ascii_uppercase</span><span class="p">),</span>
+               <span class="n">ascii_lowercase</span><span class="p">[</span><span class="n">offset</span><span class="p">:]</span> <span class="o">+</span> <span class="n">ascii_lowercase</span><span class="p">[:</span><span class="n">offset</span><span class="p">]</span> <span class="o">+</span>
+               <span class="n">ascii_uppercase</span><span class="p">[</span><span class="n">offset</span><span class="p">:]</span> <span class="o">+</span> <span class="n">ascii_uppercase</span><span class="p">[:</span><span class="n">offset</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">tbl</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s2">&quot;encode&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">encode</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT Title, encode(Title, 3) FROM Album limit 5;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="s1">&#39;For Those About To Rock We Salute You&#39;</span><span class="p">,</span>
+  <span class="s1">&#39;Iru Wkrvh Derxw Wr Urfn Zh Vdoxwh Brx&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;Balls to the Wall&#39;</span><span class="p">,</span> <span class="s1">&#39;Edoov wr wkh Zdoo&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;Restless and Wild&#39;</span><span class="p">,</span> <span class="s1">&#39;Uhvwohvv dqg Zlog&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;Let There Be Rock&#39;</span><span class="p">,</span> <span class="s1">&#39;Ohw Wkhuh Eh Urfn&#39;</span><span class="p">),</span>
+ <span class="p">(</span><span class="s1">&#39;Big Ones&#39;</span><span class="p">,</span> <span class="s1">&#39;Elj Rqhv&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>We can also add aggregate UDFs similar to SQL MIN, SUM, COUNT etc.
+Aggregate UDFs require you to write a class <code class="docutils literal"><span class="pre">__init__</span></code>, <code class="docutils literal"><span class="pre">step</span></code> and
+<code class="docutils literal"><span class="pre">finalize</span></code> methods.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CV</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Aggregate UDF for coefficient of varation in %.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">100.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">create_aggregate</span><span class="p">(</span><span class="s2">&quot;cv&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">CV</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA table_info(Invoice);&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;InvoiceId&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;CustomerId&#39;</span><span class="p">,</span> <span class="s1">&#39;INTEGER&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;InvoiceDate&#39;</span><span class="p">,</span> <span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;BillingAddress&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(70)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;BillingCity&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(40)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;BillingState&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(40)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;BillingCountry&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(40)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;BillingPostalCode&#39;</span><span class="p">,</span> <span class="s1">&#39;NVARCHAR(10)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;Total&#39;</span><span class="p">,</span> <span class="s1">&#39;NUMERIC(10,2)&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT cv(Total) from Invoice limit 10;&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mf">83.85715075292478</span><span class="p">,)]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="section" id="using-sql-magic-functions">
+<h3>Using SQL magic functions<a class="headerlink" href="#using-sql-magic-functions" title="Permalink to this headline">¶</a></h3>
+<p>We will use the
+<a class="reference external" href="https://github.com/catherinedevlin/ipython-sql">ipython-sql</a>
+notebook extension for convenience. This will only work in notebooks and
+IPython scripts with the .ipy extension.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="o">%</span><span class="n">load_ext</span> <span class="n">sql</span>
+</pre></div>
+</div>
+<div class="section" id="configuring-the-sqlmagic-extension">
+<h4>Configuring the SqlMagic extension<a class="headerlink" href="#configuring-the-sqlmagic-extension" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">config</span> <span class="n">SqlMagic</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">SqlMagic</span> <span class="n">options</span>
+<span class="o">--------------</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">autolimit</span><span class="o">=&lt;</span><span class="n">Int</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">Automatically</span> <span class="n">limit</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">returned</span> <span class="n">result</span> <span class="n">sets</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">autopandas</span><span class="o">=&lt;</span><span class="n">Bool</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">Return</span> <span class="n">Pandas</span> <span class="n">DataFrames</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">regular</span> <span class="n">result</span> <span class="n">sets</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">column_local_vars</span><span class="o">=&lt;</span><span class="n">Bool</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="kc">False</span>
+    <span class="n">Return</span> <span class="n">data</span> <span class="n">into</span> <span class="n">local</span> <span class="n">variables</span> <span class="kn">from</span> <span class="nn">column</span> <span class="n">names</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">displaylimit</span><span class="o">=&lt;</span><span class="n">Int</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">Automatically</span> <span class="n">limit</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">rows</span> <span class="n">displayed</span> <span class="p">(</span><span class="n">full</span> <span class="n">result</span> <span class="nb">set</span> <span class="ow">is</span> <span class="n">still</span>
+    <span class="n">stored</span><span class="p">)</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">dsn_filename</span><span class="o">=&lt;</span><span class="n">Unicode</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="s1">&#39;odbc.ini&#39;</span>
+    <span class="n">Path</span> <span class="n">to</span> <span class="n">DSN</span> <span class="n">file</span><span class="o">.</span> <span class="n">When</span> <span class="n">the</span> <span class="n">first</span> <span class="n">argument</span> <span class="ow">is</span> <span class="n">of</span> <span class="n">the</span> <span class="n">form</span> <span class="p">[</span><span class="n">section</span><span class="p">],</span> <span class="n">a</span>
+    <span class="n">sqlalchemy</span> <span class="n">connection</span> <span class="n">string</span> <span class="ow">is</span> <span class="n">formed</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">matching</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">DSN</span>
+    <span class="n">file</span><span class="o">.</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">feedback</span><span class="o">=&lt;</span><span class="n">Bool</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">Print</span> <span class="n">number</span> <span class="n">of</span> <span class="n">rows</span> <span class="n">affected</span> <span class="n">by</span> <span class="n">DML</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">short_errors</span><span class="o">=&lt;</span><span class="n">Bool</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="kc">True</span>
+    <span class="n">Don</span><span class="s1">&#39;t display the full traceback on SQL Programming Error</span>
+<span class="n">SqlMagic</span><span class="o">.</span><span class="n">style</span><span class="o">=&lt;</span><span class="n">Unicode</span><span class="o">&gt;</span>
+    <span class="n">Current</span><span class="p">:</span> <span class="s1">&#39;DEFAULT&#39;</span>
+    <span class="n">Set</span> <span class="n">the</span> <span class="n">table</span> <span class="n">printing</span> <span class="n">style</span> <span class="n">to</span> <span class="nb">any</span> <span class="n">of</span> <span class="n">prettytable</span><span class="s1">&#39;s defined styles</span>
+    <span class="p">(</span><span class="n">currently</span> <span class="n">DEFAULT</span><span class="p">,</span> <span class="n">MSWORD_FRIENDLY</span><span class="p">,</span> <span class="n">PLAIN_COLUMNS</span><span class="p">,</span> <span class="n">RANDOM</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">config</span> <span class="n">SqlMagic</span><span class="o">.</span><span class="n">displaylimit</span><span class="o">=</span><span class="mi">10</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="connect-to-sqlite3-database">
+<h4>Connect to SQLite3 database<a class="headerlink" href="#connect-to-sqlite3-database" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">sql</span> <span class="n">sqlite</span><span class="p">:</span><span class="o">///</span><span class="n">data</span><span class="o">/</span><span class="n">Chinook_Sqlite</span><span class="o">.</span><span class="n">sqlite</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="s1">&#39;Connected: None@data/Chinook_Sqlite.sqlite&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-databases">
+<h4>Other databases<a class="headerlink" href="#other-databases" title="Permalink to this headline">¶</a></h4>
+<p>See <a class="reference external" href="http://docs.sqlalchemy.org/en/latest/core/engines.html">SQLAlchemy connection
+strings</a> for
+how to connect to other databases such as Oracle, MySQL or PostgreSQL.</p>
+</div>
+<div class="section" id="line-magic">
+<h4>Line magic<a class="headerlink" href="#line-magic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">sql</span> <span class="n">SELECT</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">Album</span> <span class="n">LIMIT</span> <span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<table>
+    <tr>
+        <th>AlbumId</th>
+        <th>Title</th>
+        <th>ArtistId</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>For Those About To Rock We Salute You</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Balls to the Wall</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Restless and Wild</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Let There Be Rock</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Big Ones</td>
+        <td>3</td>
+    </tr>
+</table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">sql</span> <span class="n">SELECT</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">Artist</span> <span class="n">LIMIT</span> <span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<table>
+    <tr>
+        <th>ArtistId</th>
+        <th>Name</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>AC/DC</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Accept</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Aerosmith</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Alanis Morissette</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Alice In Chains</td>
+    </tr>
+</table></div>
+<div class="section" id="cell-magic">
+<h4>Cell magic<a class="headerlink" href="#cell-magic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">sql</span>
+<span class="n">SELECT</span> <span class="n">Artist</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">Album</span><span class="o">.</span><span class="n">Title</span>
+<span class="n">FROM</span> <span class="n">Album</span>
+<span class="n">INNER</span> <span class="n">JOIN</span> <span class="n">Artist</span> <span class="n">on</span> <span class="n">Album</span><span class="o">.</span><span class="n">ArtistId</span> <span class="o">=</span> <span class="n">Artist</span><span class="o">.</span><span class="n">ArtistId</span>
+<span class="n">ORDER</span> <span class="n">BY</span> <span class="n">Artist</span><span class="o">.</span><span class="n">Name</span> <span class="n">ASC</span>
+<span class="n">LIMIT</span> <span class="mi">5</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Title</th>
+    </tr>
+    <tr>
+        <td>AC/DC</td>
+        <td>For Those About To Rock We Salute You</td>
+    </tr>
+    <tr>
+        <td>AC/DC</td>
+        <td>Let There Be Rock</td>
+    </tr>
+    <tr>
+        <td>Aaron Copland &amp; London Symphony Orchestra</td>
+        <td>A Copland Celebration, Vol. I</td>
+    </tr>
+    <tr>
+        <td>Aaron Goldberg</td>
+        <td>Worlds</td>
+    </tr>
+    <tr>
+        <td>Academy of St. Martin in the Fields &amp; Sir Neville Marriner</td>
+        <td>The World of Classical Favourites</td>
+    </tr>
+</table></div>
+</div>
+<div class="section" id="you-can-assign-results-of-queries-to-python-names">
+<h3>You can assign results of queries to Python names<a class="headerlink" href="#you-can-assign-results-of-queries-to-python-names" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="o">%</span><span class="n">sql</span> <span class="n">SELECT</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">Album</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sql</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">ResultSet</span>
+</pre></div>
+</div>
+<div class="section" id="resutls-behave-like-lists">
+<h4>Resutls behave like lists<a class="headerlink" href="#resutls-behave-like-lists" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Restless and Wild&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Let There Be Rock&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="you-can-use-python-variables-in-your-queires">
+<h4>You can use Python variables in your queires.<a class="headerlink" href="#you-can-use-python-variables-in-your-queires" title="Permalink to this headline">¶</a></h4>
+<p>Use <code class="docutils literal"><span class="pre">:varname</span></code> where you want to use a Python variable in your query.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">artist_id</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="o">%</span><span class="n">sql</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">Artist</span> <span class="n">where</span> <span class="n">ArtistId</span> <span class="o">&lt;</span> <span class="p">:</span><span class="n">artist_id</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<table>
+    <tr>
+        <th>ArtistId</th>
+        <th>Name</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>AC/DC</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Accept</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Aerosmith</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Alanis Morissette</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Alice In Chains</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>Antônio Carlos Jobim</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>Apocalyptica</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>Audioslave</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>BackBeat</td>
+    </tr>
+</table><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">word</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%r</span><span class="s1">ock%&#39;</span>
+
+<span class="o">%</span><span class="n">sql</span> <span class="n">select</span> <span class="o">*</span> <span class="kn">from</span> <span class="nn">Album</span> <span class="n">WHERE</span> <span class="n">Title</span> <span class="n">LIKE</span> <span class="p">:</span><span class="n">word</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Done</span><span class="o">.</span>
+</pre></div>
+</div>
+<table>
+    <tr>
+        <th>AlbumId</th>
+        <th>Title</th>
+        <th>ArtistId</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>For Those About To Rock We Salute You</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Let There Be Rock</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>59</td>
+        <td>Deep Purple In Rock</td>
+        <td>58</td>
+    </tr>
+    <tr>
+        <td>108</td>
+        <td>Rock In Rio [CD1]</td>
+        <td>90</td>
+    </tr>
+    <tr>
+        <td>109</td>
+        <td>Rock In Rio [CD2]</td>
+        <td>90</td>
+    </tr>
+    <tr>
+        <td>213</td>
+        <td>Pure Cult: The Best Of The Cult (For Rockers, Ravers, Lovers &amp; Sinners) [UK]</td>
+        <td>139</td>
+    </tr>
+    <tr>
+        <td>216</td>
+        <td>Hot Rocks, 1964-1971 (Disc 1)</td>
+        <td>142</td>
+    </tr>
+</table></div>
+<div class="section" id="convert-to-pandas-dataframe">
+<h4>Convert to <code class="docutils literal"><span class="pre">pandas</span></code> dataframe<a class="headerlink" href="#convert-to-pandas-dataframe" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>AlbumId</th>
+      <th>Title</th>
+      <th>ArtistId</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>For Those About To Rock We Salute You</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>Balls to the Wall</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>Restless and Wild</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>Let There Be Rock</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>Big Ones</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sql-via-pandas-dataframes">SQL via <code class="docutils literal"><span class="pre">pandas</span></code> DataFrames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#joins">Joins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-defined-functions">User defined functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="07_Data.html"
+                          title="Previous page">&larr; Data</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="09_Machine_Learning.html"
+                          title="Next page">&rarr; Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/08_SQL.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="09_Machine_Learning.html" title="Machine Learning with sklearn"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="07_Data.html" title="Data"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/08_SQL.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:10 GMT -->
+</html>

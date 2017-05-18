@@ -1,0 +1,637 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/ by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:06:13 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>STA-663-2017 &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Notes on using Jupyter" href="00_Jupyter.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="00_Jupyter.html" title="Notes on using Jupyter"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+    <li><a href="#">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="sta-663-2017">
+<h1>STA-663-2017<a class="headerlink" href="#sta-663-2017" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#keyboard-shortcuts">Keyboard Shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#magic-commands">Magic commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#using-shell-commands">Using shell commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#load-extension-for-r">Load extension for R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#getting-help">Getting help</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00_Jupyter.html#further-exploration">Further exploration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#hello-world">Hello, world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#types">Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#operators">Operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#names-assignment-and-identity">Names, assignment and identity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#naming-conventions">Naming conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#collections">Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#sets">Sets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#dictionary">Dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#control-structures">Control Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01_Introduction_To_Python.html#functions">Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#what-s-wrong-with-this-code">What&#8217;s wrong with this code?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#refactoring-to-use-functions">Refactoring to use functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#function-is-re-usable">Function is re-usable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#functions-can-be-passed-in-as-arguments">Functions can be passed in as arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#functions-can-also-be-returned-by-functions">Functions can also be returned by functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#decorators">Decorators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#functools">Functools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#where-does-python-search-for-modules">Where does Python search for modules?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_Functions.html#creating-your-own-module">Creating your own module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="03_Classes.html#defining-a-new-class">Defining a new class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_Classes.html#docstrings">Docstrings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_Classes.html#creating-an-instance-of-a-class">Creating an instance of a class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_Classes.html#class-inheritance">Class inheritance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#get-through-the-looking-glass">Get &#8220;Through the Looking Glass&#8221;</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#slice-to-get-jabberwocky">Slice to get Jabberwocky</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#find-palindromic-words-in-poem-if-any">Find palindromic words in poem if any</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#top-10-most-frequent-words">Top 10 most frequent words</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#words-that-appear-exactly-twice">Words that appear exactly twice.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#trigrams">Trigrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#find-words-in-poem-that-are-over-represented">Find words in poem that are over-represented</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#encode-and-decode-poem-using-a-caesar-cipher">Encode and decode poem using a Caesar cipher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#using-regular-expressions">Using Regular Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#natural-language-processing">Natural language processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_Strings.html#string-formatting">String formatting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#array-creation">Array creation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#array-manipulation">Array manipulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#array-indexing">Array indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#calculations-and-broadcasting">Calculations and broadcasting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#combining-and-splitting-arrays">Combining and splitting arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#reductions">Reductions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#example-calculating-pairwise-distance-matrix-using-broadcasting-and-vectorization">Example: Calculating pairwise distance matrix using broadcasting and vectorization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#example-consructing-leave-one-out-arrays">Example: Consructing leave-one-out arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#generalized-ufuncs">Generalized ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#saving-and-loading-ndarrays">Saving and loading NDArrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_Numbers.html#version-information">Version information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#matplotlib">Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#types-of-plots">Types of plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#plot-layouts">Plot layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#seaborn">Seaborn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_Graphics.html#using-ggplot-as-an-alternative-to-seaborn">Using <code class="docutils literal"><span class="pre">ggplot</span></code> as an alternative to <code class="docutils literal"><span class="pre">seaborn</span></code>.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="07_Data.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_Data.html#working-with-series">Working with Series</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_Data.html#dataframe">DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_Data.html#data-conversions">Data conversions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="08_SQL.html#sql-via-pandas-dataframes">SQL via <code class="docutils literal"><span class="pre">pandas</span></code> DataFrames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_SQL.html#joins">Joins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_SQL.html#user-defined-functions">User defined functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#exploratory-data-analysis">Exploratory data analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#preprocessing">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#dimension-reduction">Dimension reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#classification">Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="09_Machine_Learning.html#using-a-pipeline">Using a Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="10A_CodeOptimization.html#testing-code">Testing code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10A_CodeOptimization.html#timing-and-profiling-code">Timing and profiling code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10A_CodeOptimization.html#data-structures-and-algorithms">Data structures and algorithms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numexpr">Using <code class="docutils literal"><span class="pre">numexpr</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numba">Using <code class="docutils literal"><span class="pre">numba</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numba-vectorize-and-guvectoize">Using numba vectorize and guvectoize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#parallelization-with-vectorize-and-guvectorize">Parallelization with vectorize and guvectorize</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="10C_Cython.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10C_Cython.html#using-cython-annnotations-to-identify-bottlenecks">Using Cython annnotations to identify bottlenecks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10C_Cython.html#using-cython-cdefs-and-directives">Using Cython cdefs and directives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10C_Cython.html#parallel-execution-with-cython">Parallel execution with Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="11A_Parallel_Programming.html#embarrassingly-parallel-programs">Embarrassingly parallel programs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11A_Parallel_Programming.html#executing-parallel-code">Executing parallel code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11A_Parallel_Programming.html#coming-highlights">Coming highlights</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#vanilla-python">Vanilla Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-numba-to-speed-up-computation">Using <code class="docutils literal"><span class="pre">numba</span></code> to speed up computation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-cython-to-speed-up-computation">Using <code class="docutils literal"><span class="pre">cython</span></code> to speed up computation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#the-concurrent-futures-module">The <code class="docutils literal"><span class="pre">concurrent.futures</span></code> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-processes-in-parallel-with-processpoolexecutor">Using processes in parallel with <code class="docutils literal"><span class="pre">ProcessPoolExecutor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-processes-in-parallel-with-threadpoolexecutor">Using processes in parallel with ThreadPoolExecutor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#turning-off-the-gil-in-cython">Turning off the GIL in <code class="docutils literal"><span class="pre">cython</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-processes-in-parallel-with-threadpoolexecutor-and-nogil">Using processes in parallel with <code class="docutils literal"><span class="pre">ThreadPoolExecutor</span></code> and <code class="docutils literal"><span class="pre">nogil</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#using-multiprocessing">Using <code class="docutils literal"><span class="pre">multiprocessing</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html#common-issues-with-use-of-shared-memory-in-parallel-programs">Common issues with use of shared memory in parallel programs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="11C_IPyParallel.html#starting-engines">Starting engines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11C_IPyParallel.html#basic-concepts-of-ipyparallel">Basic concepts of <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="11C_IPyParallel.html#working-with-compiled-code">Working with compiled code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="11C_IPyParallel.html#using-parallel-magic-commands">Using parallel magic commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#the-compilation-process">The compilation process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#arrays-pointers-and-dereferencing">Arrays, pointers and dereferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#loops-in-c">Loops in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#functions-in-c">Functions in C++</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#anonymous-functions">Anonymous functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#templates">Templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#function-pointers">Function pointers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12A_C%2b%2b.html#using-a-numeric-library">Using a numeric library</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#a-first-example-of-using-pybind11">A first example of using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#using-cppimport">Using <code class="docutils literal"><span class="pre">cppimport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#vectorizing-functions-for-use-with-numpy-arrays">Vectorizing functions for use with <code class="docutils literal"><span class="pre">numpy</span></code> arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#using-numpy-arrays-as-function-arguments-and-return-values">Using <code class="docutils literal"><span class="pre">numpy</span></code> arrays as function arguments and return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#more-on-working-with-numpy-arrays">More on working with <code class="docutils literal"><span class="pre">numpy</span></code> arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#using-the-c-eigen-library-to-calculate-matrix-inverse-and-determinant">Using the C++ <code class="docutils literal"><span class="pre">eigen</span></code> library to calculate matrix inverse and determinant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html#using-pybind11-with-openmp">Using <code class="docutils literal"><span class="pre">pybind11</span></code> with <code class="docutils literal"><span class="pre">openmp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#motivation-simultaneous-equations">Motivation - Simultaneous Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#vector-spaces">Vector Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#matrices-and-linear-transformations">Matrices and Linear Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#what-does-all-this-have-to-do-with-linear-systems">What does all this have to do with linear systems?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#more-properties-of-vectors-vector-spaces-and-matrices">More Properties of Vectors, Vector Spaces and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#inner-products">Inner Products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13A_LinearAlgebra1.html#exercises">Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#lu-decomposition-and-gaussian-elimination">LU Decomposition and Gaussian Elimination</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#cholesky-decomposition">Cholesky Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#matrix-decompositions-for-pca-and-least-squares">Matrix Decompositions for PCA and Least Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#eigendecomposition">Eigendecomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#qr-decompositon">QR decompositon</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#singular-value-decomposition">Singular Value Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#stabilty-and-condition-number">Stabilty and Condition Number</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13B_LinearAlgebra2.html#exercises">Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="13C_LinearAlgebraExamples.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13C_LinearAlgebraExamples.html#exact-solution-of-linear-system-of-equations">Exact solution of linear system of equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13C_LinearAlgebraExamples.html#basic-information-about-a-matrix">Basic information about a matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13C_LinearAlgebraExamples.html#least-squares-solution">Least-squares solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13C_LinearAlgebraExamples.html#matrix-decompositions">Matrix Decompositions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#variance-and-covariance">Variance and covariance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#eigendecomposition-of-the-covariance-matrix">Eigendecomposition of the covariance matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#covariance-matrix-as-a-linear-transformation">Covariance matrix as a linear transformation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#pca">PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#id1">Eigendecomposition of the covariance matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#change-of-basis-via-pca">Change of basis via PCA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#graphical-illustration-of-change-of-basis">Graphical illustration of change of basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13D_PCA.html#dimension-reduction-via-pca">Dimension reduction via PCA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="13E_SparseMatrices.html#creating-a-sparse-matrix">Creating a sparse matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13E_SparseMatrices.html#application-confusion-matrix">Application: Confusion matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="13E_SparseMatrices.html#application-pagerank">Application: PageRank</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#example-maximum-likelihood-estimation-mle">Example: Maximum Likelihood Estimation (MLE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#example-linear-least-squares">Example: Linear Least Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#main-issues-in-root-finding-in-one-dimension">Main Issues in Root Finding in One Dimension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#bisection-method">Bisection Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#secant-method">Secant Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#newton-rhapson-method">Newton-Rhapson Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#gauss-newton">Gauss-Newton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#inverse-quadratic-interpolation">Inverse Quadratic Interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14A_Optimization_One_Dimension.html#brent-s-method">Brent&#8217;s Method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#optimization-roots-in-n-dimensions-first-some-calculus">Optimization/Roots in n Dimensions - First Some Calculus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#convexity">Convexity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#line-search-methods">Line Search Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#steepest-descent">Steepest Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#newton-s-method">Newton&#8217;s Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#coordinate-descent">Coordinate Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#solvers">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14B_Multivariate_Optimization.html#glm-estimation-and-irls">GLM Estimation and IRLS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="14C_Optimization_In_Python.html#finding-roots">Finding roots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14C_Optimization_In_Python.html#optimization-primer">Optimization Primer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14C_Optimization_In_Python.html#using-scipy-optimize">Using <code class="docutils literal"><span class="pre">scipy.optimize</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="14C_Optimization_In_Python.html#gradient-descent">Gradient descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="14C_Optimization_In_Python.html#optimization-of-standard-statistical-models">Optimization of standard statistical models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="15A_Random_Numbers.html#python-analog-of-r-random-number-functions">Python analog of R random number functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15A_Random_Numbers.html#why-are-random-numbers-useful">Why are random numbers useful?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15A_Random_Numbers.html#where-do-random-numbers-in-the-computer-come-from">Where do random numbers in the computer come from?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15A_Random_Numbers.html#rejection-sampling">Rejection sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15A_Random_Numbers.html#using-the-numpy-random-and-scipy-stats-prngs">Using the <code class="docutils literal"><span class="pre">numpy.random</span></code> and <code class="docutils literal"><span class="pre">scipy.stats</span></code> PRNGs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#setting-the-random-seed">Setting the random seed</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#adjusting-p-values-for-multiple-testing">Adjusting p-values for multiple testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#jackknife-estimate-of-parameters">Jackknife estimate of parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#leave-one-out-cross-validation-loocv">Leave one out cross validation (LOOCV)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#check-with-r">Check with R</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#estimating-the-cdf">Estimating the CDF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15B_ResamplingAndSimulation.html#estimating-the-pdf">Estimating the PDF</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="15C_MonteCarloIntegration.html#quadrature">Quadrature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15C_MonteCarloIntegration.html#monte-carlo-integration">Monte Carlo integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15C_MonteCarloIntegration.html#variance-reduction">Variance Reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="15C_MonteCarloIntegration.html#quasi-random-numbers">Quasi-random numbers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="17_Functional_Programming.html#lazy-evaluation-pure-functions-and-higher-order-functions">Lazy evaluation, pure functions and higher order functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17_Functional_Programming.html#working-with-out-of-core-memory">Working with out-of-core memory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17_Functional_Programming.html#probabilistic-data-structures">Probabilistic data structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17_Functional_Programming.html#small-scale-distributed-programming">Small-scale distributed programming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="17A_Intermediate_Sized_Data.html#billion-numbers">1 billion numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17A_Intermediate_Sized_Data.html#using-dask">Using Dask</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17A_Intermediate_Sized_Data.html#using-blaze">Using Blaze</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="17B_Big_Data_Structures.html#selective-retrieval-from-disk-based-storage">Selective retrieval from disk-based storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17B_Big_Data_Structures.html#storing-numbers">Storing numbers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17B_Big_Data_Structures.html#storing-strings">Storing strings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="17B_Big_Data_Structures.html#data-sketches">Data Sketches</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18A_Dask.html#small-scale-distributed-programming">Small-scale distributed programming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numexpr">Using <code class="docutils literal"><span class="pre">numexpr</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numba">Using <code class="docutils literal"><span class="pre">numba</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#using-numba-vectorize-and-guvectoize">Using numba vectorize and guvectoize</a></li>
+<li class="toctree-l2"><a class="reference internal" href="10B_Numba.html#parallelization-with-vectorize-and-guvectorize">Parallelization with vectorize and guvectorize</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18B_Spark.html#cheat-sheet">Cheat sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18B_Spark.html#local-installation-of-spark">Local installation of Spark</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18B_Spark.html#start-a-spark-session">Start a spark session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18B_Spark.html#sparkcontext">SparkContext</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18B_Spark.html#actions-and-transforms-with-parallelized-collections">Actions and transforms with parallelized collections</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18C_Efficiency_In_Spark.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18C_Efficiency_In_Spark.html#accumulators">Accumulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18C_Efficiency_In_Spark.html#broadcast-variables">Broadcast Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18C_Efficiency_In_Spark.html#the-spark-shuffle-and-partitioning">The Spark Shuffle and Partitioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18C_Efficiency_In_Spark.html#piping-to-external-programs">Piping to External Programs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18D_Spark_MLib.html#mllib-pipeline">MLLib Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18D_Spark_MLib.html#unsupervised-learning">Unsupervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18D_Spark_MLib.html#supervised-learning">Supervised Learning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18D_Spark_MLib.html#using-the-newer-ml-pipeline">Using the newer <code class="docutils literal"><span class="pre">ml</span></code> pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18D_Spark_MLib.html#spark-mllib-and-sklearn-integration">Spark MLLIb and <code class="docutils literal"><span class="pre">sklearn</span></code> integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#dataframe-from-pandas">DataFrame from <code class="docutils literal"><span class="pre">pandas</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#dataframe-from-csv-files">DataFrame from CSV files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#dataframe-from-json-files">DataFrame from JSON files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#dataframe-from-sqlite3">DataFrame from SQLite3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18E_Spark_SQL.html#datasets">DataSets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18G_Spark_Streaming.html#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18G_Spark_Streaming.html#streaming-using-sockets">Streaming using sockets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18G_Spark_Streaming.html#using-spark-streaming">Using Spark Streaming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#azure">Azure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#aws">AWS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#know-your-aws-public-and-private-access-keys">Know your AWS public and private access keys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#know-your-aws-ec2-key-pair">Know your AWS EC2 key-pair</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#install-aws-command-line-client">Install AWS command line client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#configure-the-aws-command-line-client">Configure the AWS command line client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#create-a-cluster">Create a cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#get-information-about-the-cluster">Get information about the cluster</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#connect-to-the-cluster-via-ssh">Connect to the cluster via <code class="docutils literal"><span class="pre">ssh</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#note-the-ip-address-that-is-returned">Note the IP address that is returned</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#run-pyspark">Run <code class="docutils literal"><span class="pre">pyspark</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#run-the-zepellin-notebook">Run the <code class="docutils literal"><span class="pre">Zepellin</span></code> notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#connect-to-zeppelin-notebook">Connect to <code class="docutils literal"><span class="pre">Zeppelin</span></code> notebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#create-notebook-and-run-spark-within-it">Create notebook and run Spark within it</a></li>
+<li class="toctree-l2"><a class="reference internal" href="18H_Spark_Cloud.html#terminate-the-cluster">Terminate the cluster</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="19A_PyMC3.html#part-1-a-tutorial-example-estimating-coin-bias">Part 1 - A tutorial example: Estimating coin bias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19A_PyMC3.html#part-2-gallery">Part 2: Gallery</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#useful-links">Useful links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#coin-toss">Coin toss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#fit-model">Fit model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#map">MAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#estimating-mean-and-standard-deviation-of-normal-distribution">Estimating mean and standard deviation of normal distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#estimating-parameters-of-a-linear-regression-model">Estimating parameters of a linear regression model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="19B_Pystan.html#simple-logistic-model">Simple Logistic model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="20A_MCMC.html#island-hopping">Island hopping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20A_MCMC.html#bayesian-data-analysis">Bayesian Data Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20A_MCMC.html#hierarchical-models">Hierarchical models</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#slice-sampling">Slice sampling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#a-simple-slice-sampler-example">A simple slice sampler example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#hamiltonian-monte-carlo-hmc">Hamiltonian Monte Carlo (HMC)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#hamiltonian-systems">Hamiltonian systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#finite-difference-methods">Finite difference methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html#from-hamiltonians-to-probability-distributions">From Hamiltonians to probability distributions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#filling-a-list">(1) Filling a list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#filling-a-list-conditionally">(2) Filling a list conditionally</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#writing-as-functions">(3) Writing as functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#timing">(4) Timing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#compilation">(5) Compilation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#vectorizing-scalar-functions">(6) Vectorizing scalar functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html#with-numba-and-jit-compilation-we-need-to-reconsider-the-old-taboo-against-looping">(7) With <code class="docutils literal"><span class="pre">numba</span></code> and JIT compilation, we need to reconsider the old taboo against looping.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#convert-to-list-of-words">Convert to list of words</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#slower-version-without-translate">Slower version without translate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#using-a-regular-dictionary">Using a regular dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#using-a-default-dictionary">Using a default dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#using-a-counter">Using a Counter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#using-third-party-function">Using third party function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#counting-without-dictionaries">Counting without dictionaries</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html#vectorized-version">Vectorized version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#basics">Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#simplify">Simplify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#calculus">Calculus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#working-with-matrices">Working with matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#solving-algebraic-and-differential-equations">Solving Algebraic and Differential Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#numerics">Numerics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html#statistics">Statistics</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="#">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="00_Jupyter.html"
+                          title="Next page">&rarr; Notes on using Jupyter</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="00_Jupyter.html" title="Notes on using Jupyter"
+             >next</a> &nbsp; &nbsp;</li>
+    <li><a href="#">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/ by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:02 GMT -->
+</html>

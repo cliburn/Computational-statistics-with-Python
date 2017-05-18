@@ -1,0 +1,786 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/14B_Multivariate_Optimization.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:11:07 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Algorithms for Optimization and Root Finding for Multivariate Problems &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using optimization routines from scipy and statsmodels" href="14C_Optimization_In_Python.html" />
+    <link rel="prev" title="Optimization and Root Finding" href="14A_Optimization_One_Dimension.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="14C_Optimization_In_Python.html" title="Using optimization routines from scipy and statsmodels"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="14A_Optimization_One_Dimension.html" title="Optimization and Root Finding"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span><span class="p">,</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="k">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="k">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">hessian</span><span class="p">,</span> <span class="n">Function</span><span class="p">,</span> <span class="n">N</span>
+</pre></div>
+</div>
+<div class="section" id="algorithms-for-optimization-and-root-finding-for-multivariate-problems">
+<h1>Algorithms for Optimization and Root Finding for Multivariate Problems<a class="headerlink" href="#algorithms-for-optimization-and-root-finding-for-multivariate-problems" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="optimization-roots-in-n-dimensions-first-some-calculus">
+<h2>Optimization/Roots in n Dimensions - First Some Calculus<a class="headerlink" href="#optimization-roots-in-n-dimensions-first-some-calculus" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s review the theory of optimization for multivariate functions.
+Recall that in the single-variable case, extreme values (local extrema)
+occur at points where the first derivative is zero, however, the
+vanishing of the first derivative is not a sufficient condition for a
+local max or min. Generally, we apply the second derivative test to
+determine whether a candidate point is a max or min (sometimes it fails
+- if the second derivative either does not exist or is zero). In the
+multivariate case, the first and second derivatives are <em>matrices</em>. In
+the case of a scalar-valued function on <span class="math">\(\mathbb{R}^n\)</span>, the first
+derivative is an <span class="math">\(n\times 1\)</span> vector called the <em>gradient</em> (denoted
+<span class="math">\(\nabla f\)</span>). The second derivative is an <span class="math">\(n\times n\)</span> matrix
+called the <em>Hessian</em> (denoted <span class="math">\(H\)</span>)</p>
+<p>Just to remind you, the gradient and Hessian are given by:</p>
+<div class="math">
+\[\begin{split}\nabla f(x) = \left(\begin{matrix}\frac{\partial f}{\partial x_1}\\ \vdots \\\frac{\partial f}{\partial x_n}\end{matrix}\right)\end{split}\]</div>
+<div class="math">
+\[\begin{split}H = \left(\begin{matrix}
+  \dfrac{\partial^2 f}{\partial x_1^2} &amp; \dfrac{\partial^2 f}{\partial x_1\,\partial x_2} &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_1\,\partial x_n} \\[2.2ex]
+  \dfrac{\partial^2 f}{\partial x_2\,\partial x_1} &amp; \dfrac{\partial^2 f}{\partial x_2^2} &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_2\,\partial x_n} \\[2.2ex]
+  \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\[2.2ex]
+  \dfrac{\partial^2 f}{\partial x_n\,\partial x_1} &amp; \dfrac{\partial^2 f}{\partial x_n\,\partial x_2} &amp; \cdots &amp; \dfrac{\partial^2 f}{\partial x_n^2}
+\end{matrix}\right)\end{split}\]</div>
+<p>One of the first things to note about the Hessian - it&#8217;s symmetric. This
+structure leads to some useful properties in terms of interpreting
+critical points.</p>
+<p>The multivariate analog of the test for a local max or min turns out to
+be a statement about the gradient and the Hessian matrix. Specifically,
+a function <span class="math">\(f:\mathbb{R}^n\rightarrow \mathbb{R}\)</span> has a critical
+point at <span class="math">\(x\)</span> if <span class="math">\(\nabla f(x) = 0\)</span> (where zero is the zero
+vector!). Furthermore, the second derivative test at a critical point is
+as follows:</p>
+<ul class="simple">
+<li>If <span class="math">\(H(x)\)</span> is positive-definite (<span class="math">\(\iff\)</span> it has all
+positive eigenvalues), <span class="math">\(f\)</span> has a local minimum at <span class="math">\(x\)</span></li>
+<li>If <span class="math">\(H(x)\)</span> is negative-definite (<span class="math">\(\iff\)</span> it has all
+negative eigenvalues), <span class="math">\(f\)</span> has a local maximum at <span class="math">\(x\)</span></li>
+<li>If <span class="math">\(H(x)\)</span> has both positive and negative eigenvalues, <span class="math">\(f\)</span>
+has a saddle point at <span class="math">\(x\)</span>.</li>
+</ul>
+<div class="section" id="note-much-of-the-following-notes-are-taken-from-nodecal-j-and-s-j-wright-numerical-optimization-2006-it-is-available-online-via-the-library">
+<h3>Note: much of the following notes are taken from Nodecal, J., and S. J. Wright. &#8220;Numerical optimization.&#8221; (2006). It is available online via the library.<a class="headerlink" href="#note-much-of-the-following-notes-are-taken-from-nodecal-j-and-s-j-wright-numerical-optimization-2006-it-is-available-online-via-the-library" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="convexity">
+<h2>Convexity<a class="headerlink" href="#convexity" title="Permalink to this headline">¶</a></h2>
+<p>A subset <span class="math">\(A\subset \mathbb{R}^n\)</span> is <em>convex</em> if for any two points
+<span class="math">\(x,y\in A\)</span>, the line segment:</p>
+<div class="math">
+\[tx + (1-t)y \;\;\;\;\;\; t\in [0,1]\]</div>
+<p>is also in <span class="math">\(A\)</span></p>
+<p>A function <span class="math">\(f:\mathbb{R}^n \rightarrow \mathbb{R}\)</span> is <em>convex</em> if
+its domain <span class="math">\(D\)</span> is a convex set and for any two points
+<span class="math">\(x,y\in D\)</span>, the graph of <span class="math">\(f\)</span> (a subset of
+<span class="math">\(\mathbb{R}^{n+1})\)</span> lies below the line:</p>
+<div class="math">
+\[tf(x) + (1-t)f(y)\;\;\;\;\;t\in [0,1]\]</div>
+<p>i.e.</p>
+<div class="math">
+\[f(tx+(1-t)y) \leq tf(x) + (1-t)f(y)\;\;\;\;\;t\in [0,1]\]</div>
+<div class="section" id="convexity-guarantees-that-if-an-optimizer-converges-it-converges-to-the-global-minimum">
+<h3>Convexity guarantees that if an optimizer converges, it converges to the global minimum.<a class="headerlink" href="#convexity-guarantees-that-if-an-optimizer-converges-it-converges-to-the-global-minimum" title="Permalink to this headline">¶</a></h3>
+<p>Luckily, we often encounter convex problems in statistics.</p>
+</div>
+</div>
+<div class="section" id="line-search-methods">
+<h2>Line Search Methods<a class="headerlink" href="#line-search-methods" title="Permalink to this headline">¶</a></h2>
+<p>There are essentially two classes of multivariate optimization methods.
+We&#8217;ll cover line search methods, but refer the reader to Nodecal and
+Wright for discussion of &#8216;trust region methods&#8217;. We should note that all
+of these methods require that we are &#8216;close&#8217; to the minimum (maximum) we
+are seeking, and that &#8216;noisy&#8217; functions or ill-behaved functions are
+beyond our scope.</p>
+<p>A line search method is exactly as it sounds - we search on a line (in
+<span class="math">\(n\)</span> dimensional space) and try to find a minimum. We start with an
+initial point, and use an iterative method:</p>
+<div class="math">
+\[x_{k+1} = x_k + \alpha_k p_k\]</div>
+<p>where <span class="math">\(\alpha_k\)</span> is the <em>step size</em> and <span class="math">\(p_k\)</span> is the search
+direction. These are the critical choices that change the behavior of
+the search.</p>
+<div class="section" id="step-size">
+<h3>Step Size<a class="headerlink" href="#step-size" title="Permalink to this headline">¶</a></h3>
+<p>Ideally, (given a choice of direction, <span class="math">\(p_k\)</span>) we would want to
+minimize:</p>
+<div class="math">
+\[\varphi(\alpha) = f(x_k + \alpha p_k)\]</div>
+<p>with respect to <span class="math">\(\alpha\)</span>. This is usually computationally
+intensive, so in practice, a sequence of <span class="math">\(\alpha\)</span> candidates are
+generated, and then the &#8216;best&#8217; is chosen according to some &#8216;conditions&#8217;.
+We won&#8217;t be going into detail regarding these. The important thing to
+know is that they ensure that <span class="math">\(f\)</span> decreases sufficiently,
+according to some conditions. Interested students should see Nodecal.</p>
+</div>
+</div>
+<div class="section" id="steepest-descent">
+<h2>Steepest Descent<a class="headerlink" href="#steepest-descent" title="Permalink to this headline">¶</a></h2>
+<p>In steepest descent, one chooses <span class="math">\(p_k=\nabla f_k = \nabla f(x_k)\)</span>.
+It is so named, because the gradient points in the direction of steepest
+ascent, thus, <span class="math">\(-\nabla f_k\)</span> will point in the direction of
+steepest descent. We&#8217;ll consider this method in its ideal case, that of
+a quadratic:</p>
+<div class="math">
+\[f(x) = \frac12 x^TQx - b^Tx\]</div>
+<p>where <span class="math">\(Q\)</span> is positive-definite and symmetric. Note that:</p>
+<div class="math">
+\[\nabla f = Qx -b\]</div>
+<p>so the minimum occurs at <span class="math">\(x\)</span> such that</p>
+<div class="math">
+\[Qx= b\]</div>
+<p>Clearly, we can solve this easily, but let&#8217;s walk through the algorithm
+and first find the (ideal) step length:</p>
+<div class="math">
+\[f(x_k - \alpha \nabla f_k) = \frac12\left(x_k - \alpha \nabla f_k\right)^TQ\left(x_k - \alpha \nabla f_k\right) - b^T \left(x_k - \alpha \nabla f_k\right)\]</div>
+<p>If we differentiate this with respect to <span class="math">\(\alpha\)</span> and find the
+zero, we obtain:</p>
+<div class="math">
+\[\alpha_k = \frac{\nabla f_k^T\nabla f_k}{\nabla f_k^TQ\nabla f_k}\]</div>
+<p>Thus,</p>
+<div class="math">
+\[x_{k+1} = x_k - \frac{\nabla f_k^T\nabla f_k}{\nabla f_k^TQ\nabla f_k} \nabla f_k\]</div>
+<p>But we know that <span class="math">\(\nabla f_k = Qx_k -b\)</span>, so we have a closed form
+solution for <span class="math">\(x_{k+1}\)</span>. This allows us to compute an error bound.
+Again, details can be found in the text, but here is the result:</p>
+<div class="math">
+\[||x_{k+1} - x^*||_Q^2 \leq \left(\frac{\lambda_n - \lambda_1}{\lambda_n+\lambda_1}\right)^2 ||x_{k} - x^*||_Q^2\]</div>
+<p>where <span class="math">\(0&lt;\lambda_1\leq ... \leq \lambda_n\)</span> and <span class="math">\(x^*\)</span> denotes
+the minimizer.</p>
+<p>Now, if <span class="math">\(\lambda_1=...=\lambda_n = \lambda\)</span>, then
+<span class="math">\(Q=\lambda I\)</span>, the algorithm converges in one step. Geometrically,
+the contours are ellipsoids, the value of
+<span class="math">\(\frac{\lambda_n}{\lambda_1}\)</span> elongates the axes and causes the
+steps to &#8216;zig-zag&#8217;. Because of this, convergence slows as
+<span class="math">\(\frac{\lambda_n}{\lambda_1}\)</span> increases.</p>
+</div>
+<div class="section" id="newton-s-method">
+<h2>Newton&#8217;s Method<a class="headerlink" href="#newton-s-method" title="Permalink to this headline">¶</a></h2>
+<p>Newton&#8217;s method is another line-search, and here</p>
+<div class="math">
+\[p_k = -H^{-1}\nabla f_k\]</div>
+<p>Note that if the Hessian is not positive definite, this may not always
+be a descent direction.</p>
+<p>In the neighborhood of a local minimum, the Hessian <em>will</em> be positive
+definite. Now, if <span class="math">\(x_0\)</span> is &#8216;close enough&#8217; to the minimizer
+<span class="math">\(x^*\)</span>, the step size <span class="math">\(\alpha_k =1\)</span> gives quadratic
+convergence.</p>
+<p>The advantage of multiplying the gradient by the inverse of the Hessian
+is that the gradient is corrected for curvature, and the new direction
+points toward the minimum.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1">#def Quad(x):</span>
+<span class="c1">#    return (x[1:])*np.sin(x[:-1])**2.0)</span>
+
+<span class="c1">#def DQuad(x,y):</span>
+<span class="c1">#    return (np.array([np.cos(x)*np.sin(y)**2.0,2.0*np.sin(x)*np.cos(y)**2.0]))</span>
+
+<span class="k">def</span> <span class="nf">Quad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">DQuad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.0</span><span class="o">*</span><span class="n">x</span><span class="p">,</span><span class="mf">10.0</span><span class="o">*</span><span class="n">y</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">X</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+<span class="n">Hinv</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Steepest Descent&quot;</span><span class="p">);</span>
+<span class="n">step</span><span class="o">=-</span><span class="mf">0.25</span>
+<span class="n">X0</span> <span class="o">=</span> <span class="mf">10.0</span>
+<span class="n">Y0</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="n">Ngrad</span><span class="o">=</span><span class="n">Hinv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">DQuad</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">))</span>
+
+<span class="n">sgrad</span> <span class="o">=</span> <span class="n">step</span><span class="o">*</span><span class="n">DQuad</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">X1</span> <span class="o">=</span> <span class="n">X0</span> <span class="o">+</span> <span class="n">sgrad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Y1</span> <span class="o">=</span> <span class="n">Y0</span> <span class="o">+</span> <span class="n">sgrad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">sgrad</span> <span class="o">=</span> <span class="n">step</span><span class="o">*</span><span class="n">DQuad</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span><span class="n">Y1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X1</span><span class="p">,</span><span class="n">Y1</span><span class="p">,</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span><span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">X2</span> <span class="o">=</span> <span class="n">X1</span> <span class="o">+</span> <span class="n">sgrad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Y2</span> <span class="o">=</span> <span class="n">Y1</span> <span class="o">+</span> <span class="n">sgrad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">sgrad</span> <span class="o">=</span> <span class="n">step</span><span class="o">*</span><span class="n">DQuad</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span><span class="n">Y2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X2</span><span class="p">,</span><span class="n">Y2</span><span class="p">,</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">sgrad</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span><span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">Z</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Newton&#39;s Method&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span><span class="n">Y0</span><span class="p">,</span><span class="n">Ngrad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">Ngrad</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span><span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">#Compute Hessian and plot again.</span>
+</pre></div>
+</div>
+<img alt="_images/14B_Multivariate_Optimization_13_0.png" src="_images/14B_Multivariate_Optimization_13_0.png" />
+</div>
+<div class="section" id="coordinate-descent">
+<h2>Coordinate Descent<a class="headerlink" href="#coordinate-descent" title="Permalink to this headline">¶</a></h2>
+<p>Another method is called &#8216;coordinate&#8217; descent, and it involves searching
+along coordinate directions (cyclically), i.e.:</p>
+<div class="math">
+\[p_{mk} = e_{k} \;\;\;\;\;\; k=1,...,n\]</div>
+<p>where <span class="math">\(m\)</span> is the number of steps.</p>
+<p>The main advantage is that <span class="math">\(\nabla f\)</span> is not required. It can
+behave reasonably well, if coordinates are not tightly coupled.</p>
+<div class="section" id="newton-cg-algorithm">
+<h3>Newton CG Algorithm<a class="headerlink" href="#newton-cg-algorithm" title="Permalink to this headline">¶</a></h3>
+<p>Features:</p>
+<ul class="simple">
+<li>Minimizes a &#8216;true&#8217; quadratic on <span class="math">\(\mathbb{R}^n\)</span> in <span class="math">\(n\)</span>
+steps</li>
+<li>Does NOT require storage or inversion of an <span class="math">\(n \times n\)</span>
+matrix.</li>
+</ul>
+<p>We begin with <span class="math">\(:\mathbb{R}^n\rightarrow \mathbb{R}\)</span>. Take a
+quadratic approximation to <span class="math">\(f\)</span>:</p>
+<div class="math">
+\[f(x) \approx \frac12 x^T H x + b^Tx + c\]</div>
+<p>Note that in the neighborhood of a minimum, <span class="math">\(H\)</span> will be
+positive-definite (and symmetric). (If we are maximizing, just consider
+<span class="math">\(-H\)</span>).</p>
+<p>This reduces the optimization problem to finding the zeros of</p>
+<div class="math">
+\[Hx = -b\]</div>
+<p>This is a linear problem, which is nice. The dimension <span class="math">\(n\)</span> may be
+very large - which is not so nice.</p>
+<div class="section" id="general-inner-product">
+<h4>General Inner Product<a class="headerlink" href="#general-inner-product" title="Permalink to this headline">¶</a></h4>
+<p>Recall the axiomatic definition of an inner product <span class="math">\(&lt;,&gt;_A\)</span>:</p>
+<ul>
+<li><p class="first">For any two vectors <span class="math">\(v,w\)</span> we have</p>
+<div class="math">
+\[&lt;v,w&gt;_A = &lt;w,v&gt;_A\]</div>
+</li>
+<li><p class="first">For any vector <span class="math">\(v\)</span></p>
+<div class="math">
+\[&lt;v,v&gt;_A \;\geq 0\]</div>
+<p>with equality <span class="math">\(\iff\)</span> <span class="math">\(v=0\)</span>.</p>
+</li>
+<li><p class="first">For <span class="math">\(c\in\mathbb{R}\)</span> and <span class="math">\(u,v,w\in\mathbb{R}^n\)</span>, we have</p>
+<div class="math">
+\[&lt;cv+w,u&gt; = c&lt;v,u&gt; + &lt;w,u&gt;\]</div>
+</li>
+</ul>
+<p>These properties are known as symmetric, positive definite and bilinear,
+respectively.</p>
+<p>Fact: If we denote the standard inner product on <span class="math">\(\mathbb{R}^n\)</span> as
+<span class="math">\(&lt;,&gt;\)</span> (this is the &#8216;dot product&#8217;), any symmetric, positive
+definite <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> defines an inner product on
+<span class="math">\(\mathbb{R}^n\)</span> via:</p>
+<div class="math">
+\[&lt;v,w&gt;_A \; = &lt;v,Aw&gt; = v^TAw\]</div>
+<p>Just as with the standard inner product, general inner products define
+for us a notion of &#8216;orthogonality&#8217;. Recall that with respect to the
+standard product, 2 vectors are orthogonal if their product vanishes.
+The same applies to <span class="math">\(&lt;,&gt;_A\)</span>:</p>
+<div class="math">
+\[&lt;v,w&gt;_A = 0\]</div>
+<p>means that <span class="math">\(v\)</span> and <span class="math">\(w\)</span> are orthogonal under the inner
+product induced by <span class="math">\(A\)</span>. Equivalently, if <span class="math">\(v,w\)</span> are
+orthogonal under <span class="math">\(A\)</span>, we have:</p>
+<div class="math">
+\[v^TAw = 0\]</div>
+<p>This is also called <em>conjugate</em> (thus the name of the method).</p>
+</div>
+<div class="section" id="conjugate-vectors">
+<h4>Conjugate Vectors<a class="headerlink" href="#conjugate-vectors" title="Permalink to this headline">¶</a></h4>
+<p>Suppose we have a set of <span class="math">\(n\)</span> vectors <span class="math">\(p_1,...,p_n\)</span> that are
+mutually conjugate. These vectors form a basis of <span class="math">\(\mathbb{R}^n\)</span>.
+Getting back to the problem at hand, this means that our solution vector
+<span class="math">\(x\)</span> to the linear problem may be written as follows:</p>
+<div class="math">
+\[x = \sum\limits_{i=1}^n \alpha_i p_i\]</div>
+<p>So, finding <span class="math">\(x\)</span> reduces to finding a conjugate basis and the
+coefficients for <span class="math">\(x\)</span> in that basis.</p>
+<p>If we let <span class="math">\(A=H\)</span>,note that:</p>
+<div class="math">
+\[{p}_k^{T} {-b}={p}_k^{T} {A}{x}\]</div>
+<p>and because <span class="math">\(x = \sum\limits_{i=1}^n \alpha_i p_i\)</span>, we have:</p>
+<div class="math">
+\[p^TAx = \sum\limits_{i=1}^n \alpha_i p^TA p_i\]</div>
+<p>we can solve for <span class="math">\(\alpha_k\)</span>:</p>
+<div class="math">
+\[\alpha_k = \frac{{p}_k^{T}{(-b)}}{{p}_k^{T} {A}{p}_k} = -\frac{\langle {p}_k, {b}\rangle}{\,\,\,\langle {p}_k,  {p}_k\rangle_{A}} = -\frac{\langle{p}_k, {b}\rangle}{\,\,\,\|{p}_k\|_{A}^2}.\]</div>
+<p>Now, all we need are the <span class="math">\(p_k\)</span>&#8216;s.</p>
+<p>A nice initial guess would be the gradient at some initial point
+<span class="math">\(x_1\)</span>. So, we set <span class="math">\(p_1 = \nabla f(x_1)\)</span>. Then set:</p>
+<div class="math">
+\[x_2 = x_1 + \alpha_1p_1\]</div>
+<p>This should look familiar. In fact, it is gradient descent. For
+<span class="math">\(p_2\)</span>, we want <span class="math">\(p_1\)</span> and <span class="math">\(p_2\)</span> to be conjugate (under
+<span class="math">\(A\)</span>). That just means orthogonal under the inner product induced
+by <span class="math">\(A\)</span>. We set</p>
+<div class="math">
+\[p_2 = \nabla f(x_2) - \frac{p_1^TA\nabla f(x_2)}{{p}_1^{T}{A}{p}_1} {p}_1\]</div>
+<p>I.e. We take the gradient at <span class="math">\(x_1\)</span> and subtract its projection
+onto <span class="math">\(p_1\)</span>. This is the same as Gram-Schmidt orthogonalization.</p>
+<p>The <span class="math">\(k^{th}\)</span> conjugate vector is:</p>
+<div class="math">
+\[p_{k} = \nabla f(x_k) - \sum\limits_{i=1}^{k-1}\frac{p_i^T A \nabla f(x_k)}{p_i^TAp_i} p_i\]</div>
+<p>The &#8216;trick&#8217; is that in general, we do not need all <span class="math">\(n\)</span> conjugate
+vectors. In fact, it turns out that <span class="math">\(\nabla f(x_k) = b-Ax_k\)</span> is
+conjugate to all the <span class="math">\(p_i\)</span> for <span class="math">\(i=1,...,k-2\)</span>. Therefore, we
+need only the last term in the sum.</p>
+<p>Convergence rate is dependent on sparsity and condition number of
+<span class="math">\(A\)</span>. Worst case is <span class="math">\(n^2\)</span>.</p>
+</div>
+</div>
+<div class="section" id="bfgs-broydenfletchergoldfarbshanno">
+<h3>BFGS - Broyden–Fletcher–Goldfarb–Shanno<a class="headerlink" href="#bfgs-broydenfletchergoldfarbshanno" title="Permalink to this headline">¶</a></h3>
+<p>BFGS is a &#8216;quasi&#8217; Newton method of optimization. Such methods are
+variants of the Newton method, where the Hessian <span class="math">\(H\)</span> is replaced
+by some approximation. We we wish to solve the equation:</p>
+<div class="math">
+\[B_k{p}_k = -\nabla f({x}_k)\]</div>
+<p>for <span class="math">\(p_k\)</span>. This gives our search direction, and the next candidate
+point is given by:</p>
+<div class="math">
+\[x_{k+1} = x_k + \alpha_k p_k\]</div>
+<p>.</p>
+<p>where <span class="math">\(\alpha_k\)</span> is a step size.</p>
+<p>At each step, we require that the new approximate <span class="math">\(H\)</span> meets the
+secant condition:</p>
+<div class="math">
+\[B_{k+1}(x_{k+1}-x_k) = \nabla f(x_{k+1}) -\nabla f(x_k)\]</div>
+<p>There is a unique, rank one update that satisfies the above:</p>
+<div class="math">
+\[B_{k+1} = B_k + c_k v_kv_k^T\]</div>
+<p>where</p>
+<div class="math">
+\[c_k = -\frac{1}{\left(B_k(x_{k+1}-x_k) - (\nabla f(x_{k+1})-\nabla f(x_k)\right)^T (x_{k+1}-x_k) }\]</div>
+<p>and</p>
+<div class="math">
+\[v_k = B_k(x_{k+1}-x_k) - (\nabla f(x_{k+1})-\nabla f(x_k))\]</div>
+<p>Note that the update does NOT preserve positive definiteness if
+<span class="math">\(c_k&lt;0\)</span>. In this case, there are several options for the rank one
+correction, but we will not address them here. Instead, we will describe
+the BFGS method, which almost always guarantees a positive-definite
+correction. Specifically:</p>
+<div class="math">
+\[B_{k+1} = B_k + b_k g_k g_k^T + c_k B_k d_k d_k^TB_k\]</div>
+<p>where we have introduced the shorthand:</p>
+<div class="math">
+\[g_k = \nabla f(x_{k+1}) - \nabla f(x_k) \;\;\;\;\;\;\;\ \mathrm{ and }\;\;\;\;\;\;\; d_k = x_{k+1} - x_k\]</div>
+<p>If we set:</p>
+<div class="math">
+\[b_k = \frac{1}{g_k^Td_k} \;\;\;\;\; \mathrm{ and } \;\;\;\;\; c_k = \frac{1}{d_k^TB_kd_k}\]</div>
+<p>we satisfy the secant condition.</p>
+</div>
+<div class="section" id="nelder-mead-simplex">
+<h3>Nelder-Mead Simplex<a class="headerlink" href="#nelder-mead-simplex" title="Permalink to this headline">¶</a></h3>
+<p>While Newton&#8217;s method is considered a &#8216;second order method&#8217; (requires
+the second derivative), and quasi-Newton methods are first order
+(require only first derivatives), Nelder-Mead is a zero-order method.
+I.e. NM requires only the function itself - no derivatives.</p>
+<p>For <span class="math">\(f:\mathbb{R}^n\rightarrow \mathbb{R}\)</span>, the algorithm computes
+the values of the function on a simplex of dimension <span class="math">\(n\)</span>,
+constructed from <span class="math">\(n+1\)</span> vertices. For a univariate function, the
+simplex is a line segment. In two dimensions, the simplex is a triangle,
+in 3D, a tetrahedral solid, and so on.</p>
+<p>The algorithm begins with <span class="math">\(n+1\)</span> starting points and then the
+follwing steps are repeated until convergence:</p>
+<ul>
+<li><p class="first">Compute the function at each of the points</p>
+</li>
+<li><p class="first">Sort the function values so that</p>
+<div class="math">
+\[f(x_1)\leq ...\leq f(x_{n+1})\]</div>
+</li>
+<li><p class="first">Compute the centroid <span class="math">\(x_c\)</span> of the n-dimensional region defined
+by <span class="math">\(x_1,...,x_n\)</span></p>
+</li>
+<li><p class="first">Reflect <span class="math">\(x_{n+1}\)</span> about the centroid to get <span class="math">\(x_r\)</span></p>
+<div class="math">
+\[x_r = x_c + \alpha (x_c - x_{n+1})\]</div>
+</li>
+<li><p class="first">Create a new simplex according to the following rules:</p>
+<ul>
+<li><p class="first">If <span class="math">\(f(x_1)\leq f(x_r) &lt; f(x_n)\)</span>, replace <span class="math">\(x_{n+1}\)</span>
+with <span class="math">\(x_r\)</span></p>
+</li>
+<li><p class="first">If <span class="math">\(f(x_r)&lt;f(x_1)\)</span>, expand the simplex through <span class="math">\(x_r\)</span>:</p>
+<div class="math">
+\[x_e = x_c + \gamma (x_c - x_{n+1})\]</div>
+<p>If <span class="math">\(f(x_e)&lt;f(x_r)\)</span>, replace <span class="math">\(x_{n+1}\)</span> with
+<span class="math">\(x_e\)</span>, otherwise, replace <span class="math">\(x_{n+1}\)</span> with <span class="math">\(x_r\)</span></p>
+</li>
+<li><p class="first">If <span class="math">\(f({x}_{r}) \geq f({x}_{n})\)</span>, compute
+<span class="math">\(x_p = x_c + \rho(x_c - x_{n+1})\)</span>. If
+<span class="math">\(f({x}_{p}) &lt; f({x}_{n+1})\)</span>, replace <span class="math">\(x_{n+1}\)</span> with
+<span class="math">\(x_p\)</span></p>
+</li>
+<li><p class="first">If all else fails, replace <em>all</em> points except <span class="math">\(x_1\)</span>
+according to</p>
+<div class="math">
+\[x_i = {x}_{1} + \sigma({x}_{i} - {x}_{1})\]</div>
+</li>
+</ul>
+</li>
+</ul>
+<p>The default values of <span class="math">\(\alpha, \gamma,\rho\)</span> and <span class="math">\(\sigma\)</span> in
+scipy are not listed in the documentation, nor are they inputs to the
+function.</p>
+</div>
+<div class="section" id="powell-s-method">
+<h3>Powell&#8217;s Method<a class="headerlink" href="#powell-s-method" title="Permalink to this headline">¶</a></h3>
+<p>Powell&#8217;s method is another derivative-free optimization method that is
+similar to conjugate-gradient. The algorithm steps are as follows:</p>
+<p>Begin with a point <span class="math">\(p_0\)</span> (an initial guess) and a set of vectors
+<span class="math">\(\xi_1,...,\xi_n\)</span>, initially the standard basis of
+<span class="math">\(\mathbb{R}^n\)</span>.</p>
+<ul class="simple">
+<li>Compute for <span class="math">\(i=1,...,n\)</span>, find <span class="math">\(\lambda_i\)</span> that minimizes
+<span class="math">\(f(p_{i-1} +\lambda_i \xi_i)\)</span> and set
+<span class="math">\(p_i = p_{i-1} + \lambda_i\xi_i\)</span></li>
+<li>For <span class="math">\(i=1,...,n-1\)</span>, replace <span class="math">\(\xi_{i}\)</span> with
+<span class="math">\(\xi_{i+1}\)</span> and then replace <span class="math">\(\xi_n\)</span> with
+<span class="math">\(p_n - p_0\)</span></li>
+<li>Choose <span class="math">\(\lambda\)</span> so that <span class="math">\(f(p_0 + \lambda(p_n-p_0)\)</span> is
+minimum and replace <span class="math">\(p_0\)</span> with <span class="math">\(p_0 + \lambda(p_n-p_0)\)</span></li>
+</ul>
+<p>Essentially, the algorithm performs line searches and tries to find
+fruitful directions to search.</p>
+</div>
+</div>
+<div class="section" id="solvers">
+<h2>Solvers<a class="headerlink" href="#solvers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="levenberg-marquardt-damped-least-squares">
+<h3>Levenberg-Marquardt (Damped Least Squares)<a class="headerlink" href="#levenberg-marquardt-damped-least-squares" title="Permalink to this headline">¶</a></h3>
+<p>Recall the least squares problem:</p>
+<p>Given a set of data points <span class="math">\((x_i, y_i)\)</span> where <span class="math">\(x_i\)</span>&#8216;s are
+independent variables (in <span class="math">\(\mathbb{R}^n\)</span> and the <span class="math">\(y_i\)</span>&#8216;s are
+response variables (in <span class="math">\(\mathbb{R}\)</span>), find the parameter values of
+<span class="math">\(\beta\)</span> for the model <span class="math">\(f(x;\beta)\)</span> so that</p>
+<div class="math">
+\[S(\beta) = \sum\limits_{i=1}^m \left(y_i - f(x_i;\beta)\right)^2\]</div>
+<p>is minimized.</p>
+<p>If we were to use Newton&#8217;s method, our update step would look like:</p>
+<div class="math">
+\[\beta_{k+1} = \beta_k - H^{-1}\nabla S(\beta_k)\]</div>
+<p>Gradient descent, on the other hand, would yield:</p>
+<div class="math">
+\[\beta_{k+1} = \beta_k - \gamma\nabla S(\beta_k)\]</div>
+<p>Levenberg-Marquardt adaptively switches between Newton&#8217;s method and
+gradient descent.</p>
+<div class="math">
+\[\beta_{k+1} = \beta_k - (H + \lambda I)^{-1}\nabla S(\beta_k)\]</div>
+<p>When <span class="math">\(\lambda\)</span> is small, the update is essentially Newton-Gauss,
+while for <span class="math">\(\lambda\)</span> large, the update is gradient descent.</p>
+</div>
+<div class="section" id="newton-krylov">
+<h3>Newton-Krylov<a class="headerlink" href="#newton-krylov" title="Permalink to this headline">¶</a></h3>
+<p>The notion of a Krylov space comes from the Cayley-Hamilton theorem
+(CH). CH states that a matrix <span class="math">\(A\)</span> satisfies its characteristic
+polynomial. A direct corollary is that <span class="math">\(A^{-1}\)</span> may be written as
+a linear combination of powers of the matrix (where the highest power is
+<span class="math">\(n-1\)</span>).</p>
+<p>The Krylov space of order <span class="math">\(r\)</span> generated by an <span class="math">\(n\times n\)</span>
+matrix <span class="math">\(A\)</span> and an <span class="math">\(n\)</span>-dimensional vector <span class="math">\(b\)</span> is given
+by:</p>
+<div class="math">
+\[\mathcal{K}_r(A,b) = \operatorname{span} \, \{ b, Ab, A^2b, \ldots, A^{r-1}b \}\]</div>
+<p>These are actually the subspaces spanned by the conjugate vectors we
+mentioned in Newton-CG, so, technically speaking, Newton-CG is a Krylov
+method.</p>
+<p>Now, the scipy.optimize newton-krylov solver is what is known as a
+&#8216;Jacobian Free Newton Krylov&#8217;. It is a very efficient algorithm for
+solving <em>large</em> <span class="math">\(n\times n\)</span> non-linear systems. We won&#8217;t go into
+detail of the algorithm&#8217;s steps, as this is really more applicable to
+problems in physics and non-linear dynamics.</p>
+</div>
+</div>
+<div class="section" id="glm-estimation-and-irls">
+<h2>GLM Estimation and IRLS<a class="headerlink" href="#glm-estimation-and-irls" title="Permalink to this headline">¶</a></h2>
+<p>Recall generalized linear models are models with the following
+components:</p>
+<ul>
+<li><p class="first">A linear predictor <span class="math">\(\eta = X\beta\)</span></p>
+</li>
+<li><p class="first">A response variable with distribution in the exponential family</p>
+</li>
+<li><p class="first">An invertible &#8216;link&#8217; function <span class="math">\(g\)</span> such that</p>
+<div class="math">
+\[E(Y) = \mu = g^{-1}(\eta)\]</div>
+</li>
+</ul>
+<p>We may write the log-likelihood:</p>
+<div class="math">
+\[\ell(\eta) = \sum\limits_{i=1}^m (y_i \log(\eta_i) + (\eta_i - y_i)\log(1-\eta_i)\]</div>
+<p>where <span class="math">\(\eta_i = \eta(x_i,\beta)\)</span>.</p>
+<p>Differentiating, we obtain:</p>
+<div class="math">
+\[\frac{\partial L}{\partial \beta} = \frac{\partial \eta}{\partial \beta}^T\frac{\partial L}{\partial \eta} = 0\]</div>
+<p>Written slightly differently than we have in the previous sections, the
+Newton update to find <span class="math">\(\beta\)</span> would be:</p>
+<div class="math">
+\[-\frac{\partial^2 L}{\partial \beta \beta^T} \left(\beta_{k+1} -\beta_k\right) = \frac{\partial \eta}{\partial \beta}^T\frac{\partial L}{\partial \eta}\]</div>
+<p>Now, if we compute:</p>
+<div class="math">
+\[-\frac{\partial^2 L}{\partial \beta \beta^T} = \sum \frac{\partial L}{\partial \eta_i}\frac{\partial^2 \eta_i}{\partial \beta \beta^T} - \frac{\partial \eta}{\partial \beta}^T \frac{\partial^2 L}{\partial \eta \eta^T}  \frac{\partial \eta}{\partial \beta}\]</div>
+<p>Taking expected values on the right hand side and noting:</p>
+<div class="math">
+\[E\left(\frac{\partial L}{\partial \eta_i} \right) = 0\]</div>
+<p>and</p>
+<div class="math">
+\[E\left(-\frac{\partial^2 L}{\partial \eta \eta^T} \right) = E\left(\frac{\partial L}{\partial \eta}\frac{\partial L}{\partial \eta}^T\right) \equiv A\]</div>
+<p>So if we replace the Hessian in Newton&#8217;s method with its expected value,
+we obtain:</p>
+<div class="math">
+\[\frac{\partial \eta}{\partial \beta}^TA\frac{\partial \eta}{\partial \beta}\left(\beta_{k+1} -\beta_k\right) = \frac{\partial \eta}{\partial \beta}^T\frac{\partial L}{\partial \eta}\]</div>
+<p>Now, these actually have the form of the normal equations for a weighted
+least squares problem.</p>
+<div class="math">
+\[\min_{\beta_{k+1}}\left(A^{-1}\frac{\partial L}{\partial \eta} + \frac{\partial \eta}{\partial \beta}\left(\beta_{k+1} -\beta_k\right)\right)^T A \left(A^{-1}\frac{\partial L}{\partial \eta} + \frac{\partial \eta}{\partial \beta}\left(\beta_{k+1} -\beta_k\right)\right)\]</div>
+<p><span class="math">\(A\)</span> is a weight matrix, and changes with iteration - thus this
+technique is <em>iteratively reweighted least squares</em>.</p>
+<div class="section" id="constrained-optimization-and-lagrange-multipliers">
+<h3>Constrained Optimization and Lagrange Multipliers<a class="headerlink" href="#constrained-optimization-and-lagrange-multipliers" title="Permalink to this headline">¶</a></h3>
+<p>Often, we want to optimize a function subject to a constraint or
+multiple constraints. The most common analytical technique for this is
+called &#8216;Lagrange multipliers&#8217;. The theory is based on the following:</p>
+<p>If we wish to optimize a function <span class="math">\(f(x,y)\)</span> subject to the
+constraint <span class="math">\(g(x,y)=c\)</span>, we are really looking for points at which
+the gradient of <span class="math">\(f\)</span> and the gradient of <span class="math">\(g\)</span> are in the same
+direction. This amounts to:</p>
+<div class="math">
+\[\nabla_{(x,y)}f = \lambda \nabla_{(x,y)}g\]</div>
+<p>(often, this is written with a (-) sign in front of <span class="math">\(\lambda\)</span>).
+The 2-d problem above defines two equations in three unknowns. The
+original constraint, <span class="math">\(g(x,y)=c\)</span> yields a third equation.
+Additional constraints are handled by finding:</p>
+<div class="math">
+\[\nabla_{(x,y)}f = \lambda_1 \nabla_{(x,y)}g_1 + ... + \lambda_k \nabla_{(x,y)}g_k\]</div>
+<div class="figure" id="id1">
+<img alt="Lagrange Multipliers" src="_images/Lagrange_multiplier.png" />
+<p class="caption"><span class="caption-text">Lagrange Multipliers</span></p>
+</div>
+<p>The generalization to functions on <span class="math">\(\mathbb{R}^n\)</span> is also trivial:</p>
+<div class="math">
+\[\nabla_{x}f = \lambda \nabla_{x}g\]</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Algorithms for Optimization and Root Finding for Multivariate Problems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#optimization-roots-in-n-dimensions-first-some-calculus">Optimization/Roots in n Dimensions - First Some Calculus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convexity">Convexity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#line-search-methods">Line Search Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#steepest-descent">Steepest Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#newton-s-method">Newton&#8217;s Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coordinate-descent">Coordinate Descent</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solvers">Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#glm-estimation-and-irls">GLM Estimation and IRLS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="14A_Optimization_One_Dimension.html"
+                          title="Previous page">&larr; Optimization and Root Finding</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="14C_Optimization_In_Python.html"
+                          title="Next page">&rarr; Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/14B_Multivariate_Optimization.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="14C_Optimization_In_Python.html" title="Using optimization routines from scipy and statsmodels"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="14A_Optimization_One_Dimension.html" title="Optimization and Root Finding"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/14B_Multivariate_Optimization.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:11:15 GMT -->
+</html>

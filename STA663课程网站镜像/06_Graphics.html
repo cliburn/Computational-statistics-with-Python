@@ -1,0 +1,1188 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/06_Graphics.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:08:30 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Graphics in Python &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data" href="07_Data.html" />
+    <link rel="prev" title="Using numpy" href="05_Numbers.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="07_Data.html" title="Data"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="05_Numbers.html" title="Using numpy"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="graphics-in-python">
+<h1>Graphics in Python<a class="headerlink" href="#graphics-in-python" title="Permalink to this headline">¶</a></h1>
+<p>The foundational package for most graphics in Python is
+<code class="docutils literal"><span class="pre">`matplotlib</span></code> &lt;<a class="reference external" href="http://matplotlib.org/">http://matplotlib.org</a>&gt;`__, and the
+<code class="docutils literal"><span class="pre">`seaborn</span></code> &lt;<a class="reference external" href="http://stanford.edu/~mwaskom/software/seaborn/">http://stanford.edu/~mwaskom/software/seaborn/</a>&gt;`__ package
+builds on this to provide more statistical graphing options. We will
+focus on these two packages, but there are many others if these don&#8217;t
+meet your needs.</p>
+<p>There are also several specialized packages that might come in useful:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">`ggplot</span></code> &lt;<a class="reference external" href="http://ggplot.yhathq.com/">http://ggplot.yhathq.com</a>&gt;`__ is a port of the R
+<code class="docutils literal"><span class="pre">ggplto2</span></code> library to Python</li>
+<li><code class="docutils literal"><span class="pre">`vispy</span></code> &lt;<a class="reference external" href="http://vispy.org/">http://vispy.org</a>&gt;`__ and
+<code class="docutils literal"><span class="pre">`lightning</span></code> &lt;<a class="reference external" href="http://lightning-viz.org/">http://lightning-viz.org</a>&gt;`__ for interactive
+visualization of large data sets</li>
+<li><code class="docutils literal"><span class="pre">`bokeh</span></code> &lt;<a class="reference external" href="http://bokeh.pydata.org/en/latest/">http://bokeh.pydata.org/en/latest/</a>&gt;`__ for web-friendly
+interactive graphics</li>
+<li><code class="docutils literal"><span class="pre">`pyxley</span></code> &lt;pyxley%20github&gt;`__ and <code class="docutils literal"><span class="pre">`spyre</span></code> &lt;spyre%20pyton&gt;`__
+for R <code class="docutils literal"><span class="pre">shiny</span></code> fans and several others.</li>
+</ul>
+<div class="section" id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.scipy-lectures.org/intro/matplotlib/matplotlib.html">Matplotlib
+tutorial</a></li>
+<li><a class="reference external" href="http://matplotlib.org/1.2.1/gallery.html">Matplotlib gallery</a></li>
+<li><a class="reference external" href="http://stanford.edu/~mwaskom/software/seaborn/examples/index.html#example-gallery">Seaborn
+gallery</a></li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="matplotlib">
+<h2>Matplotlib<a class="headerlink" href="#matplotlib" title="Permalink to this headline">¶</a></h2>
+<p>Matplotlib has a &#8220;functional&#8221; interface similar to Matlab via the
+<code class="docutils literal"><span class="pre">pyplot</span></code> module for simple interactive use, as well as an
+object-oriented interface that is useful for more complex graphic
+creations.</p>
+</div>
+<div class="section" id="types-of-plots">
+<h2>Types of plots<a class="headerlink" href="#types-of-plots" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">11</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_5_0.png" src="_images/06_Graphics_5_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">)))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_6_0.png" src="_images/06_Graphics_6_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_7_0.png" src="_images/06_Graphics_7_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_8_0.png" src="_images/06_Graphics_8_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_10_0.png" src="_images/06_Graphics_10_0.png" />
+</div>
+<div class="section" id="colors">
+<h2>Colors<a class="headerlink" href="#colors" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_12_0.png" src="_images/06_Graphics_12_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;summer&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_13_0.png" src="_images/06_Graphics_13_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hsv&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_14_0.png" src="_images/06_Graphics_14_0.png" />
+<div class="section" id="gettting-a-list-of-colors-from-a-colormap">
+<h3>Gettting a list of colors from a colormap<a class="headerlink" href="#gettting-a-list-of-colors-from-a-colormap" title="Permalink to this headline">¶</a></h3>
+<p>Giving an argument of 0.0 &lt; x &lt; 1.0 to a <code class="docutils literal"><span class="pre">colormap</span></code> gives the
+appropriate interpolated color.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># find the bottom, middle and top colors of the winter colormap</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">winter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">colors</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">0.50196078</span><span class="p">,</span>  <span class="mf">0.74901961</span><span class="p">,</span>  <span class="mf">1.</span>        <span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.</span>        <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">,</span>  <span class="mf">0.5</span>       <span class="p">,</span>  <span class="mf">1.</span>        <span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_17_0.png" src="_images/06_Graphics_17_0.png" />
+<div class="section" id="styles">
+<h4>Styles<a class="headerlink" href="#styles" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;seaborn-ticks&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-white&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-whitegrid&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-colorblind&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-pastel&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-poster&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-paper&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;ggplot&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-deep&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;bmh&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-talk&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-dark&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;dark_background&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-bright&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-notebook&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;classic&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;presentation&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-muted&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-dark-palette&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;grayscale&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;seaborn-darkgrid&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;classic&#39;</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_20_0.png" src="_images/06_Graphics_20_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;fivethirtyeight&#39;</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_21_0.png" src="_images/06_Graphics_21_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_22_0.png" src="_images/06_Graphics_22_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">xkcd</span><span class="p">():</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_23_0.png" src="_images/06_Graphics_23_0.png" />
+</div>
+<div class="section" id="creating-your-onw-style">
+<h4>Creating your onw style<a class="headerlink" href="#creating-your-onw-style" title="Permalink to this headline">¶</a></h4>
+<p>Many, many options can be configured.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span>
+</pre></div>
+</div>
+<pre class="literal-block">
+RcParams({'agg.path.chunksize': 0,
+          'animation.avconv_args': [],
+          'animation.avconv_path': 'avconv',
+          'animation.bitrate': -1,
+          'animation.codec': 'mpeg4',
+          'animation.convert_args': [],
+          'animation.convert_path': 'convert',
+          'animation.ffmpeg_args': [],
+          'animation.ffmpeg_path': 'ffmpeg',
+          'animation.frame_format': 'png',
+          'animation.html': 'none',
+          'animation.mencoder_args': [],
+          'animation.mencoder_path': 'mencoder',
+          'animation.writer': 'ffmpeg',
+          'axes.axisbelow': True,
+          'axes.edgecolor': 'white',
+          'axes.facecolor': '#EAEAF2',
+          'axes.formatter.limits': [-7, 7],
+          'axes.formatter.use_locale': False,
+          'axes.formatter.use_mathtext': False,
+          'axes.formatter.useoffset': True,
+          'axes.grid': True,
+          'axes.grid.axis': 'both',
+          'axes.grid.which': 'major',
+          'axes.hold': True,
+          'axes.labelcolor': '.15',
+          'axes.labelpad': 5.0,
+          'axes.labelsize': 16.5,
+          'axes.labelweight': 'normal',
+          'axes.linewidth': 0.0,
+          'axes.prop_cycle': cycler('color', [(0.2980392156862745, 0.4470588235294118, 0.6901960784313725), (0.3333333333333333, 0.6588235294117647, 0.40784313725490196), (0.7686274509803922, 0.3058823529411765, 0.3215686274509804), (0.5058823529411764, 0.4470588235294118, 0.6980392156862745), (0.8, 0.7254901960784313, 0.4549019607843137), (0.39215686274509803, 0.7098039215686275, 0.803921568627451)]),
+          'axes.spines.bottom': True,
+          'axes.spines.left': True,
+          'axes.spines.right': True,
+          'axes.spines.top': True,
+          'axes.titlesize': 18.0,
+          'axes.titleweight': 'normal',
+          'axes.unicode_minus': True,
+          'axes.xmargin': 0.0,
+          'axes.ymargin': 0.0,
+          'axes3d.grid': True,
+          'backend': 'module://ipykernel.pylab.backend_inline',
+          'backend.qt4': 'PyQt4',
+          'backend.qt5': 'PyQt5',
+          'backend_fallback': True,
+          'boxplot.bootstrap': None,
+          'boxplot.boxprops.color': 'b',
+          'boxplot.boxprops.linestyle': '-',
+          'boxplot.boxprops.linewidth': 1.0,
+          'boxplot.capprops.color': 'k',
+          'boxplot.capprops.linestyle': '-',
+          'boxplot.capprops.linewidth': 1.0,
+          'boxplot.flierprops.color': 'b',
+          'boxplot.flierprops.linestyle': 'none',
+          'boxplot.flierprops.linewidth': 1.0,
+          'boxplot.flierprops.marker': '+',
+          'boxplot.flierprops.markeredgecolor': 'k',
+          'boxplot.flierprops.markerfacecolor': 'b',
+          'boxplot.flierprops.markersize': 6.0,
+          'boxplot.meanline': False,
+          'boxplot.meanprops.color': 'r',
+          'boxplot.meanprops.linestyle': '-',
+          'boxplot.meanprops.linewidth': 1.0,
+          'boxplot.medianprops.color': 'r',
+          'boxplot.medianprops.linestyle': '-',
+          'boxplot.medianprops.linewidth': 1.0,
+          'boxplot.notch': False,
+          'boxplot.patchartist': False,
+          'boxplot.showbox': True,
+          'boxplot.showcaps': True,
+          'boxplot.showfliers': True,
+          'boxplot.showmeans': False,
+          'boxplot.vertical': True,
+          'boxplot.whiskerprops.color': 'b',
+          'boxplot.whiskerprops.linestyle': '--',
+          'boxplot.whiskerprops.linewidth': 1.0,
+          'boxplot.whiskers': 1.5,
+          'contour.corner_mask': True,
+          'contour.negative_linestyle': 'dashed',
+          'datapath': '/Users/cliburn/anaconda/envs/py35/lib/python3.5/site-packages/matplotlib/mpl-data',
+          'docstring.hardcopy': False,
+          'errorbar.capsize': 3.0,
+          'examples.directory': '',
+          'figure.autolayout': False,
+          'figure.dpi': 80.0,
+          'figure.edgecolor': (1, 1, 1, 0),
+          'figure.facecolor': (1, 1, 1, 0),
+          'figure.figsize': [6.0, 4.0],
+          'figure.frameon': True,
+          'figure.max_open_warning': 20,
+          'figure.subplot.bottom': 0.125,
+          'figure.subplot.hspace': 0.2,
+          'figure.subplot.left': 0.125,
+          'figure.subplot.right': 0.9,
+          'figure.subplot.top': 0.9,
+          'figure.subplot.wspace': 0.2,
+          'figure.titlesize': 'medium',
+          'figure.titleweight': 'normal',
+          'font.cursive': ['Apple Chancery',
+                           'Textile',
+                           'Zapf Chancery',
+                           'Sand',
+                           'Script MT',
+                           'Felipa',
+                           'cursive'],
+          'font.family': ['sans-serif'],
+          'font.fantasy': ['Comic Sans MS',
+                           'Chicago',
+                           'Charcoal',
+                           'ImpactWestern',
+                           'Humor Sans',
+                           'fantasy'],
+          'font.monospace': ['Bitstream Vera Sans Mono',
+                             'DejaVu Sans Mono',
+                             'Andale Mono',
+                             'Nimbus Mono L',
+                             'Courier New',
+                             'Courier',
+                             'Fixed',
+                             'Terminal',
+                             'monospace'],
+          'font.sans-serif': ['Arial',
+                              'Liberation Sans',
+                              'Bitstream Vera Sans',
+                              'sans-serif'],
+          'font.serif': ['Bitstream Vera Serif',
+                         'DejaVu Serif',
+                         'New Century Schoolbook',
+                         'Century Schoolbook L',
+                         'Utopia',
+                         'ITC Bookman',
+                         'Bookman',
+                         'Nimbus Roman No9 L',
+                         'Times New Roman',
+                         'Times',
+                         'Palatino',
+                         'Charter',
+                         'serif'],
+          'font.size': 10.0,
+          'font.stretch': 'normal',
+          'font.style': 'normal',
+          'font.variant': 'normal',
+          'font.weight': 'normal',
+          'grid.alpha': 1.0,
+          'grid.color': 'white',
+          'grid.linestyle': '-',
+          'grid.linewidth': 1.0,
+          'image.aspect': 'equal',
+          'image.cmap': 'Greys',
+          'image.composite_image': True,
+          'image.interpolation': 'bilinear',
+          'image.lut': 256,
+          'image.origin': 'upper',
+          'image.resample': False,
+          'interactive': True,
+          'keymap.all_axes': ['a'],
+          'keymap.back': ['left', 'c', 'backspace'],
+          'keymap.forward': ['right', 'v'],
+          'keymap.fullscreen': ['f', 'ctrl+f'],
+          'keymap.grid': ['g'],
+          'keymap.home': ['h', 'r', 'home'],
+          'keymap.pan': ['p'],
+          'keymap.quit': ['ctrl+w', 'cmd+w'],
+          'keymap.save': ['s', 'ctrl+s'],
+          'keymap.xscale': ['k', 'L'],
+          'keymap.yscale': ['l'],
+          'keymap.zoom': ['o'],
+          'legend.borderaxespad': 0.5,
+          'legend.borderpad': 0.4,
+          'legend.columnspacing': 2.0,
+          'legend.edgecolor': 'inherit',
+          'legend.facecolor': 'inherit',
+          'legend.fancybox': False,
+          'legend.fontsize': 15.0,
+          'legend.framealpha': None,
+          'legend.frameon': False,
+          'legend.handleheight': 0.7,
+          'legend.handlelength': 2.0,
+          'legend.handletextpad': 0.8,
+          'legend.isaxes': True,
+          'legend.labelspacing': 0.5,
+          'legend.loc': 'upper right',
+          'legend.markerscale': 1.0,
+          'legend.numpoints': 1,
+          'legend.scatterpoints': 1,
+          'legend.shadow': False,
+          'lines.antialiased': True,
+          'lines.color': 'b',
+          'lines.dash_capstyle': 'butt',
+          'lines.dash_joinstyle': 'round',
+          'lines.linestyle': '-',
+          'lines.linewidth': 1.75,
+          'lines.marker': 'None',
+          'lines.markeredgewidth': 0.0,
+          'lines.markersize': 7.0,
+          'lines.solid_capstyle': 'round',
+          'lines.solid_joinstyle': 'round',
+          'markers.fillstyle': 'full',
+          'mathtext.bf': 'serif:bold',
+          'mathtext.cal': 'cursive',
+          'mathtext.default': 'it',
+          'mathtext.fallback_to_cm': True,
+          'mathtext.fontset': 'cm',
+          'mathtext.it': 'serif:italic',
+          'mathtext.rm': 'serif',
+          'mathtext.sf': 'sans\-serif',
+          'mathtext.tt': 'monospace',
+          'nbagg.transparent': True,
+          'patch.antialiased': True,
+          'patch.edgecolor': 'k',
+          'patch.facecolor': (0.2980392156862745,
+                              0.4470588235294118,
+                              0.6901960784313725),
+          'patch.linewidth': 0.3,
+          'path.effects': [],
+          'path.simplify': True,
+          'path.simplify_threshold': 0.1111111111111111,
+          'path.sketch': None,
+          'path.snap': True,
+          'pdf.compression': 6,
+          'pdf.fonttype': 3,
+          'pdf.inheritcolor': False,
+          'pdf.use14corefonts': False,
+          'pgf.debug': False,
+          'pgf.preamble': [],
+          'pgf.rcfonts': True,
+          'pgf.texsystem': 'xelatex',
+          'plugins.directory': '.matplotlib_plugins',
+          'polaraxes.grid': True,
+          'ps.distiller.res': 6000,
+          'ps.fonttype': 3,
+          'ps.papersize': 'letter',
+          'ps.useafm': False,
+          'ps.usedistiller': False,
+          'savefig.bbox': None,
+          'savefig.directory': '~',
+          'savefig.dpi': 72.0,
+          'savefig.edgecolor': 'w',
+          'savefig.facecolor': 'w',
+          'savefig.format': 'png',
+          'savefig.frameon': True,
+          'savefig.jpeg_quality': 95,
+          'savefig.orientation': 'portrait',
+          'savefig.pad_inches': 0.1,
+          'savefig.transparent': False,
+          'svg.fonttype': 'path',
+          'svg.image_inline': True,
+          'svg.image_noscale': False,
+          'text.antialiased': True,
+          'text.color': '.15',
+          'text.dvipnghack': None,
+          'text.hinting': 'auto',
+          'text.hinting_factor': 8,
+          'text.latex.preamble': [],
+          'text.latex.preview': False,
+          'text.latex.unicode': False,
+          'text.usetex': False,
+          'timezone': 'UTC',
+          'tk.window_focus': False,
+          'toolbar': 'toolbar2',
+          'verbose.fileo': 'sys.stdout',
+          'verbose.level': 'silent',
+          'webagg.open_in_browser': True,
+          'webagg.port': 8988,
+          'webagg.port_retries': 50,
+          'xtick.color': '.15',
+          'xtick.direction': 'out',
+          'xtick.labelsize': 15.0,
+          'xtick.major.pad': 7.0,
+          'xtick.major.size': 0.0,
+          'xtick.major.width': 1.0,
+          'xtick.minor.pad': 4.0,
+          'xtick.minor.size': 0.0,
+          'xtick.minor.visible': False,
+          'xtick.minor.width': 0.5,
+          'ytick.color': '.15',
+          'ytick.direction': 'out',
+          'ytick.labelsize': 15.0,
+          'ytick.major.pad': 7.0,
+          'ytick.major.size': 0.0,
+          'ytick.major.width': 1.0,
+          'ytick.minor.pad': 4.0,
+          'ytick.minor.size': 0.0,
+          'ytick.minor.visible': False,
+          'ytick.minor.width': 0.5})
+</pre>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">foo</span><span class="o">.</span><span class="n">mplstyle</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span> <span class="kc">True</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">titlesize</span> <span class="p">:</span> <span class="mi">24</span>
+<span class="n">axes</span><span class="o">.</span><span class="n">labelsize</span> <span class="p">:</span> <span class="mi">20</span>
+<span class="n">lines</span><span class="o">.</span><span class="n">linewidth</span> <span class="p">:</span> <span class="mi">3</span>
+<span class="n">lines</span><span class="o">.</span><span class="n">markersize</span> <span class="p">:</span> <span class="mi">10</span>
+<span class="n">xtick</span><span class="o">.</span><span class="n">labelsize</span> <span class="p">:</span> <span class="mi">16</span>
+<span class="n">ytick</span><span class="o">.</span><span class="n">labelsize</span> <span class="p">:</span> <span class="mi">16</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">foo</span><span class="o">.</span><span class="n">mplstyle</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;foo.mplstyle&#39;</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_28_0.png" src="_images/06_Graphics_28_0.png" />
+</div>
+<div class="section" id="customizing-plots">
+<h4>Customizing plots<a class="headerlink" href="#customizing-plots" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">})</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;sine curve&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;cosine curve&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;sin(x)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="mf">1.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">],</span>
+           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">r&#39;$\frac{\pi}</span><span class="si">{2}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="s1">r&#39;$\pi$&#39;</span><span class="p">,</span> <span class="s1">r&#39;$\frac{3\pi}</span><span class="si">{2}</span><span class="s1">$&#39;</span><span class="p">,</span> <span class="s1">r&#39;$2\pi$&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Sine and Cosine Plots&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s1">&#39;Empty space&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_30_0.png" src="_images/06_Graphics_30_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="plot-layouts">
+<h2>Plot layouts<a class="headerlink" href="#plot-layouts" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">():</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_32_0.png" src="_images/06_Graphics_32_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">,</span> <span class="n">ax4</span><span class="p">]</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_33_0.png" src="_images/06_Graphics_33_0.png" />
+</div>
+<div class="section" id="seaborn">
+<h2>Seaborn<a class="headerlink" href="#seaborn" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lines.linewidth&quot;</span><span class="p">:</span> <span class="mf">2.5</span><span class="p">})</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy.random</span> <span class="k">as</span> <span class="nn">rng</span>
+</pre></div>
+</div>
+<div class="section" id="density-plots">
+<h3>Density plots<a class="headerlink" href="#density-plots" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_38_0.png" src="_images/06_Graphics_38_0.png" />
+</div>
+<div class="section" id="kernel-density-estimate">
+<h3>Kernel density estimate<a class="headerlink" href="#kernel-density-estimate" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">50</span><span class="p">),</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">100</span><span class="p">)])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_40_0.png" src="_images/06_Graphics_40_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">iris</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">iris</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sepal_length</th>
+      <th>sepal_width</th>
+      <th>petal_length</th>
+      <th>petal_width</th>
+      <th>species</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.1</td>
+      <td>3.5</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.9</td>
+      <td>3.0</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4.7</td>
+      <td>3.2</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>setosa</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4.6</td>
+      <td>3.1</td>
+      <td>1.5</td>
+      <td>0.2</td>
+      <td>setosa</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5.0</td>
+      <td>3.6</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>setosa</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+<div class="section" id="joint-distribution-plot">
+<h3>Joint distribution plot<a class="headerlink" href="#joint-distribution-plot" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;petal_length&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;petal_width&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">iris</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;kdeplot&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_44_0.png" src="_images/06_Graphics_44_0.png" />
+</div>
+<div class="section" id="box-and-violin-plots">
+<h3>Box and violin plots<a class="headerlink" href="#box-and-violin-plots" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;petal_length&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">iris</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">violinplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;petal_length&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">iris</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_46_0.png" src="_images/06_Graphics_46_0.png" />
+<div class="section" id="composite-plots">
+<h4>Composite plots<a class="headerlink" href="#composite-plots" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv&#39;</span>
+<span class="n">titanic</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">titanic</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>survived</th>
+      <th>pclass</th>
+      <th>sex</th>
+      <th>age</th>
+      <th>sibsp</th>
+      <th>parch</th>
+      <th>fare</th>
+      <th>embarked</th>
+      <th>class</th>
+      <th>who</th>
+      <th>adult_male</th>
+      <th>deck</th>
+      <th>embark_town</th>
+      <th>alive</th>
+      <th>alone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>male</td>
+      <td>22</td>
+      <td>1</td>
+      <td>0</td>
+      <td>7.2500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>True</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+      <td>no</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>female</td>
+      <td>38</td>
+      <td>1</td>
+      <td>0</td>
+      <td>71.2833</td>
+      <td>C</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>False</td>
+      <td>C</td>
+      <td>Cherbourg</td>
+      <td>yes</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>3</td>
+      <td>female</td>
+      <td>26</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7.9250</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>woman</td>
+      <td>False</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+      <td>yes</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>1</td>
+      <td>female</td>
+      <td>35</td>
+      <td>1</td>
+      <td>0</td>
+      <td>53.1000</td>
+      <td>S</td>
+      <td>First</td>
+      <td>woman</td>
+      <td>False</td>
+      <td>C</td>
+      <td>Southampton</td>
+      <td>yes</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>3</td>
+      <td>male</td>
+      <td>35</td>
+      <td>0</td>
+      <td>0</td>
+      <td>8.0500</td>
+      <td>S</td>
+      <td>Third</td>
+      <td>man</td>
+      <td>True</td>
+      <td>NaN</td>
+      <td>Southampton</td>
+      <td>no</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">lmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;survived&#39;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;alone&#39;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">titanic</span><span class="p">,</span> <span class="n">logistic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_51_0.png" src="_images/06_Graphics_51_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">PairGrid</span><span class="p">(</span><span class="n">titanic</span><span class="p">,</span>
+                 <span class="n">y_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fare&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">],</span>
+                 <span class="n">x_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;embark_town&#39;</span> <span class="p">],</span>
+                 <span class="n">aspect</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">5.5</span><span class="p">)</span>
+<span class="n">g</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;bright&quot;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_52_0.png" src="_images/06_Graphics_52_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="using-ggplot-as-an-alternative-to-seaborn">
+<h2>Using <code class="docutils literal"><span class="pre">ggplot</span></code> as an alternative to <code class="docutils literal"><span class="pre">seaborn</span></code>.<a class="headerlink" href="#using-ggplot-as-an-alternative-to-seaborn" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">ggplot</span></code> module is a port of R&#8217;s <code class="docutils literal"><span class="pre">ggplot2</span></code> - usage is very
+similar except for the following minor differences:</p>
+<ul class="simple">
+<li>Pass in a <code class="docutils literal"><span class="pre">pandas</span></code> dataframe</li>
+<li>aethetics comes before data in the argument list ot ggplot</li>
+<li>Give column names and other arugments (e.g.. function to call) as
+strings</li>
+<li>You need to use the line continuation character <code class="docutils literal"><span class="pre">\</span></code> to extend over
+multiple lines</li>
+</ul>
+<p>Only the most elementary examples are shown below. The <code class="docutils literal"><span class="pre">ggplot</span></code> module
+is extremely rich and sophisticated with a steep learning curve if
+you&#8217;re not already familiar with it from R. Please see
+<a class="reference external" href="http://ggplot.yhathq.com/docs/index.html">documentation</a> for
+details.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ggplot</span> <span class="k">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<div class="section" id="interacting-with-r">
+<h3>Interacting with R<a class="headerlink" href="#interacting-with-r" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">rpy2</span><span class="o">.</span><span class="n">ipython</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="note-that-we-are-exporting-the-r-mtcars-dataframe-to-python-converts-to-pandas-dataframe">
+<h3>Note that we are exporting the R <code class="docutils literal"><span class="pre">mtcars</span></code> dataframe to Python (converts to <code class="docutils literal"><span class="pre">pandas</span></code> DataFrame)<a class="headerlink" href="#note-that-we-are-exporting-the-r-mtcars-dataframe-to-python-converts-to-pandas-dataframe" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">R</span> <span class="o">-</span><span class="n">o</span> <span class="n">mtcars</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">mtcars</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mpg</th>
+      <th>cyl</th>
+      <th>disp</th>
+      <th>hp</th>
+      <th>drat</th>
+      <th>wt</th>
+      <th>qsec</th>
+      <th>vs</th>
+      <th>am</th>
+      <th>gear</th>
+      <th>carb</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Mazda RX4</th>
+      <td>21.0</td>
+      <td>6</td>
+      <td>160</td>
+      <td>110</td>
+      <td>3.90</td>
+      <td>2.620</td>
+      <td>16.46</td>
+      <td>0</td>
+      <td>1</td>
+      <td>4</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Mazda RX4 Wag</th>
+      <td>21.0</td>
+      <td>6</td>
+      <td>160</td>
+      <td>110</td>
+      <td>3.90</td>
+      <td>2.875</td>
+      <td>17.02</td>
+      <td>0</td>
+      <td>1</td>
+      <td>4</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Datsun 710</th>
+      <td>22.8</td>
+      <td>4</td>
+      <td>108</td>
+      <td>93</td>
+      <td>3.85</td>
+      <td>2.320</td>
+      <td>18.61</td>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Hornet 4 Drive</th>
+      <td>21.4</td>
+      <td>6</td>
+      <td>258</td>
+      <td>110</td>
+      <td>3.08</td>
+      <td>3.215</td>
+      <td>19.44</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Hornet Sportabout</th>
+      <td>18.7</td>
+      <td>8</td>
+      <td>360</td>
+      <td>175</td>
+      <td>3.15</td>
+      <td>3.440</td>
+      <td>17.02</td>
+      <td>0</td>
+      <td>0</td>
+      <td>3</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;mpg&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">mtcars</span><span class="p">,)</span> <span class="o">+</span> <span class="n">geom_point</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_60_0.png" src="_images/06_Graphics_60_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ggplot</span><span class="p">:</span> <span class="p">(</span><span class="mi">292414163</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;mpg&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">mtcars</span><span class="p">)</span> <span class="o">+</span> <span class="n">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="n">geom_smooth</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;loess&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_61_0.png" src="_images/06_Graphics_61_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ggplot</span><span class="p">:</span> <span class="p">(</span><span class="mi">292201757</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;mpg&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">mtcars</span><span class="p">)</span> <span class="o">+</span> <span class="n">geom_point</span><span class="p">()</span> <span class="o">+</span> <span class="n">geom_line</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_62_0.png" src="_images/06_Graphics_62_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ggplot</span><span class="p">:</span> <span class="p">(</span><span class="mi">287265863</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;mpg&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">mtcars</span><span class="p">)</span> <span class="o">+</span> <span class="n">geom_histogram</span><span class="p">(</span><span class="n">binwidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_63_0.png" src="_images/06_Graphics_63_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ggplot</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="mi">9223372036566578744</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ggplot</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;mpg&#39;</span><span class="p">),</span> <span class="n">mtcars</span><span class="p">)</span> <span class="o">+</span> \
+<span class="n">geom_line</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">)</span> <span class="o">+</span> \
+<span class="n">xlim</span><span class="p">(</span><span class="mf">2.97</span><span class="p">,</span> <span class="mf">41.33</span><span class="p">)</span> <span class="o">+</span> \
+<span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Density plot&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_64_0.png" src="_images/06_Graphics_64_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">ggplot</span><span class="p">:</span> <span class="p">(</span><span class="mi">288465612</span><span class="p">)</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="section" id="use-ggplot-in-r-directly-with-r-magic">
+<h4>Use <code class="docutils literal"><span class="pre">ggplot</span></code> in R directly with %R magic<a class="headerlink" href="#use-ggplot-in-r-directly-with-r-magic" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">cars</span> <span class="o">=</span> <span class="n">mtcars</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="note-that-we-pass-in-python-variables-with-the-i-optin-and-using-the-r-cell-magic">
+<h3>Note that we pass in Python variables with the <code class="docutils literal"><span class="pre">-i</span></code> optin and using the %%R cell magic<a class="headerlink" href="#note-that-we-pass-in-python-variables-with-the-i-optin-and-using-the-r-cell-magic" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">R</span> <span class="o">-</span><span class="n">i</span> <span class="n">cars</span>
+<span class="n">library</span><span class="p">(</span><span class="s1">&#39;ggplot2&#39;</span><span class="p">)</span>
+<span class="n">ggplot</span><span class="p">(</span><span class="n">cars</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">mpg</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">am</span><span class="p">))</span> <span class="o">+</span>
+<span class="n">geom_point</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position_jitter</span><span class="p">(</span><span class="n">width</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">height</span><span class="o">=.</span><span class="mi">08</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span>
+<span class="n">stat_smooth</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">glm</span><span class="p">,</span> <span class="n">method</span><span class="o">.</span><span class="n">args</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="s2">&quot;binomial&quot;</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/06_Graphics_68_0.png" src="_images/06_Graphics_68_0.png" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Graphics in Python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#matplotlib">Matplotlib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#types-of-plots">Types of plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#colors">Colors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plot-layouts">Plot layouts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#seaborn">Seaborn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-ggplot-as-an-alternative-to-seaborn">Using <code class="docutils literal"><span class="pre">ggplot</span></code> as an alternative to <code class="docutils literal"><span class="pre">seaborn</span></code>.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="05_Numbers.html"
+                          title="Previous page">&larr; Using <code class="docutils literal"><span class="pre">numpy</span></code></a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="07_Data.html"
+                          title="Next page">&rarr; Data</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/06_Graphics.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="07_Data.html" title="Data"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="05_Numbers.html" title="Using numpy"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/06_Graphics.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:04 GMT -->
+</html>

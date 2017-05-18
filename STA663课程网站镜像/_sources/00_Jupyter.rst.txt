@@ -1,0 +1,167 @@
+
+Notes on using Jupyter
+======================
+
+Keyboard Shortcuts
+------------------
+
+General
+~~~~~~~
+
+-  See Help menu for list of keyboard shortcuts
+-  For Windows users, the Ctrl key is the equivalent of the Cmd key
+-  Cmd-Shift-P: Brings up command palette (or use the toolbar icon)
+
+Most useful shortcuts.
+
+In EDIT mode
+~~~~~~~~~~~~
+
+-  ESC: switch to COMMAND mode
+-  Tab: auto-complete
+-  Shift-Tab: tooltip (e.g. to get function arguments)
+-  Cmd-/: toggle commenting of highlighted code
+
+In COMMAND mode
+~~~~~~~~~~~~~~~
+
+-  Return: switch to EDIT mode
+-  F: Brings up Find and Replace dialog (toggle option to replace within
+   selected cell or whole notebook)
+-  A: Create new cell above
+-  B: Create new cell below
+-  DD: Delete selected cell(s)
+-  M: Switch to Markdown cell
+-  Y: Switch to Code cell
+-  Shift-Down: Select multiple cells
+-  Shift-Up: Select multiple cells
+-  Shift-M: Merge selected cells
+-  Shift-Return: Execute selected cell(s)
+-  Alt-Return: Execute selected cell(s) and insert new cell below
+
+Magic commands
+--------------
+
+.. code:: python
+
+    %lsmagic
+
+
+
+
+.. parsed-literal::
+
+    Available line magics:
+    %alias  %alias_magic  %autocall  %automagic  %autosave  %bookmark  %cat  %cd  %clear  %colors  %config  %connect_info  %cp  %debug  %dhist  %dirs  %doctest_mode  %ed  %edit  %env  %gui  %hist  %history  %killbgscripts  %ldir  %less  %lf  %lk  %ll  %load  %load_ext  %loadpy  %logoff  %logon  %logstart  %logstate  %logstop  %ls  %lsmagic  %lx  %macro  %magic  %man  %matplotlib  %mkdir  %more  %mv  %notebook  %page  %pastebin  %pdb  %pdef  %pdoc  %pfile  %pinfo  %pinfo2  %popd  %pprint  %precision  %profile  %prun  %psearch  %psource  %pushd  %pwd  %pycat  %pylab  %qtconsole  %quickref  %recall  %rehashx  %reload_ext  %rep  %rerun  %reset  %reset_selective  %rm  %rmdir  %run  %save  %sc  %set_env  %store  %sx  %system  %tb  %time  %timeit  %unalias  %unload_ext  %who  %who_ls  %whos  %xdel  %xmode
+    
+    Available cell magics:
+    %%!  %%HTML  %%SVG  %%bash  %%capture  %%debug  %%file  %%html  %%javascript  %%js  %%latex  %%perl  %%prun  %%pypy  %%python  %%python2  %%python3  %%ruby  %%script  %%sh  %%svg  %%sx  %%system  %%time  %%timeit  %%writefile
+    
+    Automagic is ON, % prefix IS NOT needed for line magics.
+
+
+
+.. code:: python
+
+    %%file hello.txt
+    Hello, world
+    This is thing number 1
+    This is thing number 2
+    This is thing number 3
+
+
+.. parsed-literal::
+
+    Writing hello.txt
+
+
+.. code:: python
+
+    %cat hello.txt
+
+
+.. parsed-literal::
+
+    Hello, world
+    This is thing number 1
+    This is thing number 2
+    This is thing number 3
+
+Using shell commands
+--------------------
+
+Use ! to run commands in the shell or %%bash to run multi-line commands.
+
+.. code:: python
+
+    ! tail -n3 hello.txt | head -n2 
+
+
+.. parsed-literal::
+
+    This is thing number 1
+    This is thing number 2
+
+
+.. code:: python
+
+    %%bash
+    
+    for i in $(ls); do
+        echo item: $i
+    done
+
+
+.. parsed-literal::
+
+    item: 00_Jupyter.ipynb
+    item: 01_Introduction_To_Python.ipynb
+    item: 02_Functions.ipynb
+    item: 03_Classes.ipynb
+    item: hello.txt
+
+
+Load extension for R
+--------------------
+
+This allows you to execute R code in a cell and pass variables in and
+out.
+
+.. code:: python
+
+    %load_ext rpy2.ipython
+
+.. code:: python
+
+    a, b = 2, 5
+
+.. code:: python
+
+    %%R -i a,b -o x 
+    x <- a:b
+
+.. code:: python
+
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([2, 3, 4, 5], dtype=int32)
+
+
+
+Getting help
+------------
+
+-  Use the Help menu for general documentation
+-  Use ? before or after a name to get information about the name
+-  Use ?? before or after a name to also get the source if available
+
+Further exploration
+-------------------
+
+See blog post `28 Jupyter Notebook tips, tricks and
+shortcuts <https://www.dataquest.io/blog/jupyter-notebook-tips-tricks-shortcuts/>`__

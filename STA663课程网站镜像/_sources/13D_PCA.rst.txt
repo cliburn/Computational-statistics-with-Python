@@ -1,0 +1,709 @@
+
+Applications of Linear Alebra: PCA
+==================================
+
+We will explore 3 applications of linear algebra in data analysis -
+change of basis (for dimension reduction), projections (for solving
+linear systems) and the quadratic form (for optimization). The first
+application is the change of basis to the eigenvector basis that
+underlies Principal Components Analysis s(PCA).
+
+We will review the following in class:
+
+-  The standard basis
+-  Orthonormal basis and orthgonal matrices
+-  Change of basis
+-  Similar matrices
+-  Eigendecomposition
+-  Sample covariance
+-  Covariance as a linear transform
+-  PCA and dimension reduction
+-  PCA and "explained variance"
+-  SVD
+
+.. code:: python
+
+    %matplotlib inline
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+Variance and covariance
+-----------------------
+
+Remember the formula for covariance
+
+.. math::
+
+
+   \text{Cov}(X, Y) = \frac{\sum_{i=1}^n(X_i - \bar{X})(Y_i - \bar{Y})}{n-1}
+
+where :math:`\text{Cov}(X, X)` is the sample variance of :math:`X`.
+
+.. code:: python
+
+    def cov(x, y):
+        """Returns covariance of vectors x and y)."""
+        xbar = x.mean()
+        ybar = y.mean()
+        return np.sum((x - xbar)*(y - ybar))/(len(x) - 1)
+
+.. code:: python
+
+    X = np.random.random(10)
+    Y = np.random.random(10)
+
+.. code:: python
+
+    np.array([[cov(X, X), cov(X, Y)], [cov(Y, X), cov(Y,Y)]])
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.08255874, -0.009372  ],
+           [-0.009372  ,  0.08437116]])
+
+
+
+.. code:: python
+
+    # This can of course be calculated using numpy's built in cov() function
+    np.cov(X, Y)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.08255874, -0.009372  ],
+           [-0.009372  ,  0.08437116]])
+
+
+
+.. code:: python
+
+    # Extension to more variables is done in a pair-wise way
+    Z = np.random.random(10)
+    np.cov([X, Y, Z])
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.08255874, -0.009372  ,  0.02351863],
+           [-0.009372  ,  0.08437116, -0.02369603],
+           [ 0.02351863, -0.02369603,  0.12269876]])
+
+
+
+Eigendecomposition of the covariance matrix
+-------------------------------------------
+
+.. code:: python
+
+    mu = [0,0]
+    sigma = [[0.6,0.2],[0.2,0.2]]
+    n = 1000
+    x = np.random.multivariate_normal(mu, sigma, n).T
+
+.. code:: python
+
+    A = np.cov(x)
+
+.. code:: python
+
+    m = np.array([[1,2,3],[6,5,4]])
+    ms = m - m.mean(1).reshape(2,1)
+    np.dot(ms, ms.T)/2
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1., -1.],
+           [-1.,  1.]])
+
+
+
+.. code:: python
+
+    e, v = np.linalg.eig(A)
+
+.. code:: python
+
+    plt.scatter(x[0,:], x[1,:], alpha=0.2)
+    for e_, v_ in zip(e, v.T):
+        plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
+    plt.axis([-3,3,-3,3])
+    plt.title('Eigenvectors of covariance matrix scaled by eigenvalue.');
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_13_0.png
+
+
+Covariance matrix as a linear transformation
+--------------------------------------------
+
+The covariance matrix is a linear transformation that maps
+:math:`\mathbb{R}^n` in the direction of its eigenvectors with scaling
+factor given by the eigenvalues. Here we see it applied to a collection
+of random vectors in the box bounded by [-1, 1].
+
+We will assume we have a covariance matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    covx = np.array([[1,0.6],[0.6,1]])
+
+Create random vectors in a box
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    u = np.random.uniform(-1, 1, (100, 2)).T
+
+Apply covariance matrix as linear transformation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    y = covx @ u
+
+.. code:: python
+
+    e1, v1 = np.linalg.eig(covx)
+
+The linear transform maps the random vectors as described.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    plt.scatter(u[0], u[1], c='blue')
+    plt.scatter(y[0], y[1], c='orange')
+    for e_, v_ in zip(e1, v1.T):
+        plt.plot([0, e_*v_[0]], [0, e_*v_[1]], 'r-', lw=2)
+    plt.xticks([])
+    plt.yticks([])
+    pass
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_23_0.png
+
+
+PCA
+---
+
+Principal Components Analysis (PCA) basically means to find and rank all
+the eigenvalues and eigenvectors of a covariance matrix. This is useful
+because high-dimensional data (with :math:`p` features) may have nearly
+all their variation in a small number of dimensions :math:`k`, i.e. in
+the subspace spanned by the eigenvectors of the covariance matrix that
+have the :math:`k` largest eigenvalues. If we project the original data
+into this subspace, we can have a dimension reduction (from :math:`p` to
+:math:`k`) with hopefully little loss of information.
+
+Numerically, PCA is typically done using SVD on the data matrix rather
+than eigendecomposition on the covariance matrix. The next section
+explains why this works.
+
+Data matrices that have zero mean for all feature vectors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: latex
+
+   \begin{align}
+   \text{Cov}(X, Y) &= \frac{\sum_{i=1}^n(X_i - \bar{X})(Y_i - \bar{Y})}{n-1} \\
+     &= \frac{\sum_{i=1}^nX_iY_i}{n-1} \\
+     &= \frac{XY^T}{n-1}
+   \end{align}
+
+and so the covariance matrix for a data set X that has zero mean in each
+feature vector is just :math:`XX^T/(n-1)`.
+
+In other words, we can also get the eigendecomposition of the covariance
+matrix from the positive semi-definite matrix :math:`XX^T`.
+
+Note that zeroing the feature vector does not affect the covariance matrix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    np.set_printoptions(precision=3)
+
+.. code:: python
+
+    X = np.random.random((5,4))
+    X
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.224,  0.136,  0.364,  0.189],
+           [ 0.79 ,  0.007,  0.486,  0.682],
+           [ 0.349,  0.013,  0.484,  0.094],
+           [ 0.771,  0.924,  0.636,  0.692],
+           [ 0.33 ,  0.01 ,  0.439,  0.183]])
+
+
+
+.. code:: python
+
+    ### Subtract the row mean from each row
+
+.. code:: python
+
+    Y = X - X.mean(1)[:, None]
+
+.. code:: python
+
+    Y.mean(1)
+
+
+
+
+.. parsed-literal::
+
+    array([  0.000e+00,  -2.776e-17,   0.000e+00,   2.776e-17,   0.000e+00])
+
+
+
+.. code:: python
+
+    Y
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.004, -0.092,  0.136, -0.039],
+           [ 0.298, -0.484, -0.005,  0.191],
+           [ 0.114, -0.222,  0.249, -0.141],
+           [ 0.015,  0.168, -0.119, -0.064],
+           [ 0.089, -0.23 ,  0.199, -0.058]])
+
+
+
+.. code:: python
+
+    ### Calculate the covariance
+
+.. code:: python
+
+    np.cov(X)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.01 ,  0.012,  0.02 , -0.01 ,  0.017],
+           [ 0.012,  0.12 ,  0.038, -0.029,  0.042],
+           [ 0.02 ,  0.038,  0.048, -0.019,  0.04 ],
+           [-0.01 , -0.029, -0.019,  0.016, -0.019],
+           [ 0.017,  0.042,  0.04 , -0.019,  0.035]])
+
+
+
+.. code:: python
+
+    np.cov(Y)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.01 ,  0.012,  0.02 , -0.01 ,  0.017],
+           [ 0.012,  0.12 ,  0.038, -0.029,  0.042],
+           [ 0.02 ,  0.038,  0.048, -0.019,  0.04 ],
+           [-0.01 , -0.029, -0.019,  0.016, -0.019],
+           [ 0.017,  0.042,  0.04 , -0.019,  0.035]])
+
+
+
+Eigendecomposition of the covariance matrix
+-------------------------------------------
+
+.. code:: python
+
+    e1, v1 = np.linalg.eig(np.dot(x, x.T)/(n-1))
+
+.. code:: python
+
+    plt.scatter(x[0,:], x[1,:], alpha=0.2)
+    for e_, v_ in zip(e1, v1.T):
+        plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
+    plt.axis([-3,3,-3,3]);
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_38_0.png
+
+
+Change of basis via PCA
+-----------------------
+
+We can transform the original data set so that the eigenvectors are the basis vectors and find the new coordinates of the data points with respect to this new basis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the change of basis transformation covered in the Linear
+Alegebra module. First, note that the covariance matrix is a real
+symmetric matrix, and so the eigenvector matrix is an orthogonal matrix.
+
+.. code:: python
+
+    e, v = np.linalg.eig(np.cov(x))
+    v.dot(v.T)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.],
+           [ 0.,  1.]])
+
+
+
+Linear algebra review for change of basis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Graphical illustration of change of basis
+-----------------------------------------
+
+.. figure:: spectral.png
+   :alt: Commuative diagram
+
+   Commuative diagram
+
+Suppose we have a vector :math:`u` in the standard basis :math:`B` , and
+a matrix :math:`A` that maps :math:`u` to :math:`v`, also in :math:`B`.
+We can use the eigenvalues of :math:`A` to form a new basis :math:`B'`.
+As explained above, to bring a vector :math:`u` from :math:`B`-space to
+a vector :math:`u'` in :math:`B'`-space, we multiply it by
+:math:`Q^{-1}`, the inverse of the matrix having the eigenvctors as
+column vectors. Now, in the eigenvector basis, the equivalent operation
+to :math:`A` is the diagonal matrix :math:`\Lambda` - this takes
+:math:`u'` to :math:`v'`. Finally, we convert :math:`v'` back to a
+vector :math:`v` in the standard basis by multiplying with :math:`Q`.
+
+.. code:: python
+
+    ys = np.dot(v1.T, x)
+
+Principal components
+^^^^^^^^^^^^^^^^^^^^
+
+Principal components are simply the eigenvectors of the covariance
+matrix used as basis vectors. Each of the original data points is
+expressed as a linear combination of the principal components, giving
+rise to a new set of coordinates.
+
+.. code:: python
+
+    plt.scatter(ys[0,:], ys[1,:], alpha=0.2)
+    for e_, v_ in zip(e1, np.eye(2)):
+        plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
+    plt.axis([-3,3,-3,3]);
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_46_0.png
+
+
+For example, if we only use the first column of ``ys``, we will have the
+projection of the data onto the first principal component, capturing the
+majority of the variance in the data with a single feature that is a
+linear combination of the original features.
+
+Transform back to original coordinates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We may need to transform the (reduced) data set to the original feature
+coordinates for interpretation. This is simply another linear transform
+(matrix multiplication).
+
+.. code:: python
+
+    zs = np.dot(v1, ys)
+
+.. code:: python
+
+    plt.scatter(zs[0,:], zs[1,:], alpha=0.2)
+    for e_, v_ in zip(e1, v1.T):
+        plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
+    plt.axis([-3,3,-3,3]);
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_50_0.png
+
+
+.. code:: python
+
+    u, s, v = np.linalg.svd(x)
+    u.dot(u.T)
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.],
+           [ 0.,  1.]])
+
+
+
+Dimension reduction via PCA
+---------------------------
+
+We have the sepctral decomposition of the covariance matrix
+
+.. math::
+
+
+   A = Q^{-1}\Lambda Q
+
+Suppose :math:`\Lambda` is a rank :math:`p` matrix. To reduce the
+dimensionality to :math:`k \le p`, we simply set all but the first
+:math:`k` values of the diagonal of :math:`\Lambda` to zero. This is
+equivalent to ignoring all except the first :math:`k` principal
+components.
+
+What does this achieve? Recall that :math:`A` is a covariance matrix,
+and the trace of the matrix is the overall variability, since it is the
+sum of the variances.
+
+.. code:: python
+
+    A
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.605,  0.202],
+           [ 0.202,  0.209]])
+
+
+
+.. code:: python
+
+    A.trace()
+
+
+
+
+.. parsed-literal::
+
+    0.81349656039067819
+
+
+
+.. code:: python
+
+    e, v = np.linalg.eig(A)
+    D = np.diag(e)
+    D
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.69 ,  0.   ],
+           [ 0.   ,  0.124]])
+
+
+
+.. code:: python
+
+    D.trace()
+
+
+
+
+.. parsed-literal::
+
+    0.81349656039067819
+
+
+
+.. code:: python
+
+    D[0,0]/D.trace()
+
+
+
+
+.. parsed-literal::
+
+    0.84806267856011852
+
+
+
+Since the trace is invariant under change of basis, the total
+variability is also unchanged by PCA. By keeping only the first
+:math:`k` principal components, we can still "explain"
+:math:`\sum_{i=1}^k e[i]/\sum{e}` of the total variability. Sometimes,
+the degree of dimension reduction is specified as keeping enough
+principal components so that (say) :math:`90\%` of the total variability
+is explained.
+
+Using Singular Value Decomposition (SVD) for PCA
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SVD is a decomposition of the data matrix :math:`X = U S V^T` where
+:math:`U` and :math:`V` are orthogonal matrices and :math:`S` is a
+diagnonal matrix.
+
+Recall that the transpose of an orthogonal matrix is also its inverse,
+so if we multiply on the right by :math:`X^T`, we get the follwoing
+simplification
+
+.. raw:: latex
+
+   \begin{align}
+   X &= U S V^T \\
+   X X^T &= U S V^T (U S V^T)^T \\
+    &= U S V^T V S U^T \\
+    &= U S^2 U^T
+   \end{align}
+
+Compare with the eigendecomposition of a matrix
+:math:`A = W \Lambda W^{-1}`, we see that SVD gives us the
+eigendecomposition of the matrix :math:`XX^T`, which as we have just
+seen, is basically a scaled version of the covariance for a data matrix
+with zero mean, with the eigenvectors given by :math:`U` and
+eigenvealuse by :math:`S^2` (scaled by :math:`n-1`)..
+
+.. code:: python
+
+    u, s, v = np.linalg.svd(x)
+
+.. code:: python
+
+    e2 = s**2/(n-1)
+    v2 = u
+    plt.scatter(x[0,:], x[1,:], alpha=0.2)
+    for e_, v_ in zip(e2, v2):
+        plt.plot([0, 3*e_*v_[0]], [0, 3*e_*v_[1]], 'r-', lw=2)
+    plt.axis([-3,3,-3,3]);
+
+
+
+.. image:: 13D_PCA_files/13D_PCA_61_0.png
+
+
+.. code:: python
+
+    v1 # from eigenvectors of covariance matrix
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.922, -0.387],
+           [ 0.387,  0.922]])
+
+
+
+.. code:: python
+
+    v2 # from SVD
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.922, -0.387],
+           [-0.387,  0.922]])
+
+
+
+.. code:: python
+
+    e1 # from eigenvalues of covariance matrix
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.693,  0.124])
+
+
+
+.. code:: python
+
+    e2 # from SVD
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.693,  0.124])
+
+
+
+.. code:: python
+
+    a0 = np.random.normal(0,1,100)
+    a1 = a0 + np.random.normal(0,.5,100)
+    a2 = 2*a0 + a1 + np.random.normal(5,0.01,100)
+    xs = np.vstack([a0, a1, a2])
+    xs.shape
+
+
+
+
+.. parsed-literal::
+
+    (3, 100)
+
+
+
+.. code:: python
+
+    U, s, V = np.linalg.svd(xs)
+
+.. code:: python
+
+    (s**2)/(99)
+
+
+
+
+.. parsed-literal::
+
+    array([ 36.809,   1.658,   0.125])
+
+
+
+.. code:: python
+
+    U
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.099, -0.675, -0.731],
+           [-0.113, -0.723,  0.682],
+           [-0.989,  0.149, -0.005]])
+
+

@@ -1,0 +1,675 @@
+
+Efficient storage of data in memory
+===================================
+
+When dealing with big data, minimizing the amount of memory used is
+critical to avoid having to use disk-based access, which can be 100,000
+times slower than random access. This notebook deals with ways to
+minimizee data storage for several common use cases:
+
+-  Large arrays of homogenous data (often numbers)
+-  Large string collections
+-  Counting distinct values
+-  Yes/No responses to queries
+
+Methods covered range from the mundane (use ``numpy`` arrays rather than
+lists), to classic but less well-known data structures (e.g. prefix
+trees or tries) to algorithmically ingenious probabilistic data
+structures (e.g. bloom filter and hyperloglog).
+
+Selective retrieval from disk-based storage
+-------------------------------------------
+
+We have alrady seen that there are many ways to retrieve only the parts
+of the data we need now into memory at this particular moment. Options
+include
+
+-  generators (e.g. to read a file a line at a time)
+-  ``numpy.memmap``
+-  HDF5 via ``h5py``
+-  Key-value stores (e.g. ``redis``)
+-  SQL and NoSQL databases (e.g. ``sqlite3``)
+
+Storing numbers
+---------------
+
+Less memory is used when storing numbers in numpy arrays rather than
+lists.
+
+.. code:: python
+
+    sys.getsizeof(list(range(int(1e8))))
+
+
+
+
+.. parsed-literal::
+
+    900000112
+
+
+
+.. code:: python
+
+    np.arange(int(1e8)).nbytes
+
+
+
+
+.. parsed-literal::
+
+    800000000
+
+
+
+Using only the precision needed can also save memory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    np.arange(int(1e8)).astype('float32').nbytes
+
+
+
+
+.. parsed-literal::
+
+    400000000
+
+
+
+.. code:: python
+
+    np.arange(int(1e8)).astype('float64').nbytes
+
+
+
+
+.. parsed-literal::
+
+    800000000
+
+
+
+Storing strings
+---------------
+
+.. code:: python
+
+    def flatmap(func, items):
+        return it.chain.from_iterable(map(func, items))
+
+.. code:: python
+
+    def flatten(xss):
+        return (x for xs in xss for x in xs)
+
+Using a list
+~~~~~~~~~~~~
+
+.. code:: python
+
+    with open('data/Ulysses.txt') as f:
+        word_list = list(flatten(line.split() for line in f))
+
+.. code:: python
+
+    sys.getsizeof(word_list)
+
+
+
+
+.. parsed-literal::
+
+    2258048
+
+
+
+.. code:: python
+
+    target = 'WARRANTIES'
+
+.. code:: python
+
+    %timeit -r1 -n1 word_list.index(target)
+
+
+.. parsed-literal::
+
+    1 loops, best of 1: 7.97 ms per loop
+
+
+Using a sorted list
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    word_list.sort()
+
+.. code:: python
+
+    import bisect
+    %timeit -r1 -n1 bisect.bisect(word_list, target)
+
+
+.. parsed-literal::
+
+    1 loops, best of 1: 31.8 µs per loop
+
+
+Using a set
+~~~~~~~~~~~
+
+.. code:: python
+
+    word_set = set(word_list)
+
+.. code:: python
+
+    sys.getsizeof(word_set)
+
+
+
+
+.. parsed-literal::
+
+    2097376
+
+
+
+.. code:: python
+
+    %timeit -r1 -n1 target in word_set
+
+
+.. parsed-literal::
+
+    1 loops, best of 1: 2.25 µs per loop
+
+
+Using a `trie <https://en.wikipedia.org/wiki/Trie>`__ (prefix tree)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+    ! pip install hat_trie
+
+.. code:: python
+
+    %load_ext memory_profiler
+
+.. code:: python
+
+    from hat_trie import Trie
+
+.. code:: python
+
+    %memit word_trie = Trie(word_list)
+
+
+.. parsed-literal::
+
+    peak memory: 116.97 MiB, increment: 0.39 MiB
+
+
+.. code:: python
+
+    %timeit -r1 -n1 target in word_trie
+
+
+.. parsed-literal::
+
+    1 loops, best of 1: 5.86 µs per loop
+
+
+Data Sketches
+-------------
+
+A ``sketch`` is a probabilistic algorithm or data structure that
+approximates some statistic of interest, typically using very little
+memory and processing time. Often they are applied to streaming data,
+and so must be able to incrementally process data. Many data sketches
+make use of hash functions to distribute data into buckets uniformly.
+Typically, data sketches have the following desirable properties
+
+-  sub-linear in space
+-  single scan
+-  can be parallelized
+-  can be combined (merge)
+
+Some statistics that sketches have been used to estimate include
+
+-  indicator variables (event detection)
+-  counts
+-  quantiles
+-  moments
+-  entropy
+
+Packages for data sketches in Python are relatively immmature, and if
+you are interested, you could make a large contribution by creating a
+comprehensive open source library of data sketches in Python.
+
+Morris counter
+~~~~~~~~~~~~~~
+
+The Morris counter is used as a simple illustration of a probabilistic
+data structure, with the standard trade-off of using less memory in
+return for less accuracy. The algorithm is extremely simple - keep a
+counter :math:`c` that represents the **exponent** - that is, when the
+Morris counter is :math:`c`, the estimated count is :math:`2^c`. The
+probabilistic part comes from the way that the counter is incremented by
+comparing a uniform random variate to :math:`1/2^c`.
+
+.. code:: python
+
+    from random import random
+    
+    class MorrisCounter:
+        def __init__(self, c=0):
+            self.c = c
+    
+        def __len__(self):
+            return 2 ** self.c
+    
+        def add(self, item):
+            self.c += random() < 1/(2**self.c)
+
+.. code:: python
+
+    mc = MorrisCounter()
+
+.. code:: python
+
+    print('True\t\tMorris\t\tRel Error')
+    for i, word in enumerate(word_list):
+        mc.add(word)
+        if i%int(.2e5)==0:
+            print('%8d\t%8d\t%.2f' % (i, len(mc), 0 if i==0 else abs(i - len(mc))/i))
+
+
+.. parsed-literal::
+
+    True		Morris		Rel Error
+           0	       2	0.00
+       20000	    8192	0.59
+       40000	   32768	0.18
+       60000	   65536	0.09
+       80000	   65536	0.18
+      100000	  131072	0.31
+      120000	  131072	0.09
+      140000	  131072	0.06
+      160000	  131072	0.18
+      180000	  131072	0.27
+      200000	  131072	0.34
+      220000	  262144	0.19
+      240000	  262144	0.09
+      260000	  524288	1.02
+
+
+Increasing accuracy
+~~~~~~~~~~~~~~~~~~~
+
+A simple way to increase the accuracy is to have multiple Morris
+counters and take the average. These two ideas of using a probabilistic
+calculation and multiple samples to improve precision are the basis for
+the more useful probabilisitc data structures described below.
+
+.. code:: python
+
+    mcs = [MorrisCounter() for i in range(10)]
+
+.. code:: python
+
+    print('True\t\tMorris\t\tRel Error')
+    for i, word in enumerate(word_list):
+        for j in range(10):
+            mcs[j].add(word)
+        estimate = np.mean([len(m) for m in mcs])
+        if i%int(.2e5)==0:
+            print('%8d\t%8d\t%.2f' % (i, estimate, 0 if i==0 else abs(i - estimate)/i))
+
+
+.. parsed-literal::
+
+    True		Morris		Rel Error
+           0	       2	0.00
+       20000	   20889	0.04
+       40000	   26214	0.34
+       60000	   36044	0.40
+       80000	   49152	0.39
+      100000	   72089	0.28
+      120000	   75366	0.37
+      140000	   95027	0.32
+      160000	  111411	0.30
+      180000	  131072	0.27
+      200000	  137625	0.31
+      220000	  137625	0.37
+      240000	  144179	0.40
+      260000	  170393	0.34
+
+
+Distinct value Sketches
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The Morris counter is less useful because the degree of memory saved as
+compared to counting the number of elements exactly is not much unless
+the numbers are staggeringly huge. In contrast, counting the number of
+**distinct** elements exactly requires storage of all distinct elements
+(e.g. in a set) and hence grows with the cardinality :math:`n`.
+Probabilistic data structures known as Distinct Value Sketches can do
+this with a tiny and fixed memory size.
+
+Examples where counting distinct values is useful:
+
+-  number of unique users in a Twitter stream
+-  number of distinct records to be fetched by a databse query
+-  number of unique IP addresses accessing a website
+-  number of distinct queries submitted to a search engine
+-  number of distinct DNA motifs in genomics data sets (e.g. microbiome)
+
+`Hash functions <https://en.wikipedia.org/wiki/Hash_function>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A hash function takes data of arbitrary size and converts it into a
+number in a fixed range. Ideally, given an arbitrary set of data items,
+the hash function generates numbers that follow a uniform distribution
+within the fixed range. Hash functions are immensely useful throughout
+computer science (for example - they power Python sets and
+dictionaries), and especially for the generation of probabilistic data
+structures.
+
+A simple hash function mapping
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note the **collisions**. If not handled, there is a loss of information.
+Commonly, practical hash functions return a 32 or 64 bit integer. Also
+note that there are an arbitrary number of hash functions that can
+return numbers within a given range.
+
+Note also that because the hash function is deterministic, the same item
+will always map to the same bin.
+
+.. code:: python
+
+    def string_hash(word, n):
+        return sum(ord(char) for char in word) % n
+
+.. code:: python
+
+    sentence = "The quick brown fox jumps over the lazy dog."
+    for word in sentence.split():
+        print(word, string_hash(word, 10))
+
+
+.. parsed-literal::
+
+    The 9
+    quick 1
+    brown 2
+    fox 3
+    jumps 9
+    over 4
+    the 1
+    lazy 8
+    dog. 0
+
+
+Built-in Python hash function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    help(hash)
+
+
+.. parsed-literal::
+
+    Help on built-in function hash in module builtins:
+    
+    hash(obj, /)
+        Return the hash value for the given object.
+        
+        Two objects that compare equal must also have the same hash value, but the
+        reverse is not necessarily true.
+    
+
+
+.. code:: python
+
+    for word in sentence.split():
+        print('{:<10s} {:24}'.format(word, hash(word)))
+
+
+.. parsed-literal::
+
+    The             -184990475008303844
+    quick           3616884800889772302
+    brown           6377133929055916905
+    fox             -611579958660588990
+    jumps          -5271806623556898369
+    over            7546130948312823661
+    the             6678103606492090842
+    lazy           -1515512778017190090
+    dog.            3069897472948403276
+
+
+Using a hash function from the MurmurHash3 library
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that the hash function accepts a seed, allowing the creation of
+multiple hash functions. We also display the hash result as a 32-bit
+binary string.
+
+.. code:: python
+
+    import mmh3
+    
+    for word in sentence.split():
+        print('{:<10} {:+032b} {:+032b}'.format(word.ljust(10), mmh3.hash(word, seed=1234), 
+              mmh3.hash(word, seed=4321)))
+
+
+.. parsed-literal::
+
+    The        +0001000011111110001001110101100 +1110110100100101010111100011010
+    quick      -0101111111011110110101100101000 +1000100001101010110000101101100
+    brown      +1000101010000110110010001110101 -1101101110000000010001100010100
+    fox        -1000000010010010000111001111011 +0111011111000011001001001110111
+    jumps      +0000010111000011010000100101010 +0010010001111110100010010110011
+    over       -0110101101111001001101011111011 -1101110111110010000101101000100
+    the        -1000000101110000000110011111001 +0001000111100111011000011100101
+    lazy       -1101011000111111110011111001100 +0010101110101100001000101110000
+    dog.       +0100110101101111101011110111111 -0101111000110000001011110001011
+
+
+LogLog family
+^^^^^^^^^^^^^
+
+The binary digits in a (say) 32-bit hash are effectively random, and
+equivalent to a sequence of fair coin tosses. Hence the probability that
+we see a run of 5 zeros in the smallest hash so far suggests that we
+have added :math:`2^5` unique items so far. This is the intuition behind
+the loglog family of Distinct Value Sketches. Note that the biggest
+count we can track with 32 bits is :math:`2^{32} = 4294967296`.
+
+The accuracy of the sketch can be improved by averaging results with
+multiple coin flippers. In practice, this is done by using the first
+:math:`k` bit registers to identify :math:`2^k` different coin flippers.
+Hence, the max count is now :math:`2 ** (32 - k)`. The hyperloglog
+algorithm uses the harmonic mean of the :math:`2^k` flippers which
+reduces the effect of outliers and hence the variance of the estimate.
+
+.. code:: python
+
+    for i in range(1, 15):
+        k = 2**i
+        hashes = [''.join(map(str, np.random.randint(0,2,32))) for i in range(k)]
+        print('%6d\t%s' % (k, min(hashes)))
+
+
+.. parsed-literal::
+
+         2	00010001101110111100011011110100
+         4	00001111000110101110111110111011
+         8	00011100101100110010101100011110
+        16	01000001100111101011001100101001
+        32	00001011000101110101000110101010
+        64	00000000110100000010001101011101
+       128	00000000100101100011100101100111
+       256	00000000001101010111001001101010
+       512	00000000001001011011001100001100
+      1024	00000000001010000100011000011011
+      2048	00000000010100111100001101001100
+      4096	00000000000000110001101010011100
+      8192	00000000000000001100110110000101
+     16384	00000000000000001101011110101001
+
+
+.. code:: bash
+
+    pip install hyperloglog
+
+.. code:: python
+
+    from hyperloglog import HyperLogLog
+
+.. code:: python
+
+    hll = HyperLogLog(0.01) # accept 1% counting error
+
+.. code:: python
+
+    print('True\t\tHLL\t\tRel Error')
+    s = set([])
+    for i, word in enumerate(word_list):
+        s.add(word)
+        hll.add(word)
+        if i%int(.2e5)==0:
+            print('%8d\t%8d\t\t%.2f' % (len(s), len(h1), 0 if i==0 else abs(len(s) - len(h1))/i))
+
+
+.. parsed-literal::
+
+    True		HLL		Rel Error
+
+
+::
+
+
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-1-22150e0b1002> in <module>()
+          1 print('True\t\tHLL\t\tRel Error')
+          2 s = set([])
+    ----> 3 for i, word in enumerate(word_list):
+          4     s.add(word)
+          5     hll.add(word)
+
+
+    NameError: name 'word_list' is not defined
+
+
+Bloom filters
+~~~~~~~~~~~~~
+
+Bloom filters are designed to answer queries about whether a specific
+item is in a collection. If the answer is NO, then it is definitive.
+However, if the answer is yes, it might be a false positive. The
+possibility of a false positive makes the Bloom filter a probabilistic
+data structure.
+
+A bloom filter consists of a bit vector of length :math:`k` initially
+set to zero, and :math:`n` different hash functions that return a hash
+value that will fall into one of the :math:`k` bins. In the construction
+phase, for every item in the collection, :math:`n` hash values are
+generated by the :math:`n` hash functions, and every position indicated
+by a hash value is flipped to one. In the query phase, given an item,
+:math:`n` hash values are calculated as before - if any of these
+:math:`n` positions is a zero, then the item is definitely not in the
+collection. However, because of the possibility of hash collisions, even
+if all the positions are one, this could be a false positive. Clearly,
+the rate of false positives depends on the ratio of zero and one bits,
+and there are Bloom filter implementations that will dynamically bound
+the ratio and hence the false positive rate.
+
+Possible uses of a Bloom filter include:
+
+-  Does a particular sequence motif appear in a DNA string?
+-  Has this book been recommended to this customer before?
+-  Check if an element exists on disk before performing I/O
+-  Check if URL is a potential malware site using in-browser Bloom
+   filter to minimize network communication
+-  As an alternative way to generate distinct value counts cheaply (only
+   increment count if Bloom filter says NO)
+
+.. code:: bash
+
+    pip install git+https://github.com/jaybaird/python-bloomfilter.git
+
+.. code:: python
+
+    from pybloom import ScalableBloomFilter
+    
+    # The Scalable Bloom Filter grows as needed to keep the error rate small 
+    # The default error_rate=0.001
+    sbf = ScalableBloomFilter()
+
+.. code:: python
+
+    for word in word_set:
+        sbf.add(word)
+
+.. code:: python
+
+    test_words = ['banana', 'artist', 'Dublin', 'masochist', 'Obama']
+
+.. code:: python
+
+    for word in test_words:
+        print(word, word in sbf)
+
+
+.. parsed-literal::
+
+    banana True
+    artist True
+    Dublin True
+    masochist False
+    Obama False
+
+
+.. code:: python
+
+    ### Chedck
+    for word in test_words:
+        print(word, word in word_set)
+
+
+.. parsed-literal::
+
+    banana True
+    artist True
+    Dublin True
+    masochist False
+    Obama False
+
+
+.. code:: python
+
+    %load_ext version_information
+
+.. code:: python
+
+    %version_information pybloom, hyperloglog, hat_trie
+
+
+
+
+.. raw:: html
+
+    <table><tr><th>Software</th><th>Version</th></tr><tr><td>Python</td><td>3.5.1 64bit [GCC 4.2.1 (Apple Inc. build 5577)]</td></tr><tr><td>IPython</td><td>4.0.3</td></tr><tr><td>OS</td><td>Darwin 15.4.0 x86_64 i386 64bit</td></tr><tr><td>pybloom</td><td>2.0.0</td></tr><tr><td>hyperloglog</td><td>0.0.10</td></tr><tr><td>hat_trie</td><td>0.3</td></tr><tr><td colspan='2'>Thu Apr 14 16:01:59 2016 EDT</td></tr></table>
+
+
+

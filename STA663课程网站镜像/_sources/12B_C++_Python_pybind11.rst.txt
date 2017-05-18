@@ -1,0 +1,930 @@
+
+Using ``pybind11``
+==================
+
+The package ``pybind11`` is provides an elegant way to wrap C++ code for
+Python, including automatic conversions for ``numpy`` arrays and the C++
+``Eigen`` linear algebra library. Used with the ``cppimport`` package,
+this provides a very nice work flow for integrating C++ and Python:
+
+-  Edit C++ code
+-  Run Python code
+
+.. code:: python
+
+    ! pip3 install pybind11
+    ! pip3 install cppimport
+
+
+.. parsed-literal::
+
+    Requirement already satisfied (use --upgrade to upgrade): pybind11 in /opt/conda/lib/python3.5/site-packages
+    [33mYou are using pip version 8.1.2, however version 9.0.1 is available.
+    You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+    Requirement already satisfied (use --upgrade to upgrade): cppimport in /opt/conda/lib/python3.5/site-packages
+    Requirement already satisfied (use --upgrade to upgrade): pybind11 in /opt/conda/lib/python3.5/site-packages (from cppimport)
+    Requirement already satisfied (use --upgrade to upgrade): mako in /opt/conda/lib/python3.5/site-packages (from cppimport)
+    Requirement already satisfied (use --upgrade to upgrade): MarkupSafe>=0.9.2 in /opt/conda/lib/python3.5/site-packages (from mako->cppimport)
+    [33mYou are using pip version 8.1.2, however version 9.0.1 is available.
+    You should consider upgrading via the 'pip install --upgrade pip' command.[0m
+
+
+Clone the Eigen library - no installation is required as Eigen is a
+header only library.
+
+.. code:: python
+
+    ! git clone https://github.com/RLovelett/eigen.git
+
+
+.. parsed-literal::
+
+    fatal: destination path 'eigen' already exists and is not an empty directory.
+
+
+Resources
+---------
+
+-  ```pybind11`` <http://pybind11.readthedocs.io/en/latest/>`__
+-  ```cppimport`` <https://github.com/tbenthompson/cppimport>`__
+-  ```Eigen`` <http://eigen.tuxfamily.org>`__
+
+A first example of using ``pybind11``
+-------------------------------------
+
+Create a new subdirectory - e.g. ``example1`` and create the following 5
+files in it:
+
+-  ``funcs.hpp``
+-  ``funcs.cpp``
+-  ``wrap.cpp``
+-  ``setup.py``
+-  ``test_funcs.py``
+
+First write the C++ header and implementation files
+
+.. code:: python
+
+    %mkdir example1
+    %cd example1
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example1
+
+
+.. code:: python
+
+    %%file funcs.hpp
+    
+    int add(int i, int j);
+
+
+.. parsed-literal::
+
+    Writing funcs.hpp
+
+
+.. code:: python
+
+    %%file funcs.cpp
+    
+    int add(int i, int j) {
+        return i + j;
+    };
+
+
+.. parsed-literal::
+
+    Writing funcs.cpp
+
+
+Next write the C++ wrapper code using ``pybind11`` in ``wrap.cpp``. The
+arguments ``"i"_a=1, "j"_a=2`` in the exported function definition tells
+``pybind11`` to generate variables named ``i`` with default value 1 and
+``j`` with default value 2 for the ``add`` function.
+
+.. code:: python
+
+    %%file wrap1.cpp
+    #include <pybind11/pybind11.h>
+    #include "funcs.hpp"
+    
+    namespace py = pybind11;
+    
+    using namespace pybind11::literals;
+    
+    PYBIND11_PLUGIN(wrap1) {
+        py::module m("wrap1", "pybind11 example plugin");
+        m.def("add", &add, "A function which adds two numbers",
+              "i"_a=1, "j"_a=2);
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap1.cpp
+
+
+Finally, write the ``setup.py`` file to compile the extension module.
+This is mostly boilerplate.
+
+.. code:: python
+
+    %%file setup.py
+    import os, sys
+    
+    from distutils.core import setup, Extension
+    from distutils import sysconfig
+    
+    cpp_args = ['-std=c++11'] 
+    
+    ext_modules = [
+        Extension(
+        'wrap1',
+            ['funcs.cpp', 'wrap1.cpp'],
+            include_dirs=['pybind11/include'],
+        language='c++',
+        extra_compile_args = cpp_args,
+        ),
+    ]
+    
+    setup(
+        name='wrap1',
+        version='0.0.1',
+        author='Cliburn Chan',
+        author_email='cliburn.chan@duke.edu',
+        description='Example',
+        ext_modules=ext_modules,
+    )
+
+
+.. parsed-literal::
+
+    Writing setup.py
+
+
+Now build the extension module in the subdirectory with these files
+
+.. code:: python
+
+    %%bash
+    
+    python setup.py build_ext -i
+
+
+.. parsed-literal::
+
+    running build_ext
+    building 'wrap1' extension
+    creating build
+    creating build/temp.linux-x86_64-3.5
+    gcc -pthread -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC -Ipybind11/include -I/opt/conda/include/python3.5m -c funcs.cpp -o build/temp.linux-x86_64-3.5/funcs.o -std=c++11
+    gcc -pthread -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC -Ipybind11/include -I/opt/conda/include/python3.5m -c wrap1.cpp -o build/temp.linux-x86_64-3.5/wrap1.o -std=c++11
+    g++ -pthread -shared -L/opt/conda/lib -Wl,-rpath=/opt/conda/lib,--no-as-needed build/temp.linux-x86_64-3.5/funcs.o build/temp.linux-x86_64-3.5/wrap1.o -L/opt/conda/lib -lpython3.5m -o /home/jovyan/work/sta-663-2017-public/scratch/example1/wrap1.cpython-35m-x86_64-linux-gnu.so
+
+
+.. parsed-literal::
+
+    cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+    cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+
+
+And if you are successful, you should now see a new ``funcs.so``
+extension module. We can write a ``test_funcs.py`` file test the
+extension module:
+
+.. code:: python
+
+    %%file test_funcs.py
+    
+    import wrap1
+    
+    def test_add():
+        print(wrap1.add(3, 4))
+        assert(wrap1.add(3, 4) == 7)
+    
+    if __name__ == '__main__':
+        test_add()
+
+
+.. parsed-literal::
+
+    Writing test_funcs.py
+
+
+And finally, running the test should not generate any error messages:
+
+.. code:: python
+
+    %%bash
+    
+    python test_funcs.py
+
+
+.. parsed-literal::
+
+    7
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+Using ``cppimport``
+-------------------
+
+In the development stage, it can be distracting to have to repeatedly
+rebuild the extension module by running
+
+.. code:: bash
+
+    python setup.py clean
+    python setup.py build_ext -i
+
+every single time you modify the C++ code. The ``cppimport`` package
+does this for you.
+
+Create a new sub-directory ``exaample2`` and copy the files
+``func.hpp``, ``funcs.cpp`` and ``wrap.cpp`` from ``example1`` over. For
+the previous example, we just need to add some annotation (between
+``<% and %>`` delimiters) to the top of the ``wrap.cpp`` file
+
+.. code:: python
+
+    %mkdir example2
+    %cp example1/funcs.* example2/
+    %cd example2
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example2
+
+
+.. code:: python
+
+    %%file wrap2.cpp
+    <%
+    cfg['compiler_args'] = ['-std=c++11'] 
+    cfg['sources'] = ['funcs.cpp']
+    setup_pybind11(cfg)
+    %>
+    
+    #include "funcs.hpp"
+    #include <pybind11/pybind11.h>
+    
+    namespace py = pybind11;
+    
+    PYBIND11_PLUGIN(wrap2) {
+        py::module m("wrap2", "pybind11 example plugin");
+        m.def("add", &add, "A function which adds two numbers");
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap2.cpp
+
+
+.. code:: python
+
+    %%file test_funcs.py
+    
+    import cppimport
+    funcs = cppimport.imp("wrap2")
+    
+    def test_add():
+        assert(funcs.add(3, 4) == 7)
+    
+    if __name__ == '__main__':
+        print(funcs.add(3,4))
+        test_add()
+
+
+.. parsed-literal::
+
+    Writing test_funcs.py
+
+
+.. code:: python
+
+    %%bash
+    
+    python test_funcs.py 
+
+
+.. parsed-literal::
+
+    7
+
+
+.. parsed-literal::
+
+    cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+    cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+
+
+Or just call from notebook
+
+.. code:: python
+
+    import cppimport
+    funcs = cppimport.imp("wrap2")
+    
+    funcs.add(3, 4)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+
+
+without any need to manually build the extension module. Any updates
+will be detected by ``cppimport`` and it will automatically trigger a
+re-build.
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+Vectorizing functions for use with ``numpy`` arrays
+---------------------------------------------------
+
+Example showing how to vectorize a ``square`` function. Note that from
+here on, we don't bother to use separate header and implementation files
+for these code snippets, and just write them together with the wrapping
+code in a ``code.cpp`` file. This means that with ``cppimport``, there
+are only two files that we actually code for, a C++ ``code.cpp`` file
+and a python test file.
+
+.. code:: python
+
+    %mkdir example3
+    %cd example3
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example3
+
+
+.. code:: python
+
+    %%file wrap3.cpp
+    <%
+    cfg['compiler_args'] = ['-std=c++11'] 
+    setup_pybind11(cfg)
+    %>
+    
+    #include <pybind11/pybind11.h>
+    #include <pybind11/numpy.h>
+    
+    namespace py = pybind11;
+    double square(double x) {
+        return x * x;
+    }
+    
+    PYBIND11_PLUGIN(wrap3) {
+        py::module m("wrap3", "pybind11 example plugin");
+        m.def("square", py::vectorize(square), "A vectroized square function.");
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap3.cpp
+
+
+.. code:: python
+
+    import cppimport
+    
+    wrap3 = cppimport.imp("wrap3")
+    wrap3.square([1,2,3])
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.,  4.,  9.])
+
+
+
+Once the shared libary is built, you can use it as a regular Python
+module.
+
+.. code:: python
+
+    ! ls
+
+
+.. parsed-literal::
+
+    wrap3.cpp  wrap3.cpython-35m-x86_64-linux-gnu.so
+
+
+.. code:: python
+
+    import wrap3
+    
+    wrap3.square([2,4,6])
+
+
+
+
+.. parsed-literal::
+
+    array([  4.,  16.,  36.])
+
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+Using ``numpy`` arrays as function arguments and return values
+--------------------------------------------------------------
+
+Example showing how to pass ``numpy`` arrays in and out of functions.
+These ``numpy`` array arguments can either be generic ``py:array`` or
+typed ``py:array_t<double>``. The properties of the ``numpy`` array can
+be obtained by calling its ``request`` method. This returns a ``struct``
+of the following form:
+
+.. code:: cpp
+
+    struct buffer_info {
+        void *ptr;
+        size_t itemsize;
+        std::string format;
+        int ndim;
+        std::vector<size_t> shape;
+        std::vector<size_t> strides;
+    };
+
+Here is C++ code for two functions - the function ``twice`` shows how to
+change a passed in ``numpy`` array in-place using pointers; the function
+``sum`` shows how to sum the elements of a ``numpy`` array. By taking
+advantage of the information in ``buffer_info``, the code will work for
+arbitrary ``n-d`` arrays.
+
+.. code:: python
+
+    %mkdir example4
+    %cd example4
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example4
+
+
+.. code:: python
+
+    %%file wrap4.cpp
+    <%
+    cfg['compiler_args'] = ['-std=c++11']
+    setup_pybind11(cfg)
+    %>
+    
+    #include <pybind11/pybind11.h>
+    #include <pybind11/numpy.h>
+    
+    namespace py = pybind11;
+    
+    // Passing in an array of doubles
+    void twice(py::array_t<double> xs) {
+        py::buffer_info info = xs.request();
+        auto ptr = static_cast<double *>(info.ptr);
+    
+        int n = 1;
+        for (auto r: info.shape) {
+          n *= r;
+        }
+    
+        for (int i = 0; i <n; i++) {
+            *ptr++ *= 2;
+        }
+    }
+    
+    // Passing in a generic array
+    double sum(py::array xs) {
+        py::buffer_info info = xs.request();
+        auto ptr = static_cast<double *>(info.ptr);
+    
+        int n = 1;
+        for (auto r: info.shape) {
+          n *= r;
+        }
+    
+        double s = 0.0;
+        for (int i = 0; i <n; i++) {
+            s += *ptr++;
+        }
+    
+        return s;
+    }
+    
+    PYBIND11_PLUGIN(wrap4) {
+        pybind11::module m("wrap4", "auto-compiled c++ extension");
+        m.def("sum", &sum);
+        m.def("twice", &twice);
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap4.cpp
+
+
+.. code:: python
+
+    %%file test_code.py
+    import cppimport
+    import numpy as np
+    
+    code = cppimport.imp("wrap4")
+    
+    if __name__ == '__main__':
+        xs = np.arange(12).reshape(3,4).astype('float')
+        print(xs)
+        print("np :", xs.sum())
+        print("cpp:", code.sum(xs))
+    
+        print()
+        code.twice(xs)
+        print(xs)
+
+
+.. parsed-literal::
+
+    Writing test_code.py
+
+
+.. code:: python
+
+    %%bash
+    
+    python test_code.py
+
+
+.. parsed-literal::
+
+    [[  0.   1.   2.   3.]
+     [  4.   5.   6.   7.]
+     [  8.   9.  10.  11.]]
+    np : 66.0
+    cpp: 66.0
+    
+    [[  0.   2.   4.   6.]
+     [  8.  10.  12.  14.]
+     [ 16.  18.  20.  22.]]
+
+
+.. parsed-literal::
+
+    cc1plus: warning: command line option ‘-Wstrict-prototypes’ is valid for C/ObjC but not for C++
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+More on working with ``numpy`` arrays
+-------------------------------------
+
+This example shows how to use array access for ``numpy`` arrays within
+the C++ function. It is taken from the ``pybind11`` documentation, but
+fixes a small bug in the official version. As noted in the
+documentation, the function would be more easily coded using
+``py::vectorize``.
+
+.. code:: python
+
+    %mkdir example5
+    %cd example5
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example5
+
+
+.. code:: python
+
+    %%file wrap5.cpp
+    <%
+    cfg['compiler_args'] = ['-std=c++11']
+    setup_pybind11(cfg)
+    %>
+    
+    #include <pybind11/pybind11.h>
+    #include <pybind11/numpy.h>
+    
+    namespace py = pybind11;
+    
+    py::array_t<double> add_arrays(py::array_t<double> input1, py::array_t<double> input2) {
+        auto buf1 = input1.request(), buf2 = input2.request();
+    
+        if (buf1.ndim != 1 || buf2.ndim != 1)
+            throw std::runtime_error("Number of dimensions must be one");
+    
+        if (buf1.shape[0] != buf2.shape[0])
+            throw std::runtime_error("Input shapes must match");
+    
+        auto result = py::array(py::buffer_info(
+            nullptr,            /* Pointer to data (nullptr -> ask NumPy to allocate!) */
+            sizeof(double),     /* Size of one item */
+            py::format_descriptor<double>::value, /* Buffer format */
+            buf1.ndim,          /* How many dimensions? */
+            { buf1.shape[0] },  /* Number of elements for each dimension */
+            { sizeof(double) }  /* Strides for each dimension */
+        ));
+    
+        auto buf3 = result.request();
+    
+        double *ptr1 = (double *) buf1.ptr,
+               *ptr2 = (double *) buf2.ptr,
+               *ptr3 = (double *) buf3.ptr;
+    
+        for (size_t idx = 0; idx < buf1.shape[0]; idx++)
+            ptr3[idx] = ptr1[idx] + ptr2[idx];
+    
+        return result;
+    }
+    
+    PYBIND11_PLUGIN(wrap5) {
+        py::module m("wrap5");
+        m.def("add_arrays", &add_arrays, "Add two NumPy arrays");
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap5.cpp
+
+
+.. code:: python
+
+    import cppimport
+    import numpy as np
+    
+    code = cppimport.imp("wrap5")
+    
+    xs = np.arange(12)
+    print(xs)
+    
+    print(code.add_arrays(xs, xs))
+
+
+.. parsed-literal::
+
+    [ 0  1  2  3  4  5  6  7  8  9 10 11]
+    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.  20.  22.]
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+Using the C++ ``eigen`` library to calculate matrix inverse and determinant
+---------------------------------------------------------------------------
+
+Example showing how ``Eigen`` vectors and matrices can be passed in and
+out of C++ functions. Note that ``Eigen`` arrays are automatically
+converted to/from ``numpy`` arrays simply by including the
+``pybind/eigen.h`` header. Because of this, it is probably simplest in
+most cases to work with ``Eigen`` vectors and matrices rather than
+``py::buffer`` or ``py::array`` where ``py::vectorize`` is insufficient.
+
+.. code:: python
+
+    %mkdir example6
+    %cd example6
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch/example6
+
+
+.. code:: python
+
+    %%file wrap6.cpp
+    <%
+    cfg['compiler_args'] = ['-std=c++11']
+    cfg['include_dirs'] = ['../eigen']
+    setup_pybind11(cfg)
+    %>
+    
+    #include <pybind11/pybind11.h>
+    #include <pybind11/eigen.h>
+    
+    #include <Eigen/LU>
+    
+    namespace py = pybind11;
+    
+    // convenient matrix indexing comes for free
+    double get(Eigen::MatrixXd xs, int i, int j) {
+        return xs(i, j);
+    }
+    
+    // takes numpy array as input and returns double
+    double det(Eigen::MatrixXd xs) {
+        return xs.determinant();
+    }
+    
+    // takes numpy array as input and returns another numpy array
+    Eigen::MatrixXd inv(Eigen::MatrixXd xs) {
+        return xs.inverse();
+    }
+    
+    PYBIND11_PLUGIN(wrap6) {
+        pybind11::module m("wrap6", "auto-compiled c++ extension");
+        m.def("inv", &inv);
+        m.def("det", &det);
+        return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Writing wrap6.cpp
+
+
+.. code:: python
+
+    import cppimport
+    import numpy as np
+    
+    code = cppimport.imp("wrap6")
+    
+    A = np.array([[1,2,1],
+                  [2,1,0],
+                  [-1,1,2]])
+    
+    print(A)
+    print(code.det(A))
+    print(code.inv(A))
+
+
+.. parsed-literal::
+
+    [[ 1  2  1]
+     [ 2  1  0]
+     [-1  1  2]]
+    -3.0
+    [[-0.66666667  1.          0.33333333]
+     [ 1.33333333 -1.         -0.66666667]
+     [-1.          1.          1.        ]]
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+
+
+Using ``pybind11`` with ``openmp``
+----------------------------------
+
+.. code:: python
+
+    %mkdir example7
+    %cd example7
+
+
+.. parsed-literal::
+
+    mkdir: cannot create directory ‘example7’: File exists
+    /home/jovyan/work/sta-663-2017-public/scratch/example7
+
+
+Here is an example of using OpenMP to integrate the value of :math:`\pi`
+written using ``pybind11``.
+
+.. code:: python
+
+    %%file wrap7.cpp
+    /*
+    <%
+    cfg['compiler_args'] = ['-std=c++11', '-fopenmp']
+    cfg['linker_args'] = ['-lgomp']
+    setup_pybind11(cfg)
+    %>
+    */
+    #include <cmath>
+    #include <omp.h>
+    #include <pybind11/pybind11.h>
+    #include <pybind11/numpy.h>
+    
+    namespace py = pybind11;
+    
+    // Passing in an array of doubles
+    void twice(py::array_t<double> xs) {
+        py::gil_scoped_acquire acquire;
+        
+        py::buffer_info info = xs.request();
+        auto ptr = static_cast<double *>(info.ptr);
+    
+        int n = 1;
+        for (auto r: info.shape) {
+          n *= r;
+        }
+    
+        #pragma omp parallel for
+        for (int i = 0; i <n; i++) {
+            *ptr++ *= 2;
+        }
+    }  
+    
+    PYBIND11_PLUGIN(wrap7) {
+      pybind11::module m("wrap7", "auto-compiled c++ extension");
+      m.def("twice", [](py::array_t<double> xs) {
+          /* Release GIL before calling into C++ code */      
+          py::gil_scoped_release release;
+          return twice(xs);
+        });
+    
+      return m.ptr();
+    }
+
+
+.. parsed-literal::
+
+    Overwriting wrap7.cpp
+
+
+.. code:: python
+
+    import cppimport
+    import numpy as np
+    
+    code = cppimport.imp("wrap7")
+    xs = np.arange(10).astype('double')
+    code.twice(xs)
+    xs
+
+
+
+
+.. parsed-literal::
+
+    array([  0.,   2.,   4.,   6.,   8.,  10.,  12.,  14.,  16.,  18.])
+
+
+
+.. code:: python
+
+    %cd ..
+
+
+.. parsed-literal::
+
+    /home/jovyan/work/sta-663-2017-public/scratch
+

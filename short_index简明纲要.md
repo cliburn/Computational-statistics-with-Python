@@ -1,0 +1,25 @@
+STA 663 课程纲要极简版本
+---
+
+- [x] Lecture 1: Python 和 IPython notebook (J)
+- [x] Lecture 2: 函数式编程 (C)
+- [x] Lecture 3: 数据科学相关的 Python 知识 (C)
+- [x] Lecture 4: 使用 `numpy` 和`pandas` (C)
+- [x] Lecture 5: 计算机的运算和算法 (C)
+- [x] Lecture 6: 线性代数与矩阵 I (J)
+- [x] Lecture 7: 线性代数与矩阵 II (J)
+- [x] Lecture 8: PCA
+- [x] Lecture 9: 单变量优化
+- [x] Lecture 10: 多变量优化
+- [ ] Lecture 11: 约束优化
+- [ ] Lecture 12: 期望最大化 I
+- [ ] Lecture 13: 期望最大化II
+- [ ] Lecture 14: 随机数和蒙特卡罗方法
+- [ ] Lecture 15: 计算推理和模拟实验
+- [ ] Lecture 16: MCMC算法（马尔可夫链蒙特卡罗(Markov Chain Monte Carlo)） I
+- [ ] Lecture 17: MCMC算法（马尔可夫链蒙特卡罗(Markov Chain Monte Carlo)）II
+- [ ] Lecture 18: 分析和代码优化
+- [ ] Lecture 19: 编译成原生代码以提高运行速度
+- [ ] Lecture 20: 并发编程
+- [ ] Lecture 21: GPU 计算
+- [ ] Lecture 22: "Map（映射）"和"Reduce（归约)" 以及 SPARK

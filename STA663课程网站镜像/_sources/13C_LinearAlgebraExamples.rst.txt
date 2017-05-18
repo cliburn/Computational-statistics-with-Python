@@ -1,0 +1,806 @@
+
+Linear Algebra Examples
+=======================
+
+This just shows the machanics of linear algebra calculations with
+python. See Lecture 5 for motivation and understanding.
+
+.. code:: python
+
+    import numpy as np
+    import scipy.linalg as la
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+
+.. code:: python
+
+    plt.style.use('ggplot')
+
+Resources
+---------
+
+-  `Tutorial for
+   ``scipy.linalg`` <http://docs.scipy.org/doc/scipy/reference/tutorial/linalg.html>`__
+
+Exact solution of linear system of equations
+--------------------------------------------
+
+.. raw:: latex
+
+   \begin{align}
+   x + 2y &= 3 \\
+   3x + 4y &= 17
+   \end{align}
+
+.. code:: python
+
+    A = np.array([[1,2],[3,4]])
+    A
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 2],
+           [3, 4]])
+
+
+
+.. code:: python
+
+    b = np.array([3,17])
+    b
+
+
+
+
+.. parsed-literal::
+
+    array([ 3, 17])
+
+
+
+.. code:: python
+
+    x = la.solve(A, b)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([ 11.,  -4.])
+
+
+
+.. code:: python
+
+    np.allclose(A @ x, b)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    A1 = np.random.random((1000,1000))
+    b1 = np.random.random(1000)
+
+Using solve is faster and more stable numerically than using matrix inversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    %timeit la.solve(A1, b1)
+
+
+.. parsed-literal::
+
+    The slowest run took 5.24 times longer than the fastest. This could mean that an intermediate result is being cached 
+    1 loops, best of 3: 90.3 ms per loop
+
+
+.. code:: python
+
+    %timeit la.inv(A1) @ b1
+
+
+.. parsed-literal::
+
+    1 loops, best of 3: 140 ms per loop
+
+
+Under the hood (Optional)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``solve`` function uses the ``dgesv`` fortran function to do the
+actual work. Here is an example of how to do this directly with the
+``lapack`` function. There is rarely any reason to use ``blas`` or
+``lapack`` functions directly becuase the ``linalg`` package provides
+more convenient functions that also perfrom error checking, but you can
+use Python to experiment with ``lapack`` or ``blas`` before using them
+in a language like C or Fortran.
+
+-  `How to interpret lapack function
+   names <http://www.netlib.org/lapack/lug/node24.html>`__
+-  `Summary of BLAS functions <http://cvxopt.org/userguide/blas.html>`__
+-  `Sumary of Lapack
+   functions <http://cvxopt.org/userguide/lapack.html>`__
+
+.. code:: python
+
+    import scipy.linalg.lapack as lapack
+
+.. code:: python
+
+    lu, piv, x, info = lapack.dgesv(A, b)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([ 11.,  -4.])
+
+
+
+Basic information about a matrix
+--------------------------------
+
+.. code:: python
+
+    C = np.array([[1, 2+3j], [3-2j, 4]])
+    C
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.+0.j,  2.+3.j],
+           [ 3.-2.j,  4.+0.j]])
+
+
+
+.. code:: python
+
+    C.conjugate()
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.-0.j,  2.-3.j],
+           [ 3.+2.j,  4.-0.j]])
+
+
+
+Trace
+^^^^^
+
+.. code:: python
+
+    def trace(M):
+        return np.diag(M).sum()
+
+.. code:: python
+
+    trace(C)
+
+
+
+
+.. parsed-literal::
+
+    (5+0j)
+
+
+
+.. code:: python
+
+    np.allclose(trace(C), la.eigvals(C).sum())
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+Determinant
+^^^^^^^^^^^
+
+.. code:: python
+
+    la.det(C)
+
+
+
+
+.. parsed-literal::
+
+    (-8-5j)
+
+
+
+Rank
+^^^^
+
+.. code:: python
+
+    np.linalg.matrix_rank(C)
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Norm
+^^^^
+
+.. code:: python
+
+    la.norm(C, None) # Frobenius (default)
+
+
+
+
+.. parsed-literal::
+
+    6.5574385243020004
+
+
+
+.. code:: python
+
+    la.norm(C, 2) # largest sinular value
+
+
+
+
+.. parsed-literal::
+
+    6.3890280236012158
+
+
+
+.. code:: python
+
+    la.norm(C, -2) # smallest singular value
+
+
+
+
+.. parsed-literal::
+
+    1.4765909770949921
+
+
+
+.. code:: python
+
+    la.svdvals(C)
+
+
+
+
+.. parsed-literal::
+
+    array([ 6.38902802,  1.47659098])
+
+
+
+Least-squares solution
+----------------------
+
+.. code:: python
+
+    la.solve(A, b)
+
+
+
+
+.. parsed-literal::
+
+    array([ 11.,  -4.])
+
+
+
+.. code:: python
+
+    x, resid, rank, s = la.lstsq(A, b)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([ 11.,  -4.])
+
+
+
+.. code:: python
+
+    A1 = np.array([[1,2],[2,4]])
+    A1
+
+
+
+
+.. parsed-literal::
+
+    array([[1, 2],
+           [2, 4]])
+
+
+
+.. code:: python
+
+    b1 = np.array([3, 17])
+    b1
+
+
+
+
+.. parsed-literal::
+
+    array([ 3, 17])
+
+
+
+.. code:: python
+
+    try:
+        la.solve(A1, b1)
+    except la.LinAlgError as e:
+        print(e)
+
+
+.. parsed-literal::
+
+    singular matrix
+
+
+.. code:: python
+
+    x, resid, rank, s = la.lstsq(A1, b1)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.48,  2.96])
+
+
+
+.. code:: python
+
+    A2 = np.random.random((10,3))
+    b2 = np.random.random(10)
+
+.. code:: python
+
+    try:
+        la.solve(A2, b2)
+    except ValueError as e:
+        print(e)
+
+
+.. parsed-literal::
+
+    expected square matrix
+
+
+.. code:: python
+
+    x, resid, rank, s = la.lstsq(A2, b2)
+    x
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.4036226 ,  0.38604513,  0.40359296])
+
+
+
+Normal equations
+~~~~~~~~~~~~~~~~
+
+One way to solve least squares equations :math:`X\beta = y` for
+:math:`\beta` is by using the formula :math:`\beta = (X^TX)^{-1}X^Ty` as
+you may have learnt in statistical theory classes (or can derive
+yourself with a bit of calculus). This is implemented below.
+
+Note: This is not how the ``la.lstsq`` function solves least square
+problems as it can be inefficent for large matrices.
+
+.. code:: python
+
+    def least_squares(X, y):
+        return la.solve(X.T @ X, X.T @ y)
+
+.. code:: python
+
+    least_squares(A2, b2)
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.4036226 ,  0.38604513,  0.40359296])
+
+
+
+Matrix Decompositions
+---------------------
+
+.. code:: python
+
+    A = np.array([[1,0.6],[0.6,4]])
+    A
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1. ,  0.6],
+           [ 0.6,  4. ]])
+
+
+
+LU
+~~
+
+.. code:: python
+
+    p, l, u = la.lu(A)
+
+.. code:: python
+
+    p
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.,  0.],
+           [ 0.,  1.]])
+
+
+
+.. code:: python
+
+    l
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1. ,  0. ],
+           [ 0.6,  1. ]])
+
+
+
+.. code:: python
+
+    u
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.  ,  0.6 ],
+           [ 0.  ,  3.64]])
+
+
+
+.. code:: python
+
+    np.allclose(p@l@u, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+Choleskey
+~~~~~~~~~
+
+.. code:: python
+
+    U = la.cholesky(A)
+    U
+
+
+
+
+.. parsed-literal::
+
+    array([[ 1.       ,  0.6      ],
+           [ 0.       ,  1.9078784]])
+
+
+
+.. code:: python
+
+    np.allclose(U.T @ U, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    # If workiing wiht complex matrices
+    np.allclose(U.T.conj() @ U, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+QR
+~~
+
+.. code:: python
+
+    Q, R = la.qr(A)
+
+.. code:: python
+
+    Q
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.85749293, -0.51449576],
+           [-0.51449576,  0.85749293]])
+
+
+
+.. code:: python
+
+    np.allclose((la.norm(Q[:,0]), la.norm(Q[:,1])), (1,1))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+
+.. code:: python
+
+    np.allclose(Q@R, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+Spectral
+~~~~~~~~
+
+.. code:: python
+
+    u, v = la.eig(A)
+
+.. code:: python
+
+    u
+
+
+
+
+.. parsed-literal::
+
+    array([ 0.88445056+0.j,  4.11554944+0.j])
+
+
+
+.. code:: python
+
+    v
+
+
+
+
+.. parsed-literal::
+
+    array([[-0.98195639, -0.18910752],
+           [ 0.18910752, -0.98195639]])
+
+
+
+.. code:: python
+
+    np.allclose((la.norm(v[:,0]), la.norm(v[:,1])), (1,1))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    np.allclose(v @ np.diag(u) @ v.T, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+Inverting A
+^^^^^^^^^^^
+
+.. code:: python
+
+    np.allclose(v @ np.diag(1/u) @ v.T, la.inv(A))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+Powers of A
+^^^^^^^^^^^
+
+.. code:: python
+
+    np.allclose(v @ np.diag(u**5) @ v.T, np.linalg.matrix_power(A, 5))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+SVD
+~~~
+
+.. code:: python
+
+    U, s, V = la.svd(A)
+
+.. code:: python
+
+    U
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.18910752,  0.98195639],
+           [ 0.98195639, -0.18910752]])
+
+
+
+.. code:: python
+
+    np.allclose((la.norm(U[:,0]), la.norm(U[:,1])), (1,1))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    s
+
+
+
+
+.. parsed-literal::
+
+    array([ 4.11554944,  0.88445056])
+
+
+
+.. code:: python
+
+    V
+
+
+
+
+.. parsed-literal::
+
+    array([[ 0.18910752,  0.98195639],
+           [ 0.98195639, -0.18910752]])
+
+
+
+.. code:: python
+
+    np.allclose((la.norm(V[:,0]), la.norm(V[:,1])), (1,1))
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    np.allclose(U @ np.diag(s) @ V, A)
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+

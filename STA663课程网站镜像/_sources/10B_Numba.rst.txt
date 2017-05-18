@@ -1,0 +1,739 @@
+
+Just-in-time compilation (JIT)
+==============================
+
+For programmer productivity, it often makes sense to code the majority
+of your application in a high-level language such as Python and only
+optimize code bottlenecks identified by profiling. One way to speed up
+these bottlenecks is to compile the code to machine executables, often
+via an intermediate C or C-like stage. There are two common approaches
+to compiling Python code - using a Just-In-Time (JIT) compiler and using
+Cython for Ahead of Time (AOT) compilation.
+
+This notebook mostly illustrates the JIT approach.
+
+.. code:: python
+
+    %matplotlib inline
+    import matplotlib.pyplot as plt
+
+**Utility function for timing functions**
+
+.. code:: python
+
+    import time
+    from numpy.testing import assert_almost_equal
+
+.. code:: python
+
+    def timer(f, *args, **kwargs):
+        start = time.clock()
+        ans = f(*args, **kwargs)
+        return ans, time.clock() - start
+
+.. code:: python
+
+    def report(fs, *args, **kwargs):
+        ans, t = timer(fs[0], *args, **kwargs)
+        print('%s: %.1f' % (fs[0].__name__, 1.0))  
+        for f in fs[1:]:
+            ans_, t_ = timer(f, *args, **kwargs)
+            print('%s: %.1f' % (f.__name__, t/t_))
+
+Using ``numexpr``
+-----------------
+
+One of the simplest approaches is to use
+```numexpr`` <https://github.com/pydata/numexpr>`__ which takes a
+``numpy`` expression and compiles a more efficient version of the
+``numpy`` expression written as a string. If there is a simple
+expression that is taking too long, this is a good choice due to its
+simplicity. However, it is quite limited.
+
+.. code:: python
+
+    import numpy as np
+    a = np.random.random(int(1e6))
+    b = np.random.random(int(1e6))
+    c = np.random.random(int(1e6))
+
+.. code:: python
+
+    %timeit -r3 -n3 b**2 - 4*a*c
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 9.94 ms per loop
+
+
+.. code:: python
+
+    import numexpr as ne
+
+.. code:: python
+
+    %timeit -r3 -n3 ne.evaluate('b**2 - 4*a*c')
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 1.87 ms per loop
+
+
+Using ``numba``
+---------------
+
+When it works, the JIT ``numba`` can speed up Python code tremendously
+with minimal effort.
+
+`Documentation for
+``numba`` <http://numba.pydata.org/numba-doc/0.12.2/index.html>`__
+
+Example 1
+~~~~~~~~~
+
+Plain Python version
+^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def matrix_multiply(A, B):
+        m, n = A.shape
+        n, p = B.shape
+        C = np.zeros((m, p))
+        for i in range(m):
+            for j in range(p):
+                for k in range(n):
+                    C[i,j] += A[i,k] * B[k, j]
+        return C
+
+.. code:: python
+
+    A = np.random.random((30, 50))
+    B = np.random.random((50, 40))
+
+Numba jit version
+^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import numba
+    from numba import jit
+
+.. code:: python
+
+    @jit
+    def matrix_multiply_numba(A, B):
+        m, n = A.shape
+        n, p = B.shape
+        C = np.zeros((m, p))
+        for i in range(m):
+            for j in range(p):
+                for k in range(n):
+                    C[i,j] += A[i,k] * B[k, j]
+        return C
+
+.. code:: python
+
+    %timeit matrix_multiply(A, B)
+    %timeit matrix_multiply_numba(A, B)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 38.3 ms per loop
+    The slowest run took 2092.60 times longer than the fastest. This could mean that an intermediate result is being cached.
+    10000 loops, best of 3: 63 µs per loop
+
+
+Numpy version
+^^^^^^^^^^^^^
+
+.. code:: python
+
+    def matrix_multiply_numpy(A, B):
+        return A.dot(B)
+
+Check that outputs are the same
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    assert_almost_equal(matrix_multiply(A, B), matrix_multiply_numba(A, B))
+    assert_almost_equal(matrix_multiply(A, B), matrix_multiply_numpy(A, B))
+
+.. code:: python
+
+    %timeit -r3 -n3 matrix_multiply_numba(A, B)
+
+
+.. parsed-literal::
+
+    3 loops, best of 3: 62.9 µs per loop
+
+
+.. code:: python
+
+    report([matrix_multiply, matrix_multiply_numba, matrix_multiply_numpy], A, B)
+
+
+.. parsed-literal::
+
+    matrix_multiply: 1.0
+    matrix_multiply_numba: 500.8
+    matrix_multiply_numpy: 328.1
+
+
+Pre-compilation by giving specific signature
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    @jit('double[:,:](double[:,:], double[:,:])')
+    def matrix_multiply_numba_1(A, B):
+        m, n = A.shape
+        n, p = B.shape
+        C = np.zeros((m, p))
+        for i in range(m):
+            for j in range(p):
+                for k in range(n):
+                    C[i,j] += A[i,k] * B[k, j]
+        return C
+
+.. code:: python
+
+    %timeit matrix_multiply_numba(A, B)
+    %timeit matrix_multiply_numba_1(A, B)
+
+
+.. parsed-literal::
+
+    10000 loops, best of 3: 65 µs per loop
+    10000 loops, best of 3: 71.4 µs per loop
+
+
+Example 2: Using nopython
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Vectorized Python version
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def mc_pi(n):
+        x = np.random.uniform(-1, 1, (n,2))
+        return 4*np.sum((x**2).sum(1) < 1)/n
+
+.. code:: python
+
+    n = int(1e6)
+
+.. code:: python
+
+    %timeit mc_pi(n)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 54.9 ms per loop
+
+
+Numba on vectorized version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    @jit
+    def mc_pi_numba(n):
+        x = np.random.uniform(-1, 1, (n,2))
+        return 4*np.sum((x**2).sum(1) < 1)/n
+
+.. code:: python
+
+    %timeit mc_pi_numba(n)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 50.4 ms per loop
+
+
+Using nopython
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    @jit(nopython=True)
+    def mc_pi_numba_njit(n):
+        x = np.random.uniform(-1, 1, (n,2))
+        return 4*np.sum((x**2).sum(1) < 1)/n
+
+.. code:: python
+
+    from numba.errors import TypingError
+
+.. code:: python
+
+    try:
+        mc_pi_numba_njit(n)
+    except TypingError:
+        print("Unable to convert to pure C code.")
+
+
+.. parsed-literal::
+
+    Unable to convert to pure C code.
+
+
+Numba on unrolled version
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    @jit(nopython=True)
+    def mc_pi_numba_unrolled(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x*x + y*y) < 1:
+                s += 1
+        return 4*s/n
+
+.. code:: python
+
+    %timeit mc_pi_numba_unrolled(n)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 22.7 ms per loop
+
+
+Usig cache=True
+~~~~~~~~~~~~~~~
+
+This stores the compiled function in a file and avoids re-compilation on
+re-running a Python program.
+
+.. code:: python
+
+    @jit(nopython=True, cache=True)
+    def mc_pi_numba_unrolled_cache(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x*x + y*y) < 1:
+                s += 1
+        return 4*s/n
+
+.. code:: python
+
+    %timeit mc_pi_numba_unrolled_cache(n)
+
+
+.. parsed-literal::
+
+    10 loops, best of 3: 22.9 ms per loop
+
+
+Using numba vectorize and guvectoize
+------------------------------------
+
+Sometimes it is convenient to use ``numba`` to convert functions to
+vectorized functions for use in ``numpy``. See
+`documentation <http://numba.pydata.org/numba-doc/dev/user/vectorize.html>`__
+for details.
+
+.. code:: python
+
+    from numba import int32, int64, float32, float64
+
+Using ``vectorize``
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    @numba.vectorize()
+    def f(x, y):
+        return np.sqrt(x**2 + y**2)
+
+.. code:: python
+
+    xs = np.random.random(10)
+    ys = np.random.random(10)
+
+.. code:: python
+
+    np.array([np.sqrt(x**2 + y**2) for (x, y) in zip(xs, ys)])
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.17417879,  0.99673188,  1.08354518,  0.34952589,  0.54177337,
+            0.83519138,  0.87414636,  0.03990384,  0.48380479,  1.29560727])
+
+
+
+.. code:: python
+
+    f(xs, ys)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.17417879,  0.99673188,  1.08354518,  0.34952589,  0.54177337,
+            0.83519138,  0.87414636,  0.03990384,  0.48380479,  1.29560727])
+
+
+
+Adding function signatures
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    @numba.vectorize([float64(float64, float64),
+                      float32(float32, float32),
+                      float64(int64, int64),
+                      float32(int32, int32)])
+    def f_sig(x, y):
+        return np.sqrt(x**2 + y**2)
+
+.. code:: python
+
+    f_sig(xs, ys)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.17417879,  0.99673188,  1.08354518,  0.34952589,  0.54177337,
+            0.83519138,  0.87414636,  0.03990384,  0.48380479,  1.29560727])
+
+
+
+Using ``guvectorize``
+~~~~~~~~~~~~~~~~~~~~~
+
+**Create our own version of inner1d**
+
+.. code:: python
+
+    @numba.guvectorize([(float64[:], float64[:], float64[:])], '(n),(n)->()')
+    def nb_inner1d(u, v, res):
+        res[0] = 0
+        for i in range(len(u)):
+            res[0] += u[i]*v[i]
+
+.. code:: python
+
+    xs = np.random.random((3,4))
+
+.. code:: python
+
+    nb_inner1d(xs, xs)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.37655175,  0.64148236,  0.78119023])
+
+
+
+**Check**
+
+.. code:: python
+
+    from numpy.core.umath_tests import inner1d
+
+.. code:: python
+
+    inner1d(xs,xs)
+
+
+
+
+.. parsed-literal::
+
+    array([ 1.37655175,  0.64148236,  0.78119023])
+
+
+
+.. code:: python
+
+    %timeit -r3 -n3 nb_inner1d(xs, xs)
+
+
+.. parsed-literal::
+
+    The slowest run took 4.00 times longer than the fastest. This could mean that an intermediate result is being cached.
+    3 loops, best of 3: 967 ns per loop
+
+
+.. code:: python
+
+    %timeit -r3 -n3 inner1d(xs, xs)
+
+
+.. parsed-literal::
+
+    The slowest run took 5.28 times longer than the fastest. This could mean that an intermediate result is being cached.
+    3 loops, best of 3: 1.07 µs per loop
+
+
+**Create our own version of matrix\_multiply**
+
+.. code:: python
+
+    @numba.guvectorize([(int64[:,:], int64[:,:], int64[:,:])], 
+                        '(m,n),(n,p)->(m,p)')
+    def nb_matrix_multiply(u, v, res):
+        m, n = u.shape
+        n, p = v.shape
+        for i in range(m):
+            for j in range(p):
+                res[i,j] = 0
+                for k in range(n):
+                    res[i,j] += u[i,k] * v[k,j]
+
+.. code:: python
+
+    xs = np.random.randint(0, 10, (5, 2, 3))
+    ys = np.random.randint(0, 10, (5, 3, 2))
+
+.. code:: python
+
+    nb_matrix_multiply(xs, ys)
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 56,   7],
+            [106,  41]],
+    
+           [[ 72,  52],
+            [ 17,  12]],
+    
+           [[ 17,  11],
+            [ 42,  22]],
+    
+           [[ 20,   9],
+            [ 32,  15]],
+    
+           [[ 52,  50],
+            [ 87, 118]]])
+
+
+
+**Check**
+
+.. code:: python
+
+    from numpy.core.umath_tests import matrix_multiply
+
+.. code:: python
+
+    matrix_multiply(xs, ys)
+
+
+
+
+.. parsed-literal::
+
+    array([[[ 56,   7],
+            [106,  41]],
+    
+           [[ 72,  52],
+            [ 17,  12]],
+    
+           [[ 17,  11],
+            [ 42,  22]],
+    
+           [[ 20,   9],
+            [ 32,  15]],
+    
+           [[ 52,  50],
+            [ 87, 118]]])
+
+
+
+.. code:: python
+
+    %timeit -r3 -n3 nb_matrix_multiply(xs, ys)
+
+
+.. parsed-literal::
+
+    The slowest run took 5.75 times longer than the fastest. This could mean that an intermediate result is being cached.
+    3 loops, best of 3: 1.33 µs per loop
+
+
+.. code:: python
+
+    %timeit -r3 -n3 matrix_multiply(xs, ys)
+
+
+.. parsed-literal::
+
+    The slowest run took 9.53 times longer than the fastest. This could mean that an intermediate result is being cached.
+    3 loops, best of 3: 1.33 µs per loop
+
+
+Parallelization with vectorize and guvectorize
+----------------------------------------------
+
+.. code:: python
+
+    @numba.vectorize([float64(float64, float64),
+                      float32(float32, float32),
+                      float64(int64, int64),
+                      float32(int32, int32)],
+                     target='parallel')
+    def f_parallel(x, y):
+        return np.sqrt(x**2 + y**2)
+
+.. code:: python
+
+    xs = np.random.random(int(1e8))
+    ys = np.random.random(int(1e8))
+
+.. code:: python
+
+    %timeit f(xs, ys)
+
+
+.. parsed-literal::
+
+    1 loop, best of 3: 744 ms per loop
+
+
+.. code:: python
+
+    %timeit f_parallel(xs, ys)
+
+
+.. parsed-literal::
+
+    1 loop, best of 3: 185 ms per loop
+
+
+Mandelbrot example with ``numba``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Pure Python**
+
+.. code:: python
+
+    # color function for point at (x, y)
+    def mandel(x, y, max_iters):
+        c = complex(x, y)
+        z = 0.0j
+        for i in range(max_iters):
+            z = z*z + c
+            if z.real*z.real + z.imag*z.imag >= 4:
+                return i
+        return max_iters
+
+.. code:: python
+
+    def create_fractal(xmin, xmax, ymin, ymax, image, iters):
+        height, width = image.shape
+        
+        pixel_size_x = (xmax - xmin)/width
+        pixel_size_y = (ymax - ymin)/height
+            
+        for x in range(width):
+            real = xmin + x*pixel_size_x
+            for y in range(height):
+                imag = ymin + y*pixel_size_y
+                color = mandel(real, imag, iters)
+                image[y, x]  = color    
+
+.. code:: python
+
+    gimage = np.zeros((1024, 1536), dtype=np.uint8)
+    xmin, xmax, ymin, ymax = np.array([-2.0, 1.0, -1.0, 1.0]).astype('float32')
+    iters = 50
+    
+    start = time.clock()
+    create_fractal(xmin, xmax, ymin, ymax, gimage, iters)
+    dt = time.clock() - start
+    
+    print("Mandelbrot created on CPU in %f s" % dt)
+    plt.grid(False)
+    plt.imshow(gimage, cmap='jet')
+    pass
+
+
+.. parsed-literal::
+
+    Mandelbrot created on CPU in 15.738658 s
+
+
+
+.. image:: 10B_Numba_files/10B_Numba_85_1.png
+
+
+**Numba**
+
+.. code:: python
+
+    from numba import uint32, float32
+
+**The jit decorator can also be called as a regular function**
+
+.. code:: python
+
+    mandel_numba = jit(uint32(float32, float32, uint32))(mandel)
+
+.. code:: python
+
+    @jit
+    def create_fractal_numba(xmin, xmax, ymin, ymax, image, iters):
+        height, width = image.shape
+        
+        pixel_size_x = (xmax - xmin)/width
+        pixel_size_y = (ymax - ymin)/height
+            
+        for x in range(width):
+            real = xmin + x*pixel_size_x
+            for y in range(height):
+                imag = ymin + y*pixel_size_y
+                color = mandel_numba(real, imag, iters)
+                image[y, x]  = color  
+
+.. code:: python
+
+    gimage = np.zeros((1024, 1536), dtype=np.uint8)
+    xmin, xmax, ymin, ymax = np.array([-2.0, 1.0, -1.0, 1.0]).astype('float32')
+    iters = 50
+    
+    start = time.clock()
+    create_fractal_numba(xmin, xmax, ymin, ymax, gimage, iters)
+    dt = time.clock() - start
+    
+    print("Mandelbrot created wiht Numba in %f s" % dt)
+    plt.grid(False)
+    plt.imshow(gimage, cmap='jet')
+    pass
+
+
+.. parsed-literal::
+
+    Mandelbrot created wiht Numba in 0.243637 s
+
+
+
+.. image:: 10B_Numba_files/10B_Numba_91_1.png
+

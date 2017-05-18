@@ -1,0 +1,748 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/19B_Pystan.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:15:15 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyStan &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Metropolis and Gibbs Sampling" href="20A_MCMC.html" />
+    <link rel="prev" title="Using PyMC3" href="19A_PyMC3.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="20A_MCMC.html" title="Metropolis and Gibbs Sampling"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="19A_PyMC3.html" title="Using PyMC3"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="o">%</span><span class="n">precision</span> <span class="mi">4</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">pystan</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="nn">stats</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="pystan">
+<h1>PyStan<a class="headerlink" href="#pystan" title="Permalink to this headline">¶</a></h1>
+<p>Install <code class="docutils literal"><span class="pre">PyStan</span></code> with</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pystan</span>
+</pre></div>
+</div>
+<p>The nice thing about <code class="docutils literal"><span class="pre">PyMC</span></code> is that everything is in Python. With
+<code class="docutils literal"><span class="pre">PyStan</span></code>, however, you need to use a domain specific language based on
+C++ syntax to specify the model and the data, which is less flexible and
+more work. However, in exchange you get an extremely powerful HMC
+package (only does HMC) that can be used in R and Python.</p>
+<div class="section" id="useful-links">
+<h2>Useful links<a class="headerlink" href="#useful-links" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.stat.columbia.edu/~gelman/research/unpublished/stan-resubmit-JSS1293.pdf">Paper describing
+Stan</a></li>
+<li><a class="reference external" href="http://mc-stan.org/interfaces/">Stan home page</a></li>
+<li><a class="reference external" href="https://github.com/stan-dev/example-models/wiki">Stan Examples and Reference
+Manual</a></li>
+<li><a class="reference external" href="http://pystan.readthedocs.org/en/latest/">PyStan docs</a></li>
+<li><a class="reference external" href="https://github.com/stan-dev/pystan">PyStan GitHub page</a></li>
+</ul>
+</div>
+<div class="section" id="coin-toss">
+<h2>Coin toss<a class="headerlink" href="#coin-toss" title="Permalink to this headline">¶</a></h2>
+<p>We&#8217;ll repeat the example of determining the bias of a coin from observed
+coin tosses. The likelihood is binomial, and we use a beta prior.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">coin_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">data {</span>
+<span class="s2">    int&lt;lower=0&gt; n; // number of tosses</span>
+<span class="s2">    int&lt;lower=0&gt; y; // number of heads</span>
+<span class="s2">}</span>
+<span class="s2">transformed data </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">parameters {</span>
+<span class="s2">    real&lt;lower=0, upper=1&gt; p;</span>
+<span class="s2">}</span>
+<span class="s2">transformed parameters </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">model {</span>
+<span class="s2">    p ~ beta(2, 2);</span>
+<span class="s2">    y ~ binomial(n, p);</span>
+<span class="s2">}</span>
+<span class="s2">generated quantities </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">coin_dat</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+             <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">61</span><span class="p">,</span>
+            <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fit-model">
+<h2>Fit model<a class="headerlink" href="#fit-model" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sm</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">StanModel</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">coin_code</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_7f1947cd2d39ae427cd7b6bb6e6ffd77</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="map">
+<h2>MAP<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h2>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">optimizing</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">coin_dat</span><span class="p">)</span>
+<span class="n">op</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="n">array</span><span class="p">(</span><span class="mf">0.6078431219203108</span><span class="p">))])</span>
+</pre></div>
+</div>
+<div class="section" id="mcmc">
+<h3>MCMC<a class="headerlink" href="#mcmc" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">sampling</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">coin_dat</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="loading-from-a-file">
+<h3>Loading from a file<a class="headerlink" href="#loading-from-a-file" title="Permalink to this headline">¶</a></h3>
+<p>The string in coin_code can also be in a file - say <code class="docutils literal"><span class="pre">coin_code.stan</span></code>
+- then we can use it like so</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">stan</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="s1">&#39;coin_code.stan&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">coin_dat</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_7f1947cd2d39ae427cd7b6bb6e6ffd77</span><span class="o">.</span>
+<span class="mi">4</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">2000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">4000.</span>
+
+       <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">p</span>      <span class="mf">0.61</span>  <span class="mf">7.5e-4</span>   <span class="mf">0.05</span>   <span class="mf">0.51</span>   <span class="mf">0.57</span>   <span class="mf">0.61</span>   <span class="mf">0.64</span>    <span class="mf">0.7</span>   <span class="mi">4000</span>    <span class="mf">1.0</span>
+<span class="n">lp__</span> <span class="o">-</span><span class="mf">70.24</span>    <span class="mf">0.01</span>   <span class="mf">0.71</span> <span class="o">-</span><span class="mf">72.26</span> <span class="o">-</span><span class="mf">70.39</span> <span class="o">-</span><span class="mf">69.96</span> <span class="o">-</span><span class="mf">69.79</span> <span class="o">-</span><span class="mf">69.74</span>   <span class="mi">4000</span>    <span class="mf">1.0</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">41</span><span class="p">:</span><span class="mi">38</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">coin_dict</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+<span class="n">coin_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="c1"># lp_ is the log posterior</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">odict_keys</span><span class="p">([</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;lp__&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="we-can-convert-to-a-dataframe-if-necessary">
+<h3>We can convert to a DataFrame if necessary<a class="headerlink" href="#we-can-convert-to-a-dataframe-if-necessary" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">coin_dict</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>p</th>
+      <th>lp__</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.634851</td>
+      <td>-69.930430</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.706164</td>
+      <td>-72.132244</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.536575</td>
+      <td>-70.754119</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/19B_Pystan_17_0.png" src="_images/19B_Pystan_17_0.png" />
+</div>
+</div>
+<div class="section" id="estimating-mean-and-standard-deviation-of-normal-distribution">
+<h2>Estimating mean and standard deviation of normal distribution<a class="headerlink" href="#estimating-mean-and-standard-deviation-of-normal-distribution" title="Permalink to this headline">¶</a></h2>
+<div class="math">
+\[X \sim \mathcal{N}(\mu, \sigma^2)\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">norm_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">data {</span>
+<span class="s2">    int&lt;lower=0&gt; n;</span>
+<span class="s2">    real y[n];</span>
+<span class="s2">}</span>
+<span class="s2">transformed data </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">parameters {</span>
+<span class="s2">    real&lt;lower=0, upper=100&gt; mu;</span>
+<span class="s2">    real&lt;lower=0, upper=10&gt; sigma;</span>
+<span class="s2">}</span>
+<span class="s2">transformed parameters </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">model {</span>
+<span class="s2">    y ~ normal(mu, sigma);</span>
+<span class="s2">}</span>
+<span class="s2">generated quantities </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">norm_dat</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+             <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">}</span>
+
+<span class="n">fit</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">stan</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">norm_code</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">norm_dat</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span><span class="o">.</span>
+<span class="mi">1</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">500</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">500.</span>
+
+        <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">mu</span>     <span class="mf">10.07</span>  <span class="mf">9.0e-3</span>    <span class="mf">0.2</span>   <span class="mf">9.69</span>   <span class="mf">9.93</span>  <span class="mf">10.07</span>  <span class="mf">10.19</span>  <span class="mf">10.44</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">sigma</span>   <span class="mf">2.01</span>  <span class="mf">5.8e-3</span>   <span class="mf">0.13</span>   <span class="mf">1.77</span>   <span class="mf">1.91</span>    <span class="mf">2.0</span>   <span class="mf">2.09</span>   <span class="mf">2.25</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">lp__</span>  <span class="o">-</span><span class="mf">117.1</span>    <span class="mf">0.04</span>   <span class="mf">0.87</span> <span class="o">-</span><span class="mf">119.5</span> <span class="o">-</span><span class="mf">117.5</span> <span class="o">-</span><span class="mf">116.8</span> <span class="o">-</span><span class="mf">116.4</span> <span class="o">-</span><span class="mf">116.2</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">03</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">trace</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">extract</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">][:],</span> <span class="mi">25</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">trace</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][:],</span> <span class="mi">25</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/19B_Pystan_22_0.png" src="_images/19B_Pystan_22_0.png" />
+<div class="section" id="optimization-finding-map">
+<h3>Optimization (finding MAP)<a class="headerlink" href="#optimization-finding-map" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">sm</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">StanModel</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">norm_code</span><span class="p">)</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">optimizing</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">norm_dat</span><span class="p">)</span>
+<span class="n">op</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="n">array</span><span class="p">(</span><span class="mf">10.070224531526673</span><span class="p">)),</span>
+             <span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">,</span> <span class="n">array</span><span class="p">(</span><span class="mf">1.9913776026951058</span><span class="p">))])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reusing-fitted-objects">
+<h3>Reusing fitted objects<a class="headerlink" href="#reusing-fitted-objects" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">new_dat</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+             <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+            <span class="p">}</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit2</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">stan</span><span class="p">(</span><span class="n">fit</span><span class="o">=</span><span class="n">fit</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">new_dat</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit2</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span><span class="o">.</span>
+<span class="mi">1</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">2000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">1000.</span>
+
+        <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">mu</span>       <span class="mf">9.9</span>  <span class="mf">6.3e-3</span>    <span class="mf">0.2</span>   <span class="mf">9.52</span>   <span class="mf">9.77</span>   <span class="mf">9.89</span>  <span class="mf">10.03</span>  <span class="mf">10.32</span>   <span class="mi">1000</span>    <span class="mf">1.0</span>
+<span class="n">sigma</span>   <span class="mf">1.99</span>  <span class="mf">4.5e-3</span>   <span class="mf">0.14</span>   <span class="mf">1.73</span>   <span class="mf">1.89</span>   <span class="mf">1.98</span>   <span class="mf">2.08</span>    <span class="mf">2.3</span>   <span class="mi">1000</span>    <span class="mf">1.0</span>
+<span class="n">lp__</span>  <span class="o">-</span><span class="mf">115.5</span>    <span class="mf">0.03</span>   <span class="mf">0.99</span> <span class="o">-</span><span class="mf">118.1</span> <span class="o">-</span><span class="mf">115.9</span> <span class="o">-</span><span class="mf">115.1</span> <span class="o">-</span><span class="mf">114.7</span> <span class="o">-</span><span class="mf">114.5</span>   <span class="mi">1000</span>    <span class="mf">1.0</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">29</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="saving-compiled-models">
+<h3>Saving compiled models<a class="headerlink" href="#saving-compiled-models" title="Permalink to this headline">¶</a></h3>
+<p>We can also compile Stan models and save them to file, so as to reload
+them for later use without needing to recompile.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save compiled models for reuse.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reload compiled models for reuse.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+    <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">StanModel</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">norm_code</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;norm_model.pic&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">new_model</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;norm_model.pic&#39;</span><span class="p">)</span>
+<span class="n">fit4</span> <span class="o">=</span> <span class="n">new_model</span><span class="o">.</span><span class="n">sampling</span><span class="p">(</span><span class="n">new_dat</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">fit4</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_3318343d5265d1b4ebc1e443f0228954</span><span class="o">.</span>
+<span class="mi">1</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">2000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">1000.</span>
+
+        <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">mu</span>      <span class="mf">9.92</span>  <span class="mf">6.7e-3</span>   <span class="mf">0.21</span>   <span class="mf">9.49</span>   <span class="mf">9.77</span>   <span class="mf">9.91</span>  <span class="mf">10.07</span>  <span class="mf">10.32</span>   <span class="mi">1000</span>   <span class="mf">1.01</span>
+<span class="n">sigma</span>   <span class="mf">1.99</span>  <span class="mf">4.3e-3</span>   <span class="mf">0.14</span>   <span class="mf">1.75</span>   <span class="mf">1.89</span>   <span class="mf">1.98</span>   <span class="mf">2.07</span>   <span class="mf">2.29</span>   <span class="mi">1000</span>    <span class="mf">1.0</span>
+<span class="n">lp__</span>  <span class="o">-</span><span class="mf">115.5</span>    <span class="mf">0.03</span>    <span class="mf">1.0</span> <span class="o">-</span><span class="mf">118.2</span> <span class="o">-</span><span class="mf">115.9</span> <span class="o">-</span><span class="mf">115.2</span> <span class="o">-</span><span class="mf">114.8</span> <span class="o">-</span><span class="mf">114.5</span>   <span class="mi">1000</span>    <span class="mf">1.0</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">42</span><span class="p">:</span><span class="mi">54</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="estimating-parameters-of-a-linear-regression-model">
+<h2>Estimating parameters of a linear regression model<a class="headerlink" href="#estimating-parameters-of-a-linear-regression-model" title="Permalink to this headline">¶</a></h2>
+<p>We will show how to estimate regression parameters using a simple linear
+model</p>
+<div class="math">
+\[y \sim ax + b\]</div>
+<p>We can restate the linear model</p>
+<div class="math">
+\[y = ax + b + \epsilon\]</div>
+<p>as sampling from a probability distribution</p>
+<div class="math">
+\[y \sim \mathcal{N}(ax + b, \sigma^2)\]</div>
+<p>We will assume the following priors</p>
+<div class="math">
+\[\begin{split}a \sim \mathcal{N}(0, 100) \\
+b \sim \mathcal{N}(0, 100) \\
+\sigma \sim \mathcal{U}(0, 20)\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">lin_reg_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">data {</span>
+<span class="s2">    int&lt;lower=0&gt; n;</span>
+<span class="s2">    real x[n];</span>
+<span class="s2">    real y[n];</span>
+<span class="s2">}</span>
+<span class="s2">transformed data </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">parameters {</span>
+<span class="s2">    real a;</span>
+<span class="s2">    real b;</span>
+<span class="s2">    real sigma;</span>
+<span class="s2">}</span>
+<span class="s2">transformed parameters {</span>
+<span class="s2">    real mu[n];</span>
+<span class="s2">    for (i in 1:n) {</span>
+<span class="s2">        mu[i] &lt;- a*x[i] + b;</span>
+<span class="s2">        }</span>
+<span class="s2">}</span>
+<span class="s2">model {</span>
+<span class="s2">    sigma ~ uniform(0, 20);</span>
+<span class="s2">    y ~ normal(mu, sigma);</span>
+<span class="s2">}</span>
+<span class="s2">generated quantities </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">_a</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">_b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">_a</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">_b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">lin_reg_dat</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+             <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+             <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="n">y</span>
+            <span class="p">}</span>
+
+<span class="n">fit</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">stan</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">lin_reg_code</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lin_reg_dat</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_4bdbb0aeaf5fafee91f7aa8b257093f2</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_4bdbb0aeaf5fafee91f7aa8b257093f2</span><span class="o">.</span>
+<span class="mi">1</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">500</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">500.</span>
+
+         <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">a</span>        <span class="mf">7.27</span>    <span class="mf">0.04</span>   <span class="mf">0.97</span>   <span class="mf">5.48</span>   <span class="mf">6.64</span>   <span class="mf">7.24</span>   <span class="mf">7.83</span>   <span class="mf">9.24</span>    <span class="mi">500</span>   <span class="mf">1.02</span>
+<span class="n">b</span>        <span class="mf">1.51</span>    <span class="mf">0.03</span>   <span class="mf">0.56</span>   <span class="mf">0.25</span>   <span class="mf">1.21</span>   <span class="mf">1.55</span>   <span class="mf">1.85</span>   <span class="mf">2.62</span>    <span class="mi">500</span>   <span class="mf">1.01</span>
+<span class="n">sigma</span>    <span class="mf">0.94</span>    <span class="mf">0.01</span>    <span class="mf">0.3</span>   <span class="mf">0.54</span>   <span class="mf">0.75</span>   <span class="mf">0.87</span>   <span class="mf">1.05</span>   <span class="mf">1.69</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="mf">1.51</span>    <span class="mf">0.03</span>   <span class="mf">0.56</span>   <span class="mf">0.25</span>   <span class="mf">1.21</span>   <span class="mf">1.55</span>   <span class="mf">1.85</span>   <span class="mf">2.62</span>    <span class="mi">500</span>   <span class="mf">1.01</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>    <span class="mf">2.24</span>    <span class="mf">0.02</span>   <span class="mf">0.48</span>   <span class="mf">1.15</span>   <span class="mf">1.99</span>   <span class="mf">2.26</span>   <span class="mf">2.51</span>   <span class="mf">3.25</span>    <span class="mi">500</span>   <span class="mf">1.01</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>    <span class="mf">2.97</span>    <span class="mf">0.02</span>   <span class="mf">0.41</span>   <span class="mf">2.06</span>   <span class="mf">2.75</span>   <span class="mf">2.98</span>    <span class="mf">3.2</span>    <span class="mf">3.8</span>    <span class="mi">500</span>   <span class="mf">1.01</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>     <span class="mf">3.7</span>    <span class="mf">0.02</span>   <span class="mf">0.35</span>   <span class="mf">2.96</span>    <span class="mf">3.5</span>   <span class="mf">3.71</span>   <span class="mf">3.89</span>   <span class="mf">4.38</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>    <span class="mf">4.42</span>    <span class="mf">0.01</span>   <span class="mf">0.31</span>   <span class="mf">3.79</span>   <span class="mf">4.24</span>   <span class="mf">4.43</span>   <span class="mf">4.58</span>   <span class="mf">5.01</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>    <span class="mf">5.15</span>    <span class="mf">0.01</span>    <span class="mf">0.3</span>   <span class="mf">4.57</span>   <span class="mf">4.97</span>   <span class="mf">5.17</span>   <span class="mf">5.31</span>   <span class="mf">5.72</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span>    <span class="mf">5.88</span>    <span class="mf">0.01</span>   <span class="mf">0.31</span>   <span class="mf">5.23</span>    <span class="mf">5.7</span>   <span class="mf">5.88</span>   <span class="mf">6.05</span>   <span class="mf">6.51</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span>     <span class="mf">6.6</span>    <span class="mf">0.02</span>   <span class="mf">0.36</span>   <span class="mf">5.84</span>   <span class="mf">6.41</span>   <span class="mf">6.62</span>   <span class="mf">6.81</span>   <span class="mf">7.32</span>    <span class="mi">500</span>   <span class="mf">1.01</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>    <span class="mf">7.33</span>    <span class="mf">0.02</span>   <span class="mf">0.42</span>   <span class="mf">6.41</span>   <span class="mf">7.09</span>   <span class="mf">7.34</span>   <span class="mf">7.58</span>    <span class="mf">8.1</span>    <span class="mi">500</span>   <span class="mf">1.02</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>    <span class="mf">8.06</span>    <span class="mf">0.02</span>    <span class="mf">0.5</span>   <span class="mf">6.98</span>   <span class="mf">7.77</span>   <span class="mf">8.08</span>   <span class="mf">8.37</span>   <span class="mf">8.98</span>    <span class="mi">500</span>   <span class="mf">1.02</span>
+<span class="n">mu</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>   <span class="mf">8.79</span>    <span class="mf">0.03</span>   <span class="mf">0.58</span>   <span class="mf">7.54</span>   <span class="mf">8.43</span>   <span class="mf">8.81</span>   <span class="mf">9.16</span>   <span class="mf">9.85</span>    <span class="mi">500</span>   <span class="mf">1.02</span>
+<span class="n">lp__</span>    <span class="o">-</span><span class="mf">3.59</span>    <span class="mf">0.08</span>   <span class="mf">1.87</span>  <span class="o">-</span><span class="mf">8.62</span>  <span class="o">-</span><span class="mf">4.54</span>  <span class="o">-</span><span class="mf">3.04</span>   <span class="o">-</span><span class="mf">2.2</span>  <span class="o">-</span><span class="mf">1.48</span>    <span class="mi">500</span>    <span class="mf">1.0</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">43</span><span class="p">:</span><span class="mi">19</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/19B_Pystan_36_0.png" src="_images/19B_Pystan_36_0.png" />
+</div>
+<div class="section" id="simple-logistic-model">
+<h2>Simple Logistic model<a class="headerlink" href="#simple-logistic-model" title="Permalink to this headline">¶</a></h2>
+<p>We have observations of height and weight and want to use a logistic
+model to guess the sex.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># observed data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;HtWt.csv&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>male</th>
+      <th>height</th>
+      <th>weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>63.2</td>
+      <td>168.7</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>68.7</td>
+      <td>169.8</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>64.8</td>
+      <td>176.6</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>67.9</td>
+      <td>246.8</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>68.9</td>
+      <td>151.6</td>
+    </tr>
+  </tbody>
+</table>
+</div><div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">log_reg_code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">data {</span>
+<span class="s2">    int&lt;lower=0&gt; n;</span>
+<span class="s2">    int male[n];</span>
+<span class="s2">    real weight[n];</span>
+<span class="s2">    real height[n];</span>
+<span class="s2">}</span>
+<span class="s2">transformed data </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">parameters {</span>
+<span class="s2">    real a;</span>
+<span class="s2">    real b;</span>
+<span class="s2">    real c;</span>
+<span class="s2">}</span>
+<span class="s2">transformed parameters </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">model {</span>
+<span class="s2">    a ~ normal(0, 10);</span>
+<span class="s2">    b ~ normal(0, 10);</span>
+<span class="s2">    c ~ normal(0, 10);</span>
+<span class="s2">    for(i in 1:n) {</span>
+<span class="s2">        male[i] ~ bernoulli(inv_logit(a*weight[i] + b*height[i] + c));</span>
+<span class="s2">  }</span>
+<span class="s2">}</span>
+<span class="s2">generated quantities </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">log_reg_dat</span> <span class="o">=</span> <span class="p">{</span>
+             <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span>
+             <span class="s1">&#39;male&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">male</span><span class="p">,</span>
+             <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+             <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">weight</span>
+            <span class="p">}</span>
+
+<span class="n">fit</span> <span class="o">=</span> <span class="n">pystan</span><span class="o">.</span><span class="n">stan</span><span class="p">(</span><span class="n">model_code</span><span class="o">=</span><span class="n">log_reg_code</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">log_reg_dat</span><span class="p">,</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">chains</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">INFO</span><span class="p">:</span><span class="n">pystan</span><span class="p">:</span><span class="n">COMPILING</span> <span class="n">THE</span> <span class="n">C</span><span class="o">++</span> <span class="n">CODE</span> <span class="n">FOR</span> <span class="n">MODEL</span> <span class="n">anon_model_bbf283522d1e199c049bb423b4a6e0da</span> <span class="n">NOW</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">fit</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Inference</span> <span class="k">for</span> <span class="n">Stan</span> <span class="n">model</span><span class="p">:</span> <span class="n">anon_model_bbf283522d1e199c049bb423b4a6e0da</span><span class="o">.</span>
+<span class="mi">4</span> <span class="n">chains</span><span class="p">,</span> <span class="n">each</span> <span class="k">with</span> <span class="nb">iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">;</span> <span class="n">warmup</span><span class="o">=</span><span class="mi">500</span><span class="p">;</span> <span class="n">thin</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span> <span class="n">per</span> <span class="n">chain</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">total</span> <span class="n">post</span><span class="o">-</span><span class="n">warmup</span> <span class="n">draws</span><span class="o">=</span><span class="mf">2000.</span>
+
+       <span class="n">mean</span> <span class="n">se_mean</span>     <span class="n">sd</span>   <span class="mf">2.5</span><span class="o">%</span>    <span class="mi">25</span><span class="o">%</span>    <span class="mi">50</span><span class="o">%</span>    <span class="mi">75</span><span class="o">%</span>  <span class="mf">97.5</span><span class="o">%</span>  <span class="n">n_eff</span>   <span class="n">Rhat</span>
+<span class="n">a</span>    <span class="mf">9.0e-3</span>  <span class="mf">2.2e-4</span> <span class="mf">9.8e-3</span>  <span class="o">-</span><span class="mf">0.01</span> <span class="mf">2.1e-3</span> <span class="mf">9.3e-3</span>   <span class="mf">0.02</span>   <span class="mf">0.03</span>   <span class="mi">2000</span>    <span class="mf">1.0</span>
+<span class="n">b</span>      <span class="mf">0.38</span>  <span class="mf">2.0e-3</span>   <span class="mf">0.09</span>    <span class="mf">0.2</span>   <span class="mf">0.32</span>   <span class="mf">0.37</span>   <span class="mf">0.44</span>   <span class="mf">0.56</span>   <span class="mi">2000</span>   <span class="mf">1.01</span>
+<span class="n">c</span>    <span class="o">-</span><span class="mf">26.56</span>    <span class="mf">0.13</span>   <span class="mf">5.95</span> <span class="o">-</span><span class="mf">38.72</span> <span class="o">-</span><span class="mf">30.44</span> <span class="o">-</span><span class="mf">26.31</span> <span class="o">-</span><span class="mf">22.51</span> <span class="o">-</span><span class="mf">14.95</span>   <span class="mi">2000</span>   <span class="mf">1.01</span>
+<span class="n">lp__</span> <span class="o">-</span><span class="mf">35.38</span>    <span class="mf">0.03</span>   <span class="mf">1.25</span> <span class="o">-</span><span class="mf">38.66</span> <span class="o">-</span><span class="mf">36.02</span> <span class="o">-</span><span class="mf">35.06</span> <span class="o">-</span><span class="mf">34.44</span>  <span class="o">-</span><span class="mf">33.9</span>   <span class="mi">2000</span>   <span class="mf">1.01</span>
+
+<span class="n">Samples</span> <span class="n">were</span> <span class="n">drawn</span> <span class="n">using</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">diag_e</span><span class="p">)</span> <span class="n">at</span> <span class="n">Mon</span> <span class="n">Apr</span>  <span class="mi">3</span> <span class="mi">23</span><span class="p">:</span><span class="mi">43</span><span class="p">:</span><span class="mi">57</span> <span class="mf">2017.</span>
+<span class="n">For</span> <span class="n">each</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">n_eff</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">crude</span> <span class="n">measure</span> <span class="n">of</span> <span class="n">effective</span> <span class="n">sample</span> <span class="n">size</span><span class="p">,</span>
+<span class="ow">and</span> <span class="n">Rhat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">potential</span> <span class="n">scale</span> <span class="n">reduction</span> <span class="n">factor</span> <span class="n">on</span> <span class="n">split</span> <span class="n">chains</span> <span class="p">(</span><span class="n">at</span>
+<span class="n">convergence</span><span class="p">,</span> <span class="n">Rhat</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">df_trace</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fit</span><span class="o">.</span><span class="n">extract</span><span class="p">([</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]))</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">df_trace</span><span class="p">[:],</span> <span class="n">diagonal</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/19B_Pystan_41_0.png" src="_images/19B_Pystan_41_0.png" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyStan</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#useful-links">Useful links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coin-toss">Coin toss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fit-model">Fit model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#map">MAP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimating-mean-and-standard-deviation-of-normal-distribution">Estimating mean and standard deviation of normal distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimating-parameters-of-a-linear-regression-model">Estimating parameters of a linear regression model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simple-logistic-model">Simple Logistic model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="19A_PyMC3.html"
+                          title="Previous page">&larr; Using PyMC3</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="20A_MCMC.html"
+                          title="Next page">&rarr; Metropolis and Gibbs Sampling</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/19B_Pystan.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="20A_MCMC.html" title="Metropolis and Gibbs Sampling"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="19A_PyMC3.html" title="Using PyMC3"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/19B_Pystan.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:15:37 GMT -->
+</html>

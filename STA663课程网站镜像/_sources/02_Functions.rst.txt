@@ -1,0 +1,762 @@
+
+Functions
+=========
+
+.. code:: python
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    %matplotlib inline
+
+What's wrong with this code?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    max_iter = 100
+    h, w = 400, 400
+    
+    img = np.zeros((h, w)).astype('int')
+    for i, real in enumerate(np.linspace(-1.5, 0.5, w)):
+        for j, imag in enumerate(np.linspace(-1, 1, h)):
+            c = complex(real, imag)
+            z = 0 + 0j
+            for k in range(max_iter):
+                z = z*z + c
+                if abs(z) > 2:
+                    break
+            img[j, i] = k
+    
+    plt.grid(False)
+    plt.imshow(img, cmap=plt.cm.jet)
+    pass
+
+
+
+.. image:: 02_Functions_files/02_Functions_3_0.png
+
+
+-  hard to understand
+-  uses global variables
+-  not re-usable except by copy and paste
+
+Refactoring to use functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def mandel(c, z=0, max_iter=100):
+        for k in range(max_iter):
+            z = z*z + c
+            if abs(z) > 2:
+                return k
+        return k
+
+.. code:: python
+
+    def mandelbrot(w, h, xl=-1.5, xu=0.5, yl=-1, yu=1):
+        img = np.zeros((h, w)).astype('int')
+        for i, real in enumerate(np.linspace(xl, xu, w)):
+            for j, imag in enumerate(np.linspace(yl, yu, h)):
+                c = complex(real, imag)
+                img[j, i] = mandel(c)
+        return img
+
+.. code:: python
+
+    img = mandelbrot(w=400, h=400)
+    plt.grid(False)
+    plt.imshow(img, cmap=plt.cm.jet)
+    pass
+
+
+
+.. image:: 02_Functions_files/02_Functions_8_0.png
+
+
+Function is re-usable
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    img = mandelbrot(w=400, h=400, xl=-0.75, xu=-0.73, yl=0.1, yu=0.12)
+    plt.grid(False)
+    plt.imshow(img, cmap=plt.cm.jet)
+    pass
+
+
+
+.. image:: 02_Functions_files/02_Functions_10_0.png
+
+
+Anonymous functions (lambdas)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    def square(x):
+        return x*x
+
+.. code:: python
+
+    square(3)
+
+
+
+
+.. parsed-literal::
+
+    9
+
+
+
+.. code:: python
+
+    square2 = lambda x: x*x
+
+.. code:: python
+
+    square2(3)
+
+
+
+
+.. parsed-literal::
+
+    9
+
+
+
+First class functions
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    # functions can be treated the same way as (say) an integer
+
+Functions can be passed in as arguments
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def grad(x, f, h=0.01):
+        return (f(x+h) - f(x-h))/(2*h)
+
+.. code:: python
+
+    def f(x):
+        return 3*x**2 + 5*x + 3
+
+.. code:: python
+
+    grad(0, f)
+
+
+
+
+.. parsed-literal::
+
+    5.000000000000004
+
+
+
+Functions can also be returned by functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import time
+    
+    def timer(f):
+        def g(*args, **kwargs):
+            start = time.time()
+            result = f(*args, **kwargs)   
+            elapsed = time.time() - start
+            return result, elapsed
+        return g
+
+.. code:: python
+
+    def f(n=1000000):
+        s = sum([x*x for x in range(n)])
+        return s
+    
+    timed_func = timer(f)
+
+.. code:: python
+
+    timed_func()
+
+
+
+
+.. parsed-literal::
+
+    (333332833333500000, 0.18930506706237793)
+
+
+
+Decorators
+^^^^^^^^^^
+
+.. code:: python
+
+    @timer
+    def g(n=1000000):
+        s = sum([x*x for x in range(n)])
+        return s
+
+.. code:: python
+
+    g()
+
+
+
+
+.. parsed-literal::
+
+    (333332833333500000, 0.192213773727417)
+
+
+
+Map, filter, reduce
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    map(lambda x: x*x, [1,2,3,4])
+
+
+
+
+.. parsed-literal::
+
+    <map at 0x10996d5c0>
+
+
+
+.. code:: python
+
+    list(map(lambda x: x*x, [1,2,3,4]))
+
+
+
+
+.. parsed-literal::
+
+    [1, 4, 9, 16]
+
+
+
+.. code:: python
+
+    list(filter(lambda x: x%2==0, [1,2,3,4]))
+
+
+
+
+.. parsed-literal::
+
+    [2, 4]
+
+
+
+.. code:: python
+
+    from functools import reduce
+
+.. code:: python
+
+    reduce(lambda x, y: x*y, [1,2,3,4], 10)
+
+
+
+
+.. parsed-literal::
+
+    240
+
+
+
+List comprehension
+~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    [x*x for x in [1,2,3,4]]
+
+
+
+
+.. parsed-literal::
+
+    [1, 4, 9, 16]
+
+
+
+.. code:: python
+
+    [x for x in [1,2,3,4] if x%2 == 0]
+
+
+
+
+.. parsed-literal::
+
+    [2, 4]
+
+
+
+Set and dictionary comprehension
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    {i%3 for i in range(10)}
+
+
+
+
+.. parsed-literal::
+
+    {0, 1, 2}
+
+
+
+.. code:: python
+
+    {i: i%3 for i in range(10)}
+
+
+
+
+.. parsed-literal::
+
+    {0: 0, 1: 1, 2: 2, 3: 0, 4: 1, 5: 2, 6: 0, 7: 1, 8: 2, 9: 0}
+
+
+
+Generator expressions
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    (i**2 for i in range(10,15))
+
+
+
+
+.. parsed-literal::
+
+    <generator object <genexpr> at 0x109e5ca40>
+
+
+
+.. code:: python
+
+    for x in (i**2 for i in range(10,15)):
+        print(x)
+
+
+.. parsed-literal::
+
+    100
+    121
+    144
+    169
+    196
+
+
+Generator expressions
+---------------------
+
+Generator expressions return a potentially infinite stream, but one at a
+time thus sparing memory. They are ubiquitous in Python 3, allowing us
+to handle arbitrarily large data sets.
+
+.. code:: python
+
+    # Note that count can generate an infinite stream
+    def count(i=0):
+        while True:
+            yield i
+            i += 1    
+
+.. code:: python
+
+    c = count()
+    next(c)
+
+
+
+
+.. parsed-literal::
+
+    0
+
+
+
+.. code:: python
+
+    next(c)
+
+
+
+
+.. parsed-literal::
+
+    1
+
+
+
+.. code:: python
+
+    next(c)
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+.. code:: python
+
+    list(zip('abcde', count(10)))
+
+
+
+
+.. parsed-literal::
+
+    [('a', 10), ('b', 11), ('c', 12), ('d', 13), ('e', 14)]
+
+
+
+.. code:: python
+
+    for i in count():
+        print(i)
+        if i >= 10:
+            break
+
+
+.. parsed-literal::
+
+    0
+    1
+    2
+    3
+    4
+    5
+    6
+    7
+    8
+    9
+    10
+
+
+.. code:: python
+
+    def palindrome_numbers(n):
+        yield from range(1, n+1)
+        yield from range(n, 0, -1)
+
+.. code:: python
+
+    list(palindrome_numbers(5))
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 5, 5, 4, 3, 2, 1]
+
+
+
+Itertools
+~~~~~~~~~
+
+.. code:: python
+
+    import itertools as it
+
+.. code:: python
+
+    for i in it.islice(count(), 5, 10):
+        print(i)
+
+
+.. parsed-literal::
+
+    5
+    6
+    7
+    8
+    9
+
+
+.. code:: python
+
+    for i in it.takewhile(lambda i: i< 5, count()):
+        print(i)
+
+
+.. parsed-literal::
+
+    0
+    1
+    2
+    3
+    4
+
+
+.. code:: python
+
+    import operator as op
+    
+    [i for i in it.starmap(op.add, [(1,2), (2,3), (3,4)])]
+
+
+
+
+.. parsed-literal::
+
+    [3, 5, 7]
+
+
+
+.. code:: python
+
+    fruits = ['appple', 'banana', 'cherry', 'durain', 'eggplant',  'fig']
+    
+    for k, group in it.groupby(sorted(fruits, key=len), len):
+        print(k, list(group))
+
+
+.. parsed-literal::
+
+    3 ['fig']
+    6 ['appple', 'banana', 'cherry', 'durain']
+    8 ['eggplant']
+
+
+Functools
+^^^^^^^^^
+
+.. code:: python
+
+    import functools as fn
+
+.. code:: python
+
+    rng1 = fn.partial(np.random.normal, 2, .3)
+    rng2 = fn.partial(np.random.normal, 10, 1)
+
+.. code:: python
+
+    rng1(10)
+
+
+
+
+.. parsed-literal::
+
+    array([ 2.13849718,  1.5807533 ,  1.92939089,  2.32091577,  1.75429334,
+            2.39892103,  2.13631947,  1.90810476,  1.54398362,  2.22273936])
+
+
+
+.. code:: python
+
+    rng2(10)
+
+
+
+
+.. parsed-literal::
+
+    array([  9.46427924,  10.75766948,   9.79962611,  10.46099347,
+            10.44005324,   9.69270764,   8.788236  ,  10.32903729,
+             8.98723117,   9.97326292])
+
+
+
+.. code:: python
+
+    fn.reduce(op.add, rng2(10))
+
+
+
+
+.. parsed-literal::
+
+    95.284222396568097
+
+
+
+Modules
+~~~~~~~
+
+.. code:: python
+
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+.. code:: python
+
+    from pandas import DataFrame, Series
+    import scipy.stats as ss
+
+.. code:: python
+
+    DataFrame(ss.beta(2,5).rvs((3,4)), columns=['a', 'b', 'c', 'd'])
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>a</th>
+          <th>b</th>
+          <th>c</th>
+          <th>d</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>0.128479</td>
+          <td>0.285557</td>
+          <td>0.380817</td>
+          <td>0.223367</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>0.391506</td>
+          <td>0.282001</td>
+          <td>0.231474</td>
+          <td>0.196180</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>0.567670</td>
+          <td>0.122379</td>
+          <td>0.278288</td>
+          <td>0.151692</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Where does Python search for modules?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    import sys
+    sys.path
+
+
+
+
+.. parsed-literal::
+
+    ['',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/StreamLib-1.0.1-py3.5.egg',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/julia-0.1.1-py3.5.egg',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/pybind11-1.9.dev0-py3.5.egg',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/scikits.odes-2.3.0.dev0-py3.5-macosx-10.6-x86_64.egg',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/ReFlowRESTClient-0.4-py3.5.egg',
+     '/Users/cliburn/spark/python',
+     '/Users/cliburn/git-teach/sta-663-2017-public/notebook',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python35.zip',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/plat-darwin',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/lib-dynload',
+     '/Users/cliburn/.local/lib/python3.5/site-packages',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/Sphinx-1.4.1-py3.5.egg',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/aeosa',
+     '/Users/cliburn/anaconda2/envs/p3/lib/python3.5/site-packages/IPython/extensions',
+     '/Users/cliburn/.ipython']
+
+
+
+Creating your own module
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %%file my_module.py
+    
+    PI = 3.14
+    
+    def my_f(x):
+        return PI*x
+
+
+.. parsed-literal::
+
+    Overwriting my_module.py
+
+
+.. code:: python
+
+    import my_module as mm
+    
+    mm.PI
+
+
+
+
+.. parsed-literal::
+
+    3.14
+
+
+
+.. code:: python
+
+    mm.my_f(2)
+
+
+
+
+.. parsed-literal::
+
+    6.28
+
+
+
+.. code:: python
+
+    from my_module import PI
+
+.. code:: python
+
+    PI * 2 * 2
+
+
+
+
+.. parsed-literal::
+
+    12.56
+
+
+
+**Note**: Modules can also be nested within each other - e.g.
+``numpy.random`` to creaate a *package*. We will explore how to create
+packages in a later session.

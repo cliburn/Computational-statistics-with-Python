@@ -1,0 +1,668 @@
+
+Using Auxiliary Variables in MCMC proposals
+===========================================
+
+Slice sampling
+--------------
+
+Slice sampling is a simple MCMC algorithm that introduces the idea of
+auxiliary variables. The motivation for slice sampling is that if we can
+sample uniformly from the region under the graph of the target
+distribution, we will have random samples from the target distribution.
+In the univariate case, the algorithm is as follows
+
+-  start with some :math:`x` where :math:`p(x) \ne 0`
+-  repeat
+
+   -  sample :math:`y` (auxiliary variable) uniformly from 0 to
+      :math:`f(x)`
+   -  draw a horizontal line at :math:`y` within :math:`p(x)` (this may
+      consist of multiple intervals)
+   -  sample :math:`x` from the horizontal segments
+
+The auxiliary :math:`y` variable allows us to sample :math:`(x, y)`
+points that are in the region under the graph of the target
+distribution. Only the :math:`x` variable is used for the Monte Carlo
+samples - the :math:`y` variables are simply discarded. This works
+because the joint disribution is constructed so that it factors
+:math:`p(x, y) = p(y \mid x) p(x)` and so projecting leaves just
+:math:`p(x)`. The slice sampler is a Markov Chain Monte Carlo method
+since the next :math:`(x, y)` position depends only on the current
+position. Like Gibbs sampling, there is no tuning process and all
+proposals are accepted. For slice sampling, you either need the inverse
+distribution function or some way to estimate it. Later we will see that
+Hamiltonian Monte Carlo also uses auxiliary variables to generate a new
+proposal in an analogous way.
+
+A toy example illustrates the process - Suppose we want to draw random
+samples from the posterior distribution :math:`\mathcal{N}(0, 1)` using
+slice sampling
+
+Start with some value :math:`x` - sample :math:`y` from
+:math:`\mathcal{U}(0, f(x))` - this is the horizontal "slice" that gives
+the method its name - sample the next :math:`x` from :math:`f^{-1}(y)` -
+this is typically done numerically - repeat
+
+Will sketch picture in class to show what is going on.
+
+A simple slice sampler example
+------------------------------
+
+.. code:: python
+
+    import scipy.stats as stats
+
+.. code:: python
+
+    dist = stats.norm(5, 3)
+    w = 0.5
+    x = dist.rvs()
+    
+    niters = 1000
+    xs = []
+    while len(xs) < niters:
+        y = np.random.uniform(0, dist.pdf(x))
+        lb = x
+        rb = x
+        while y < dist.pdf(lb):
+            lb -= w
+        while y < dist.pdf(rb):
+            rb += w
+        x = np.random.uniform(lb, rb)
+        if y > dist.pdf(x):
+            if np.abs(x-lb) < np.abs(x-rb):
+                lb = x
+            else:
+                lb = y
+        else:
+            xs.append(x)
+
+.. code:: python
+
+    plt.hist(xs, 20)
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_5_0.png
+
+
+Notes on the slice sampler:
+
+-  the slice may consist of disjoint pieces for multimodal distributions
+-  the slice can be a rectangular hyperslab for multivariable posterior
+   distributions
+-  sampling from the slice (i.e. finding the boundaries at level
+   :math:`y`) is non-trivial and may involve iterative rejection steps -
+   see figure below (from Wikimedia) for a typical approach - the blue
+   bars represent disjoint pieces of the true slice through a bimodal
+   distribution and the black lines are the proposal distribution
+   approximating the true slice
+
+.. figure:: http://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Summary_of_slice_sampling.png/750px-Summary_of_slice_sampling.png
+   :alt: Slice sampling algorithm from Wikipedia
+
+   Slice sampling algorithm from Wikipedia
+
+Hamiltonian Monte Carlo (HMC)
+-----------------------------
+
+HMC uses an auxiliary variable corresponding to the momentum of
+particles in a potential energy well to generate proposal distributions
+that can make use of gradient information in the posterior distribution.
+For reversibility to be maintained, the total energy of the particle has
+to be conserved - hence we are interested in Hamiltonian systems. The
+main attraction of HMC is that it works much better than other methods
+when variables of interest are highly correlated. Because we have to
+solve problems involving momentum, we need to understand how to
+numerically solve differential equations in a way that is both accurate
+(i.e. second order) and preserves total energy (necessary for a
+Hamiltonian system).
+
+Example adapted from `MCMC: Hamiltonian Monte Carlo (a.k.a. Hybrid Monte
+Carlo) <https://theclevermachine.wordpress.com/2012/11/18/mcmc-hamiltonian-monte-carlo-a-k-a-hybrid-monte-carlo/>`__
+
+Hamiltonian systems
+-------------------
+
+In a Hamiltonian system, we consider particles with position :math:`x`
+and momentum (or velocity if we assume unit mass) :math:`v`. The total
+energy of the system :math:`H(x, v) = K(v) + U(x)`, where :math:`K` is
+the kinetic energy and :math:`U` is the potential energy, is conserved.
+Such a system satisfies the following Hamiltonian equations
+
+.. math::
+
+
+   \begin{align}
+   \frac{dx}{dt} &= & \frac{\delta H}{dv} \\
+   \frac{dv}{dt} &= & -\frac{\delta H}{dx} 
+   \end{align}
+
+Since :math:`K` depends only on :math:`v` and :math:`U` depends only on
+:math:`x`, we have
+
+.. math::
+
+
+   \begin{align}
+   \frac{dx}{dt} &= & \frac{\delta K}{dv} \\
+   \frac{dv}{dt} &= & -\frac{\delta U}{dx}
+   \end{align}
+
+Harmonic oscillator
+~~~~~~~~~~~~~~~~~~~
+
+We will consider solving a classical Hamiltonian system - that of a
+undamped spring governed by the second order differential equation
+
+.. math::
+
+
+   x'' + x = 0
+
+We convert this to two first order ODEs by using a dummy variable
+:math:`x' = v` to get
+
+.. math::
+
+
+   \begin{align}
+   x' &= v \\
+   v' &= -x
+   \end{align}
+
+From the Hamiltonian equations above, this is equivalent to a system
+with kinetic energy :math:`K(v) = \frac{1}{2}v^2` and potential energy
+:math:`U(x) = \frac{1}{2}x^2`.
+
+Writing in matrix form,
+
+.. math::
+
+
+   A = \pmatrix{ x' \\ v' } = \pmatrix{0 & 1 \\ -1 & 0} \pmatrix{x \\ v}
+
+and in general, for the state vector :math:`x`,
+
+.. math::
+
+
+   x' = Ax
+
+We note that :math:`A` is anti- or skew-symmetric (:math:`A^T = -A`),
+and hence has purely imaginary eigenvalues. Solving
+:math:`|A - \lambda I = 0`, we see that the eigenvalues and eigenvectors
+are :math:`i, \pmatrix{1\\i}` and :math:`-i, \pmatrix{1\\-i}`. Since the
+eigenvalues are pure imaginary, we see that the solution for the initial
+conditions :math:`(x,v) = (1, 0)` is :math:`x(t) = e^{it}` and the orbit
+just goes around a circle with a period of :math:`2\pi`, neither growing
+nor decaying. Another weay of seeing this is that the Hamiltonian
+:math:`H(u, v)` or sum of potential (:math:`U(x)) = \frac{1}{2}x^2`) and
+kinetic energy (:math:`K(v) = \frac{1}{2}v^2`) is constant, i.e. in
+vector form, :math:`(x^T x) = \text{constant}`.
+
+Finite difference methods
+-------------------------
+
+We want to find a finite difference approximation to :math:`u' = Au`
+that is **accurate** and **preserves total energy**. If total energy is
+not preserved, the orbit will either spiral in towards zero or outwards
+away from the unit circle. If the accuracy is poor, the orbit will not
+be close to its starting value after :math:`t = 2\pi`. This gives us an
+easy way to visualize how good our numerical scheme is. We can also
+compare the numerical scheme to the Taylor series to evaluate its
+accuracy.
+
+Forward Euler
+~~~~~~~~~~~~~
+
+The simplest finite difference scheme for integrating ODEs is the
+forward Euler
+
+.. math::
+
+
+   \frac{u_{n+1} - u_n}{\Delta t} = A u_n
+
+Rearranging terms, we get
+
+.. math::
+
+
+   u_{n+1} = u_n + \Delta t A u_n = \left( I + \Delta t A \right) u_n
+
+Since the eigenvalues of :math:`A` are :math:`\pm i`, we see that the
+eigenvalues of the forward Euler matrix are :math:`1 \pm i`. Since the
+absolute value of the eigenvalues is greater than 1, we expect
+**growing** solutions - i.e. the solution will spiral away from the unit
+circle.
+
+.. code:: python
+
+    import scipy.linalg as la
+
+.. code:: python
+
+    def f_euler(A, u, N):
+        orbit = np.zeros((N,2))
+    
+        dt = 2*np.pi/N
+        for i in range(N):
+            u = u + dt * A @ u
+            orbit[i] = u
+        return orbit
+
+.. code:: python
+
+    A = np.array([[0,1],[-1,0]])
+    u = np.array([1.0,0.0])
+    N = 64
+    orbit = f_euler(A, u, N)
+
+Accuracy
+^^^^^^^^
+
+.. code:: python
+
+    la.norm(np.array([1.0,0.0]) - orbit[-1])
+
+
+
+
+.. parsed-literal::
+
+    0.3600318484671193
+
+
+
+Conservation of energy
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    plt.plot([p @ p for p in orbit])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_17_0.png
+
+
+.. code:: python
+
+    ax = plt.subplot(111)
+    plt.plot(orbit[:, 0], orbit[:,1], 'o')
+    ax.axis('square')
+    plt.axis([-1.5, 1.5, -1.5, 1.5])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_18_0.png
+
+
+Accuracy and conservation of energy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We can see that forward Euler is not very accurate and also does not
+preserve energy since the orbit spirals away from the unit circle.
+
+The trapezoidal method
+~~~~~~~~~~~~~~~~~~~~~~
+
+The trapezoidal method uses the following scheme
+
+.. math::
+
+
+   \frac{u_{n+1} - u_n}{\Delta t} = \frac{1}{2}  ( A u_{n+1} + A u_{n})
+
+This is an implicit scheme (because :math:`u_{n+1}` appears on the RHS)
+whose solution is
+
+.. math::
+
+
+   u_{n+1} = \left(I - \frac{\Delta t}{2} A \right)^{-1} \left(I + \frac{\Delta t}{2} A \right) u_{n} = B u_n
+
+By inspection, we see that the eigenvalues are the complex conjugates of
+
+.. math::
+
+
+   \frac{1 + \frac{\Delta t}{2} i}{1 - \frac{\Delta t}{2} i}
+
+whose absolute value is 1 - hence, energy is conserved. If we expand the
+matrix :math:`B` using the geometric series and compare with the Taylor
+expansion, we see that the trapezoidal method has local truncation error
+:math:`O(h^3)` and hence accuracy :math:`O(h^2)`, where :math:`h` is the
+time step.
+
+.. code:: python
+
+    def trapezoidal(A, u, N):
+        p = len(u)
+        orbit = np.zeros((N,p))
+    
+        dt = 2*np.pi/N
+        for i in range(N):
+            u = la.inv(np.eye(p) - dt/2 * A) @ (np.eye(p) + dt/2 * A) @ u
+            orbit[i] = u
+        return orbit
+
+.. code:: python
+
+    A = np.array([[0,1],[-1,0]])
+    u = np.array([1.0,0.0])
+    N = 64
+    orbit = trapezoidal(A, u, N)
+
+Accuracy
+^^^^^^^^
+
+.. code:: python
+
+    la.norm(np.array([1.0,0.0]) - orbit[-1])
+
+
+
+
+.. parsed-literal::
+
+    0.005039305635733781
+
+
+
+Conservation of energy
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    plt.plot([p @ p for p in orbit])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_26_0.png
+
+
+.. code:: python
+
+    ax = plt.subplot(111)
+    plt.plot(orbit[:, 0], orbit[:,1], 'o')
+    ax.axis('square')
+    plt.axis([-1.5, 1.5, -1.5, 1.5])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_27_0.png
+
+
+The leapfrog method
+~~~~~~~~~~~~~~~~~~~
+
+The leapfrog method uses a second order difference to update
+:math:`u_n`. The algorithm simplifies to the following explicit scheme:
+
+-  First take one half-step for v
+-  Then take a full step for u
+-  Then take one final half step for v
+
+It performs as well as the trapezoidal method, with the advantage of
+being an explicit scheme and cheaper to calculate, so the leapfrog
+method is used in HMC.
+
+.. code:: python
+
+    def leapfrog(A, u, N):
+        orbit = np.zeros((N,2))
+    
+        dt = 2*np.pi/N
+        for i in range(N):
+            u[1] = u[1] + dt/2 * A[1] @ u
+            u[0] = u[0] + dt * A[0] @ u
+            u[1] = u[1] + dt/2 * A[1] @ u
+            orbit[i] = u
+        return orbit
+
+If we don't care about the intermediate steps, it is more efficient to just take 1/2 steps at the beginning and end
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def leapfrog2(A, u, N):
+        dt = 2*np.pi/N
+    
+        u[1] = u[1] + dt/2 * A[1] @ u
+        for i in range(N-1):
+            u[0] = u[0] + dt * A[0] @ u
+            u[1] = u[1] + dt * A[1] @ u
+    
+        u[0] = u[0] + dt * A[0] @ u
+        u[1] = u[1] + dt/2 * A[1] @ u   
+        return u
+
+.. code:: python
+
+    A = np.array([[0,1],[-1,0]])
+    u = np.array([1.0,0.0])
+    N = 64
+
+.. code:: python
+
+    orbit = leapfrog(A, u, N)
+
+Accuracy
+^^^^^^^^
+
+.. code:: python
+
+    la.norm(np.array([1.0,0.0]) - orbit[-1])
+
+
+
+
+.. parsed-literal::
+
+    0.0025229913808033464
+
+
+
+Conservation of energy
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    plt.plot([p @ p for p in orbit])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_37_0.png
+
+
+.. code:: python
+
+    ax = plt.subplot(111)
+    plt.plot(orbit[:, 0], orbit[:,1], 'o')
+    ax.axis('square')
+    plt.axis([-1.5, 1.5, -1.5, 1.5])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_38_0.png
+
+
+From Hamiltonians to probability distributions
+----------------------------------------------
+
+The physical analogy considers the negative log likelihood of the target
+distribution :math:`p(x)` to correspond to a potential energy well, with
+a collection of particles moving on the surface of the well. The state
+of each particle is given only by its position and momentum (or velocity
+if we assume unit mass for each particle). In a Hamiltonian system, the
+total energy :math:`H(x,, v) = U(x) + K(v)` is conserved. From
+statistical mechanics, the probability of each state is related to the
+total energy of the system
+
+.. math::
+
+
+   \begin{align}
+   p(x, v) & \propto e^{-H(x, v)} \\
+   &= e^{-U(x) - K(v)} \\
+   &= e^{-P(x)}e^{-K(v)} \\
+   & \propto p(x) \, p(v)
+   \end{align}
+
+Since the joint distribution factorizes :math:`p(x, v) = p(x)\, p(v)`,
+we can select an initial random :math:`v` for a particle, numerically
+integrate using a finite difference method such as the leapfrog and then
+use the updated :math:`x^*` as the new proposal. The acceptance ratio
+for the new :math:`x^*` is
+
+.. math::
+
+
+   \frac{ e^{ -U(x^*)-K(v^*) }} { e^{-U(x)-K(v)} } = e^{U(x)-U(x^*)+K(x)-K(x^*)}
+
+If our finite difference scheme was exact, the acceptance ration would
+be 1 since energy is conserved with Hamiltonian dynamics. However, as we
+have seen, the leapfrog method does not conserve energy perfectly and an
+accept/reject step is still needed.
+
+Example of HMC
+~~~~~~~~~~~~~~
+
+We will explore how HMC works when the target distribution is bivariate
+normal centered at zero
+
+.. math::
+
+
+   x \sim N(0, \Sigma)
+
+In practice of course, the target distribution will be the posterior
+distribution and depend on both data and distributional parameters.
+
+The potential energy or negative log likelihood is proportional to
+
+.. math::
+
+
+   U(x) = \frac{x^T\Sigma^{-1} x}{2}
+
+The kinetic energy is given by
+
+.. math::
+
+
+   K(v) = \frac{v^T v}{2}
+
+where the initial :math:`v_0` is chosen at random from the unit normal
+at each step.
+
+To find the time updates, we use the Hamiltonian equations and find the
+first derivatives of total energy with respect to :math:`x` and
+:math:`v`
+
+.. math::
+
+
+   \begin{align}
+   x' &= \frac{\delta K}{\delta v} &= v \\
+   v' &= -\frac{\delta U}{\delta x} &= -\Sigma^{-1} x \\
+   \end{align}
+
+giving us the block matrix
+
+.. math::
+
+
+   A = \pmatrix{0 & 1 \\ -\Sigma^{-1} & 0}
+
+By using the first derivatives, we are making use of the gradient
+information on the log posterior to guide the proposal distribution.
+
+This is what the target distribution should look like
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    sigma = np.array([[1,0.8],[0.8,1]])
+    mu = np.zeros(2)
+    ys = np.random.multivariate_normal(mu, sigma, 1000)
+    sns.kdeplot(ys)
+    plt.axis([-3.5,3.5,-3.5,3.5])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_42_0.png
+
+
+This is the HMC posterior
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def E(A, u0, v0, u, v):
+        """Total energy."""
+        return (u0 @ tau @ u0 + v0 @ v0) - (u @ tau@u + v @ v)
+
+.. code:: python
+
+    def leapfrog(A, u, v, h, N):
+        """Leapfrog finite difference scheme."""
+        v = v - h/2 * A @ u
+        for i in range(N-1):
+            u = u + h * v
+            v = v - h * A @ u
+    
+        u = u + h * v
+        v = v - h/2 * A @ u
+    
+        return u, v
+
+.. code:: python
+
+    niter = 100
+    h = 0.01
+    N = 100
+    
+    tau = la.inv(sigma)
+    
+    orbit = np.zeros((niter+1, 2))
+    u = np.array([-3,3])
+    orbit[0] = u
+    for k in range(niter):
+        v0 = np.random.normal(0,1,2)
+        u, v = leapfrog(tau, u, v0, h, N)
+    
+        # accept-reject
+        u0 = orbit[k]
+        a = np.exp(E(A, u0, v0, u, v))
+        r = np.random.rand()
+    
+        if r < a:
+            orbit[k+1] = u
+        else:
+            orbit[k+1] = u0
+
+.. code:: python
+
+    sns.kdeplot(orbit)
+    plt.plot(orbit[:,0], orbit[:,1], alpha=0.2)
+    plt.scatter(orbit[:1,0], orbit[:1,1],  c='red', s=30)
+    plt.scatter(orbit[1:,0], orbit[1:,1],  c=np.arange(niter)[::-1], cmap='Reds')
+    plt.axis([-3.5,3.5,-3.5,3.5])
+    pass
+
+
+
+.. image:: 20B_AuxiliaryVariableMCMC_files/20B_AuxiliaryVariableMCMC_47_0.png
+
+

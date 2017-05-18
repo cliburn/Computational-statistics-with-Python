@@ -1,0 +1,934 @@
+
+Multi-Core Parallelism
+======================
+
+.. code:: python
+
+    %load_ext cython
+
+.. code:: python
+
+    from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+    import multiprocessing as mp
+    from multiprocessing import Pool, Value, Array
+    import os
+    import time
+    import numpy as np
+    from numba import njit
+
+Vanilla Python
+--------------
+
+.. code:: python
+
+    def mc_pi(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x**2 + y**2) < 1:
+                s += 1
+        return 4*s/n
+
+.. code:: python
+
+    %%time
+    
+    res = [mc_pi(int(1e5)) for i in range(10)]
+
+
+.. parsed-literal::
+
+    CPU times: user 5.19 s, sys: 20.6 ms, total: 5.21 s
+    Wall time: 5.21 s
+
+
+Using ``numba`` to speed up computation
+---------------------------------------
+
+.. code:: python
+
+    @njit()
+    def mc_pi_numba(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x**2 + y**2) < 1:
+                s += 1
+        return 4*s/n
+
+.. code:: python
+
+    %%time
+    
+    res = [mc_pi_numba(int(1e7)) for i in range(10)]
+
+
+.. parsed-literal::
+
+    CPU times: user 3.66 s, sys: 21.9 ms, total: 3.68 s
+    Wall time: 3.69 s
+
+
+.. code:: python
+
+    np.array(res)
+
+
+
+
+.. parsed-literal::
+
+    array([ 3.1419736,  3.1417564,  3.14116  ,  3.141356 ,  3.141194 ,
+            3.1419628,  3.141704 ,  3.1418208,  3.1413216,  3.1413336])
+
+
+
+Using ``cython`` to speed up computation
+----------------------------------------
+
+Note the use of an external C library (GNU Scientific Library or
+``gsl``) to replace ``numpy`` random number generators (which are slow
+for generating one number at a time). The GSL has already been packaged
+for use in Cython, so we just have to ``pip install`` it.
+
+Install cythongsl if necessary and restart kernel.
+
+.. code:: bash
+
+    ! pip install cythongsl
+
+.. code:: python
+
+    %%cython -lgsl
+    
+    import cython
+    from cython_gsl cimport *
+    
+    @cython.cdivision(True) 
+    def mc_pi_cython(int n):
+        cdef gsl_rng_type * T
+        cdef gsl_rng * r
+        cdef double s = 0.0
+        cdef double x, y
+        cdef int i
+    
+        gsl_rng_env_setup()
+    
+        T = gsl_rng_default
+        r = gsl_rng_alloc (T)
+    
+        for i in range(n):
+            x = 2*gsl_rng_uniform(r) - 1
+            y = 2*gsl_rng_uniform(r)- 1
+            if (x**2 + y**2) < 1:
+                s += 1
+        return 4*s/n
+
+.. code:: python
+
+    %%time
+    
+    res = [mc_pi_cython(int(1e7)) for i in range(10)]
+
+
+.. parsed-literal::
+
+    CPU times: user 7.61 s, sys: 41.6 ms, total: 7.65 s
+    Wall time: 7.62 s
+
+
+.. code:: python
+
+    np.array(res)
+
+
+
+
+.. parsed-literal::
+
+    array([ 3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584,
+            3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584])
+
+
+
+The ``concurrent.futures`` module
+---------------------------------
+
+Concurrent processes are processes that will return the same results
+regardless of the order in which they were executed. A "future" is
+something that will return a result sometime in the future. The
+``concurrent.futures`` module provides an event handler, which can be
+fed functions to be scheduled for future execution. This provides us
+with a simple model for parallel execution on a multi-core machine.
+
+While concurrent futures provide a simpler interface, it is slower and
+less flexible when compared with using ``multiprocessing`` for parallel
+execution.
+
+Using processes in parallel with ``ProcessPoolExecutor``
+--------------------------------------------------------
+
+We get a linear speedup as expected.
+
+.. code:: python
+
+    %%time
+    
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e7) for i in range(10)])
+
+
+.. parsed-literal::
+
+    CPU times: user 19.3 ms, sys: 31.4 ms, total: 50.7 ms
+    Wall time: 2.33 s
+
+
+.. code:: python
+
+    np.array(list(res))
+
+
+
+
+.. parsed-literal::
+
+    array([ 3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584,
+            3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584])
+
+
+
+When you have many jobs
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``futures`` object gives fine control over the process, such as
+adding callbacks and canceling a submitted job, but is computationally
+expensive. We can use the ``chunksize`` argument to reduce this cost
+when submitting many jobs.
+
+Using default chunksize of 1 for 10000 jobs
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The total amount of computation whether you have 10 jobs of size
+10,000,000 or 10,000 jobs of size 10,000 is essentially the same, so we
+would expect them both to take about the same amount of time.
+
+.. code:: python
+
+    %%time
+    
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e4) for i in range(int(1e4))])
+
+
+.. parsed-literal::
+
+    CPU times: user 4.52 s, sys: 1.67 s, total: 6.19 s
+    Wall time: 5.61 s
+
+
+Using chunksize of 100
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %%time
+    
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e4) for i in range(int(1e4))], chunksize=100)
+
+
+.. parsed-literal::
+
+    CPU times: user 105 ms, sys: 81 ms, total: 186 ms
+    Wall time: 2.11 s
+
+
+Functions with multiple arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    def f(a, b):
+        return a + b
+
+Using a function adapter
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def f_(args):
+        return f(*args)
+
+.. code:: python
+
+    xs = np.arange(24)
+    chunks = np.array_split(xs, xs.shape[0]//2)
+
+.. code:: python
+
+    chunks
+
+
+
+
+.. parsed-literal::
+
+    [array([0, 1]),
+     array([2, 3]),
+     array([4, 5]),
+     array([6, 7]),
+     array([8, 9]),
+     array([10, 11]),
+     array([12, 13]),
+     array([14, 15]),
+     array([16, 17]),
+     array([18, 19]),
+     array([20, 21]),
+     array([22, 23])]
+
+
+
+.. code:: python
+
+    with ProcessPoolExecutor(max_workers=4) as pool:
+        res = pool.map(f_, chunks)
+    list(res)
+
+
+
+
+.. parsed-literal::
+
+    [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45]
+
+
+
+Using processes in parallel with ThreadPoolExecutor
+---------------------------------------------------
+
+We do not get any speedup because the GIL only allows one thread to run
+at one time.
+
+.. code:: python
+
+    %%time
+    
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e7) for i in range(10)])
+
+
+.. parsed-literal::
+
+    CPU times: user 7.62 s, sys: 88.8 ms, total: 7.71 s
+    Wall time: 7.62 s
+
+
+.. code:: python
+
+    np.array(list(res))
+
+
+
+
+.. parsed-literal::
+
+    array([ 3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584,
+            3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584])
+
+
+
+Turning off the GIL in ``cython``
+---------------------------------
+
+.. code:: python
+
+    %%cython -lgsl
+    
+    import cython
+    from cython_gsl cimport *
+    
+    @cython.cdivision(True) 
+    def mc_pi_cython_nogil(int n):
+        cdef gsl_rng_type * T
+        cdef gsl_rng * r
+        cdef double s = 0.0
+        cdef double x, y
+        cdef int i
+    
+        gsl_rng_env_setup()
+    
+        T = gsl_rng_default
+        r = gsl_rng_alloc (T)
+    
+        with cython.nogil:
+            for i in range(n):
+                x = 2*gsl_rng_uniform(r) - 1
+                y = 2*gsl_rng_uniform(r)- 1
+                if (x**2 + y**2) < 1:
+                    s += 1
+        return 4*s/n
+
+Using processes in parallel with ``ThreadPoolExecutor`` and ``nogil``
+---------------------------------------------------------------------
+
+We finally get the linear speedup expected. Note that threads are
+actually faster than processes because there is less overhead to using a
+thread.
+
+.. code:: python
+
+    %%time
+    
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        res = pool.map(mc_pi_cython_nogil, [int(1e7) for i in range(10)])
+
+
+.. parsed-literal::
+
+    CPU times: user 7.61 s, sys: 7.57 ms, total: 7.62 s
+    Wall time: 2.28 s
+
+
+.. code:: python
+
+    np.array(list(res))
+
+
+
+
+.. parsed-literal::
+
+    array([ 3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584,
+            3.1414584,  3.1414584,  3.1414584,  3.1414584,  3.1414584])
+
+
+
+Using ``multiprocessing``
+-------------------------
+
+One nice thing about using ``multiprocessing`` is that it works equally
+well for small numbers of large jobs, or large numbers of small jobs out
+of the box.
+
+.. code:: python
+
+    %%time
+    
+    with mp.Pool(processes=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e7) for i in range(10)])
+
+
+.. parsed-literal::
+
+    CPU times: user 16 ms, sys: 34 ms, total: 50.1 ms
+    Wall time: 2.41 s
+
+
+.. code:: python
+
+    %%time
+    
+    with mp.Pool(processes=4) as pool:
+        res = pool.map(mc_pi_cython, [int(1e4) for i in range(int(1e4))])
+
+
+.. parsed-literal::
+
+    CPU times: user 18.1 ms, sys: 32.5 ms, total: 50.6 ms
+    Wall time: 2.11 s
+
+
+Creating individual processes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    def f(i):
+        time.sleep(np.random.random())
+        print(os.getpid(), i)
+
+.. code:: python
+
+    for i in range(10):
+        p = mp.Process(target=f, args=(i,))
+        p.start()
+        p.join()
+
+
+.. parsed-literal::
+
+    27826 0
+    27827 1
+    27828 2
+    27829 3
+    27830 4
+    27831 5
+    27832 6
+    27833 7
+    27834 8
+    27835 9
+
+
+Functions with multiple arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Multiprocessing ``Pool`` has a ``starmap`` method that removes the need
+to write a wrapper function.
+
+.. code:: python
+
+    def f(a, b):
+        return a + b
+
+.. code:: python
+
+    xs = np.arange(24)
+    with Pool(processes=4) as pool:
+        res = pool.starmap(f, np.array_split(xs, xs.shape[0]//2))
+    list(res)
+
+
+
+
+.. parsed-literal::
+
+    [1, 5, 9, 13, 17, 21, 25, 29, 33, 37, 41, 45]
+
+
+
+Partial application
+^^^^^^^^^^^^^^^^^^^
+
+Sometimes, ``functools.partial`` can be used to reduce the number of
+arguments needed to just one.
+
+.. code:: python
+
+    def f(a, b):
+        return a * b
+
+.. code:: python
+
+    from functools import partial
+    
+    fp = partial(f, b=2)
+
+.. code:: python
+
+    xs = np.arange(24)
+    with Pool(processes=4) as pool:
+        res = pool.map(fp, xs)
+    np.array(list(res))
+
+
+
+
+.. parsed-literal::
+
+    array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32,
+           34, 36, 38, 40, 42, 44, 46])
+
+
+
+How do we get a return value from a process?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def f1(q, i):
+        time.sleep(np.random.random())
+        q.put((os.getpid(), i))
+
+.. code:: python
+
+    q = mp.Queue()
+    
+    res = []
+    for i in range(10):
+        p = mp.Process(target=f1, args=(q,i,))
+        p.start()
+        res.append(q.get())
+        p.join()
+    
+    res
+
+
+
+
+.. parsed-literal::
+
+    [(27844, 0),
+     (27845, 1),
+     (27846, 2),
+     (27847, 3),
+     (27848, 4),
+     (27849, 5),
+     (27850, 6),
+     (27851, 7),
+     (27852, 8),
+     (27853, 9)]
+
+
+
+Counting number of jobs (1)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def f2(i):
+        global counter
+        counter = counter + 1
+        print(os.getpid(), i)
+
+Checking
+^^^^^^^^
+
+.. code:: python
+
+    counter = 0
+    f2(10)
+    print(counter)
+
+
+.. parsed-literal::
+
+    27789 10
+    1
+
+
+.. code:: python
+
+    counter = 0
+    
+    for i in range(10):
+        p = mp.Process(target=f2, args=(i,))
+        p.start()
+        p.join()
+
+
+.. parsed-literal::
+
+    27854 0
+    27855 1
+    27856 2
+    27857 3
+    27858 4
+    27859 5
+    27860 6
+    27861 7
+    27862 8
+    27863 9
+
+
+Note that separate processes have their own memory and DO NOT share global memory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    counter
+
+
+
+
+.. parsed-literal::
+
+    0
+
+
+
+Counting number of jobs (2)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We can use shared memory to do this, but it is slow because
+multiprocessing has to ensure that only one process gets to use counter
+at any one time. Multiprocesing provides Value and Array shared memory
+variables, but you can also convert arbitrary Python variables into
+shared memory objects (less efficient).
+
+.. code:: python
+
+    def f3(i, counter, store):
+        counter.value += 1
+        store[os.getpid() % 10] += i
+
+.. code:: python
+
+    %%time
+    
+    counter = mp.Value('i', 0)
+    store = mp.Array('i', [0]*10)
+    
+    for i in range(int(1e2)):
+        p = mp.Process(target=f3, args=(i, counter, store))
+        p.start()
+        p.join()
+    
+    print(counter.value)
+    print(store[:])
+
+
+.. parsed-literal::
+
+    100
+    [510, 520, 530, 540, 450, 460, 470, 480, 490, 500]
+    CPU times: user 120 ms, sys: 436 ms, total: 556 ms
+    Wall time: 1.25 s
+
+
+Counting number of jobs (3)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We should try to avoid using shared memory as much as possible in
+parallel jobs as they drastically reduce efficiency. One useful approach
+is to use the ``map-reduce`` pattern. We should also use Pool to reuse
+processes rather than spawn too many of them. We will see much more of
+the ``map-reduc`` approach when we work with Spark.
+
+.. code:: python
+
+    def f4(i):
+        return (os.getpid(), 1, i)
+
+.. code:: python
+
+    %%time
+    
+    # map step
+    with mp.Pool(processes=10) as pool:
+        res = pool.map(f4, range(int(1e2)))
+    
+    #reeduce step
+    res = np.array(res)
+    
+    counter = res[:, 1].sum()
+    print(counter)
+    
+    store = np.zeros(10)
+    idx = res[:, 0] % 10
+    for i in range(10):
+        store[i] = res[idx==i, 2].sum()
+    
+    print(store)
+
+
+.. parsed-literal::
+
+    100
+    [ 423.  486.  531.  303.  579.  552.  615.  633.  414.  414.]
+    CPU times: user 25.7 ms, sys: 70.1 ms, total: 95.8 ms
+    Wall time: 197 ms
+
+
+Using decorators with multiprocessing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    @njit()
+    def mc_pi_numba(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x**2 + y**2) < 1:
+                s += 1
+        return 4*s/n
+    
+    def get_pis(n1, n2):
+        results = [mc_pi_numba(int(n1)) for i in range(n2)]
+        return results
+
+.. code:: python
+
+    %%time
+    
+    get_pis(1e7, 10)
+
+
+.. parsed-literal::
+
+    CPU times: user 3.65 s, sys: 17.1 ms, total: 3.67 s
+    Wall time: 3.67 s
+
+
+
+
+.. parsed-literal::
+
+    [3.1412004,
+     3.142614,
+     3.1412916,
+     3.1415904,
+     3.1416708,
+     3.14172,
+     3.141886,
+     3.141906,
+     3.1419364,
+     3.1418736]
+
+
+
+Using ``joblib`` for simple parallelism
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    from joblib import Parallel, delayed
+    
+    @njit
+    def mc_pi(n):
+        s = 0
+        for i in range(n):
+            x = np.random.uniform(-1, 1)
+            y = np.random.uniform(-1, 1)
+            if (x**2 + y**2) < 1:
+                s += 1
+        return 4*s/n
+    
+    def get_pis(n1, n2, k):
+        n1, n2 = int(n1), int(n2)
+        results = Parallel(n_jobs=k)(delayed(mc_pi)(n1) for i in range(n2))
+        return results
+
+.. code:: python
+
+    %%time
+    
+    get_pis(1e7, 10, 1)
+
+
+.. parsed-literal::
+
+    CPU times: user 3.5 s, sys: 46.3 ms, total: 3.54 s
+    Wall time: 3.5 s
+
+
+
+
+.. parsed-literal::
+
+    [3.1414168,
+     3.1419008,
+     3.1421364,
+     3.1421516,
+     3.1421732,
+     3.1422248,
+     3.1412356,
+     3.1419928,
+     3.1413028,
+     3.1416204]
+
+
+
+.. code:: python
+
+    %%time
+    
+    get_pis(1e7, 10, 8)
+
+
+.. parsed-literal::
+
+    CPU times: user 95.1 ms, sys: 60.3 ms, total: 155 ms
+    Wall time: 947 ms
+
+
+
+
+.. parsed-literal::
+
+    [3.141658,
+     3.141658,
+     3.141658,
+     3.141658,
+     3.141658,
+     3.141658,
+     3.141658,
+     3.141658,
+     3.1405908,
+     3.1405908]
+
+
+
+Common issues with use of shared memory in parallel programs
+------------------------------------------------------------
+
+Writing to shared memory requires careful coordination of processes, and
+many control and communication concepts are implemented in the
+multiprocessing library for this purpose, including semaphores, locks,
+barriers etc. We will not cover these concepts due to their complexity,
+choosing instead to decouple processes (leading to embarrassingly
+parallel problems) by making redundant copies of resources if necessary
+and reducing at a later stage if necessary. Most problems in statistical
+data analysis can be solved using this simple approach.
+
+Race conditions
+~~~~~~~~~~~~~~~
+
+In the example below, up to 4 processes may be trying to increment and
+assign a new value to val at the same time. Because this takes two steps
+(increment the RHS, assign to LHS), it can happen that two or more
+processes increment at the same time, but this is only assigned and
+counted once.
+
+.. code:: python
+
+    def count1(i):
+        val.value += 1
+        
+    for run in range(3):
+        val = Value('i', 0)
+        with Pool(processes=4) as pool:
+            pool.map(count1, range(1000))
+    
+        print(val.value)
+
+
+.. parsed-literal::
+
+    442
+    363
+    408
+
+
+It is usually easier and faster to make copies of resources for each
+process so that no sharing is required.
+
+.. code:: python
+
+    def count2(i):
+        ix = os.getpid() % 4
+        arr[ix] += 1
+        
+    for run in range(3):
+        arr = Array('i', [0]*4)
+    
+        with Pool(processes=4) as pool:
+            pool.map(count2, range(1000))
+    
+        print(arr[:], np.sum(arr))
+
+
+.. parsed-literal::
+
+    [252, 244, 252, 252] 1000
+    [252, 244, 252, 252] 1000
+    [244, 252, 252, 252] 1000
+
+
+Deadlock
+~~~~~~~~
+
+Suppose there are two processes P1 and P2 and two resources A and B.
+Suppose P1 has a ``lock`` on A and will only release A after it gains B,
+while P2 has a ``lock`` on B and will only release the lock after it
+gains A. The two processes are doomed to wait forever; this is known as
+a deadlock and can occur when concurrent processes compete to have
+exclusive access to the same shared resources. A classic model of
+deadlock is the `Dining Philosophers
+Problem <dining%20philosophers%20solution>`__.
+
+We will not show any examples since it will simply freeze the notebook.

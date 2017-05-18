@@ -1,0 +1,1047 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13A_LinearAlgebra1.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:15 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Linear Algebra Review &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Matrix Decompositions" href="13B_LinearAlgebra2.html" />
+    <link rel="prev" title="Using pybind11" href="12B_C%2b%2b_Python_pybind11.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="13B_LinearAlgebra2.html" title="Matrix Decompositions"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="12B_C%2b%2b_Python_pybind11.html" title="Using pybind11"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="linear-algebra-review">
+<h1>Linear Algebra Review<a class="headerlink" href="#linear-algebra-review" title="Permalink to this headline">¶</a></h1>
+<p>From xkcd:</p>
+<div class="figure" id="id2">
+<img alt="texte" src="http://imgs.xkcd.com/comics/matrix_transform.png" />
+<p class="caption"><span class="caption-text">texte</span></p>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">patch</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="o">%</span><span class="n">precision</span> <span class="mi">4</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Students may (probably should) ignore this code. It is just here to make pretty arrows.</span>
+
+<span class="k">def</span> <span class="nf">plot_vectors</span><span class="p">(</span><span class="n">vs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot vectors in vs assuming origin at (0,0).&quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">angles</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale_units</span><span class="o">=</span><span class="s1">&#39;xy&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">U</span><span class="p">,</span> <span class="n">X</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">U</span><span class="p">,</span> <span class="n">X</span><span class="p">])</span>
+    <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">V</span><span class="p">,</span> <span class="n">Y</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">V</span><span class="p">,</span> <span class="n">Y</span><span class="p">])</span>
+    <span class="n">xrng</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+    <span class="n">yrng</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span>
+    <span class="n">xmin</span> <span class="o">-=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">xrng</span>
+    <span class="n">xmax</span> <span class="o">+=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">xrng</span>
+    <span class="n">ymin</span> <span class="o">-=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">yrng</span>
+    <span class="n">ymax</span> <span class="o">+=</span> <span class="mf">0.05</span><span class="o">*</span><span class="n">yrng</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linear-algebra-and-linear-systems">
+<h1>Linear Algebra and Linear Systems<a class="headerlink" href="#linear-algebra-and-linear-systems" title="Permalink to this headline">¶</a></h1>
+<p>A lot of problems in statistical computing can be described
+mathematically using linear algebra. This lecture is meant to serve as a
+review of concepts you have covered in linear algebra courses, so that
+we may discuss some important matrix decompositions used in statistical
+analyses.</p>
+<div class="section" id="motivation-simultaneous-equations">
+<h2>Motivation - Simultaneous Equations<a class="headerlink" href="#motivation-simultaneous-equations" title="Permalink to this headline">¶</a></h2>
+<p>Consider a set of <span class="math">\(m\)</span> linear equations in <span class="math">\(n\)</span> unknowns:</p>
+<p>We can let:</p>
+<p>And re-write the system:</p>
+<div class="math">
+\[Ax = b\]</div>
+<p>This reduces the problem to a matrix equation, and now solving the
+system amounts to finding <span class="math">\(A^{-1}\)</span> (or sort of). Certain
+properties of the matrix <span class="math">\(A\)</span> yield important information about the
+linear system.</p>
+<p>Most students in elementary linear algebra courses learn to use Gaussian
+elimination to solve systems such as the one above. To understand more
+advanced techniques and matrix decompositions (more on those later),
+we&#8217;ll need to recall some mathematical concepts.</p>
+</div>
+<div class="section" id="vector-spaces">
+<h2>Vector Spaces<a class="headerlink" href="#vector-spaces" title="Permalink to this headline">¶</a></h2>
+<p>Technically, a vector space is a field of coefficients
+<span class="math">\(\mathbb{F}\)</span>, together with a commutative group (over addition)
+<span class="math">\(V\)</span> such that</p>
+<ul class="simple">
+<li>If <span class="math">\(c\in \mathbb{F}\)</span> and <span class="math">\(v\in V\)</span>, then <span class="math">\(cv\in V\)</span></li>
+<li>If <span class="math">\(v_1,v_2 V\)</span> and <span class="math">\(c\in \mathbb{F}\)</span> then
+<span class="math">\(c(v_1+v_2) = c v_1 + c v_2\)</span></li>
+<li>If <span class="math">\(c_1,c_2\in \mathbb{F}\)</span> and <span class="math">\(v\in V\)</span>, then
+<span class="math">\((c_1+c_2)v = c_1v + c_2v\)</span></li>
+<li>If <span class="math">\(c_1,c_2\in \mathbb{F}\)</span> and <span class="math">\(v\in V\)</span>, then
+<span class="math">\((c_1c_2)v = c_1(c_2v)\)</span></li>
+<li>If <span class="math">\(1\)</span> is the multiplicative identity in <span class="math">\(\mathbb{F}\)</span>,
+then <span class="math">\(1\cdot v = v\)</span></li>
+</ul>
+<p>That may not seem to be particularly useful for the purposes of this
+course, and for many of our purposes we can simplify this a bit. We are
+mostly interested in finite dimensional &#8216;real&#8217; vector spaces. So our
+vectors will be elements of <span class="math">\(\mathbb{R}^n\)</span>, i.e. points in
+<span class="math">\(n\)</span> dimensional space. The &#8216;coefficents&#8217; are also real numbers.
+This leads to the idea that vectors are simply <span class="math">\(n\)</span>-tuples of
+numbers. This is a nice, concrete way of seeing things, but it is a
+little oversimplified. It obscures a bit the need for a basis, and what
+&#8216;coordinates&#8217; actually are. It also doesn&#8217;t help much when we want to
+consider vector spaces of things that are not numbers, such as functions
+(yes - we can do that!! and it is helpful <em>even in statistics</em>)</p>
+<p>Therefore, I hope you will indulge me and first think of the &#8216;vectors&#8217;
+(usually denoted <span class="math">\(u,v,w,x,y\)</span>) and their &#8216;coefficients&#8217; (usually
+denoted <span class="math">\(a,b,c\)</span>) as <em>fundamentally different objects</em>.</p>
+<p><strong>Conceptually</strong>: Think of vectors as <em>linear combinations</em> of
+Things(Tm). Think of the <span class="math">\(v's\)</span> as objects of some sort (functions,
+apples, cookies) and the <span class="math">\(c's\)</span> as numbers (real, complex,
+quaternions...)</p>
+<div class="section" id="linear-independence-and-basis">
+<h3>Linear Independence and Basis<a class="headerlink" href="#linear-independence-and-basis" title="Permalink to this headline">¶</a></h3>
+<p>A collection of vectors <span class="math">\(v_1,...,v_n\)</span> is said to be <em>linearly
+independent</em> if</p>
+<div class="math">
+\[c_1v_1 + \cdots c_nv_n = 0\]</div>
+<div class="math">
+\[\iff\]</div>
+<div class="math">
+\[c_1=\cdots=c_n=0\]</div>
+<p>In other words, any linear combination of the vectors that results in a
+zero vector is trivial.</p>
+<p>Another interpretation of this is that no vector in the set may be
+expressed as a linear combination of the others. In this sense, linear
+independence is an expression of non-redundancy in a set of vectors.</p>
+<p><strong>Fact</strong>: Any linearly independent set of <span class="math">\(n\)</span> vectors spans an
+<span class="math">\(n\)</span>-dimensional space. (I.e. the collection of all possible linear
+combinations is <span class="math">\(V\)</span> - this is actually the definition of
+dimension) Such a set of vectors is said to be a <em>basis</em> of <span class="math">\(V\)</span>.
+Another term for basis is <em>minimal spanning set</em>.</p>
+</div>
+<div class="section" id="example">
+<h3>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>We can consider the vector space of polynomials of degree <span class="math">\(\leq 2\)</span>
+over <span class="math">\(\mathbb{R}\)</span>. A basis for this space is</p>
+<div class="math">
+\[\left\{1,x,x^2\right\}\]</div>
+<p>Any vector may be written</p>
+<div class="math">
+\[c_1\cdot 1 + c_2x + c_3 x^2 = c_1 + c_2 x +c_ 3 x^2\]</div>
+<p>where <span class="math">\(c_1,c_2,c_3\in \mathbb{R}\)</span></p>
+</div>
+<div class="section" id="coordinates">
+<h3>Coordinates<a class="headerlink" href="#coordinates" title="Permalink to this headline">¶</a></h3>
+<p>When we have a set of basis vectors <span class="math">\(\left\{v_1,...,v_n\right\}\)</span>
+for a vector space, as we have said, any vector may be represented as:</p>
+<div class="math">
+\[c_1v_1+...+c_nv_n\]</div>
+<p>The <span class="math">\(c_i's\)</span> are called <em>coordinates</em>. For example, in the space of
+<span class="math">\(2^{nd}\)</span> degree polynomials, the vector:</p>
+<div class="math">
+\[2 x +\pi x^2\]</div>
+<p>has coordinates <span class="math">\((0,2,\pi)\)</span>.</p>
+<p>You probably think of coordinates in terms of the coordinate plane, and
+equate the coordinates with the <span class="math">\(n\)</span>-tuples that label the points.
+This is all true - but skips a step. Now that we have separated our
+basis vectors from their coordinates, let&#8217;s see how this applies in the
+case of the real vector spaces you are accustomed to.</p>
+<p>The coordinates of the pictured vector (below) are <span class="math">\((2,3)\)</span>. But
+what does that mean? It means we have assumed the <em>standard basis</em>,
+<span class="math">\(\left\{e_1,e_2\right\}\)</span>, and the vector <span class="math">\((2,3)\)</span> really
+means:</p>
+<div class="math">
+\[2e_1 + 3e_2\]</div>
+<p>where <span class="math">\(e_1\)</span> is a unit vector (length = 1) on the horizontal axis
+and <span class="math">\(e_2\)</span> is a unit vector along the vertical axis. This is a
+<em>choice of coordinates</em>. We could equally well choose the basis
+<span class="math">\(\left\{v,e_2\right\}\)</span> where <span class="math">\(v\)</span> is any vector that is
+linearly independent of <span class="math">\(e_2\)</span>. Then all vectors would be
+considered of the form:</p>
+<div class="math">
+\[c_1 v + c_2 e_2\]</div>
+<p>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Again, this code is not intended as a coding example.</span>
+
+<span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>         <span class="c1"># axis</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">])</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span><span class="n">v1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="s2">&quot;(2,3)&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/13A_LinearAlgebra1_23_0.png" src="_images/13A_LinearAlgebra1_23_0.png" />
+<p>Note that in the standard basis, the coordinates of <span class="math">\(e_1\)</span> are
+<span class="math">\((1,0)\)</span>. This is because:</p>
+<div class="math">
+\[e_1 = 1\cdot e_1 + 0\cdot e_2\]</div>
+<p>Similarly, the coordinates of <span class="math">\(e_2\)</span> are <span class="math">\((0,1)\)</span> because</p>
+<div class="math">
+\[e_2 = 0\cdot e_1 + 1\cdot e_2\]</div>
+<p>In the basis <span class="math">\(\left\{v,e_1\right\}\)</span>, the coordinates of
+<span class="math">\(e_1\)</span> are <span class="math">\((0,1)\)</span>, because</p>
+<div class="math">
+\[e_1 = 0\cdot v + 1\cdot e_1\]</div>
+<p>and the coordinates of <span class="math">\(v\)</span> are <span class="math">\((1,0)\)</span>.</p>
+<p>Well need these concepts in a moment when we talk about change of basis.</p>
+</div>
+</div>
+<div class="section" id="matrices-and-linear-transformations">
+<h2>Matrices and Linear Transformations<a class="headerlink" href="#matrices-and-linear-transformations" title="Permalink to this headline">¶</a></h2>
+<p>So we have this vector space and it consists of linear combinations of
+vectors. It&#8217;s not terribly interesting just sitting there. So let&#8217;s do
+something with it.</p>
+<p>This is mathematics, and once mathematicians have objects collected into
+some set or &#8216;space&#8217;, we like to send them to other spaces, or back into
+the space itself, but changing one object into another. This is called a
+&#8216;transformation&#8217;.</p>
+<p>Let&#8217;s suppose we have two vector spaces, <span class="math">\(V\)</span> and <span class="math">\(W\)</span>. We&#8217;d
+like to define a transformation - but there is a catch. We want our
+transformation to act on all the vectors. Let&#8217;s suppose
+<span class="math">\(V=W=\mathbb{R}^2\)</span>. That seems simple enough. But there are still
+infinitely many vectors. Defining a transformation sounds laborious.</p>
+<p>Ah, but we are clever. We have defined our space in such a way that for
+<em>certain</em> transformations, we need only define our transformation on a
+finite set (in the case of finite dimensional vector spaces).</p>
+<div class="section" id="linear-transformations">
+<h3>Linear Transformations<a class="headerlink" href="#linear-transformations" title="Permalink to this headline">¶</a></h3>
+<p>A linear transformation <span class="math">\(f:V\rightarrow W\)</span> is a map from <span class="math">\(V\)</span>
+to <span class="math">\(W\)</span> such that</p>
+<div class="math">
+\[f(c_1 v_1+c_2v_2) = c_1f(v_1)+c_2f(v_2)\]</div>
+<p>Now, recall that a basis essentially generates the entire vector space
+via linear combinations. So, once we define a linear transformation
+<span class="math">\(f\)</span> on a basis, we have it for the whole space.</p>
+</div>
+<div class="section" id="matrices-transformations-and-geometric-interpretation">
+<h3>Matrices, Transformations and Geometric Interpretation<a class="headerlink" href="#matrices-transformations-and-geometric-interpretation" title="Permalink to this headline">¶</a></h3>
+<p>Thinking back to real vector spaces, what does a matrix <em>do</em> to a
+vector? Matrix multiplication has a <em>geometric</em> interpretation. When we
+multiply a vector, we either rotate, reflect, dilate or some combination
+of those three. So multiplying by a matrix <em>transforms</em> one vector into
+another vector. These are <em>linear transformations</em>.</p>
+<p>See the cell below for an example of a vector (<span class="math">\(v_1 = (2,3)\)</span>)
+transformed by a matrix</p>
+<div class="math">
+\[\begin{split}A = \left(\begin{matrix}2 &amp; 1\\1&amp;1\end{matrix}\right)\end{split}\]</div>
+<p>so that</p>
+<div class="math">
+\[v_2 = Av_1\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>         <span class="c1"># axis</span>
+<span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># transformation f in standard basis</span>
+<span class="n">v2</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">v1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">])</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="s2">&quot;v1 =(2,3)&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="s2">&quot;Av1 = &quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">v2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s2">&quot;(7,5)&quot;</span><span class="p">,</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">v2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">5</span>
+</pre></div>
+</div>
+<img alt="_images/13A_LinearAlgebra1_27_1.png" src="_images/13A_LinearAlgebra1_27_1.png" />
+<p>Important Facts:</p>
+<ul class="simple">
+<li>Any matrix defines a linear transformation</li>
+<li>Every linear transformation may be represented by a matrix. This form
+is NOT unique (it depends on the chosen bassis - more on that in a
+moment)</li>
+<li>We need only define a transformation by saying what it does to a
+<em>basis</em></li>
+</ul>
+<p>Suppose we have a matrix <span class="math">\(A\)</span> that defines some transformation. We
+can take any invertible matrix <span class="math">\(B\)</span> and</p>
+<div class="math">
+\[B^{-1}AB\]</div>
+<p>defines the same transformation. This operation is called a <em>change of
+basis</em>, because we are simply expressing the transformation with respect
+to a different basis.</p>
+<p>This is an important concept in matrix decompositions.</p>
+</div>
+<div class="section" id="example-find-a-matrix-representation-of-a-linear-transformation">
+<h3>Example - Find <em>a</em> Matrix Representation of a Linear Transformation<a class="headerlink" href="#example-find-a-matrix-representation-of-a-linear-transformation" title="Permalink to this headline">¶</a></h3>
+<p>Note that we say find &#8216;a&#8217; matrix representation - not &#8216;the&#8217; matrix
+representation. That is because the matrix representation is dependent
+on the <em>choice of basis</em>. Just to motivate you as to why this is
+important, recall our linear system:</p>
+<div class="math">
+\[Ax=b\]</div>
+<p>Some forms of <span class="math">\(A\)</span> are <em>much</em> simpler to invert. For example,
+suppose <span class="math">\(A\)</span> is diagonal. Then we can solve each equation easily:</p>
+<div class="math">
+\[\begin{split}Ax =b \iff \left\{\begin{matrix}d_1 &amp; 0&amp; \cdots &amp;  0\\0 &amp; d_2 &amp; \cdots &amp; 0\\ \vdots &amp; &amp; &amp;\vdots\\ 0 &amp;0&amp;\cdots &amp;d_n
+\end{matrix}\right\}
+\left\{\begin{matrix}x_1\\ \vdots\\x_n\end{matrix}\right\}= \left\{\begin{matrix}b_1\\ \vdots\\b_n\end{matrix}\right\} \iff x_1 = \frac{b_1}{d_1},...,x_n=\frac{b_n}{d_n}\end{split}\]</div>
+<p>So, if we could find a basis in which the transformation defined by
+<span class="math">\(A\)</span> is diagonal, our system is very easily solved. Of course, this
+is not always possible - but we can often simplify our system via change
+of basis so that the resulting system is easier to solve. (These are
+&#8216;matrix decomposition methods&#8217;, and we will talk about them in detail,
+once we have the tools to do so).</p>
+<p>Now, let <span class="math">\(f(x)\)</span> be the linear transformation that takes
+<span class="math">\(e_1=(1,0)\)</span> to <span class="math">\(f(e_1)=(2,3)\)</span> and <span class="math">\(e_2=(0,1)\)</span> to
+<span class="math">\(f(e_2) = (1,1)\)</span>. A matrix representation of <span class="math">\(f\)</span> would be
+given by:</p>
+<div class="math">
+\[\begin{split}A = \left(\begin{matrix}2 &amp; 1\\3&amp;1\end{matrix}\right)\end{split}\]</div>
+<p>This is the matrix we use if we consider the vectors of
+<span class="math">\(\mathbb{R}^2\)</span> to be linear combinations of the form</p>
+<div class="math">
+\[c_1 e_1 + c_2 e_2\]</div>
+</div>
+<div class="section" id="example-change-to-a-different-basis">
+<h3>Example - Change to a Different Basis<a class="headerlink" href="#example-change-to-a-different-basis" title="Permalink to this headline">¶</a></h3>
+<p>Now, consider a second pair of (linearly independent) vectors in
+<span class="math">\(\mathbb{R}^2\)</span>, say <span class="math">\(v_1\)</span> and <span class="math">\(v_2\)</span>, and suppose that
+the coordinates of <span class="math">\(v_1\)</span> in the basis <span class="math">\(e_1,e_2\)</span> are
+<span class="math">\((1,3)\)</span> and that the coordinates of <span class="math">\(v_2\)</span> in the basis
+<span class="math">\(e_1,e_2\)</span> are <span class="math">\((4,1)\)</span>. We first find the transformation that
+takes <span class="math">\(e_1\)</span> to <span class="math">\(v_1\)</span> and <span class="math">\(e_2\)</span> to <span class="math">\(v_2\)</span>. A
+matrix representation for this (in the <span class="math">\(e_1, e_2\)</span> basis) is:</p>
+<div class="math">
+\[\begin{split}B = \left(\begin{matrix}1 &amp; 4\\3&amp;1\end{matrix}\right)\end{split}\]</div>
+<p>Our original transformation <span class="math">\(f\)</span> can be expressed with respect to
+the basis <span class="math">\(v_1, v_2\)</span> via</p>
+<div class="math">
+\[BAB^{-1}\]</div>
+<p>Here is what the new basis looks like:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">B</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">),</span> <span class="n">B</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e2</span><span class="p">)])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1">#plt.show()</span>
+<span class="c1">#plt.tight_layout()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">Circle</span> <span class="n">at</span> <span class="mh">0x11f0409e8</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/13A_LinearAlgebra1_30_1.png" src="_images/13A_LinearAlgebra1_30_1.png" />
+<p>Let&#8217;s see what the new matrix looks like:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># transformation f in standard basis</span>
+<span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>         <span class="c1"># standard basis vectors e1,e2</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">))</span>             <span class="c1"># demonstrate that Ae1 is (2,3)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e2</span><span class="p">))</span>             <span class="c1"># demonstrate that Ae2 is (1,1)</span>
+
+<span class="c1"># new basis vectors</span>
+<span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># How v1 and v2 are transformed by A</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Av1: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Av2: &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v2</span><span class="p">))</span>
+
+<span class="c1"># Change of basis from standard to v1,v2</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">B_inv</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;B B_inv &quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_inv</span><span class="p">))</span>   <span class="c1"># check inverse</span>
+
+<span class="c1"># Matrix of the transformation with respect to the new basis</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_inv</span><span class="p">))</span>        <span class="c1"># B A B^{-1}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">B_inv</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B_inv</span><span class="p">,(</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">2</span> <span class="mi">3</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">Av1</span><span class="p">:</span>
+<span class="p">[</span><span class="mi">5</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">Av2</span><span class="p">:</span>
+<span class="p">[</span> <span class="mi">9</span> <span class="mi">13</span><span class="p">]</span>
+<span class="p">[[</span><span class="mi">1</span> <span class="mi">4</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">3</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="n">B</span> <span class="n">B_inv</span>
+<span class="p">[[</span> <span class="mf">1.</span>  <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.</span>  <span class="mf">1.</span><span class="p">]]</span>
+<span class="p">[[</span> <span class="mf">0.0909</span>  <span class="mf">4.6364</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.2727</span>  <span class="mf">2.9091</span><span class="p">]]</span>
+<span class="p">[[</span><span class="o">-</span><span class="mf">0.0909</span>  <span class="mf">0.3636</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.2727</span> <span class="o">-</span><span class="mf">0.0909</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([</span> <span class="mf">0.0909</span><span class="p">,</span>  <span class="mf">0.</span>    <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="what-does-all-this-have-to-do-with-linear-systems">
+<h2>What does all this have to do with linear systems?<a class="headerlink" href="#what-does-all-this-have-to-do-with-linear-systems" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>If <span class="math">\(A\)</span> is an <span class="math">\(m\times n\)</span> matrix and <span class="math">\(m&gt;n\)</span>, if all
+<span class="math">\(m\)</span> rows are linearly independent, then the system is
+<em>overdetermined</em> and <em>inconsistent</em>. The system cannot be solved
+exactly. This is the usual case in data analysis, and why least
+squares is so important. For example, we may be finding the
+parameters of a linear model, where there are <span class="math">\(m\)</span> data points
+and <span class="math">\(n\)</span> parameters.</li>
+<li>If <span class="math">\(A\)</span> is an <span class="math">\(m\times n\)</span> matrix and <span class="math">\(m&lt;n\)</span>, if all
+<span class="math">\(m\)</span> rows are linearly independent, then the system is
+<em>underdetermined</em> and there are <em>infinite</em> solutions.</li>
+<li>If <span class="math">\(A\)</span> is an <span class="math">\(m\times n\)</span> matrix and some of its rows are
+linearly dependent, then the system is <em>reducible</em>. We can get rid of
+some equations. In other words, there are equations in the system
+that do not give us any new information.</li>
+<li>If <span class="math">\(A\)</span> is a square matrix and its rows are linearly
+independent, the system has a unique solution. (<span class="math">\(A\)</span> is
+invertible.) This is a lovely case that happens mostly in the realm
+of pure mathematics and pretty much never in practice.</li>
+</ul>
+<ul class="simple">
+<li>We can often transform a linear system into a simpler form, simply
+via a change of basis.</li>
+</ul>
+</div>
+<div class="section" id="more-properties-of-vectors-vector-spaces-and-matrices">
+<h2>More Properties of Vectors, Vector Spaces and Matrices<a class="headerlink" href="#more-properties-of-vectors-vector-spaces-and-matrices" title="Permalink to this headline">¶</a></h2>
+<p>Linear algebra has a whole lot more to tell us about linear systems, so
+we&#8217;ll review a few basics.</p>
+<div class="section" id="norms-and-distance-of-vectors">
+<h3>Norms and Distance of Vectors<a class="headerlink" href="#norms-and-distance-of-vectors" title="Permalink to this headline">¶</a></h3>
+<p>You probably learned that the &#8216;norm&#8217; of a vector
+<span class="math">\(v \in \mathbb{R}^n\)</span>, denoted <span class="math">\(||v||\)</span> is simply its length.
+For a vector with components</p>
+<div class="math">
+\[v = \left(v_1,...,v_n\right)\]</div>
+<p>the norm of <span class="math">\(v\)</span> is given by:</p>
+<div class="math">
+\[||v|| = \sqrt{v_1^2+...+v_n^2}\]</div>
+<p>This <em>natural</em> definition of a norm comes from the distance formula.
+Recall that for two points <span class="math">\((x_1,y_1),(x_0,y_0)\)</span> in the plane, the
+distance between them is given by:</p>
+<div class="math">
+\[D = \sqrt{(x_1-x_0)^2+(y_1-y_0)^2}\]</div>
+<p>The length of a vector in <span class="math">\(\mathbb{R}^n\)</span> is the distance from the
+origin, so</p>
+<div class="math">
+\[||v|| = \sqrt{(v_1 -0 )^2 +...+(v_n-0)^2} = \sqrt{v_1^2+...+v_n^2}\]</div>
+<p>The distance between two vectors is the length of their difference:</p>
+<div class="math">
+\[d(v,w) = ||v-w||\]</div>
+<div class="section" id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># norm of a vector</span>
+<span class="c1"># Note: The numpy linalg package is imported at the top of this notebook</span>
+
+
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.2361</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># distance between two vectors</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="o">-</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.0000</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="inner-products">
+<h2>Inner Products<a class="headerlink" href="#inner-products" title="Permalink to this headline">¶</a></h2>
+<p>Inner products are closely related to norms and distance. The (standard)
+inner product (or dot product) of two <span class="math">\(n\)</span> dimensional vectors
+<span class="math">\(v\)</span> and <span class="math">\(w\)</span> is given by:</p>
+<div class="math">
+\[&lt;v,w&gt; = v_1w_1+...+v_nw_n\]</div>
+<p>I.e. the inner product is just the sum of the product of the components.
+Certain &#8216;special&#8217; matrices also define inner products, and we will see
+some of those later.</p>
+<p>The standard inner product is related to the standard norm via:</p>
+<div class="math">
+\[||v|| = &lt;v,v&gt;^{\frac12}\]</div>
+<p>The inner product of two vectors is proportional to the cosine of the
+angle between them. In fact:</p>
+<div class="math">
+\[&lt;v,w&gt; = ||v|| \cdot ||w|| \cos(\theta)\]</div>
+<p>where <span class="math">\(\theta\)</span> is the angle between <span class="math">\(v\)</span> and <span class="math">\(w\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">e1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">e2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">v1</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e1</span><span class="p">)</span>
+<span class="n">v2</span><span class="o">=</span><span class="n">A</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plot_vectors</span><span class="p">([</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="c1">#help(plt.Circle)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]),</span><span class="n">radius</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="o">.</span><span class="n">draw</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">function</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">artist</span><span class="o">.</span><span class="n">allow_rasterization</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">draw_wrapper</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/13A_LinearAlgebra1_44_1.png" src="_images/13A_LinearAlgebra1_44_1.png" />
+<p>There is a more abstract formulation of an inner product, that is useful
+when considering more general vector spaces, especially function vector
+spaces:</p>
+<div class="section" id="general-inner-product">
+<h3>General Inner Product<a class="headerlink" href="#general-inner-product" title="Permalink to this headline">¶</a></h3>
+<p>We&#8217;ll state the definition for vector spaces over <span class="math">\(\mathbb{R}\)</span>,
+but note that all may be extended for any field of coefficients.</p>
+<p>An inner product on a vector space <span class="math">\(V\)</span> is a symmetric, positive
+definite, bilinear form. This means an inner product is any map
+<span class="math">\(&lt;,&gt;_A\)</span> (the A is just to make the point that this is different
+from the standard inner product).</p>
+<div class="math">
+\[&lt;,&gt;_A: V\times V:\rightarrow \mathbb{R}\]</div>
+<p>with the following properties:</p>
+<ul>
+<li><p class="first">Symmetric: For any <span class="math">\(v_1,v_2\in V\times V\)</span>,</p>
+<div class="math">
+\[&lt;v_1,v_2&gt;_A = &lt;v_2,v_1&gt;_A\]</div>
+</li>
+<li><p class="first">Positive Definite: For any <span class="math">\(v\in V\)</span>,</p>
+<div class="math">
+\[&lt;v,v&gt;_A \geq 0\]</div>
+<p>with equality <em>only</em> when <span class="math">\(v=0\)</span> (note that <span class="math">\(0\)</span> means the
+zero <em>vector</em>).</p>
+</li>
+<li><p class="first">Bilinear: For any <span class="math">\(c_1,c_2\in\mathbb{R}\)</span> and
+<span class="math">\(v_1,v_2,v\in V\)</span>,</p>
+<div class="math">
+\[&lt;c(v_1+v_2),v&gt;_A = c&lt;v_1,v&gt; + c&lt;v_2,v&gt;\]</div>
+<p>Note that symmetry gives that this is true for the second component.
+This means that the inner product is linear in each of its two
+components.</p>
+</li>
+</ul>
+<div class="math">
+\[||v|| = &lt;v,v&gt;^{\frac12}\]</div>
+<p>We will discuss this a bit more when we learn about positive-definite
+matrices!</p>
+</div>
+<div class="section" id="general-norms">
+<h3>General Norms<a class="headerlink" href="#general-norms" title="Permalink to this headline">¶</a></h3>
+<p>There is also a more abstract definition of a norm - a norm is function
+from a vector space to the real numbers, that is positive definite,
+absolutely scalable and satisfies the triangle inequality.</p>
+<p>We&#8217;ll mostly be dealing with norms that come from inner products, but it
+is good to note that not all norms <em>must</em> come from an inner product.</p>
+</div>
+<div class="section" id="outer-products">
+<h3>Outer Products<a class="headerlink" href="#outer-products" title="Permalink to this headline">¶</a></h3>
+<p>Note that the inner product is just matrix multiplication of a
+<span class="math">\(1\times n\)</span> vector with an <span class="math">\(n\times 1\)</span> vector. In fact, we
+may write:</p>
+<div class="math">
+\[&lt;v,w&gt; = v^tw\]</div>
+<p>The <em>outer product</em> of two vectors is just the opposite. It is given by:</p>
+<div class="math">
+\[v\otimes w = vw^t\]</div>
+<p>Note that I am considering <span class="math">\(v\)</span> and <span class="math">\(w\)</span> as <em>column</em> vectors.
+The result of the inner product is a <em>scalar</em>. The result of the outer
+product is a <em>matrix</em>.</p>
+<div class="section" id="id1">
+<h4>Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p><strong>Extended example</strong>: the covariance matrix is an outer proudct.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># We have n observations of p variables</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">4</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">p</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># The covariance matrix is a p by p matrix</span>
+<span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.1212</span><span class="p">,</span>  <span class="mf">0.0027</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0452</span><span class="p">,</span>  <span class="mf">0.0313</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.0027</span><span class="p">,</span>  <span class="mf">0.0792</span><span class="p">,</span>  <span class="mf">0.0045</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0142</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.0452</span><span class="p">,</span>  <span class="mf">0.0045</span><span class="p">,</span>  <span class="mf">0.0844</span><span class="p">,</span>  <span class="mf">0.0174</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.0313</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0142</span><span class="p">,</span>  <span class="mf">0.0174</span><span class="p">,</span>  <span class="mf">0.0924</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># From the definition, the covariance matrix</span>
+<span class="c1"># is just the outer product of the normalized</span>
+<span class="c1"># matrix where every variable has zero mean</span>
+<span class="c1"># divided by the number of degrees of freedom</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">v</span> <span class="o">-</span> <span class="n">v</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.1212</span><span class="p">,</span>  <span class="mf">0.0027</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0452</span><span class="p">,</span>  <span class="mf">0.0313</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.0027</span><span class="p">,</span>  <span class="mf">0.0792</span><span class="p">,</span>  <span class="mf">0.0045</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0142</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.0452</span><span class="p">,</span>  <span class="mf">0.0045</span><span class="p">,</span>  <span class="mf">0.0844</span><span class="p">,</span>  <span class="mf">0.0174</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.0313</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0142</span><span class="p">,</span>  <span class="mf">0.0174</span><span class="p">,</span>  <span class="mf">0.0924</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="trace-and-determinant-of-matrices">
+<h3>Trace and Determinant of Matrices<a class="headerlink" href="#trace-and-determinant-of-matrices" title="Permalink to this headline">¶</a></h3>
+<p>The trace of a matrix <span class="math">\(A\)</span> is the sum of its diagonal elements. It
+is important for a couple of reasons:</p>
+<ul class="simple">
+<li>It is an <em>invariant</em> of a matrix under change of basis (more on this
+later).</li>
+<li>It defines a matrix norm (more on that later)</li>
+</ul>
+<p>The determinant of a matrix is defined to be the alternating sum of the
+product of permutations of the elements of a matrix.</p>
+<div class="math">
+\[\det(A) = \sum_{\sigma \in S_n} sgn(\sigma) \prod_{i=1}^n a_{i,\sigma_i}\]</div>
+<p>Let&#8217;s not dwell on that though. It is important to know that the
+determinant of a <span class="math">\(2\times 2\)</span> matrix is</p>
+<div class="math">
+\[\begin{split}\left|\begin{matrix}a_{11} &amp; a_{12}\\a_{21} &amp; a_{22}\end{matrix}\right| = a_{11}a_{22} - a_{12}a_{21}\end{split}\]</div>
+<p>This may be extended to an <span class="math">\(n\times n\)</span> matrix by minor expansion.
+I will leave that for you to google. We will be computing determinants
+using tools such as:</p>
+<p><code class="docutils literal"><span class="pre">np.linalg.det(A)</span></code></p>
+<p>What is most important about the determinant:</p>
+<ul class="simple">
+<li>Like the trace, it is also invariant under change of basis</li>
+<li>An <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> is invertible <span class="math">\(\iff\)</span>
+det<span class="math">\((A)\neq 0\)</span></li>
+<li>The rows(columns) of an <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> are
+linearly independent <span class="math">\(\iff\)</span> det<span class="math">\((A)\neq 0\)</span></li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mi">23</span> <span class="mi">96</span> <span class="mi">78</span> <span class="mi">38</span> <span class="mi">47</span> <span class="mi">97</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">44</span> <span class="mi">50</span> <span class="mi">36</span> <span class="mi">19</span>  <span class="mi">5</span> <span class="mi">25</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">61</span> <span class="mi">33</span> <span class="mi">91</span> <span class="mi">96</span>  <span class="mi">5</span> <span class="mi">53</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">17</span> <span class="mi">33</span> <span class="mi">79</span> <span class="mi">64</span> <span class="mi">40</span> <span class="mi">49</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">11</span> <span class="mi">74</span> <span class="mi">14</span> <span class="mi">79</span> <span class="mi">22</span> <span class="mi">74</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">36</span> <span class="mi">89</span> <span class="mi">74</span> <span class="mi">40</span> <span class="mi">31</span> <span class="mi">92</span><span class="p">]]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">992477586.0000</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="column-space-row-space-rank-and-kernel">
+<h3>Column space, Row space, Rank and Kernel<a class="headerlink" href="#column-space-row-space-rank-and-kernel" title="Permalink to this headline">¶</a></h3>
+<p>Let <span class="math">\(A\)</span> be an <span class="math">\(m\times n\)</span> matrix. We can view the columns of
+<span class="math">\(A\)</span> as vectors, say <span class="math">\(\textbf{a_1},...,\textbf{a_n}\)</span>. The
+space of all linear combinations of the <span class="math">\(\textbf{a_i}\)</span> are the
+<em>column space</em> of the matrix <span class="math">\(A\)</span>. Now, if
+<span class="math">\(\textbf{a_1},...,\textbf{a_n}\)</span> are <em>linearly independent</em>, then
+the column space is of dimension <span class="math">\(n\)</span>. Otherwise, the dimension of
+the column space is the size of the maximal set of linearly independent
+<span class="math">\(\textbf{a_i}\)</span>. Row space is exactly analogous, but the vectors
+are the <em>rows</em> of <span class="math">\(A\)</span>.</p>
+<p>The <em>rank</em> of a matrix <em>A</em> is the dimension of its column space - and -
+the dimension of its row space. These are equal for any matrix. Rank can
+be thought of as a measure of non-degeneracy of a system of linear
+equations, in that it is the <em>dimension of the image of the linear
+transformation</em> determined by <span class="math">\(A\)</span>.</p>
+<p>The <em>kernel</em> of a matrix <em>A</em> is the dimension of the space mapped to
+zero under the linear transformation that <span class="math">\(A\)</span> represents. The
+dimension of the kernel of a linear transformation is called the
+<em>nullity</em>.</p>
+<p>Index theorem: For an <span class="math">\(m\times n\)</span> matrix <span class="math">\(A\)</span>,</p>
+<p>rank(<span class="math">\(A\)</span>) + nullity(<span class="math">\(A\)</span>) = <span class="math">\(n\)</span>.</p>
+</div>
+<div class="section" id="matrix-norms">
+<h3>Matrix Norms<a class="headerlink" href="#matrix-norms" title="Permalink to this headline">¶</a></h3>
+<p>We can extend the notion of a norm of a vector to a norm of a matrix.
+Matrix norms are used in determining the <em>condition</em> of a matrix (we
+will define this in the next lecture.) There are many matrix norms, but
+three of the most common are so called &#8216;p&#8217; norms, and they are based on
+p-norms of vectors. So, for an <span class="math">\(n\)</span>-dimensional vector <span class="math">\(v\)</span>
+and for <span class="math">\(1\leq p &lt;\infty\)</span></p>
+<div class="math">
+\[||v||_p = \left(\sum\limits_{i=1}^n |v_i|^p\right)^\frac1p\]</div>
+<p>and for <span class="math">\(p =\infty\)</span>:</p>
+<div class="math">
+\[||v||_\infty = \max{|v_i|}\]</div>
+<p>Similarly, the corresponding matrix norms are:</p>
+<div class="math">
+\[||A||_p = \sup_x \frac{||Ax||_p}{||x||_p}\]</div>
+<div class="math">
+\[||A||_{1} = \max_j\left(\sum\limits_{i=1}^n|a_{ij}|\right)\]</div>
+<p>(column sum)</p>
+<div class="math">
+\[||A||_{\infty} = \max_i\left(\sum\limits_{j=1}^n|a_{ij}|\right)\]</div>
+<p>(row sum)</p>
+<p>FACT: The matrix 2-norm, <span class="math">\(||A||_2\)</span> is given by the largest
+eigenvalue of <span class="math">\(\left(A^TA\right)^\frac12\)</span> - otherwise known as the
+largest singular value of <span class="math">\(A\)</span>. We will define eigenvalues and
+singular values formally in the next lecture.</p>
+<p>Another norm that is often used is called the Frobenius norm. It one of
+the simplests to compute:</p>
+<div class="math">
+\[||A||_F = \left(\sum\sum \left(a_{ij}\right)^2\right)^\frac12\]</div>
+</div>
+<div class="section" id="special-matrices">
+<h3>Special Matrices<a class="headerlink" href="#special-matrices" title="Permalink to this headline">¶</a></h3>
+<p>Some matrices have interesting properties that allow us either simplify
+the underlying linear system or to understand more about it.</p>
+<div class="section" id="square-matrices">
+<h4>Square Matrices<a class="headerlink" href="#square-matrices" title="Permalink to this headline">¶</a></h4>
+<p>Square matrices have the same number of columns (usually denoted
+<span class="math">\(n\)</span>). We refer to an arbitrary square matrix as and
+<span class="math">\(n\times n\)</span> or we refer to it as a &#8216;square matrix of dimension
+<span class="math">\(n\)</span>&#8216;. If an <span class="math">\(n\times n\)</span> matrix <span class="math">\(A\)</span> has <em>full rank</em>
+(i.e. it has rank <span class="math">\(n\)</span>), then <span class="math">\(A\)</span> is invertible, and its
+inverse is unique. This is a situation that leads to a unique solution
+to a linear system.</p>
+</div>
+<div class="section" id="diagonal-matrices">
+<h4>Diagonal Matrices<a class="headerlink" href="#diagonal-matrices" title="Permalink to this headline">¶</a></h4>
+<p>A diagonal matrix is a matrix with all entries off the diagonal equal to
+zero. Strictly speaking, such a matrix should be square, but we can also
+consider rectangular matrices of size <span class="math">\(m\times n\)</span> to be diagonal,
+if all entries <span class="math">\(a_{ij}\)</span> are zero for <span class="math">\(i\neq j\)</span></p>
+</div>
+<div class="section" id="symmetric-and-skew-symmetric">
+<h4>Symmetric and Skew Symmetric<a class="headerlink" href="#symmetric-and-skew-symmetric" title="Permalink to this headline">¶</a></h4>
+<p>A matrix <span class="math">\(A\)</span> is (skew) symmetric iff <span class="math">\(a_{ij} = (-)a_{ji}\)</span>.</p>
+<p>Equivalently, <span class="math">\(A\)</span> is (skew) symmetric iff</p>
+<div class="math">
+\[A = (-)A^T\]</div>
+</div>
+<div class="section" id="upper-and-lower-triangular">
+<h4>Upper and Lower Triangular<a class="headerlink" href="#upper-and-lower-triangular" title="Permalink to this headline">¶</a></h4>
+<p>A matrix <span class="math">\(A\)</span> is (upper|lower) triangular if <span class="math">\(a_{ij} = 0\)</span>
+for all <span class="math">\(i (&gt;|&lt;) j\)</span></p>
+</div>
+<div class="section" id="banded-and-sparse-matrices">
+<h4>Banded and Sparse Matrices<a class="headerlink" href="#banded-and-sparse-matrices" title="Permalink to this headline">¶</a></h4>
+<p>These are matrices with lots of zero entries. Banded matrices have
+non-zero &#8216;bands&#8217;, and this structure can be exploited to simplify
+computations. Sparse matrices are matrices where there are &#8216;few&#8217;
+non-zero entries, but there is no pattern to where non-zero entries are
+found.</p>
+</div>
+<div class="section" id="orthogonal-and-orthonormal">
+<h4>Orthogonal and Orthonormal<a class="headerlink" href="#orthogonal-and-orthonormal" title="Permalink to this headline">¶</a></h4>
+<p>A matrix <span class="math">\(A\)</span> is <em>orthogonal</em> iff</p>
+<div class="math">
+\[A A^T = I\]</div>
+<p>In other words, <span class="math">\(A\)</span> is orthogonal iff</p>
+<div class="math">
+\[A^T=A^{-1}\]</div>
+<p>Facts:</p>
+<ul class="simple">
+<li>The rows and columns of an orthogonal matrix are an orthonormal set
+of vectors.</li>
+<li>Geometrically speaking, orthogonal transformations preserve lengths
+and angles between vectors</li>
+</ul>
+</div>
+<div class="section" id="positive-definite">
+<h4>Positive Definite<a class="headerlink" href="#positive-definite" title="Permalink to this headline">¶</a></h4>
+<p>Positive definite matrices are an important class of matrices with very
+desirable properties. A square matrix <span class="math">\(A\)</span> is positive definite if</p>
+<div class="math">
+\[u^TA u &gt; 0\]</div>
+<p>for any non-zero n-dimensional vector <span class="math">\(u\)</span>.</p>
+<p>A symmetric, positive-definite matrix <span class="math">\(A\)</span> is a positive-definite
+matrix such that</p>
+<div class="math">
+\[A = A^T\]</div>
+<p>IMPORTANT:</p>
+<ul class="simple">
+<li>Symmetric, positive-definite matrices have &#8216;square-roots&#8217; (in a
+sense)</li>
+<li>Any symmetric, positive-definite matrix is <em>diagonizable</em>!!!</li>
+<li>Co-variance matrices are symmetric and positive-definite</li>
+</ul>
+<p>Now that we have the basics down, we can move on to numerical methods
+for solving systems - aka matrix decompositions.</p>
+</div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<p><strong>1</strong>. Determine whether the following system of equations has no
+solution, infinite solutions or a unique solution <em>without solving the
+system</em></p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+x+2y-z+w &amp;=&amp; 2\\
+3x-4y+2 w &amp;=&amp; 3\\
+2y+z &amp;=&amp; 4\\
+2x+2y-3z+2w&amp;=&amp;0\\
+-2x+6y-z-w&amp;=&amp;-1
+\end{eqnarray*}\end{split}\]</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.0000</span>
+</pre></div>
+</div>
+<p><strong>2</strong>. Let <span class="math">\(f(x)\)</span> be a linear transformation of
+<span class="math">\(\mathbb{R}^3\)</span> such that</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+f(e_1) &amp;=&amp; (1,1,3)\\
+f(e_2) &amp;=&amp; (1,0,4)\\
+f(e_3) &amp;=&amp; (0,2,1)
+\end{eqnarray*}\end{split}\]</div>
+<ul>
+<li><p class="first">Find a matrix representation for <span class="math">\(f\)</span>.</p>
+</li>
+<li><p class="first">Compute the matrix representation for <span class="math">\(f\)</span> in the basis</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+v_1 &amp;=&amp; (2,3,3)\\
+v_2 &amp;=&amp; (8,5,2)\\
+v_3 &amp;=&amp; (1,0,5)
+\end{eqnarray*}\end{split}\]</div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivation-simultaneous-equations">Motivation - Simultaneous Equations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vector-spaces">Vector Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#matrices-and-linear-transformations">Matrices and Linear Transformations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-does-all-this-have-to-do-with-linear-systems">What does all this have to do with linear systems?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#more-properties-of-vectors-vector-spaces-and-matrices">More Properties of Vectors, Vector Spaces and Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inner-products">Inner Products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exercises">Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="12B_C%2b%2b_Python_pybind11.html"
+                          title="Previous page">&larr; Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="13B_LinearAlgebra2.html"
+                          title="Next page">&rarr; Matrix Decompositions</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/13A_LinearAlgebra1.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="13B_LinearAlgebra2.html" title="Matrix Decompositions"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="12B_C%2b%2b_Python_pybind11.html" title="Using pybind11"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/13A_LinearAlgebra1.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:23 GMT -->
+</html>

@@ -1,0 +1,948 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/10A_CodeOptimization.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:28 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Code Optimization &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Just-in-time compilation (JIT)" href="10B_Numba.html" />
+    <link rel="prev" title="Machine Learning with sklearn" href="09_Machine_Learning.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="10B_Numba.html" title="Just-in-time compilation (JIT)"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="09_Machine_Learning.html" title="Machine Learning with sklearn"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="code-optimization">
+<h1>Code Optimization<a class="headerlink" href="#code-optimization" title="Permalink to this headline">¶</a></h1>
+<p>Here we will look briefly at how to time and profile your code, and then
+at an approach to making your code run faster. There is a sequence of
+mini-goals that is applicable to nearly every programming problem:</p>
+<ol class="arabic simple">
+<li>Make it run</li>
+<li>Make it right</li>
+<li>Make it fast</li>
+</ol>
+<p>Note that the list does not start with <code class="docutils literal"><span class="pre">Make</span> <span class="pre">it</span> <span class="pre">fast</span></code>. Testing,
+debugging and optimization are a set of strategies and practices to
+achieve those goals. Only optimization will be covered in these notes -
+pointers to resources for testing and debugging are provided but not
+covered.</p>
+<div class="section" id="testing-code">
+<h2>Testing code<a class="headerlink" href="#testing-code" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>For an introduction to standard testing in Python, see <a class="reference external" href="http://docs.python-guide.org/en/latest/writing/tests/">Testing Your
+Code</a></li>
+<li>For automated generation of tests, see the <a class="reference external" href="https://github.com/DRMacIver/hypothesis">Hypothesis
+package</a></li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">distance</span><span class="o">.</span><span class="n">py</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns Euclidean distance betwen numpy vectors u and v.&quot;&quot;&quot;</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">distance</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">test_distance</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="k">import</span> <span class="n">assert_almost_equal</span>
+<span class="kn">from</span> <span class="nn">distance</span> <span class="k">import</span> <span class="n">euclidean_dist</span>
+
+<span class="k">def</span> <span class="nf">test_non_negativity</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">test_coincidence_when_zero</span><span class="p">():</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">test_coincidence_when_not_zero</span><span class="p">():</span>
+     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">test_symmetry</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_triangle</span><span class="p">():</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_known1</span><span class="p">():</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_known2</span><span class="p">():</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+    <span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">test_known3</span><span class="p">():</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">4</span><span class="p">])</span>
+    <span class="n">assert_almost_equal</span><span class="p">(</span><span class="n">euclidean_dist</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">test_distance</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span>! py.test
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span><span class="p">:</span> <span class="mi">1</span><span class="p">:</span> <span class="n">py</span><span class="o">.</span><span class="n">test</span><span class="p">:</span> <span class="ow">not</span> <span class="n">found</span>
+</pre></div>
+</div>
+<div class="section" id="debugging">
+<h3>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h3>
+<p>Tools within Jupyter from the <a class="reference external" href="https://ipython.org/ipython-doc/1/interactive/tutorial.html#debugging">official
+tutorial</a></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">After</span> <span class="n">an</span> <span class="n">exception</span> <span class="n">occurs</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">call</span> <span class="o">%</span><span class="n">debug</span> <span class="n">to</span> <span class="n">jump</span> <span class="n">into</span> <span class="n">the</span> <span class="n">Python</span> <span class="n">debugger</span> <span class="p">(</span><span class="n">pdb</span><span class="p">)</span> <span class="ow">and</span> <span class="n">examine</span> <span class="n">the</span> <span class="n">problem</span><span class="o">.</span> <span class="n">Alternatively</span><span class="p">,</span> <span class="k">if</span> <span class="n">you</span> <span class="n">call</span> <span class="o">%</span><span class="n">pdb</span><span class="p">,</span> <span class="n">IPython</span> <span class="n">will</span> <span class="n">automatically</span> <span class="n">start</span> <span class="n">the</span> <span class="n">debugger</span> <span class="n">on</span> <span class="nb">any</span> <span class="n">uncaught</span> <span class="n">exception</span><span class="o">.</span> <span class="n">You</span> <span class="n">can</span> <span class="nb">print</span> <span class="n">variables</span><span class="p">,</span> <span class="n">see</span> <span class="n">code</span><span class="p">,</span> <span class="n">execute</span> <span class="n">statements</span> <span class="ow">and</span> <span class="n">even</span> <span class="n">walk</span> <span class="n">up</span> <span class="ow">and</span> <span class="n">down</span> <span class="n">the</span> <span class="n">call</span> <span class="n">stack</span> <span class="n">to</span> <span class="n">track</span> <span class="n">down</span> <span class="n">the</span> <span class="n">true</span> <span class="n">source</span> <span class="n">of</span> <span class="n">the</span> <span class="n">problem</span><span class="o">.</span> <span class="n">This</span> <span class="n">can</span> <span class="n">be</span> <span class="n">an</span> <span class="n">efficient</span> <span class="n">way</span> <span class="n">to</span> <span class="n">develop</span> <span class="ow">and</span> <span class="n">debug</span> <span class="n">code</span><span class="p">,</span> <span class="ow">in</span> <span class="n">many</span> <span class="n">cases</span> <span class="n">eliminating</span> <span class="n">the</span> <span class="n">need</span> <span class="k">for</span> <span class="nb">print</span> <span class="n">statements</span> <span class="ow">or</span> <span class="n">external</span> <span class="n">debugging</span> <span class="n">tools</span><span class="o">.</span>
+
+<span class="n">You</span> <span class="n">can</span> <span class="n">also</span> <span class="n">step</span> <span class="n">through</span> <span class="n">a</span> <span class="n">program</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">beginning</span> <span class="n">by</span> <span class="n">calling</span> <span class="o">%</span><span class="n">run</span> <span class="o">-</span><span class="n">d</span> <span class="n">theprogram</span><span class="o">.</span><span class="n">py</span><span class="o">.</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>See the <a class="reference external" href="http://www.scipy-lectures.org/advanced/debugging/">Scipy
+tutorial</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="timing-and-profiling-code">
+<h2>Timing and profiling code<a class="headerlink" href="#timing-and-profiling-code" title="Permalink to this headline">¶</a></h2>
+<p>Install profiling tools:</p>
+<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">pre</span> <span class="n">line</span><span class="o">-</span><span class="n">profiler</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">psutil</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">memory_profiler</span>
+</pre></div>
+</div>
+<p>References:</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://scipy-lectures.github.com/advanced/optimizing/index.html">http://scipy-lectures.github.com/advanced/optimizing/index.html</a></li>
+<li><a class="reference external" href="http://pynash.org/2013/03/06/timing-and-profiling.html">http://pynash.org/2013/03/06/timing-and-profiling.html</a></li>
+</ol>
+<div class="section" id="timing-code">
+<h3>Timing code<a class="headerlink" href="#timing-code" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>1s = 1000 ms</li>
+<li>1 ms = 1000 <span class="math">\(\mu\)</span>s</li>
+<li>1 <span class="math">\(\mu\)</span>s = 1000 ns</li>
+</ul>
+<div class="section" id="simple-approach">
+<h4>Simple approach<a class="headerlink" href="#simple-approach" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">timeit</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">nsec</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function sleeps for nsec seconds.&quot;&quot;&quot;</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">nsec</span><span class="p">)</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+<span class="n">f</span><span class="p">()</span>
+<span class="n">elapsed</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+<span class="n">elapsed</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.001308990176767</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="we-can-make-a-decorator-for-convenience">
+<h4>We can make a decorator for convenience<a class="headerlink" href="#we-can-make-a-decorator-for-convenience" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_time</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">timeit</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span>
+        <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">timeit</span><span class="o">.</span><span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">func</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="nd">@process_time</span>
+<span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">nsec</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function sleeps for nsec seconds.&quot;&quot;&quot;</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">nsec</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">f1</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.0010730819776654</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="within-the-jupyter-notebook-use-the-timeit-magic-function">
+<h4>Within the Jupyter notebook, use the timeit magic function<a class="headerlink" href="#within-the-jupyter-notebook-use-the-timeit-magic-function" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">100</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">10.1</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n10</span> <span class="n">f</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">10.1</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r10</span> <span class="n">f</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">100</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">10</span><span class="p">:</span> <span class="mf">10.1</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n10</span> <span class="o">-</span><span class="n">r3</span> <span class="n">f</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">10.1</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="profiling-code">
+<h3>Profiling code<a class="headerlink" href="#profiling-code" title="Permalink to this headline">¶</a></h3>
+<p>This can be done in a notebook with %prun, with the following readouts
+as column headers:</p>
+<ul class="simple">
+<li>ncalls<ul>
+<li>for the number of calls,</li>
+</ul>
+</li>
+<li>tottime<ul>
+<li>for the total time spent in the given function (and excluding time
+made in calls to sub-functions),</li>
+</ul>
+</li>
+<li>percall<ul>
+<li>is the quotient of tottime divided by ncalls</li>
+</ul>
+</li>
+<li>cumtime<ul>
+<li>is the total time spent in this and all subfunctions (from
+invocation till exit). This figure is accurate even for recursive
+functions.</li>
+</ul>
+</li>
+<li>percall<ul>
+<li>is the quotient of cumtime divided by primitive calls</li>
+</ul>
+</li>
+<li>filename:lineno(function)<ul>
+<li>provides the respective data of each function</li>
+</ul>
+</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">foo1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">foo2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">foo3</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="p">[</span><span class="n">foo1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+    <span class="n">foo2</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span><span class="o">**</span><span class="mi">3</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">foo1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">foo2</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">foo3</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">bar</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">prun</span> <span class="o">-</span><span class="n">q</span> <span class="o">-</span><span class="n">D</span> <span class="n">work</span><span class="o">.</span><span class="n">prof</span> <span class="n">work</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="n">e6</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">***</span> <span class="n">Profile</span> <span class="n">stats</span> <span class="n">marshalled</span> <span class="n">to</span> <span class="n">file</span> <span class="s1">&#39;work.prof&#39;</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pstats</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="s1">&#39;work.prof&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Sat</span> <span class="n">Feb</span>  <span class="mi">4</span> <span class="mi">21</span><span class="p">:</span><span class="mi">48</span><span class="p">:</span><span class="mi">25</span> <span class="mi">2017</span>    <span class="n">work</span><span class="o">.</span><span class="n">prof</span>
+
+         <span class="mi">14000048</span> <span class="n">function</span> <span class="n">calls</span> <span class="ow">in</span> <span class="mf">9.068</span> <span class="n">seconds</span>
+
+   <span class="n">Random</span> <span class="n">listing</span> <span class="n">order</span> <span class="n">was</span> <span class="n">used</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+       <span class="mi">14</span>    <span class="mf">2.495</span>    <span class="mf">0.178</span>    <span class="mf">9.067</span>    <span class="mf">0.648</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">sum</span><span class="p">}</span>
+  <span class="mi">1000001</span>    <span class="mf">0.515</span>    <span class="mf">0.000</span>    <span class="mf">0.515</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">12</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">9.068</span>    <span class="mf">9.068</span> <span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">1</span><span class="p">(</span><span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span><span class="p">)</span>
+  <span class="mi">2000002</span>    <span class="mf">0.432</span>    <span class="mf">0.000</span>    <span class="mf">0.432</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">5</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+       <span class="mi">11</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">7.572</span>    <span class="mf">0.688</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">1</span><span class="p">(</span><span class="n">foo1</span><span class="p">)</span>
+ <span class="mi">11000011</span>    <span class="mf">5.626</span>    <span class="mf">0.000</span>    <span class="mf">5.626</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">2</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;disable&#39;</span> <span class="n">of</span> <span class="s1">&#39;_lsprof.Profiler&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">6.915</span>    <span class="mf">6.915</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">8</span><span class="p">(</span><span class="o">&lt;</span><span class="n">listcomp</span><span class="o">&gt;</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">9.068</span>    <span class="mf">9.068</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">14</span><span class="p">(</span><span class="n">work</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.709</span>    <span class="mf">0.709</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">11</span><span class="p">(</span><span class="n">bar</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">9.068</span>    <span class="mf">9.068</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">exec</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">7.285</span>    <span class="mf">7.285</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">7</span><span class="p">(</span><span class="n">foo3</span><span class="p">)</span>
+        <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.786</span>    <span class="mf">0.393</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">4</span><span class="p">(</span><span class="n">foo2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;cumulative&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Sat</span> <span class="n">Feb</span>  <span class="mi">4</span> <span class="mi">21</span><span class="p">:</span><span class="mi">48</span><span class="p">:</span><span class="mi">25</span> <span class="mi">2017</span>    <span class="n">work</span><span class="o">.</span><span class="n">prof</span>
+
+         <span class="mi">14000048</span> <span class="n">function</span> <span class="n">calls</span> <span class="ow">in</span> <span class="mf">9.068</span> <span class="n">seconds</span>
+
+   <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">internal</span> <span class="n">time</span><span class="p">,</span> <span class="n">cumulative</span> <span class="n">time</span>
+   <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">13</span> <span class="n">to</span> <span class="mi">3</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="s1">&#39;foo&#39;</span><span class="o">&gt;</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+       <span class="mi">11</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">7.572</span>    <span class="mf">0.688</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">1</span><span class="p">(</span><span class="n">foo1</span><span class="p">)</span>
+        <span class="mi">2</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.786</span>    <span class="mf">0.393</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">4</span><span class="p">(</span><span class="n">foo2</span><span class="p">)</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">7.285</span>    <span class="mf">7.285</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">7</span><span class="p">(</span><span class="n">foo3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">p</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;ncalls&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Sat</span> <span class="n">Feb</span>  <span class="mi">4</span> <span class="mi">21</span><span class="p">:</span><span class="mi">48</span><span class="p">:</span><span class="mi">25</span> <span class="mi">2017</span>    <span class="n">work</span><span class="o">.</span><span class="n">prof</span>
+
+         <span class="mi">14000048</span> <span class="n">function</span> <span class="n">calls</span> <span class="ow">in</span> <span class="mf">9.068</span> <span class="n">seconds</span>
+
+   <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">call</span> <span class="n">count</span>
+   <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">13</span> <span class="n">to</span> <span class="mi">5</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="mi">5</span><span class="o">&gt;</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+ <span class="mi">11000011</span>    <span class="mf">5.626</span>    <span class="mf">0.000</span>    <span class="mf">5.626</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">2</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+  <span class="mi">2000002</span>    <span class="mf">0.432</span>    <span class="mf">0.000</span>    <span class="mf">0.432</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">5</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+  <span class="mi">1000001</span>    <span class="mf">0.515</span>    <span class="mf">0.000</span>    <span class="mf">0.515</span>    <span class="mf">0.000</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">12</span><span class="p">(</span><span class="o">&lt;</span><span class="n">genexpr</span><span class="o">&gt;</span><span class="p">)</span>
+       <span class="mi">14</span>    <span class="mf">2.495</span>    <span class="mf">0.178</span>    <span class="mf">9.067</span>    <span class="mf">0.648</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">sum</span><span class="p">}</span>
+       <span class="mi">11</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">7.572</span>    <span class="mf">0.688</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">48</span><span class="n">ed291f45d5</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">1</span><span class="p">(</span><span class="n">foo1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="checking-memory-usage">
+<h3>Checking memory usage<a class="headerlink" href="#checking-memory-usage" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">memory_profiler</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">file</span> <span class="n">foo</span><span class="o">.</span><span class="n">py</span>
+
+<span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">phrase</span> <span class="o">=</span> <span class="s1">&#39;repeat me&#39;</span>
+    <span class="n">pmul</span> <span class="o">=</span> <span class="n">phrase</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">pjoi</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">phrase</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)])</span>
+    <span class="n">pinc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">pinc</span> <span class="o">+=</span> <span class="n">phrase</span>
+    <span class="k">del</span> <span class="n">pmul</span><span class="p">,</span> <span class="n">pjoi</span><span class="p">,</span> <span class="n">pinc</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Overwriting</span> <span class="n">foo</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># mprun requires the code be in a file</span>
+<span class="c1"># functions declared interactively in python will not work</span>
+
+<span class="kn">from</span> <span class="nn">foo</span> <span class="k">import</span> <span class="n">foo</span>
+
+<span class="o">%</span><span class="n">mprun</span> <span class="o">-</span><span class="n">f</span> <span class="n">foo</span> <span class="n">foo</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="c1"># However, memit does work with interactive functions</span>
+<span class="c1"># Unlike mprun which gives a line by line analysis</span>
+<span class="c1"># memit gives the total amount of memory used</span>
+
+<span class="k">def</span> <span class="nf">gobble</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+
+<span class="o">%</span><span class="n">memit</span> <span class="o">-</span><span class="n">r</span> <span class="mi">3</span> <span class="n">gobble</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">peak</span> <span class="n">memory</span><span class="p">:</span> <span class="mf">85.16</span> <span class="n">MiB</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="mf">39.19</span> <span class="n">MiB</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="data-structures-and-algorithms">
+<h2>Data structures and algorithms<a class="headerlink" href="#data-structures-and-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>There are many ways to speed up slow code. However, the first thing that
+should come to mind (after profiling to identify the bottlenecks) is
+whether there is a more appropriate data structure or algorithm that can
+be used. The reason is that this is the only approach that makes a
+difference to the big O complexity, and this makes all the difference
+for scalability. A few examples are shown here; a large collection of
+classic data structures and algorithms in Python with detailed
+explanations is available at <a class="reference external" href="http://interactivepython.org/runestone/static/pythonds/index.html#">Problem Solving wiht Algorithms and Data
+Structures</a></p>
+<p>You are highly encouraged to take an algorithms class, where you will
+discover strategies such as:</p>
+<ul class="simple">
+<li>adaptive methods (e.g. adaptive quadrature, adaptive Runge-Kutta)</li>
+<li>divide and conquer (e.g. Barnes-Hut, Fast Fourier Transform)</li>
+<li>tabling and dynamic programming (e.g. Viterbi algorithm for Hidden
+Markov Models)</li>
+<li>graphs and network algorithms (e.g. shortest path, max flow min cut)</li>
+<li>hashing (e.g. locality senstive hashing, Bloom filters)</li>
+<li>probabilistic algorithms (e.g. randomized projections, Monte Carlo
+integration)</li>
+</ul>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Using lists</strong></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">common1</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using lists.&quot;&quot;&quot;</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">ys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">==</span><span class="n">y</span><span class="p">:</span>
+                <span class="n">zs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zs</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n3</span> <span class="o">-</span><span class="n">r3</span> <span class="n">common1</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">872</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<p><strong>Using sets</strong></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n3</span> <span class="o">-</span><span class="n">r3</span> <span class="nb">set</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">27.2</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<p><strong>Using lists</strong></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">alist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">100000</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
+<span class="n">blist</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[:]</span>
+<span class="n">entries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using repeated sorts.&quot;&quot;&quot;</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">alist</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alist</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">zs</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f1</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">270</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<p><strong>Using a heap (priority queue)</strong></p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">heapq</span> <span class="k">import</span> <span class="n">heappushpop</span><span class="p">,</span> <span class="n">heapify</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using a priority queue.&quot;&quot;&quot;</span>
+    <span class="n">heapify</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+    <span class="n">zs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">heappushpop</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">entry</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">zs</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="n">f2</span><span class="p">(</span><span class="n">blist</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">100</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">2.57</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="section" id="python-idioms-for-speed">
+<h3>Python idioms for speed<a class="headerlink" href="#python-idioms-for-speed" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="string-concatenation">
+<h4>String concatenation<a class="headerlink" href="#string-concatenation" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">concat1</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using string concatenation.&quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">item</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+<span class="k">def</span> <span class="nf">concat2</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using join.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+
+<span class="n">alist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;abcde&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000000</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">concat1</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">concat2</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">170</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">11.9</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="avoiding-loops">
+<h4>Avoiding loops<a class="headerlink" href="#avoiding-loops" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Avoiding loops.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using for loop with function call.&quot;&quot;&quot;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span> <span class="nf">loop2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using local version of function.&quot;&quot;&quot;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">sin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+<span class="k">def</span> <span class="nf">loop3</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using list comprehension.&quot;&quot;&quot;</span>
+    <span class="n">sin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">sin</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">loop4</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using map.&quot;&quot;&quot;</span>
+    <span class="n">sin</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">sin</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+
+<span class="k">def</span> <span class="nf">loop5</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using numpy.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000000</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">loop2</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">loop3</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">loop4</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n1</span> <span class="n">loop5</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">loop2</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">loop3</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">loop4</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">loop1</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">loop5</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">323</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">276</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">234</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">234</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">1</span> <span class="n">loop</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">77.6</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-in-place-operations">
+<h4>Using in-place operations<a class="headerlink" href="#using-in-place-operations" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
+
+<span class="o">%</span><span class="n">timeit</span> <span class="k">global</span> <span class="n">a</span><span class="p">;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="mi">0</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="k">global</span> <span class="n">a</span><span class="p">;</span> <span class="n">a</span> <span class="o">*=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">677</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">484</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-appropriate-indexing">
+<h4>Using appropriate indexing<a class="headerlink" href="#using-appropriate-indexing" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">idx1</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using loops.&quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">x</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+<span class="k">def</span> <span class="nf">idx2</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using logical indexing.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">xs</span><span class="p">[(</span><span class="n">xs</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">xs</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">)])</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000000</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">idx1</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">idx2</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">253</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">3.64</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-views-to-implement-stencils">
+<h4>Using views to implement stencils<a class="headerlink" href="#using-views-to-implement-stencils" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">average1</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using loops.&quot;&quot;&quot;</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cols</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">u</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">u</span> <span class="o">&gt;=</span> <span class="n">rows</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">cols</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="n">xs</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span>
+            <span class="n">ys</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">/</span><span class="mf">9.0</span>
+    <span class="k">return</span> <span class="n">ys</span>
+
+<span class="k">def</span> <span class="nf">average2</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Using shifted array views and border to avoid out of bounds checks.&quot;&quot;&quot;</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">xs1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">cols</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">xs1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[:]</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="p">(</span><span class="n">xs1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>  <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>  <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span>
+          <span class="n">xs1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span>
+          <span class="n">xs1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>   <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:]</span>   <span class="o">+</span> <span class="n">xs1</span><span class="p">[</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">2</span><span class="p">:])</span><span class="o">/</span><span class="mf">9.0</span>
+    <span class="k">return</span> <span class="n">ys</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">average1</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">average2</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">2.94</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="n">The</span> <span class="n">slowest</span> <span class="n">run</span> <span class="n">took</span> <span class="mf">5.25</span> <span class="n">times</span> <span class="n">longer</span> <span class="n">than</span> <span class="n">the</span> <span class="n">fastest</span><span class="o">.</span> <span class="n">This</span> <span class="n">could</span> <span class="n">mean</span> <span class="n">that</span> <span class="n">an</span> <span class="n">intermediate</span> <span class="n">result</span> <span class="ow">is</span> <span class="n">being</span> <span class="n">cached</span><span class="o">.</span>
+<span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">31.8</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-generalized-universal-functions-gufuncs">
+<h4>Using generalized universal functions (gufuncs)<a class="headerlink" href="#using-generalized-universal-functions-gufuncs" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">xs</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.39553964</span><span class="p">,</span>  <span class="mf">0.43949635</span><span class="p">,</span>  <span class="mf">0.77481941</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.84000755</span><span class="p">,</span>
+         <span class="mf">0.94299563</span><span class="p">,</span>  <span class="mf">0.43152857</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.87968629</span><span class="p">,</span>  <span class="mf">0.11504792</span><span class="p">,</span>  <span class="mf">0.03695428</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.71660984</span><span class="p">,</span>
+         <span class="mf">0.94491872</span><span class="p">,</span>  <span class="mf">0.48812466</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.0503604</span> <span class="p">,</span>  <span class="mf">0.22943346</span><span class="p">,</span>  <span class="mf">0.49411253</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.58721728</span><span class="p">,</span>
+         <span class="mf">0.6981426</span> <span class="p">,</span>  <span class="mf">0.3121911</span> <span class="p">],</span>
+       <span class="o">...</span><span class="p">,</span>
+       <span class="p">[</span> <span class="mf">0.26690533</span><span class="p">,</span>  <span class="mf">0.17851867</span><span class="p">,</span>  <span class="mf">0.09191283</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.51155374</span><span class="p">,</span>
+         <span class="mf">0.36687633</span><span class="p">,</span>  <span class="mf">0.89075235</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.31549862</span><span class="p">,</span>  <span class="mf">0.65091691</span><span class="p">,</span>  <span class="mf">0.78542996</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.50022381</span><span class="p">,</span>
+         <span class="mf">0.61367792</span><span class="p">,</span>  <span class="mf">0.14031692</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.282188</span>  <span class="p">,</span>  <span class="mf">0.31751235</span><span class="p">,</span>  <span class="mf">0.8940388</span> <span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.26812523</span><span class="p">,</span>
+         <span class="mf">0.34901333</span><span class="p">,</span>  <span class="mf">0.92292332</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">ys</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.93286296</span><span class="p">,</span>  <span class="mf">0.94418211</span><span class="p">,</span>  <span class="mf">0.0953946</span> <span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.26749038</span><span class="p">,</span>
+         <span class="mf">0.0531014</span> <span class="p">,</span>  <span class="mf">0.16493622</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.32503159</span><span class="p">,</span>  <span class="mf">0.4449412</span> <span class="p">,</span>  <span class="mf">0.18590556</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.76733633</span><span class="p">,</span>
+         <span class="mf">0.26397945</span><span class="p">,</span>  <span class="mf">0.34141141</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.84743659</span><span class="p">,</span>  <span class="mf">0.82717738</span><span class="p">,</span>  <span class="mf">0.13587691</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.30086508</span><span class="p">,</span>
+         <span class="mf">0.96820162</span><span class="p">,</span>  <span class="mf">0.9575234</span> <span class="p">],</span>
+       <span class="o">...</span><span class="p">,</span>
+       <span class="p">[</span> <span class="mf">0.19222391</span><span class="p">,</span>  <span class="mf">0.92741194</span><span class="p">,</span>  <span class="mf">0.6319984</span> <span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.16065195</span><span class="p">,</span>
+         <span class="mf">0.24150295</span><span class="p">,</span>  <span class="mf">0.99804306</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.5787627</span> <span class="p">,</span>  <span class="mf">0.93275705</span><span class="p">,</span>  <span class="mf">0.09585525</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.0570904</span> <span class="p">,</span>
+         <span class="mf">0.61784739</span><span class="p">,</span>  <span class="mf">0.8015175</span> <span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.37052475</span><span class="p">,</span>  <span class="mf">0.58469862</span><span class="p">,</span>  <span class="mf">0.80742525</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>  <span class="mf">0.88899757</span><span class="p">,</span>
+         <span class="mf">0.93674252</span><span class="p">,</span>  <span class="mf">0.79794595</span><span class="p">]])</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="k">import</span> <span class="n">inner1d</span>
+
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n3</span> <span class="o">-</span><span class="n">r3</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="o">@</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)])</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n3</span> <span class="o">-</span><span class="n">r3</span> <span class="n">inner1d</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">945</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">14</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numpy.core.umath_tests</span> <span class="k">import</span> <span class="n">matrix_multiply</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">n3</span> <span class="o">-</span><span class="n">r3</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="o">@</span> <span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)])</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r3</span> <span class="o">-</span><span class="n">n3</span> <span class="n">matrix_multiply</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.28</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">3</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">12</span> <span class="n">µs</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="memoization">
+<h4>Memoization<a class="headerlink" href="#memoization" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">lru_cache</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">fib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># A simple example of memoization - in practice, use `lru_cache` from functools</span>
+<span class="k">def</span> <span class="nf">memoize</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">store</span><span class="p">:</span>
+            <span class="n">store</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">store</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">func</span>
+
+<span class="nd">@memoize</span>
+<span class="k">def</span> <span class="nf">mfib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="nd">@lru_cache</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">lfib</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">assert</span><span class="p">(</span><span class="n">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="n">mfib</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">==</span> <span class="n">lfib</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n10</span> <span class="n">fib</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n10</span> <span class="n">mfib</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="o">%</span><span class="n">timeit</span> <span class="o">-</span><span class="n">r1</span> <span class="o">-</span><span class="n">n10</span> <span class="n">lfib</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">263</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">25.9</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+<span class="mi">10</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">1</span><span class="p">:</span> <span class="mf">26.3</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Optimization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#testing-code">Testing code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#timing-and-profiling-code">Timing and profiling code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-structures-and-algorithms">Data structures and algorithms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14A_Optimization_One_Dimension.html">Optimization and Root Finding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="09_Machine_Learning.html"
+                          title="Previous page">&larr; Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="10B_Numba.html"
+                          title="Next page">&rarr; Just-in-time compilation (JIT)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/10A_CodeOptimization.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="10B_Numba.html" title="Just-in-time compilation (JIT)"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="09_Machine_Learning.html" title="Machine Learning with sklearn"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/10A_CodeOptimization.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:09:29 GMT -->
+</html>

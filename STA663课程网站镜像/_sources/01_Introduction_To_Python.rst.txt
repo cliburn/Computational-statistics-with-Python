@@ -1,0 +1,1787 @@
+
+Introduction to Python
+======================
+
+Resources
+---------
+
+Jupyter
+~~~~~~~
+
+-  `Jupyter
+   documentation <http://jupyter.readthedocs.org/en/latest/index.html>`__
+-  `A gallery of interesting IPython
+   Notebooks <https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks>`__
+
+Conda
+~~~~~
+
+-  `Conda for environment and package
+   management <http://conda.pydata.org/docs/test-drive.html>`__
+
+Unix shell
+~~~~~~~~~~
+
+-  `LinuxCommand <http://linuxcommand.org/lc3_learning_the_shell.php>`__
+-  `Code
+   Academy <https://www.codecademy.com/learn/learn-the-command-line>`__
+
+Python
+~~~~~~
+
+-  `Python Documentation <https://docs.python.org/3/>`__
+-  `How To Think Like A Computer
+   Scientist <http://interactivepython.org/courselib/static/thinkcspy/toc.html#t-o-c>`__
+
+Python for Science
+~~~~~~~~~~~~~~~~~~
+
+More extensive set of notes focusing on scientific computation with
+Python - probably more useful as a reference. Overlpas with our first
+few lectures.
+
+-  `Scipy lecture notes <http://www.scipy-lectures.org/index.html>`__
+
+Coding Challenges
+~~~~~~~~~~~~~~~~~
+
+If you learn best by solving puzzles
+
+-  `Proejct Euler <https://projecteuler.net>`__
+-  `Python Challenges <http://www.pythonchallenge.com>`__
+
+Overview
+--------
+
+.. code:: python
+
+    # packages, modules, imports, namespaces
+    import numpy as np
+    from scipy.misc import factorial
+    
+    # function definition with default arguments
+    def poisson_pmf(k, mu=1):
+        """Poisson PMF for value k with rate mu."""
+        return mu**k*np.exp(-mu)/factorial(k)
+
+.. code:: python
+
+    # Jupyter notebook "magic" function
+    # Sets up "inline" plotting
+    %matplotlib inline
+    
+    # Importing the seaborn plotting library and setting defaults
+    import seaborn as sns
+    sns.set_context("notebook", font_scale=1.5)
+    
+    # Variable assignment
+    n = np.arange(10) # [0, 1, 2, ..., 0]
+    
+    # Note that poisson_pmf is vectorized
+    sns.barplot(n, poisson_pmf(n, 2))
+    
+    # pass is a do-nothing statement -
+    # Used here to suppress printing of return value for sns.barplot()
+    pass
+
+
+
+.. image:: 01_Introduction_To_Python_files/01_Introduction_To_Python_4_0.png
+
+
+Hello, world
+------------
+
+.. code:: python
+
+    print("Hello, world!")
+
+
+.. parsed-literal::
+
+    Hello, world!
+
+
+Types
+-----
+
+.. code:: python
+
+    # Boolean
+    
+    True, False
+
+
+
+
+.. parsed-literal::
+
+    (True, False)
+
+
+
+.. code:: python
+
+    # Integer
+    0, 1, 23, int(3.8)
+
+
+
+
+.. parsed-literal::
+
+    (0, 1, 23, 3)
+
+
+
+.. code:: python
+
+    # Float
+    1.2, 3.14, float(2)
+
+
+
+
+.. parsed-literal::
+
+    (1.2, 3.14, 2.0)
+
+
+
+.. code:: python
+
+    # Complex
+    1 + 2j, complex(23)
+
+
+
+
+.. parsed-literal::
+
+    ((1+2j), (23+0j))
+
+
+
+.. code:: python
+
+    # String
+    ('abc', "abc", 
+    """abc
+    def
+    ghi""",
+    r'\t')
+
+
+
+
+.. parsed-literal::
+
+    ('abc', 'abc', 'abc\ndef\nghi', '\\t')
+
+
+
+.. code:: python
+
+    # None
+    None
+
+.. code:: python
+
+    type(3)
+
+
+
+
+.. parsed-literal::
+
+    int
+
+
+
+.. code:: python
+
+    type(poisson_pmf)
+
+
+
+
+.. parsed-literal::
+
+    function
+
+
+
+Operators
+---------
+
+.. code:: python
+
+    2 * 3
+
+
+
+
+.. parsed-literal::
+
+    6
+
+
+
+.. code:: python
+
+    2 ** 3
+
+
+
+
+.. parsed-literal::
+
+    8
+
+
+
+.. code:: python
+
+    2 ^ 3 # danger, Will Robinson! ^ is bitwise exclusive-or, not exponentiation
+
+
+
+
+.. parsed-literal::
+
+    1
+
+
+
+.. code:: python
+
+    7 /3
+
+
+
+
+.. parsed-literal::
+
+    2.3333333333333335
+
+
+
+.. code:: python
+
+    7 // 3
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+.. code:: python
+
+    2 < 3
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    7 % 3
+
+
+
+
+.. parsed-literal::
+
+    1
+
+
+
+.. code:: python
+
+    1 == 1
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    1 != 2
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    a = [1,2,3]
+    b = a
+    c = [1,2,3]
+
+.. code:: python
+
+    b == a
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    b is a
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    c == a
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+.. code:: python
+
+    c is a
+
+
+
+
+.. parsed-literal::
+
+    False
+
+
+
+.. code:: python
+
+    np.array([1,2,3]) @ np.array([1,2,3])
+
+
+
+
+.. parsed-literal::
+
+    14
+
+
+
+.. code:: python
+
+    True or False, True | False
+
+
+
+
+.. parsed-literal::
+
+    (True, True)
+
+
+
+.. code:: python
+
+    True and False, False & True
+
+
+
+
+.. parsed-literal::
+
+    (False, False)
+
+
+
+.. code:: python
+
+    2 << 4
+
+
+
+
+.. parsed-literal::
+
+    32
+
+
+
+.. code:: python
+
+    fruits = ['apple', 'banana', 'cherry', 'durian', 'eggplant', 'fig']
+    'durian' in fruits
+
+
+
+
+.. parsed-literal::
+
+    True
+
+
+
+The operator module
+~~~~~~~~~~~~~~~~~~~
+
+Provides versions of operators as functions useful for the functional
+programming style.
+
+.. code:: python
+
+    import operator as op
+    
+    op.mul(3, 4)
+
+
+
+
+.. parsed-literal::
+
+    12
+
+
+
+.. code:: python
+
+    from functools import reduce
+    
+    reduce(op.mul, [2,3,4,5], 1)
+
+
+
+
+.. parsed-literal::
+
+    120
+
+
+
+Names, assignment and identity
+------------------------------
+
+.. code:: python
+
+    # Create some object (the list [1,2,3]) on the RHS and assign it to the name on the LHS
+
+.. code:: python
+
+    a = [1,2,3]
+
+.. code:: python
+
+    a
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3]
+
+
+
+.. code:: python
+
+    # Find the identity (address in memory in CPython) of the object named a
+
+.. code:: python
+
+    id(a)
+
+
+
+
+.. parsed-literal::
+
+    4439213064
+
+
+
+.. code:: python
+
+    # Give the object named as a another name b
+
+.. code:: python
+
+    b = a
+
+.. code:: python
+
+    b
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3]
+
+
+
+.. code:: python
+
+    # b is just another name for the object also named a
+    # So the identity is the same
+    id(b)
+
+
+
+
+.. parsed-literal::
+
+    4439213064
+
+
+
+.. code:: python
+
+    # Create a new object (the list [1,23]) and give it a name c
+
+.. code:: python
+
+    c = [1,2,3]
+
+.. code:: python
+
+    c
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3]
+
+
+
+.. code:: python
+
+    # The object named c has a different identity from the object with names a, b
+    id(c)
+
+
+
+
+.. parsed-literal::
+
+    4684024264
+
+
+
+.. code:: python
+
+    a
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3]
+
+
+
+.. code:: python
+
+    b[0] = 99
+
+.. code:: python
+
+    a
+
+
+
+
+.. parsed-literal::
+
+    [99, 2, 3]
+
+
+
+.. code:: python
+
+    c
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3]
+
+
+
+Augmented assignment
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    x = 1
+
+.. code:: python
+
+    x += 2
+    x
+
+
+
+
+.. parsed-literal::
+
+    3
+
+
+
+.. code:: python
+
+    x **= 3
+    x
+
+
+
+
+.. parsed-literal::
+
+    27
+
+
+
+Naming conventions
+------------------
+
+See `PEP 0008 Style Guide for Python
+Code <https://www.python.org/dev/peps/pep-0008/>`__
+
+Collections
+-----------
+
+Tuples
+~~~~~~
+
+.. code:: python
+
+    course = ('STA-663', 2017, 'Spring', 50)
+
+.. code:: python
+
+    course[0]
+
+
+
+
+.. parsed-literal::
+
+    'STA-663'
+
+
+
+.. code:: python
+
+    course[1]
+
+
+
+
+.. parsed-literal::
+
+    2017
+
+
+
+.. code:: python
+
+    course[-1]
+
+
+
+
+.. parsed-literal::
+
+    50
+
+
+
+Tuple unpacking
+^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    name, year, semester, size = course
+
+.. code:: python
+
+    semester
+
+
+
+
+.. parsed-literal::
+
+    'Spring'
+
+
+
+.. code:: python
+
+    name, *when, size = course
+
+.. code:: python
+
+    name
+
+
+
+
+.. parsed-literal::
+
+    'STA-663'
+
+
+
+.. code:: python
+
+    size
+
+
+
+
+.. parsed-literal::
+
+    50
+
+
+
+.. code:: python
+
+    when
+
+
+
+
+.. parsed-literal::
+
+    [2017, 'Spring']
+
+
+
+Named tuples
+^^^^^^^^^^^^
+
+.. code:: python
+
+    import collections
+
+.. code:: python
+
+    course = collections.namedtuple('course', ['name', 'year','semester', 'size'])
+
+.. code:: python
+
+    sta_663 = course(name = 'STA-663', year=2017, size=50, semester='Spring')
+
+.. code:: python
+
+    sta_663
+
+
+
+
+.. parsed-literal::
+
+    course(name='STA-663', year=2017, semester='Spring', size=50)
+
+
+
+.. code:: python
+
+    name, *when, size = sta_663
+
+.. code:: python
+
+    when
+
+
+
+
+.. parsed-literal::
+
+    [2017, 'Spring']
+
+
+
+.. code:: python
+
+    sta_663[-1]
+
+
+
+
+.. parsed-literal::
+
+    50
+
+
+
+.. code:: python
+
+    sta_663.size
+
+
+
+
+.. parsed-literal::
+
+    50
+
+
+
+Lists
+~~~~~
+
+.. code:: python
+
+    x = [1,2,3,4,5]
+
+.. code:: python
+
+    x[1:4]
+
+
+
+
+.. parsed-literal::
+
+    [2, 3, 4]
+
+
+
+.. code:: python
+
+    x[-1] = 10
+    x
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 10]
+
+
+
+.. code:: python
+
+    x[::2]
+
+
+
+
+.. parsed-literal::
+
+    [1, 3, 10]
+
+
+
+.. code:: python
+
+    x[::-1]
+
+
+
+
+.. parsed-literal::
+
+    [10, 4, 3, 2, 1]
+
+
+
+.. code:: python
+
+    x + x
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 10, 1, 2, 3, 4, 10]
+
+
+
+.. code:: python
+
+    x * 3
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 10, 1, 2, 3, 4, 10, 1, 2, 3, 4, 10]
+
+
+
+.. code:: python
+
+    x.append(20)
+    x
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 10, 20]
+
+
+
+.. code:: python
+
+    x.extend([3,4,5])
+    x
+
+
+
+
+.. parsed-literal::
+
+    [1, 2, 3, 4, 10, 20, 3, 4, 5]
+
+
+
+.. code:: python
+
+    x.index(10)
+
+
+
+
+.. parsed-literal::
+
+    4
+
+
+
+.. code:: python
+
+    x.count(3)
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Sets
+----
+
+.. code:: python
+
+    s = {1,1,2,3,4}
+    s
+
+
+
+
+.. parsed-literal::
+
+    {1, 2, 3, 4}
+
+
+
+.. code:: python
+
+    s.add(2)
+    s
+
+
+
+
+.. parsed-literal::
+
+    {1, 2, 3, 4}
+
+
+
+.. code:: python
+
+    s.add(5)
+    s
+
+
+
+
+.. parsed-literal::
+
+    {1, 2, 3, 4, 5}
+
+
+
+Set operations and equivalent methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    s & {5,6,7}, s.intersection({5,6,7})
+
+
+
+
+.. parsed-literal::
+
+    ({5}, {5})
+
+
+
+.. code:: python
+
+    s | {5,6,7}, s.union({5,6,7})
+
+
+
+
+.. parsed-literal::
+
+    ({1, 2, 3, 4, 5, 6, 7}, {1, 2, 3, 4, 5, 6, 7})
+
+
+
+.. code:: python
+
+    s - {5,6,7}, s.difference({5,6,7})
+
+
+
+
+.. parsed-literal::
+
+    ({1, 2, 3, 4}, {1, 2, 3, 4})
+
+
+
+.. code:: python
+
+    s ^ {5,6,7}, s.symmetric_difference({5,6,7})
+
+
+
+
+.. parsed-literal::
+
+    ({1, 2, 3, 4, 6, 7}, {1, 2, 3, 4, 6, 7})
+
+
+
+Dictionary
+----------
+
+.. code:: python
+
+    d = {'a': 1, 'b':2, 'c':3}
+    d
+
+
+
+
+.. parsed-literal::
+
+    {'a': 1, 'b': 2, 'c': 3}
+
+
+
+.. code:: python
+
+    d['b']
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+.. code:: python
+
+    d1 = dict(d=4, e=5, f=6)
+    d1
+
+
+
+
+.. parsed-literal::
+
+    {'d': 4, 'e': 5, 'f': 6}
+
+
+
+.. code:: python
+
+    d.update(d1)
+    d
+
+
+
+
+.. parsed-literal::
+
+    {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6}
+
+
+
+.. code:: python
+
+    list(d.keys())
+
+
+
+
+.. parsed-literal::
+
+    ['c', 'e', 'a', 'd', 'f', 'b']
+
+
+
+.. code:: python
+
+    list(d.values())
+
+
+
+
+.. parsed-literal::
+
+    [3, 5, 1, 4, 6, 2]
+
+
+
+.. code:: python
+
+    d['g'] = 7
+    d
+
+
+
+
+.. parsed-literal::
+
+    {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7}
+
+
+
+.. code:: python
+
+    for k in d:
+        print(k, d[k])
+
+
+.. parsed-literal::
+
+    c 3
+    e 5
+    a 1
+    g 7
+    d 4
+    f 6
+    b 2
+
+
+Dictionary variants
+~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    # From Python 3.6 regular dictionaries will maintain order
+    
+    d = {}
+    d['z'] = 1
+    d['x'] = 2
+    d['y'] = 3
+    
+    for k in d:
+        print(k, d[k])
+
+
+.. parsed-literal::
+
+    x 2
+    y 3
+    z 1
+
+
+.. code:: python
+
+    d = collections.OrderedDict()
+    d['z'] = 1
+    d['x'] = 2
+    d['y'] = 3
+    
+    for k in d:
+        print(k, d[k])
+
+
+.. parsed-literal::
+
+    z 1
+    x 2
+    y 3
+
+
+.. code:: python
+
+    d = collections.defaultdict(list)
+    d['a'].append(1)
+    d['a'].append(2)
+    d['b'].extend([3,4,5])
+    d
+
+
+
+
+.. parsed-literal::
+
+    defaultdict(list, {'a': [1, 2], 'b': [3, 4, 5]})
+
+
+
+Example: Word counter
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    jabberwocky = '''
+    ’Twas brillig, and the slithy toves
+          Did gyre and gimble in the wabe:
+    All mimsy were the borogoves,
+          And the mome raths outgrabe.
+    
+    “Beware the Jabberwock, my son!
+          The jaws that bite, the claws that catch!
+    Beware the Jubjub bird, and shun
+          The frumious Bandersnatch!”
+    
+    He took his vorpal sword in hand;
+          Long time the manxome foe he sought—
+    So rested he by the Tumtum tree
+          And stood awhile in thought.
+    
+    And, as in uffish thought he stood,
+          The Jabberwock, with eyes of flame,
+    Came whiffling through the tulgey wood,
+          And burbled as it came!
+    
+    One, two! One, two! And through and through
+          The vorpal blade went snicker-snack!
+    He left it dead, and with its head
+          He went galumphing back.
+    
+    “And hast thou slain the Jabberwock?
+          Come to my arms, my beamish boy!
+    O frabjous day! Callooh! Callay!”
+          He chortled in his joy.
+    
+    ’Twas brillig, and the slithy toves
+          Did gyre and gimble in the wabe:
+    All mimsy were the borogoves,
+          And the mome raths outgrabe.
+    '''
+
+Using regular dictionary
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    c1 = {}
+    for word in jabberwocky.split():
+        c1[word] = c1.get(word, 0) + 1
+    c1['vorpal']
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Using defaultdict with int factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    int() # Note int is a factory fucntion that produces 0
+
+
+
+
+.. parsed-literal::
+
+    0
+
+
+
+.. code:: python
+
+    c2 = collections.defaultdict(int)
+    for word in jabberwocky.split():
+        c2[word] += 1
+    c2['vorpal']
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Using Counter
+^^^^^^^^^^^^^
+
+.. code:: python
+
+    c3 = collections.Counter(jabberwocky.split())
+    c3['vorpal']
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Control Structures
+------------------
+
+if-elif-else
+~~~~~~~~~~~~
+
+.. code:: python
+
+    x, y = 3,4
+    
+    if (x > y):
+        print(x, '>', y)
+    elif (x == y):
+        print(x, 'equals', y)
+    else:
+        print('Either', x, '<', y, 'or x and y are not orderable')
+
+
+.. parsed-literal::
+
+    Either 3 < 4 or x and y are not orderable
+
+
+for
+~~~
+
+.. code:: python
+
+    for fruit in fruits:
+        print(fruit)
+
+
+.. parsed-literal::
+
+    apple
+    banana
+    cherry
+    durian
+    eggplant
+    fig
+
+
+while
+~~~~~
+
+.. code:: python
+
+    i = 0
+    while (i < 5):
+        print(i)
+        i += 1
+
+
+.. parsed-literal::
+
+    0
+    1
+    2
+    3
+    4
+
+
+continue and break
+~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    for i in range(3):
+        for j in range(5):
+            if i==j:
+                continue
+            print(i, j)
+
+
+.. parsed-literal::
+
+    0 1
+    0 2
+    0 3
+    0 4
+    1 0
+    1 2
+    1 3
+    1 4
+    2 0
+    2 1
+    2 3
+    2 4
+
+
+.. code:: python
+
+    i = 0
+    while True:
+        print(i)
+        if i > 5:
+            break
+        i += 1
+
+
+.. parsed-literal::
+
+    0
+    1
+    2
+    3
+    4
+    5
+    6
+
+
+Functions
+---------
+
+Built-in functions
+~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    ([x for x in dir(__builtin__)  if x.islower() and not x.startswith('__')])
+
+
+
+
+.. parsed-literal::
+
+    ['abs',
+     'all',
+     'any',
+     'ascii',
+     'bin',
+     'bool',
+     'bytearray',
+     'bytes',
+     'callable',
+     'chr',
+     'classmethod',
+     'compile',
+     'complex',
+     'copyright',
+     'credits',
+     'delattr',
+     'dict',
+     'dir',
+     'divmod',
+     'dreload',
+     'enumerate',
+     'eval',
+     'exec',
+     'filter',
+     'float',
+     'format',
+     'frozenset',
+     'get_ipython',
+     'getattr',
+     'globals',
+     'hasattr',
+     'hash',
+     'help',
+     'hex',
+     'id',
+     'input',
+     'int',
+     'isinstance',
+     'issubclass',
+     'iter',
+     'len',
+     'license',
+     'list',
+     'locals',
+     'map',
+     'max',
+     'memoryview',
+     'min',
+     'next',
+     'object',
+     'oct',
+     'open',
+     'ord',
+     'pow',
+     'print',
+     'property',
+     'range',
+     'repr',
+     'reversed',
+     'round',
+     'set',
+     'setattr',
+     'slice',
+     'sorted',
+     'staticmethod',
+     'str',
+     'sum',
+     'super',
+     'tuple',
+     'type',
+     'vars',
+     'zip']
+
+
+
+.. code:: python
+
+    len('hello')
+
+
+
+
+.. parsed-literal::
+
+    5
+
+
+
+.. code:: python
+
+    range(5, 10, 2)
+
+
+
+
+.. parsed-literal::
+
+    range(5, 10, 2)
+
+
+
+.. code:: python
+
+    ord('c') - ord('a')
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+.. code:: python
+
+    chr(ord('a') + 2)
+
+
+
+
+.. parsed-literal::
+
+    'c'
+
+
+
+.. code:: python
+
+    list(zip('abcd', range(1,10)))
+
+
+
+
+.. parsed-literal::
+
+    [('a', 1), ('b', 2), ('c', 3), ('d', 4)]
+
+
+
+.. code:: python
+
+    sum([4,5,6])
+
+
+
+
+.. parsed-literal::
+
+    15
+
+
+
+.. code:: python
+
+    sorted(fruits)
+
+
+
+
+.. parsed-literal::
+
+    ['apple', 'banana', 'cherry', 'durian', 'eggplant', 'fig']
+
+
+
+.. code:: python
+
+    sorted(fruits, reverse=True)
+
+
+
+
+.. parsed-literal::
+
+    ['fig', 'eggplant', 'durian', 'cherry', 'banana', 'apple']
+
+
+
+.. code:: python
+
+    sorted(fruits, key=len)
+
+
+
+
+.. parsed-literal::
+
+    ['fig', 'apple', 'banana', 'cherry', 'durian', 'eggplant']
+
+
+
+User-defined functions
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    def f(a, b, c):
+        return a + b * c
+
+.. code:: python
+
+    f(1,2,3)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+
+
+.. code:: python
+
+    f(c=3, a=1, b=2)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+
+
+.. code:: python
+
+    f(1,2,c=3)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+
+
+.. code:: python
+
+    args = [1,2,3]
+    f(*args)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+
+
+.. code:: python
+
+    kwargs = dict(a=1, b=2, c=3)
+    f(**kwargs)
+
+
+
+
+.. parsed-literal::
+
+    7
+
+

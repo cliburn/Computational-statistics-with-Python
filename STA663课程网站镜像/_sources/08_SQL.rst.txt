@@ -1,0 +1,1922 @@
+
+SQL
+===
+
+SQL is a language for getting data from databases. It is also becoming
+essential to have some basic familiarity with SQL because it is
+universally used to slice and dice data across many different data
+storage formats and technologies.
+
+We will only show the use of SQL as a query language here, since that is
+probably all that a statistician will use SQL for. However, SQL can also
+be used to create and modify tables, as well as manage database
+permissions.
+
+SQL via ``pandas`` DataFrames
+-----------------------------
+
+We will use the `pandas-sql <https://github.com/yhat/pandasql/>`__
+package to practice SQL syntax for querying a ``pandas`` DataFrame.
+Later, we will see how to use an actual relational database.
+
+.. code:: python
+
+    import seaborn as sns
+    import pandas as pd
+    import numpy as np
+
+.. code:: python
+
+    from pandasql import PandaSQL
+    pdsql = PandaSQL()
+
+.. code:: python
+
+    tips = sns.load_dataset('tips')
+    tips.head()
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>total_bill</th>
+          <th>tip</th>
+          <th>sex</th>
+          <th>smoker</th>
+          <th>day</th>
+          <th>time</th>
+          <th>size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>16.99</td>
+          <td>1.01</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>10.34</td>
+          <td>1.66</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>21.01</td>
+          <td>3.50</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>23.68</td>
+          <td>3.31</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>24.59</td>
+          <td>3.61</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>4</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Using SQL for Queries
+~~~~~~~~~~~~~~~~~~~~~
+
+Note that SQL is case-insensitive, but it is traditional to use ALL CAPS
+for SQL keywords. It is also standard to end SQL statements with a
+semi-colon.
+
+.. code:: python
+
+    pdsql("SELECT * FROM tips LIMIT 5;")
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>total_bill</th>
+          <th>tip</th>
+          <th>sex</th>
+          <th>smoker</th>
+          <th>day</th>
+          <th>time</th>
+          <th>size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>16.99</td>
+          <td>1.01</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>10.34</td>
+          <td>1.66</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>21.01</td>
+          <td>3.50</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>23.68</td>
+          <td>3.31</td>
+          <td>Male</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>24.59</td>
+          <td>3.61</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>4</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    pdsql("SELECT * FROM tips WHERE sex='Female' LIMIT 5;")
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>total_bill</th>
+          <th>tip</th>
+          <th>sex</th>
+          <th>smoker</th>
+          <th>day</th>
+          <th>time</th>
+          <th>size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>16.99</td>
+          <td>1.01</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>24.59</td>
+          <td>3.61</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>35.26</td>
+          <td>5.00</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>14.83</td>
+          <td>3.02</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>10.33</td>
+          <td>1.67</td>
+          <td>Female</td>
+          <td>No</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>3</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    pdsql("SELECT tip, sex, size FROM tips WHERE total_bill< 10 LIMIT 5;")
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>tip</th>
+          <th>sex</th>
+          <th>size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>2.00</td>
+          <td>Male</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1.45</td>
+          <td>Male</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>1.32</td>
+          <td>Male</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>1.56</td>
+          <td>Male</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>1.00</td>
+          <td>Female</td>
+          <td>1</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Ordering
+~~~~~~~~
+
+.. code:: python
+
+    query = """
+    SELECT * FROM tips
+    WHERE sex='Female' and smoker='Yes'
+    ORDER BY total_bill ASC
+    LIMIT 5;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>total_bill</th>
+          <th>tip</th>
+          <th>sex</th>
+          <th>smoker</th>
+          <th>day</th>
+          <th>time</th>
+          <th>size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>3.07</td>
+          <td>1.00</td>
+          <td>Female</td>
+          <td>Yes</td>
+          <td>Sat</td>
+          <td>Dinner</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>5.75</td>
+          <td>1.00</td>
+          <td>Female</td>
+          <td>Yes</td>
+          <td>Fri</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>9.60</td>
+          <td>4.00</td>
+          <td>Female</td>
+          <td>Yes</td>
+          <td>Sun</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>10.09</td>
+          <td>2.00</td>
+          <td>Female</td>
+          <td>Yes</td>
+          <td>Fri</td>
+          <td>Lunch</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>10.59</td>
+          <td>1.61</td>
+          <td>Female</td>
+          <td>Yes</td>
+          <td>Sat</td>
+          <td>Dinner</td>
+          <td>2</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Aggregate queries
+~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    query = """
+    SELECT count(*) AS count, max(tip) AS max, min(tip) AS min FROM tips
+    WHERE size > 1
+    GROUP BY sex, day
+    HAVING max < 6
+    ORDER BY count DESC
+    LIMIT 5;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>count</th>
+          <th>max</th>
+          <th>min</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>31</td>
+          <td>5.17</td>
+          <td>1.25</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>18</td>
+          <td>5.20</td>
+          <td>1.01</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>9</td>
+          <td>4.30</td>
+          <td>1.00</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>9</td>
+          <td>4.73</td>
+          <td>1.50</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Joins
+-----
+
+A **join** occurs when you combine information from two or more database
+tables, based on information in a column that is common among the
+tables. As usual, it is easier to understand the concept with examples.
+
+.. code:: python
+
+    student = pd.read_csv('data/student.txt')
+    student
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>student_id</th>
+          <th>first</th>
+          <th>last</th>
+          <th>email</th>
+          <th>major_id</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1</td>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>frodo.baggins@duke.edu</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>2</td>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>b_baggins@duke.edu</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>3</td>
+          <td>golum</td>
+          <td>golum</td>
+          <td>golum.golum@duke.edu</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>4</td>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>g.white@duke.edu</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>5</td>
+          <td>gandalf</td>
+          <td>grey</td>
+          <td>g.grey@duke.edu</td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>6</td>
+          <td>saruman</td>
+          <td>wise</td>
+          <td>s.wise@duke.edu</td>
+          <td>2</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    cls = pd.read_csv('data/class.txt')
+    cls
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>class_id</th>
+          <th>code</th>
+          <th>name</th>
+          <th>credits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1</td>
+          <td>ANT01</td>
+          <td>Introduction to Hobbits</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>2</td>
+          <td>MAT802</td>
+          <td>Abstrct Nonsense</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>3</td>
+          <td>ENG234</td>
+          <td>Jabberwocky</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>4</td>
+          <td>STA007</td>
+          <td>Statistics for Secret Agens</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>5</td>
+          <td>PHY211</td>
+          <td>Physics of Star Wars</td>
+          <td>4</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    major = pd.read_csv('data/major.txt')
+    major
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>major_id</th>
+          <th>name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1</td>
+          <td>Computer Science</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>2</td>
+          <td>Physics</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>3</td>
+          <td>Statisitcs</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>4</td>
+          <td>English</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>5</td>
+          <td>History</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+.. code:: python
+
+    student_cls = pd.read_csv('data/student_class.txt')
+    student_cls
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>student_id</th>
+          <th>class_id</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>1</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>2</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>2</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>3</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>3</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>3</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>3</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>4</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>4</td>
+          <td>5</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Matching students and majors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Inner join
+^^^^^^^^^^
+
+.. code:: python
+
+    query = """
+    SELECT s.first, s.last, m.name
+    FROM student s
+    INNER JOIN major m 
+    ON s.major_id = m.major_id;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>first</th>
+          <th>last</th>
+          <th>name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>Computer Science</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>Statisitcs</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>Physics</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>History</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>saruman</td>
+          <td>wise</td>
+          <td>Physics</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Left outer join
+^^^^^^^^^^^^^^^
+
+SQL also has RIGHT OUTER JOIN and FULL OUTER JOIN but these are not
+currently supported by SQLite3 (the database engine used by ``pdsql``).
+
+.. code:: python
+
+    query = """
+    SELECT s.first, s.last, m.name
+    FROM student s
+    LEFT OUTER JOIN major m 
+    ON s.major_id = m.major_id;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>first</th>
+          <th>last</th>
+          <th>name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>Computer Science</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>Statisitcs</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>Physics</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>History</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>gandalf</td>
+          <td>grey</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>saruman</td>
+          <td>wise</td>
+          <td>Physics</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Emulating a full outer join with UNION ALL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Only necessary if the database does not proivde FULL OUTER JOIN
+
+.. code:: python
+
+    query = """
+    SELECT s.first, s.last, m.name
+    FROM   student s 
+           LEFT JOIN major m 
+              ON s.major_id = m.major_id
+    UNION All
+    SELECT s.first, s.last, m.name
+    FROM   major m
+           LEFT JOIN student s
+              ON s.major_id = m.major_id
+    WHERE  s.major_id IS NULL;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>first</th>
+          <th>last</th>
+          <th>name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>Computer Science</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>Statisitcs</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>Physics</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>History</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>gandalf</td>
+          <td>grey</td>
+          <td>None</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>saruman</td>
+          <td>wise</td>
+          <td>Physics</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>None</td>
+          <td>None</td>
+          <td>English</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Using linker tables to match students to classes (a MANY TO MANY join)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    query = """
+    SELECT s.first, s.last, c.code, c.name, c.credits
+    FROM student s
+    INNER JOIN student_cls sc ON s.student_id = sc.student_id
+    INNER JOIN cls c ON c.class_id = sc.class_id;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>first</th>
+          <th>last</th>
+          <th>code</th>
+          <th>name</th>
+          <th>credits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>ENG234</td>
+          <td>Jabberwocky</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>STA007</td>
+          <td>Statistics for Secret Agens</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>ANT01</td>
+          <td>Introduction to Hobbits</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>STA007</td>
+          <td>Statistics for Secret Agens</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>ANT01</td>
+          <td>Introduction to Hobbits</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>MAT802</td>
+          <td>Abstrct Nonsense</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>ENG234</td>
+          <td>Jabberwocky</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>PHY211</td>
+          <td>Physics of Star Wars</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>MAT802</td>
+          <td>Abstrct Nonsense</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>PHY211</td>
+          <td>Physics of Star Wars</td>
+          <td>4</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Same thing but including students with no majors
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    query = """
+    SELECT s.first, s.last, c.code, c.name, c.credits
+    FROM student s
+    LEFT OUTER JOIN student_cls sc ON s.student_id = sc.student_id
+    LEFT OUTER JOIN cls c ON c.class_id = sc.class_id;
+    """
+    pdsql(query)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>first</th>
+          <th>last</th>
+          <th>code</th>
+          <th>name</th>
+          <th>credits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>ENG234</td>
+          <td>Jabberwocky</td>
+          <td>2.0</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>frodo</td>
+          <td>baggins</td>
+          <td>STA007</td>
+          <td>Statistics for Secret Agens</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>ANT01</td>
+          <td>Introduction to Hobbits</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>bilbo</td>
+          <td>baggins</td>
+          <td>STA007</td>
+          <td>Statistics for Secret Agens</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>ANT01</td>
+          <td>Introduction to Hobbits</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>5</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>MAT802</td>
+          <td>Abstrct Nonsense</td>
+          <td>8.0</td>
+        </tr>
+        <tr>
+          <th>6</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>ENG234</td>
+          <td>Jabberwocky</td>
+          <td>2.0</td>
+        </tr>
+        <tr>
+          <th>7</th>
+          <td>golum</td>
+          <td>golum</td>
+          <td>PHY211</td>
+          <td>Physics of Star Wars</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>8</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>MAT802</td>
+          <td>Abstrct Nonsense</td>
+          <td>8.0</td>
+        </tr>
+        <tr>
+          <th>9</th>
+          <td>gandalf</td>
+          <td>white</td>
+          <td>PHY211</td>
+          <td>Physics of Star Wars</td>
+          <td>4.0</td>
+        </tr>
+        <tr>
+          <th>10</th>
+          <td>gandalf</td>
+          <td>grey</td>
+          <td>None</td>
+          <td>None</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>11</th>
+          <td>saruman</td>
+          <td>wise</td>
+          <td>None</td>
+          <td>None</td>
+          <td>NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+
+
+Using SQLite3
+~~~~~~~~~~~~~
+
+`SQLite3 <https://docs.python.org/3.5/library/sqlite3.html>`__ is part
+of the standard library. However, the mechanics of using essentially any
+database in Python is similar, because of the Python
+`DB-API <https://www.python.org/dev/peps/pep-0249/>`__.
+
+.. code:: python
+
+    import sqlite3
+
+.. code:: python
+
+    c = sqlite3.connect('data/Chinook_Sqlite.sqlite')
+
+SQLite specific commands to get metadata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unlike SQL syntax for queries, how you get metadata from a relational
+database is vendor-specific. You'll have to read the docs to find out
+what is needed for your SQL flavor.
+
+What tables are there in the database?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    list(c.execute("SELECT name FROM sqlite_master WHERE type='table';"))
+
+
+
+
+.. parsed-literal::
+
+    [('Album',),
+     ('Artist',),
+     ('Customer',),
+     ('Employee',),
+     ('Genre',),
+     ('Invoice',),
+     ('InvoiceLine',),
+     ('MediaType',),
+     ('Playlist',),
+     ('PlaylistTrack',),
+     ('Track',)]
+
+
+
+What are the columns of the table "Album"?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    list(c.execute("PRAGMA table_info(Album);"))
+
+
+
+
+.. parsed-literal::
+
+    [(0, 'AlbumId', 'INTEGER', 1, None, 1),
+     (1, 'Title', 'NVARCHAR(160)', 1, None, 0),
+     (2, 'ArtistId', 'INTEGER', 1, None, 0)]
+
+
+
+Standard SQL statements with parameter substitution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note: Using Python string substitution for Python defined parameters is
+dangerous because of the risk of `SQL injection
+attacks <http://xkcd.com/327/>`__. Use parameter substitution with ``?``
+instead.
+
+Do this
+^^^^^^^
+
+.. code:: python
+
+    t = ['%rock%']
+    list(c.execute("SELECT * FROM Album WHERE Title like ? LIMIT 5;", t))
+
+
+
+
+.. parsed-literal::
+
+    [(1, 'For Those About To Rock We Salute You', 1),
+     (4, 'Let There Be Rock', 1),
+     (59, 'Deep Purple In Rock', 58),
+     (108, 'Rock In Rio [CD1]', 90),
+     (109, 'Rock In Rio [CD2]', 90)]
+
+
+
+Not this
+^^^^^^^^
+
+.. code:: python
+
+    t = ["'%rock%'"]
+    list(c.execute("SELECT * FROM Album WHERE Title like %s LIMIT 5;" % t[0]))
+
+
+
+
+.. parsed-literal::
+
+    [(1, 'For Those About To Rock We Salute You', 1),
+     (4, 'Let There Be Rock', 1),
+     (59, 'Deep Purple In Rock', 58),
+     (108, 'Rock In Rio [CD1]', 90),
+     (109, 'Rock In Rio [CD2]', 90)]
+
+
+
+User defined functions
+----------------------
+
+Sometimes it is useful to have custom functions that run on the database
+server rather than on the client. These are called User Defined
+Functions or UDF. How do to do this varies with the database used, but
+it is fairly simple with Python and SQLite.
+
+A standard UDF
+^^^^^^^^^^^^^^
+
+.. code:: python
+
+    def encode(text, offset):
+        """Caesar cipher of text with given offset."""
+        from string import ascii_lowercase, ascii_uppercase
+        tbl = dict(zip(map(ord, ascii_lowercase + ascii_uppercase), 
+                   ascii_lowercase[offset:] + ascii_lowercase[:offset] + 
+                   ascii_uppercase[offset:] + ascii_uppercase[:offset]))
+        return text.translate(tbl)
+
+.. code:: python
+
+    c.create_function("encode", 2, encode)
+
+.. code:: python
+
+    list(c.execute("SELECT Title, encode(Title, 3) FROM Album limit 5;"))
+
+
+
+
+.. parsed-literal::
+
+    [('For Those About To Rock We Salute You',
+      'Iru Wkrvh Derxw Wr Urfn Zh Vdoxwh Brx'),
+     ('Balls to the Wall', 'Edoov wr wkh Zdoo'),
+     ('Restless and Wild', 'Uhvwohvv dqg Zlog'),
+     ('Let There Be Rock', 'Ohw Wkhuh Eh Urfn'),
+     ('Big Ones', 'Elj Rqhv')]
+
+
+
+An aggregate UDF
+^^^^^^^^^^^^^^^^
+
+We can also add aggregate UDFs similar to SQL MIN, SUM, COUNT etc.
+Aggregate UDFs require you to write a class ``__init__``, ``step`` and
+``finalize`` methods.
+
+.. code:: python
+
+    class CV:
+        """Aggregate UDF for coefficient of varation in %."""
+    
+        def __init__(self):
+            self.s = []
+    
+        def step(self, value):
+            self.s.append(value)
+    
+        def finalize(self):
+            if len(self.s) < 2:
+                return 0
+            else:
+                return 100.0*np.std(self.s)/np.mean(self.s)
+
+.. code:: python
+
+    c.create_aggregate("cv", 1, CV)
+
+.. code:: python
+
+    list(c.execute("PRAGMA table_info(Invoice);"))
+
+
+
+
+.. parsed-literal::
+
+    [(0, 'InvoiceId', 'INTEGER', 1, None, 1),
+     (1, 'CustomerId', 'INTEGER', 1, None, 0),
+     (2, 'InvoiceDate', 'DATETIME', 1, None, 0),
+     (3, 'BillingAddress', 'NVARCHAR(70)', 0, None, 0),
+     (4, 'BillingCity', 'NVARCHAR(40)', 0, None, 0),
+     (5, 'BillingState', 'NVARCHAR(40)', 0, None, 0),
+     (6, 'BillingCountry', 'NVARCHAR(40)', 0, None, 0),
+     (7, 'BillingPostalCode', 'NVARCHAR(10)', 0, None, 0),
+     (8, 'Total', 'NUMERIC(10,2)', 1, None, 0)]
+
+
+
+.. code:: python
+
+    list(c.execute("SELECT cv(Total) from Invoice limit 10;"))
+
+
+
+
+.. parsed-literal::
+
+    [(83.85715075292478,)]
+
+
+
+.. code:: python
+
+    c.close()
+
+Using SQL magic functions
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We will use the
+`ipython-sql <https://github.com/catherinedevlin/ipython-sql>`__
+notebook extension for convenience. This will only work in notebooks and
+IPython scripts with the .ipy extension.
+
+.. code:: python
+
+    import warnings
+    
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        %load_ext sql
+
+Configuring the SqlMagic extension
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %config SqlMagic
+
+
+.. parsed-literal::
+
+    SqlMagic options
+    --------------
+    SqlMagic.autolimit=<Int>
+        Current: 0
+        Automatically limit the size of the returned result sets
+    SqlMagic.autopandas=<Bool>
+        Current: False
+        Return Pandas DataFrames instead of regular result sets
+    SqlMagic.column_local_vars=<Bool>
+        Current: False
+        Return data into local variables from column names
+    SqlMagic.displaylimit=<Int>
+        Current: 0
+        Automatically limit the number of rows displayed (full result set is still
+        stored)
+    SqlMagic.dsn_filename=<Unicode>
+        Current: 'odbc.ini'
+        Path to DSN file. When the first argument is of the form [section], a
+        sqlalchemy connection string is formed from the matching section in the DSN
+        file.
+    SqlMagic.feedback=<Bool>
+        Current: True
+        Print number of rows affected by DML
+    SqlMagic.short_errors=<Bool>
+        Current: True
+        Don't display the full traceback on SQL Programming Error
+    SqlMagic.style=<Unicode>
+        Current: 'DEFAULT'
+        Set the table printing style to any of prettytable's defined styles
+        (currently DEFAULT, MSWORD_FRIENDLY, PLAIN_COLUMNS, RANDOM)
+
+
+.. code:: python
+
+    %config SqlMagic.displaylimit=10
+
+Connect to SQLite3 database
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    %sql sqlite:///data/Chinook_Sqlite.sqlite
+
+
+
+
+.. parsed-literal::
+
+    'Connected: None@data/Chinook_Sqlite.sqlite'
+
+
+
+Other databases
+^^^^^^^^^^^^^^^
+
+See `SQLAlchemy connection
+strings <http://docs.sqlalchemy.org/en/latest/core/engines.html>`__ for
+how to connect to other databases such as Oracle, MySQL or PostgreSQL.
+
+Line magic
+^^^^^^^^^^
+
+.. code:: python
+
+    %sql SELECT * from Album LIMIT 5;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+
+
+.. raw:: html
+
+    <table>
+        <tr>
+            <th>AlbumId</th>
+            <th>Title</th>
+            <th>ArtistId</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>For Those About To Rock We Salute You</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Balls to the Wall</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Restless and Wild</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Let There Be Rock</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Big Ones</td>
+            <td>3</td>
+        </tr>
+    </table>
+
+
+
+.. code:: python
+
+    %sql SELECT * from Artist LIMIT 5;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+
+
+.. raw:: html
+
+    <table>
+        <tr>
+            <th>ArtistId</th>
+            <th>Name</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>AC/DC</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Accept</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Aerosmith</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Alanis Morissette</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Alice In Chains</td>
+        </tr>
+    </table>
+
+
+
+Cell magic
+^^^^^^^^^^
+
+.. code:: python
+
+    %%sql
+    SELECT Artist.Name, Album.Title
+    FROM Album
+    INNER JOIN Artist on Album.ArtistId = Artist.ArtistId
+    ORDER BY Artist.Name ASC
+    LIMIT 5;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+
+
+.. raw:: html
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Title</th>
+        </tr>
+        <tr>
+            <td>AC/DC</td>
+            <td>For Those About To Rock We Salute You</td>
+        </tr>
+        <tr>
+            <td>AC/DC</td>
+            <td>Let There Be Rock</td>
+        </tr>
+        <tr>
+            <td>Aaron Copland &amp; London Symphony Orchestra</td>
+            <td>A Copland Celebration, Vol. I</td>
+        </tr>
+        <tr>
+            <td>Aaron Goldberg</td>
+            <td>Worlds</td>
+        </tr>
+        <tr>
+            <td>Academy of St. Martin in the Fields &amp; Sir Neville Marriner</td>
+            <td>The World of Classical Favourites</td>
+        </tr>
+    </table>
+
+
+
+You can assign results of queries to Python names
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    result = %sql SELECT * from Album;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+.. code:: python
+
+    type(result)
+
+
+
+
+.. parsed-literal::
+
+    sql.run.ResultSet
+
+
+
+Resutls behave like lists
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    result[2:4]
+
+
+
+
+.. parsed-literal::
+
+    [(3, 'Restless and Wild', 2), (4, 'Let There Be Rock', 1)]
+
+
+
+You can use Python variables in your queires.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use ``:varname`` where you want to use a Python variable in your query.
+
+.. code:: python
+
+    artist_id = 10
+    
+    %sql select * from Artist where ArtistId < :artist_id;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+
+
+.. raw:: html
+
+    <table>
+        <tr>
+            <th>ArtistId</th>
+            <th>Name</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>AC/DC</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Accept</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Aerosmith</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Alanis Morissette</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Alice In Chains</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Antônio Carlos Jobim</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Apocalyptica</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Audioslave</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>BackBeat</td>
+        </tr>
+    </table>
+
+
+
+.. code:: python
+
+    word = '%rock%'
+    
+    %sql select * from Album WHERE Title LIKE :word;
+
+
+.. parsed-literal::
+
+    Done.
+
+
+
+
+.. raw:: html
+
+    <table>
+        <tr>
+            <th>AlbumId</th>
+            <th>Title</th>
+            <th>ArtistId</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>For Those About To Rock We Salute You</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>Let There Be Rock</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>59</td>
+            <td>Deep Purple In Rock</td>
+            <td>58</td>
+        </tr>
+        <tr>
+            <td>108</td>
+            <td>Rock In Rio [CD1]</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>109</td>
+            <td>Rock In Rio [CD2]</td>
+            <td>90</td>
+        </tr>
+        <tr>
+            <td>213</td>
+            <td>Pure Cult: The Best Of The Cult (For Rockers, Ravers, Lovers &amp; Sinners) [UK]</td>
+            <td>139</td>
+        </tr>
+        <tr>
+            <td>216</td>
+            <td>Hot Rocks, 1964-1971 (Disc 1)</td>
+            <td>142</td>
+        </tr>
+    </table>
+
+
+
+Convert to ``pandas`` dataframe
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code:: python
+
+    df = result.DataFrame()
+    df.head(5)
+
+
+
+
+.. raw:: html
+
+    <div>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>AlbumId</th>
+          <th>Title</th>
+          <th>ArtistId</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>1</td>
+          <td>For Those About To Rock We Salute You</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>2</td>
+          <td>Balls to the Wall</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>3</td>
+          <td>Restless and Wild</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>4</td>
+          <td>Let There Be Rock</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <th>4</th>
+          <td>5</td>
+          <td>Big Ones</td>
+          <td>3</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+

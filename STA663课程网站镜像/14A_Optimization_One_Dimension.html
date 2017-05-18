@@ -1,0 +1,803 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/14A_Optimization_One_Dimension.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:10:50 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Optimization and Root Finding &#8212; STA-663-2017 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.base.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Algorithms for Optimization and Root Finding for Multivariate Problems" href="14B_Multivariate_Optimization.html" />
+    <link rel="prev" title="Sparse Matrices" href="13E_SparseMatrices.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="14B_Multivariate_Optimization.html" title="Algorithms for Optimization and Root Finding for Multivariate Problems"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13E_SparseMatrices.html" title="Sparse Matrices"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">interp1d</span>
+</pre></div>
+</div>
+<div class="section" id="optimization-and-root-finding">
+<h1>Optimization and Root Finding<a class="headerlink" href="#optimization-and-root-finding" title="Permalink to this headline">¶</a></h1>
+<p>Many problems in statistics can be reduced to optimization problems,
+which in turn are reduced to root finding (because we optimize functions
+by taking derivatives and finding the zeroes of the derivative
+functions). Before we dive into the techniques, lets look at some
+examples of where optimization comes up in statistics.</p>
+<div class="section" id="example-maximum-likelihood-estimation-mle">
+<h2>Example: Maximum Likelihood Estimation (MLE)<a class="headerlink" href="#example-maximum-likelihood-estimation-mle" title="Permalink to this headline">¶</a></h2>
+<p>Recall that in MLE, we are interested in estimating the value of a
+parameter <span class="math">\(\theta\)</span> that maximizes a log-likelihood function
+<span class="math">\(\ell(X;\theta)\)</span>. Let <span class="math">\(X_1,...,X_n\)</span> be an iid set of random
+variables with pdf <span class="math">\(f(x;\theta)\)</span>, where
+<span class="math">\(\theta \in \mathbb{R}^k\)</span> is a parameter. The likelihood function
+is:</p>
+<div class="math">
+\[L(X;\theta) = \prod_{i=1}^n f(X_i;\theta)\]</div>
+<p>We want the value of <span class="math">\(\theta\)</span> that maximizes <span class="math">\(L\)</span>. We can
+accomplish this by taking the first derivative (or gradient) of
+<span class="math">\(L\)</span> with respect to <span class="math">\(\theta\)</span>, setting it to zero and solving
+for <span class="math">\(\theta\)</span>. However, this is more easily accomplished if we
+first take <span class="math">\(\log(L)\)</span>, as <span class="math">\(L\)</span> is a product of densities, and
+taking the log of a product yields a sum. Because <span class="math">\(log\)</span> is a
+monotonically increasing function, any value of <span class="math">\(\theta\)</span> that
+maximizes <span class="math">\(\log(L)\)</span> also maximizes <span class="math">\(L\)</span>.</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+\ell(X;\theta) &amp;=&amp; \log(L(X;\theta)) \\\\
+&amp;=&amp; \log\left(\prod_{i=1}^n f(X_i;\theta)\right)\\\\
+&amp;=&amp;\sum_{i=1}^n \log(f(X_i;\theta)
+\end{eqnarray*}\end{split}\]</div>
+<p>Optimization then amounts to finding the zeros of</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+\frac{\partial\ell}{\partial \theta} &amp;=&amp; \frac{\partial}{\partial \theta} \left(\sum_{i=1}^n\log(f(X_i;\theta)\right)\\\\
+&amp;=&amp; \sum_{i=1}^n \frac{\partial\log(f(X_i;\theta)}{\partial \theta}
+\end{eqnarray*}\end{split}\]</div>
+</div>
+<div class="section" id="example-linear-least-squares">
+<h2>Example: Linear Least Squares<a class="headerlink" href="#example-linear-least-squares" title="Permalink to this headline">¶</a></h2>
+<p>Fitting a regression line is a very simple example of least squares
+optimization. Here, we have data points <span class="math">\((x_i,y_i)\)</span> with
+<span class="math">\(1\leq i \leq n\)</span>. We wish to find the line</p>
+<div class="math">
+\[f(x) = y = ax+b\]</div>
+<p>Such that the sum of squares of the errors are minimized. Thus, we find
+parameters <span class="math">\(a,b\)</span> such that:</p>
+<div class="math">
+\[f(a,b) = \sum_{i=1}^n \left(y_i - ax_i -b\right)^2\]</div>
+<p>is minimized.</p>
+<p>We now move on to the details of some common root-finding algorithms. In
+practice, we are usually interested in multivariate optimization. We
+begin with the single variable case to develop the main ideas and then
+proceed to generalize to multi-dimensional problems.</p>
+</div>
+<div class="section" id="main-issues-in-root-finding-in-one-dimension">
+<h2>Main Issues in Root Finding in One Dimension<a class="headerlink" href="#main-issues-in-root-finding-in-one-dimension" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Separating close roots</li>
+<li>Numerical Stability</li>
+<li>Rate of Convergence</li>
+<li>Continuity and Differentiability</li>
+</ul>
+</div>
+<div class="section" id="bisection-method">
+<h2>Bisection Method<a class="headerlink" href="#bisection-method" title="Permalink to this headline">¶</a></h2>
+<p>The bisection method is one of the simplest methods for finding zeroes
+of a non-linear function. It is guaranteed to find a root - but it can
+be slow. The main idea comes from the intermediate value theorem: If
+<span class="math">\(f(a)\)</span> and <span class="math">\(f(b)\)</span> have different signs and <span class="math">\(f\)</span> is
+continous, then <span class="math">\(f\)</span> must have a zero between <span class="math">\(a\)</span> and
+<span class="math">\(b\)</span>. We evaluate the function at the midpoint,
+<span class="math">\(c = \frac12(a+b)\)</span>. <span class="math">\(f(c)\)</span> is either zero, has the same sign
+as <span class="math">\(f(a)\)</span> or the same sign as <span class="math">\(f(b)\)</span>. Suppose <span class="math">\(f(c)\)</span>
+has the same sign as <span class="math">\(f(a)\)</span> (as pictured below). We then repeat
+the process on the interval <span class="math">\([c,b]\)</span>.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span><span class="mi">3</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">3.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span>
+<span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">f</span><span class="p">(</span><span class="n">c</span><span class="p">)],</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">xaxis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_15_0.png" src="_images/14A_Optimization_One_Dimension_15_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">3.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;d&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;b&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;c&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">d</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="p">[</span><span class="n">f</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">f</span><span class="p">(</span><span class="n">c</span><span class="p">)],</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">facecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="n">d</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+
+<span class="n">xaxis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_16_0.png" src="_images/14A_Optimization_One_Dimension_16_0.png" />
+<p>We can terminate the process whenever the function evaluated at the new
+midpoint is &#8216;close enough&#8217; to zero. This method is an example of what
+are known as &#8216;bracketed methods&#8217;. This means the root is &#8216;bracketed&#8217; by
+the end-points (it is somewhere in between). Another class of methods
+are &#8216;open methods&#8217; - the root need not be somewhere in between the
+end-points (but it usually needs to be close!)</p>
+</div>
+<div class="section" id="secant-method">
+<h2>Secant Method<a class="headerlink" href="#secant-method" title="Permalink to this headline">¶</a></h2>
+<p>The secant method also begins with two initial points, but without the
+constraint that the function values are of opposite signs. We use the
+secant line to extrapolate the next candidate point.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">x0</span><span class="o">=-</span><span class="mf">1.2</span>
+<span class="n">x1</span><span class="o">=-</span><span class="mf">0.5</span>
+<span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+<span class="n">notconverge</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span><span class="s1">&#39;b--&#39;</span><span class="p">,</span><span class="s1">&#39;g--&#39;</span><span class="p">,</span><span class="s1">&#39;y--&#39;</span><span class="p">]</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">notconverge</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span>  <span class="mi">3</span><span class="p">):</span>
+    <span class="n">slope</span><span class="o">=</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]))</span><span class="o">/</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">intercept</span><span class="o">=-</span><span class="n">slope</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">nextval</span> <span class="o">=</span> <span class="o">-</span><span class="n">intercept</span><span class="o">/</span><span class="n">slope</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">nextval</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">:</span>
+        <span class="n">notconverge</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextval</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_20_0.png" src="_images/14A_Optimization_One_Dimension_20_0.png" />
+<p>The secant method has the advantage of fast convergence. While the
+bisection method has a linear convergence rate (i.e. error goes to zero
+at the rate that <span class="math">\(h(x) = x\)</span> goes to zero, the secant method has a
+convergence rate that is faster than linear, but not quite quadratic
+(i.e. <span class="math">\(\sim x^\alpha\)</span>, where
+<span class="math">\(\alpha = \frac{1+\sqrt{5}}2 \approx 1.6\)</span>)</p>
+</div>
+<div class="section" id="newton-rhapson-method">
+<h2>Newton-Rhapson Method<a class="headerlink" href="#newton-rhapson-method" title="Permalink to this headline">¶</a></h2>
+<p>We want to find the value <span class="math">\(\theta\)</span> so that some (differentiable)
+function <span class="math">\(g(\theta)=0\)</span>. Idea: start with a guess,
+<span class="math">\(\theta_0\)</span>. Let <span class="math">\(\tilde{\theta}\)</span> denote the value of
+<span class="math">\(\theta\)</span> for which <span class="math">\(g(\theta) = 0\)</span> and define
+<span class="math">\(h = \tilde{\theta} - \theta_0\)</span>. Then:</p>
+<div class="math">
+\[\begin{split}\begin{eqnarray*}
+g(\tilde{\theta}) &amp;=&amp; 0 \\\\
+&amp;=&amp;g(\theta_0 + h) \\\\
+&amp;\approx&amp; g(\theta_0) + hg'(\theta_0)
+\end{eqnarray*}\end{split}\]</div>
+<p>This implies that</p>
+<div class="math">
+\[h\approx \frac{g(\theta_0)}{g'(\theta_0)}\]</div>
+<p>So that</p>
+<div class="math">
+\[\tilde{\theta}\approx \theta_0 - \frac{g(\theta_0)}{g'(\theta_0)}\]</div>
+<p>Thus, we set our next approximation:</p>
+<div class="math">
+\[\theta_1 = \theta_0 - \frac{g(\theta_0)}{g'(\theta_0)}\]</div>
+<p>and we have developed an interative procedure with:</p>
+<div class="math">
+\[\theta_n = \theta_{n-1} - \frac{g(\theta_{n-1})}{g'(\theta_{n-1})}\]</div>
+<div class="section" id="example">
+<h3>Example:<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>Let</p>
+<div class="math">
+\[g(x) = \frac{x^3-2x+7}{x^4+2}\]</div>
+<p>The graph of this function is:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Example Function&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_27_0.png" src="_images/14A_Optimization_One_Dimension_27_0.png" />
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Good Guess&#39;</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">x0</span><span class="o">=-</span><span class="mf">1.5</span>
+<span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">notconverge</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span><span class="s1">&#39;b--&#39;</span><span class="p">,</span><span class="s1">&#39;g--&#39;</span><span class="p">,</span><span class="s1">&#39;y--&#39;</span><span class="p">,</span><span class="s1">&#39;c--&#39;</span><span class="p">,</span><span class="s1">&#39;m--&#39;</span><span class="p">,</span><span class="s1">&#39;k--&#39;</span><span class="p">,</span><span class="s1">&#39;w--&#39;</span><span class="p">]</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">notconverge</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span>  <span class="mi">6</span><span class="p">):</span>
+    <span class="n">funval</span><span class="o">=</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">slope</span><span class="o">=-</span><span class="p">((</span><span class="mi">4</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span><span class="p">(</span><span class="mi">7</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">intercept</span><span class="o">=-</span><span class="n">slope</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">nextval</span> <span class="o">=</span> <span class="o">-</span><span class="n">intercept</span><span class="o">/</span><span class="n">slope</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">funval</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">:</span>
+        <span class="n">notconverge</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextval</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_28_0.png" src="_images/14A_Optimization_One_Dimension_28_0.png" />
+<p>From the graph, we see the zero is near -2. We make an initial guess of</p>
+<div class="math">
+\[x=-1.5\]</div>
+<p>We have made an excellent choice for our first guess, and we can see
+rapid convergence!</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">funval</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.007591996330867034</span>
+</pre></div>
+</div>
+<p>In fact, the Newton-Rhapson method converges quadratically. However, NR
+(and the secant method) have a fatal flaw:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Bad Guess&#39;</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">x0</span><span class="o">=-</span><span class="mf">0.5</span>
+<span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">notconverge</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span><span class="s1">&#39;b--&#39;</span><span class="p">,</span><span class="s1">&#39;g--&#39;</span><span class="p">,</span><span class="s1">&#39;y--&#39;</span><span class="p">,</span><span class="s1">&#39;c--&#39;</span><span class="p">,</span><span class="s1">&#39;m--&#39;</span><span class="p">,</span><span class="s1">&#39;k--&#39;</span><span class="p">,</span><span class="s1">&#39;w--&#39;</span><span class="p">]</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">notconverge</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span>  <span class="mi">6</span><span class="p">):</span>
+    <span class="n">funval</span><span class="o">=</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">slope</span><span class="o">=-</span><span class="p">((</span><span class="mi">4</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span><span class="p">(</span><span class="mi">7</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">intercept</span><span class="o">=-</span><span class="n">slope</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="mi">7</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">**</span><span class="mi">4</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">nextval</span> <span class="o">=</span> <span class="o">-</span><span class="n">intercept</span><span class="o">/</span><span class="n">slope</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">funval</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">:</span>
+        <span class="n">notconverge</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextval</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_33_0.png" src="_images/14A_Optimization_One_Dimension_33_0.png" />
+<p>We have stumbled on the horizontal asymptote. The algorithm fails to
+converge.</p>
+<div class="section" id="basins-of-attraction-can-be-close">
+<h4>Basins of Attraction Can Be &#8216;Close&#8217;<a class="headerlink" href="#basins-of-attraction-can-be-close" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">11</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span><span class="mi">12</span>
+<span class="k">def</span> <span class="nf">s</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span><span class="o">*</span><span class="n">x</span> <span class="o">-</span> <span class="mi">11</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Basin of Attraction&#39;</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">x0</span><span class="o">=</span><span class="mf">2.43</span>
+<span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">notconverge</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span><span class="s1">&#39;b--&#39;</span><span class="p">,</span><span class="s1">&#39;g--&#39;</span><span class="p">,</span><span class="s1">&#39;y--&#39;</span><span class="p">,</span><span class="s1">&#39;c--&#39;</span><span class="p">,</span><span class="s1">&#39;m--&#39;</span><span class="p">,</span><span class="s1">&#39;k--&#39;</span><span class="p">,</span><span class="s1">&#39;w--&#39;</span><span class="p">]</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">notconverge</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span>  <span class="mi">6</span><span class="p">):</span>
+    <span class="n">funval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="n">s</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+    <span class="n">intercept</span><span class="o">=-</span><span class="n">slope</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="n">funval</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">nextval</span> <span class="o">=</span> <span class="o">-</span><span class="n">intercept</span><span class="o">/</span><span class="n">slope</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">funval</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">:</span>
+        <span class="n">notconverge</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextval</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_36_0.png" src="_images/14A_Optimization_One_Dimension_36_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">3.1713324128480282</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Basin of Attraction&#39;</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">5.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">x0</span><span class="o">=</span><span class="mf">2.349</span>
+<span class="n">xvals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">notconverge</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;r--&#39;</span><span class="p">,</span><span class="s1">&#39;b--&#39;</span><span class="p">,</span><span class="s1">&#39;g--&#39;</span><span class="p">,</span><span class="s1">&#39;y--&#39;</span><span class="p">,</span><span class="s1">&#39;c--&#39;</span><span class="p">,</span><span class="s1">&#39;m--&#39;</span><span class="p">,</span><span class="s1">&#39;k--&#39;</span><span class="p">,</span><span class="s1">&#39;w--&#39;</span><span class="p">]</span>
+<span class="k">while</span> <span class="p">(</span><span class="n">notconverge</span><span class="o">==</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">count</span> <span class="o">&lt;</span>  <span class="mi">6</span><span class="p">):</span>
+    <span class="n">funval</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="n">s</span><span class="p">(</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+    <span class="n">intercept</span><span class="o">=-</span><span class="n">slope</span><span class="o">*</span><span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="p">]</span><span class="o">+</span><span class="n">funval</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">slope</span><span class="o">*</span><span class="n">t</span> <span class="o">+</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">cols</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+    <span class="n">nextval</span> <span class="o">=</span> <span class="o">-</span><span class="n">intercept</span><span class="o">/</span><span class="n">slope</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">funval</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">:</span>
+        <span class="n">notconverge</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xvals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nextval</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="n">count</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">xvals</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_37_0.png" src="_images/14A_Optimization_One_Dimension_37_0.png" />
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">0.9991912395651094</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="convergence-rate">
+<h4>Convergence Rate<a class="headerlink" href="#convergence-rate" title="Permalink to this headline">¶</a></h4>
+<p>The following is a derivation of the convergence rate of the NR method:</p>
+<p>Suppose <span class="math">\(x_k \; \rightarrow \; x^*\)</span> and <span class="math">\(g'(x^*) \neq 0\)</span>.
+Then we may write:</p>
+<div class="math">
+\[x_k = x^* + \epsilon_k\]</div>
+<p>.</p>
+<p>Now expand <span class="math">\(g\)</span> at <span class="math">\(x^*\)</span>:</p>
+<div class="math">
+\[g(x_k) = g(x^*) + g'(x^*)\epsilon_k + \frac12 g''(x^*)\epsilon_k^2 + ...\]</div>
+<div class="math">
+\[g'(x_k)=g'(x^*) + g''(x^*)\epsilon_k\]</div>
+<p>We have that</p>
+</div>
+</div>
+</div>
+<div class="section" id="gauss-newton">
+<h2>Gauss-Newton<a class="headerlink" href="#gauss-newton" title="Permalink to this headline">¶</a></h2>
+<p>For 1D, the Newton method is</p>
+<div class="math">
+\[x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}\]</div>
+<p>We can generalize to <span class="math">\(k\)</span> dimensions by</p>
+<div class="math">
+\[x_{n+1} = x_n - J^{-1} f(x_n)\]</div>
+<p>where <span class="math">\(x\)</span> and <span class="math">\(f(x)\)</span> are now vectors, and <span class="math">\(J^{-1}\)</span> is
+the inverse Jacobian matrix. In general, the Jacobian is not a square
+matrix, and we use the generalized inverse <span class="math">\((J^TJ)^{-1}J^T\)</span>
+instead, giving</p>
+<div class="math">
+\[x_{n+1} = x_n - (J^TJ)^{-1}J^T f(x_n)\]</div>
+<p>In multivariate nonlinear estimation problems, we can find the vector of
+parameters <span class="math">\(\beta\)</span> by minimizing the residuals <span class="math">\(r(\beta)\)</span>,</p>
+<div class="math">
+\[\beta_{n+1} = \beta_n - (J^TJ)^{-1}J^T r(\beta_n)\]</div>
+<p>where the entries of the Jacobian matrix <span class="math">\(J\)</span> are</p>
+<div class="math">
+\[J_{ij} = \frac{\partial r_i(\beta)}{\partial \beta_j}\]</div>
+</div>
+<div class="section" id="inverse-quadratic-interpolation">
+<h2>Inverse Quadratic Interpolation<a class="headerlink" href="#inverse-quadratic-interpolation" title="Permalink to this headline">¶</a></h2>
+<p>Inverse quadratic interpolation is a type of polynomial interpolation.
+Polynomial interpolation simply means we find the polynomial of least
+degree that fits a set of points. In quadratic interpolation, we use
+three points, and find the quadratic polynomial that passes through
+those three points.</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Quadratic Interpolation&quot;</span><span class="p">)</span>
+
+<span class="c1">#First Interpolation</span>
+<span class="n">x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span><span class="p">)</span>
+
+<span class="c1">#Plot parabola</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+
+<span class="c1">#Plot first triplet</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="s1">&#39;ro&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">);</span>
+
+<span class="c1">#New x value</span>
+<span class="n">xnew</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span><span class="o">==</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))))]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">xnew</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">f</span><span class="p">(</span><span class="n">xnew</span><span class="p">)),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">);</span>
+
+<span class="c1">#New triplet</span>
+<span class="n">x1</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mf">2.5</span><span class="p">],</span><span class="n">xnew</span><span class="p">)</span>
+<span class="n">y1</span><span class="o">=</span><span class="n">f</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span><span class="p">)</span>
+
+<span class="c1">#New Parabola</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+
+<span class="n">xnew</span><span class="o">=</span><span class="n">xs</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span><span class="o">==</span><span class="nb">min</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">))))]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span><span class="n">xnew</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">f</span><span class="p">(</span><span class="n">xnew</span><span class="p">)),</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mf">1.18481848</span> <span class="o">-</span><span class="mf">1.18481848</span><span class="p">]</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_44_1.png" src="_images/14A_Optimization_One_Dimension_44_1.png" />
+<p>So that&#8217;s the idea behind quadratic interpolation. Use a quadratic
+approximation, find the zero of interest, use that as a new point for
+the next quadratic approximation.</p>
+<p>Inverse quadratic interpolation means we do quadratic interpolation on
+the <em>inverse function</em>. So, if we are looking for a root of <span class="math">\(f\)</span>,
+we approximate <span class="math">\(f^{-1}(x)\)</span> using quadratic interpolation. Note
+that the secant method can be viewed as a <em>linear</em> interpolation on the
+inverse of <span class="math">\(f\)</span>. We can write:</p>
+<div class="math">
+\[f^{-1}(y) = \frac{(y-f(x_n))(y-f(x_{n-1}))}{(f(x_{n-2})-f(x_{n-1}))(f(x_{n-2})-f(x_{n}))}x_{n-2} + \frac{(y-f(x_n))(y-f(x_{n-2}))}{(f(x_{n-1})-f(x_{n-2}))(f(x_{n-1})-f(x_{n}))}x_{n-1} + \frac{(y-f(x_{n-2}))(y-f(x_{n-1}))}{(f(x_{n})-f(x_{n-2}))(f(x_{n})-f(x_{n-1}))}x_{n-1}\]</div>
+<p>We use the above formula to find the next guess <span class="math">\(x_{n+1}\)</span> for a
+zero of <span class="math">\(f\)</span> (so <span class="math">\(y=0\)</span>):</p>
+<div class="math">
+\[x_{n+1} = \frac{f(x_n)f(x_{n-1})}{(f(x_{n-2})-f(x_{n-1}))(f(x_{n-2})-f(x_{n}))}x_{n-2} + \frac{f(x_n)f(x_{n-2})}{(f(x_{n-1})-f(x_{n-2}))(f(x_{n-1})-f(x_{n}))}x_{n-1} + \frac{f(x_{n-2})f(x_{n-1})}{(f(x_{n})-f(x_{n-2}))(f(x_{n})-f(x_{n-1}))}x_{n}\]</div>
+<p>We aren&#8217;t so much interested in deriving this as we are understanding
+the procedure:</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Inverse Quadratic Interpolation&quot;</span><span class="p">)</span>
+
+<span class="c1">#First Interpolation</span>
+<span class="n">x0</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;quadratic&#39;</span><span class="p">)</span>
+
+<span class="c1">#Plot parabola</span>
+<span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">)),</span> <span class="nb">max</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">)),</span> <span class="n">num</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f2</span><span class="p">(</span><span class="n">xs</span><span class="p">),</span> <span class="n">xs</span><span class="p">)</span>
+
+<span class="c1">#Plot first triplet</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="s1">&#39;ro&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_46_0.png" src="_images/14A_Optimization_One_Dimension_46_0.png" />
+<p>Convergence rate is approximately <span class="math">\(1.8\)</span>. The advantage of the
+inverse method is that we will <em>always</em> have a real root (the parabola
+will always cross the x-axis). A serious disadvantage is that the
+initial points must be very close to the root or the method may not
+converge.</p>
+<p>That is why it is usually used in conjunction with other methods.</p>
+</div>
+<div class="section" id="brent-s-method">
+<h2>Brent&#8217;s Method<a class="headerlink" href="#brent-s-method" title="Permalink to this headline">¶</a></h2>
+<p>Brent&#8217;s method is a combination of bisection, secant and inverse
+quadratic interpolation. Like bisection, it is a &#8216;bracketed&#8217; method
+(starts with points <span class="math">\((a,b)\)</span> such that <span class="math">\(f(a)f(b)&lt;0\)</span>.</p>
+<p>Roughly speaking, the method begins by using the secant method to obtain
+a third point <span class="math">\(c\)</span>, then uses inverse quadratic interpolation to
+generate the next possible root. Without going into too much detail, the
+algorithm attempts to assess when interpolation will go awry, and if so,
+performs a bisection step. Also, it has certain criteria to reject an
+iterate. If that happens, the next step will be linear interpolation
+(secant method).</p>
+<div class="section" id="the-brent-method-is-the-default-method-that-scypy-uses-to-minimize-a-univariate-function">
+<h3>The Brent method is the default method that scypy uses to minimize a univariate function:<a class="headerlink" href="#the-brent-method-is-the-default-method-that-scypy-uses-to-minimize-a-univariate-function" title="Permalink to this headline">¶</a></h3>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize_scalar</span>
+
+<span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">minimize_scalar</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">res</span><span class="o">.</span><span class="n">x</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">1.2807764040333458</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+<span class="n">p1</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">Line2D</span> <span class="n">at</span> <span class="mh">0x7f9c9b232bd0</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/14A_Optimization_One_Dimension_53_1.png" src="_images/14A_Optimization_One_Dimension_53_1.png" />
+<p>To find zeroes, use</p>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">brentq</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">7.864845203343107e-19</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">brentq</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="mf">2.0</span>
+</pre></div>
+</div>
+<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span><span class="mf">2.0000000172499592</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div class="sphinx-toc sphinxglobaltoc">
+<h3><a href="index-2.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="00_Jupyter.html">Notes on using Jupyter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_Introduction_To_Python.html">Introduction to Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="02_Functions.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_Classes.html">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_Strings.html">Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05_Numbers.html">Using <code class="docutils literal"><span class="pre">numpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="06_Graphics.html">Graphics in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07_Data.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="08_SQL.html">SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="09_Machine_Learning.html">Machine Learning with <code class="docutils literal"><span class="pre">sklearn</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="10A_CodeOptimization.html">Code Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10C_Cython.html">Cython</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11A_Parallel_Programming.html">Parallel Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11B_Threads_Processses_Concurrency.html">Multi-Core Parallelism</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11C_IPyParallel.html">Using <code class="docutils literal"><span class="pre">ipyparallel</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="12A_C%2b%2b.html">Using C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="12B_C%2b%2b_Python_pybind11.html">Using <code class="docutils literal"><span class="pre">pybind11</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html">Linear Algebra Review</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13A_LinearAlgebra1.html#linear-algebra-and-linear-systems">Linear Algebra and Linear Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13B_LinearAlgebra2.html">Matrix Decompositions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13C_LinearAlgebraExamples.html">Linear Algebra Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13D_PCA.html">Applications of Linear Alebra: PCA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13E_SparseMatrices.html">Sparse Matrices</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Optimization and Root Finding</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#example-maximum-likelihood-estimation-mle">Example: Maximum Likelihood Estimation (MLE)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-linear-least-squares">Example: Linear Least Squares</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-issues-in-root-finding-in-one-dimension">Main Issues in Root Finding in One Dimension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bisection-method">Bisection Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#secant-method">Secant Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#newton-rhapson-method">Newton-Rhapson Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gauss-newton">Gauss-Newton</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inverse-quadratic-interpolation">Inverse Quadratic Interpolation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#brent-s-method">Brent&#8217;s Method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="14B_Multivariate_Optimization.html">Algorithms for Optimization and Root Finding for Multivariate Problems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14C_Optimization_In_Python.html">Using optimization routines from <code class="docutils literal"><span class="pre">scipy</span></code> and <code class="docutils literal"><span class="pre">statsmodels</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="15A_Random_Numbers.html">Random numbers and probability models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15B_ResamplingAndSimulation.html">Resampling and Monte Carlo Simulations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="15C_MonteCarloIntegration.html">Numerical Evaluation of Integrals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16_PGM.html">Probabilistic Graphical Models with <code class="docutils literal"><span class="pre">pgmpy</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="17_Functional_Programming.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17A_Intermediate_Sized_Data.html">Biggish Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="17B_Big_Data_Structures.html">Efficient storage of data in memory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18A_Dask.html">Working with large data sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10B_Numba.html">Just-in-time compilation (JIT)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18B_Spark.html">Using Spark</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18C_Efficiency_In_Spark.html">Using Spark Efficiently</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18D_Spark_MLib.html">Spark MLLib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18E_Spark_SQL.html">Spark SQL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18G_Spark_Streaming.html">Spark Streaming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18H_Spark_Cloud.html">Spark on Cloud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19A_PyMC3.html">Using PyMC3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="19B_Pystan.html">PyStan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20A_MCMC.html">Metropolis and Gibbs Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="20B_AuxiliaryVariableMCMC.html">Using Auxiliary Variables in MCMC proposals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_01_The_Humble_For_Loop.html">Bonus Material: The Humble For Loop</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_02_Functional_Word_Counting.html">Bonus Material: Word count</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Extras_03_Symbolic_Algebra.html">Symbolic Algebra with <code class="docutils literal"><span class="pre">sympy</span></code></a></li>
+</ul>
+</div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="13E_SparseMatrices.html"
+                          title="Previous page">&larr; Sparse Matrices</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="14B_Multivariate_Optimization.html"
+                          title="Next page">&rarr; Algorithms for Optimization and Root Finding for Multivariate Problems</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/14A_Optimization_One_Dimension.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="http://people.duke.edu/~ccc14/sta-663-2017/search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="14B_Multivariate_Optimization.html" title="Algorithms for Optimization and Root Finding for Multivariate Problems"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="13E_SparseMatrices.html" title="Sparse Matrices"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="index-2.html">STA-663-2017 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Cliburn Chan and Janice McCarthy.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+
+<!-- Mirrored from people.duke.edu/~ccc14/sta-663-2017/14A_Optimization_One_Dimension.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 14 Apr 2017 01:11:07 GMT -->
+</html>
